@@ -13,9 +13,9 @@ setup(
     license='GPLv3',
     packages=['xivo_bus',
               'xivo_bus.ctl',
-              'xivo_bus.ressource',
-              'xivo_bus.ressource.agent',
-              'xivo_bus.ressource.agent.command',
-              'xivo_bus.ressource.xivo',
-              'xivo_bus.ressource.xivo.command', ]
+              'xivo_bus.resources',
+              'xivo_bus.resources.agent',
+              'xivo_bus.resources.agent.command',
+              'xivo_bus.resources.xivo',
+              'xivo_bus.resources.xivo.command', ]
 )
