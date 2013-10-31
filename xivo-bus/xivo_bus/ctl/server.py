@@ -19,7 +19,7 @@ import logging
 from xivo_bus.ctl.amqp_transport_server import AMQPTransportServer
 from xivo_bus.ctl.response import CommandResponse
 from xivo_bus.ctl.marshaler import Marshaler
-from xivo_bus.ressource.agent import error
+from xivo_bus.resources.agent import error
 from xivo_bus.ctl.exception import BusCtlServerError
 
 logger = logging.getLogger(__name__)

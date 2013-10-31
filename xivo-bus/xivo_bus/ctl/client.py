@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_bus.ressource.xivo import command
+from xivo_bus.resources.xivo import command
 from xivo_bus.ctl.amqp_transport_client import AMQPTransportClient
 from xivo_bus.ctl.marshaler import Marshaler
 from xivo_bus.ctl.exception import BusCtlClientError

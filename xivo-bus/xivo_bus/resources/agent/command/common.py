@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from __future__ import unicode_literals
-from xivo_bus.ressource.agent.command import abstract
+from xivo_bus.resources.agent.command import abstract
 
 
 class AddToQueueCommand(abstract.AbstractAgentAndQueueIDCommand):

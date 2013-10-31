@@ -18,7 +18,7 @@
 from __future__ import unicode_literals
 
 import unittest
-from xivo_bus.ressource.agent.command import abstract
+from xivo_bus.resources.agent.command import abstract
 
 
 class ConcreteNoDataCommand(abstract.AbstractNoDataCommand):

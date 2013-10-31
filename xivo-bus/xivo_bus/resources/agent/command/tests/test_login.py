@@ -18,7 +18,7 @@
 from __future__ import unicode_literals
 
 import unittest
-from xivo_bus.ressource.agent.command.login import LoginByIDCommand, \
+from xivo_bus.resources.agent.command.login import LoginByIDCommand, \
     LoginByNumberCommand
 
 
