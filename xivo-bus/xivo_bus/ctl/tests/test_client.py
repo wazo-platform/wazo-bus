@@ -94,15 +94,3 @@ class TestBusCtlClient(unittest.TestCase):
 
         self.marshaler.marshal_command.assert_called_once_with(command)
         self.transport.send.assert_called_once_with(request)
-
-    @patch('xivo_bus.resources.xivo.command.PingCommand')
-    def test_ping(self, PingCommand):
-        command = Mock()
-
-        PingCommand.return_value = command
-        self.bus_ctl_client._execute_command = Mock()
-
-        self.bus_ctl_client.ping()
-
-        PingCommand.assert_called_once_with()
-        self.bus_ctl_client._execute_command.assert_called_once_with(command)

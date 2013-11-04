@@ -329,15 +329,3 @@ class TestAgentClient(unittest.TestCase):
 
         OnQueueDeletedCommand.assert_called_once_with(queue_id)
         self.agent_client._execute_command.assert_called_once_with(command)
-
-    @patch('xivo_bus.resources.xivo.command.PingCommand')
-    def test_ping(self, PingCommand):
-        command = Mock()
-
-        PingCommand.return_value = command
-        self.agent_client._execute_command = Mock()
-
-        self.agent_client.ping()
-
-        PingCommand.assert_called_once_with()
-        self.agent_client._execute_command.assert_called_once_with(command)

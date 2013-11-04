@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_bus.resources.xivo import command
 from xivo_bus.ctl.amqp_transport_client import AMQPTransportClient
 from xivo_bus.ctl.marshaler import Marshaler
 from xivo_bus.ctl.exception import BusCtlClientError
@@ -47,10 +46,6 @@ class BusCtlClient(object):
 
     def _new_transport(self, hostname, port):
         return AMQPTransportClient.create_and_connect(hostname, port, self._QUEUE_NAME)
-
-    def ping(self):
-        cmd = command.PingCommand()
-        return self._execute_command(cmd)
 
     def _execute_command(self, cmd):
         request = self._marshaler.marshal_command(cmd)
