@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from __future__ import unicode_literals
+
 from xivo_bus.resources.common.event import ResourceConfigEvent
 
 
