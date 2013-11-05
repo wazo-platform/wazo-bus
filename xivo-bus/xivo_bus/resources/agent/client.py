@@ -19,7 +19,6 @@ from collections import namedtuple
 from xivo_bus.resources.agent import command
 from xivo_bus.resources.agent.exception import AgentClientError
 from xivo_bus.ctl.client import BusCtlClient
-from xivo_bus.ctl.exception import BusCtlClientError
 
 _AgentStatus = namedtuple('_AgentStatus', ['id', 'number', 'extension', 'context', 'logged'])
 
@@ -27,6 +26,10 @@ _AgentStatus = namedtuple('_AgentStatus', ['id', 'number', 'extension', 'context
 class AgentClient(BusCtlClient):
 
     _QUEUE_NAME = 'xivo_agent'
+
+    def __init__(self, fetch_response=True):
+        BusCtlClient.__init__(self)
+        self._fetch_response = fetch_response
 
     def add_agent_to_queue(self, agent_id, queue_id):
         cmd = command.AddToQueueCommand(agent_id, queue_id)
@@ -103,12 +106,23 @@ class AgentClient(BusCtlClient):
         cmd = command.OnQueueDeletedCommand(queue_id)
         self._execute_command(cmd)
 
+    def _execute_command(self, cmd):
+        request = self._marshaler.marshal_command(cmd)
+        if self._fetch_response:
+            return self._execute_request_fetch_response(request)
+        else:
+            return self._execute_request_no_fetch_response(request)
+
+    def _execute_request_fetch_response(self, request):
+        raw_response = self._transport.rpc_call('', self._QUEUE_NAME, request)
+        response = self._marshaler.unmarshal_response(raw_response)
+        if response.error is not None:
+            raise AgentClientError(response.error)
+        return response.value
+
+    def _execute_request_no_fetch_response(self, request):
+        self._transport.send('', self._QUEUE_NAME, request)
+
     def _convert_agent_status(self, status):
         return _AgentStatus(status['id'], status['number'], status['extension'],
                             status['context'], status['logged'])
-
-    def _execute_request_fetch_response(self, request):
-        try:
-            return BusCtlClient._execute_request_fetch_response(self, request)
-        except BusCtlClientError as e:
-            raise AgentClientError(e.error)

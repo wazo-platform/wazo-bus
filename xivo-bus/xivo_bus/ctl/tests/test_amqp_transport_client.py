@@ -39,7 +39,7 @@ class TestAMQPTransportClient(unittest.TestCase):
     def test_create_and_connect(self):
         config = Mock(Config)
 
-        AMQPTransportClient.create_and_connect('queue_name', config)
+        AMQPTransportClient.create_and_connect(config)
 
         config.to_connection_params.assert_called_once_with()
 
@@ -64,18 +64,18 @@ class TestAMQPTransportClient(unittest.TestCase):
         transport = self._new_transport()
         with patch.object(transport, '_send_request') as send_request:
             with patch.object(transport, '_wait_for_response') as wait_for_response:
-                transport.rpc_call('blah')
+                transport.rpc_call('exchange', 'key', 'blah')
                 send_request.assert_called_once()
                 wait_for_response.assert_called_once()
 
     @patch('xivo_bus.ctl.amqp_transport_client.AMQPTransportClient._build_rpc_call_properties')
     def test_send_request(self, build_properties):
         transport = self._new_transport()
-        transport._send_request('blah', None)
+        transport._send_request('exchange', 'key', 'blah', None)
 
         self.channel.basic_publish.assert_called_once_with(
-            exchange='',
-            routing_key='queue_name',
+            exchange='exchange',
+            routing_key='key',
             properties=None,
             body='blah'
         )
@@ -94,7 +94,7 @@ class TestAMQPTransportClient(unittest.TestCase):
 
     def _new_transport(self):
         params = pika.ConnectionParameters(host='localhost')
-        transport = AMQPTransportClient(params, 'queue_name')
+        transport = AMQPTransportClient(params)
 
         return transport
 

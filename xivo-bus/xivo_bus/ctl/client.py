@@ -17,47 +17,46 @@
 
 from xivo_bus.ctl.amqp_transport_client import AMQPTransportClient
 from xivo_bus.ctl.marshaler import Marshaler
-from xivo_bus.ctl.exception import BusCtlClientError
 
 
 class BusCtlClient(object):
 
-    _QUEUE_NAME = 'xivo'
-
-    def __init__(self, fetch_response=True):
-        self._fetch_response = fetch_response
+    def __init__(self):
         self._transport = None
         self._marshaler = Marshaler()
 
     def close(self):
-        if self._transport is None:
+        if not self.connected:
             return
 
         self._transport.close()
         self._transport = None
 
     def connect(self):
-        if self._transport is not None:
+        if self.connected:
             raise Exception('already connected')
 
         self._transport = self._new_transport()
 
+    @property
+    def connected(self):
+        return self._transport is not None
+
     def _new_transport(self):
-        return AMQPTransportClient.create_and_connect(self._QUEUE_NAME)
+        return AMQPTransportClient.create_and_connect()
 
-    def _execute_command(self, cmd):
-        request = self._marshaler.marshal_command(cmd)
-        if self._fetch_response:
-            return self._execute_request_fetch_response(request)
-        else:
-            return self._execute_request_no_fetch_response(request)
+    def declare_cti_exchange(self):
+        self._transport.exchange_declare('xivo-cti', 'direct', durable=True)
 
-    def _execute_request_fetch_response(self, request):
-        raw_response = self._transport.rpc_call(request)
-        response = self._marshaler.unmarshal_response(raw_response)
-        if response.error is not None:
-            raise BusCtlClientError(response.error)
-        return response.value
+    def declare_xivo_exchange(self):
+        self._transport.exchange_declare('xivo', 'fanout', durable=False)
 
-    def _execute_request_no_fetch_response(self, request):
-        self._transport.send(request)
+    def publish_cti_event(self, event):
+        self._publish_event('xivo-cti', event.name, event)
+
+    def publish_xivo_event(self, event):
+        self._publish_event('xivo', '', event)
+
+    def _publish_event(self, exchange, routing_key, event):
+        body = self._marshaler.marshal_command(event)
+        self._transport.send(exchange, routing_key, body)

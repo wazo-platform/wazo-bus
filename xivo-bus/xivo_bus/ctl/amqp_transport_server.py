@@ -21,8 +21,6 @@ from xivo_bus.ctl.config import default_config
 
 class AMQPTransportServer(object):
 
-    EXCHANGE = 'notifier'
-
     @classmethod
     def create_and_connect(cls, request_callback, queue_name=None, config=default_config):
         connection_params = config.to_connection_params()
@@ -38,13 +36,8 @@ class AMQPTransportServer(object):
         self._channel = self._connection.channel()
 
     def run(self):
-        self._setup_exchange()
         self._setup_queue()
         self._channel.start_consuming()
-
-    def _setup_exchange(self):
-        self._channel.exchange_declare(exchange=self.EXCHANGE,
-                                       type='fanout')
 
     def _setup_queue(self):
         if self._queue_name is None:
@@ -55,7 +48,6 @@ class AMQPTransportServer(object):
             self._channel.queue_declare(queue=self._queue_name)
 
         self._channel.basic_qos(prefetch_count=1)
-        self._channel.queue_bind(exchange=self.EXCHANGE, queue=queue_name)
         self._channel.basic_consume(self._on_request, queue_name)
 
     def _on_request(self, channel, method, properties, body):
