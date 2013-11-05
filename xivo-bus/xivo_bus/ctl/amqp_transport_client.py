@@ -17,13 +17,14 @@
 
 import pika
 import uuid
+from xivo_bus.ctl.config import default_config
 
 
 class AMQPTransportClient(object):
 
     @classmethod
-    def create_and_connect(cls, host, port, queue_name):
-        connection_params = pika.ConnectionParameters(host=host, port=port)
+    def create_and_connect(cls, queue_name, config=default_config):
+        connection_params = config.to_connection_params()
         return cls(connection_params, queue_name)
 
     def __init__(self, connection_params, queue_name):

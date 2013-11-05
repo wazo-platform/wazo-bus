@@ -20,6 +20,7 @@ import unittest
 
 from mock import Mock, patch, ANY
 from xivo_bus.ctl.amqp_transport_server import AMQPTransportServer
+from xivo_bus.ctl.config import Config
 
 
 class TestAMQPTransportServer(unittest.TestCase):
@@ -35,14 +36,13 @@ class TestAMQPTransportServer(unittest.TestCase):
     def tearDown(self):
         self.patcher.stop()
 
-    @patch('xivo_bus.ctl.amqp_transport_server.AMQPTransportServer')
-    @patch('pika.ConnectionParameters')
-    def test_create_and_connect(self, connection_params, constructor):
+    def test_create_and_connect(self):
         callback = Mock()
-        AMQPTransportServer.create_and_connect('localhost', callback, 'queue_name')
+        config = Mock(Config)
 
-        connection_params.assert_called_once_with(host='localhost')
-        constructor.assert_called_once()
+        AMQPTransportServer.create_and_connect(callback, 'queue_name', config)
+
+        config.to_connection_params.assert_called_once_with()
 
     def test_connect(self):
         self._new_transport()

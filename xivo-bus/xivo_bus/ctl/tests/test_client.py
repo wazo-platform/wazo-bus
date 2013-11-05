@@ -33,21 +33,17 @@ class TestBusCtlClient(unittest.TestCase):
 
     @patch('xivo_bus.ctl.client.AMQPTransportClient')
     def test_connect_no_transport(self, amqp_client_constructor):
-        hostname = 'localhost'
-        port = 5672
-
         client = BusCtlClient()
-        client.connect(hostname, port)
-        amqp_client_constructor.create_and_connect.assert_called_once_with(hostname, port, self.bus_ctl_client._QUEUE_NAME)
+        client.connect()
+
+        amqp_client_constructor.create_and_connect.assert_called_once_with(self.bus_ctl_client._QUEUE_NAME)
 
     @patch('xivo_bus.ctl.client.AMQPTransportClient', Mock())
     def test_connect_already_connected(self):
-        hostname = 'localhost'
-        port = 5672
-
         client = BusCtlClient()
-        client.connect(hostname, port)
-        self.assertRaises(Exception, client.connect, hostname, port)
+        client.connect()
+
+        self.assertRaises(Exception, client.connect)
 
     @patch('xivo_bus.ctl.client.AMQPTransportClient')
     def test_close_transport_with_no_connection(self, amqp_client):
@@ -64,7 +60,7 @@ class TestBusCtlClient(unittest.TestCase):
         client.connect()
         client.close()
 
-        amqp_client.create_and_connect.assert_called_once_with(ANY, ANY, ANY)
+        amqp_client.create_and_connect.assert_called_once_with(ANY)
         transport.close.assert_called_once_with()
 
     def test_execute_command_with_fetch_response(self):

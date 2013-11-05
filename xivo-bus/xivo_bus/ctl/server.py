@@ -27,7 +27,6 @@ logger = logging.getLogger(__name__)
 
 class BusCtlServer(object):
 
-    _HOST = 'localhost'
     _QUEUE_NAME = 'xivo'
 
     def __init__(self):
@@ -37,8 +36,7 @@ class BusCtlServer(object):
         self._commands_callback = {}
 
     def _setup_transport(self):
-        transport = AMQPTransportServer.create_and_connect(self._HOST,
-                                                           self._process_next_command,
+        transport = AMQPTransportServer.create_and_connect(self._process_next_command,
                                                            self._QUEUE_NAME)
         return transport
 

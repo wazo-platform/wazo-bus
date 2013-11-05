@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import pika
+from xivo_bus.ctl.config import default_config
 
 
 class AMQPTransportServer(object):
@@ -23,8 +24,8 @@ class AMQPTransportServer(object):
     EXCHANGE = 'notifier'
 
     @classmethod
-    def create_and_connect(cls, host, request_callback, queue_name=None):
-        connection_params = pika.ConnectionParameters(host=host)
+    def create_and_connect(cls, request_callback, queue_name=None, config=default_config):
+        connection_params = config.to_connection_params()
         return cls(connection_params, request_callback, queue_name)
 
     def __init__(self, connection_params, request_callback, queue_name):

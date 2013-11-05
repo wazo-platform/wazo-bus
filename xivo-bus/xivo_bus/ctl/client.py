@@ -22,8 +22,6 @@ from xivo_bus.ctl.exception import BusCtlClientError
 
 class BusCtlClient(object):
 
-    DEFAULT_HOST = 'localhost'
-    DEFAULT_PORT = 5672
     _QUEUE_NAME = 'xivo'
 
     def __init__(self, fetch_response=True):
@@ -38,14 +36,14 @@ class BusCtlClient(object):
         self._transport.close()
         self._transport = None
 
-    def connect(self, hostname=DEFAULT_HOST, port=DEFAULT_PORT):
+    def connect(self):
         if self._transport is not None:
             raise Exception('already connected')
 
-        self._transport = self._new_transport(hostname, port)
+        self._transport = self._new_transport()
 
-    def _new_transport(self, hostname, port):
-        return AMQPTransportClient.create_and_connect(hostname, port, self._QUEUE_NAME)
+    def _new_transport(self):
+        return AMQPTransportClient.create_and_connect(self._QUEUE_NAME)
 
     def _execute_command(self, cmd):
         request = self._marshaler.marshal_command(cmd)
