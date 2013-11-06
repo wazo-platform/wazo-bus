@@ -24,6 +24,7 @@ setup(
         'xivo_bus.resources.line',
         'xivo_bus.resources.user',
         'xivo_bus.resources.user_line_extension',
+        'xivo_bus.resources.user_voicemail',
         'xivo_bus.resources.voicemail',
     ]
 )
