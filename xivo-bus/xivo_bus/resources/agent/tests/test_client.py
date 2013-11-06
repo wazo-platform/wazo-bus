@@ -16,13 +16,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import unittest
-from mock import Mock, patch
+from mock import ANY, Mock, patch
 from xivo_bus.ctl.amqp_transport_client import AMQPTransportClient
 from xivo_bus.ctl.marshaler import Marshaler
 from ..client import AgentClient, _AgentStatus
 
 
 class TestAgentClient(unittest.TestCase):
+
+    QUEUE_NAME = AgentClient._QUEUE_NAME
 
     def setUp(self):
         self.marshaler = Mock(Marshaler)
@@ -46,7 +48,7 @@ class TestAgentClient(unittest.TestCase):
         result = self.agent_client._execute_command(command)
 
         self.marshaler.marshal_command.assert_called_once_with(command)
-        self.transport.rpc_call.assert_called_once_with(request)
+        self.transport.rpc_call.assert_called_once_with('', self.QUEUE_NAME, request)
         self.assertEqual(result, response.value)
 
     def test_execute_command_without_fetch_response(self):
@@ -58,7 +60,7 @@ class TestAgentClient(unittest.TestCase):
         self.agent_client._execute_command(command)
 
         self.marshaler.marshal_command.assert_called_once_with(command)
-        self.transport.send.assert_called_once_with(request)
+        self.transport.send.assert_called_once_with('', self.QUEUE_NAME, request)
 
     @patch('xivo_bus.resources.agent.command.AddToQueueCommand')
     def test_add_agent_to_queue(self, AddToQueueCommand):

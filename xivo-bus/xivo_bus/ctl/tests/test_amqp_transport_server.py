@@ -20,6 +20,7 @@ import unittest
 
 from mock import Mock, patch, ANY
 from xivo_bus.ctl.amqp_transport_server import AMQPTransportServer
+from xivo_bus.ctl.config import Config
 
 
 class TestAMQPTransportServer(unittest.TestCase):
@@ -35,14 +36,13 @@ class TestAMQPTransportServer(unittest.TestCase):
     def tearDown(self):
         self.patcher.stop()
 
-    @patch('xivo_bus.ctl.amqp_transport_server.AMQPTransportServer')
-    @patch('pika.ConnectionParameters')
-    def test_create_and_connect(self, connection_params, constructor):
+    def test_create_and_connect(self):
         callback = Mock()
-        AMQPTransportServer.create_and_connect('localhost', callback, 'queue_name')
+        config = Mock(Config)
 
-        connection_params.assert_called_once_with(host='localhost')
-        constructor.assert_called_once()
+        AMQPTransportServer.create_and_connect(callback, 'queue_name', config)
+
+        config.to_connection_params.assert_called_once_with()
 
     def test_connect(self):
         self._new_transport()
@@ -69,7 +69,7 @@ class TestAMQPTransportServer(unittest.TestCase):
         method = Mock()
         method.delivery_tag = 'delivery_tag'
 
-        body = '{"cmd": {"a": 1}, "name": "foobar"}'
+        body = '{"data": {"a": 1}, "name": "foobar"}'
 
         transport = self._new_transport(request_callback)
         transport._on_request(None, method, properties, body)
@@ -91,7 +91,7 @@ class TestAMQPTransportServer(unittest.TestCase):
         method = Mock()
         method.delivery_tag = 'delivery_tag'
 
-        body = '{"cmd": {"a": 1}, "name": "foobar"}'
+        body = '{"data": {"a": 1}, "name": "foobar"}'
 
         transport = self._new_transport(request_callback)
         transport._on_request(None, method, properties, body)

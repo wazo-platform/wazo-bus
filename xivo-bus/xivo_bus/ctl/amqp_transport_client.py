@@ -17,18 +17,18 @@
 
 import pika
 import uuid
+from xivo_bus.ctl.config import default_config
 
 
 class AMQPTransportClient(object):
 
     @classmethod
-    def create_and_connect(cls, host, port, queue_name):
-        connection_params = pika.ConnectionParameters(host=host, port=port)
-        return cls(connection_params, queue_name)
+    def create_and_connect(cls, config=default_config):
+        connection_params = config.to_connection_params()
+        return cls(connection_params)
 
-    def __init__(self, connection_params, queue_name):
+    def __init__(self, connection_params):
         self._connect(connection_params)
-        self._queue_name = queue_name
         self._setup_queue()
         self._correlation_id = None
         self._response = None
@@ -51,23 +51,26 @@ class AMQPTransportClient(object):
         if self._correlation_id == properties.correlation_id:
             self._response = body
 
-    def rpc_call(self, request):
+    def exchange_declare(self, name, type_, durable):
+        self._channel.exchange_declare(exchange=name, type=type_, durable=durable)
+
+    def rpc_call(self, exchange, routing_key, request):
         self._response = None
         self._correlation_id = str(uuid.uuid4())
         properties = self._build_rpc_call_properties()
 
-        self._send_request(request, properties)
+        self._send_request(exchange, routing_key, request, properties)
         return self._wait_for_response()
 
-    def send(self, request):
-        self._send_request(request, None)
+    def send(self, exchange, routing_key, body):
+        self._send_request(exchange, routing_key, body, None)
 
-    def _send_request(self, request, properties):
+    def _send_request(self, exchange, routing_key, body, properties):
         self._channel.basic_publish(
-            exchange='',
-            routing_key=self._queue_name,
+            exchange=exchange,
+            routing_key=routing_key,
             properties=properties,
-            body=request
+            body=body
         )
 
     def _build_rpc_call_properties(self):

@@ -33,21 +33,17 @@ class TestBusCtlClient(unittest.TestCase):
 
     @patch('xivo_bus.ctl.client.AMQPTransportClient')
     def test_connect_no_transport(self, amqp_client_constructor):
-        hostname = 'localhost'
-        port = 5672
-
         client = BusCtlClient()
-        client.connect(hostname, port)
-        amqp_client_constructor.create_and_connect.assert_called_once_with(hostname, port, self.bus_ctl_client._QUEUE_NAME)
+        client.connect()
+
+        amqp_client_constructor.create_and_connect.assert_called_once_with()
 
     @patch('xivo_bus.ctl.client.AMQPTransportClient', Mock())
     def test_connect_already_connected(self):
-        hostname = 'localhost'
-        port = 5672
-
         client = BusCtlClient()
-        client.connect(hostname, port)
-        self.assertRaises(Exception, client.connect, hostname, port)
+        client.connect()
+
+        self.assertRaises(Exception, client.connect)
 
     @patch('xivo_bus.ctl.client.AMQPTransportClient')
     def test_close_transport_with_no_connection(self, amqp_client):
@@ -64,33 +60,26 @@ class TestBusCtlClient(unittest.TestCase):
         client.connect()
         client.close()
 
-        amqp_client.create_and_connect.assert_called_once_with(ANY, ANY, ANY)
+        amqp_client.create_and_connect.assert_called_once_with()
         transport.close.assert_called_once_with()
 
-    def test_execute_command_with_fetch_response(self):
-        command = Mock()
-        request = Mock()
-        raw_response = Mock()
-        response = Mock()
-        response.error = None
-        self.marshaler.marshal_command.return_value = request
-        self.transport.rpc_call.return_value = raw_response
-        self.marshaler.unmarshal_response.return_value = response
-
-        self.bus_ctl_client._fetch_response = True
-        result = self.bus_ctl_client._execute_command(command)
-
-        self.marshaler.marshal_command.assert_called_once_with(command)
-        self.transport.rpc_call.assert_called_once_with(request)
-        self.assertEqual(result, response.value)
-
-    def test_execute_command_without_fetch_response(self):
-        command = Mock()
+    def test_publish_cti_event(self):
+        event = Mock()
+        event.name = 'foobar'
         request = Mock()
         self.marshaler.marshal_command.return_value = request
 
-        self.bus_ctl_client._fetch_response = False
-        self.bus_ctl_client._execute_command(command)
+        self.bus_ctl_client.publish_cti_event(event)
 
-        self.marshaler.marshal_command.assert_called_once_with(command)
-        self.transport.send.assert_called_once_with(request)
+        self.marshaler.marshal_command.assert_called_once_with(event)
+        self.transport.send.assert_called_once_with(ANY, event.name, request)
+
+    def test_publish_xivo_event(self):
+        event = Mock()
+        request = Mock()
+        self.marshaler.marshal_command.return_value = request
+
+        self.bus_ctl_client.publish_xivo_event(event)
+
+        self.marshaler.marshal_command.assert_called_once_with(event)
+        self.transport.send.assert_called_once_with(ANY, '', request)

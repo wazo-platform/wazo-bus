@@ -25,7 +25,7 @@ class Marshaler(object):
         self._commands_registry = commands_registry
 
     def marshal_command(self, command):
-        return json.dumps({'name': command.name, 'cmd': command.marshal()})
+        return json.dumps({'name': command.name, 'data': command.marshal()})
 
     def marshal_response(self, response):
         return json.dumps(response.marshal())
@@ -33,7 +33,7 @@ class Marshaler(object):
     def unmarshal_command(self, data):
         msg = json.loads(data)
         msg_name = msg['name']
-        msg_cmd = msg['cmd']
+        msg_cmd = msg['data']
         cmd_class = self._commands_registry[msg_name]
         return cmd_class.unmarshal(msg_cmd)
 

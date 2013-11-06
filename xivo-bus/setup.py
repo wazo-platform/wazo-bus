@@ -18,6 +18,7 @@ setup(
         'xivo_bus.resources.agent',
         'xivo_bus.resources.agent.command',
         'xivo_bus.resources.common',
+        'xivo_bus.resources.cti',
         'xivo_bus.resources.device',
         'xivo_bus.resources.extension',
         'xivo_bus.resources.line',
