@@ -26,8 +26,15 @@ class TestCallFormResultEvent(unittest.TestCase):
     def test_marshal(self):
         user_id = 42
         variables = {'a': 'b'}
-        command = CallFormResultEvent(user_id, variables)
+        event = CallFormResultEvent(user_id, variables)
 
-        msg = command.marshal()
+        msg = event.marshal()
 
         self.assertEqual(msg, {'user_id': 42, 'variables': {'a': 'b'}})
+
+    def test_string_user_id(self):
+        user_id = "42"
+
+        event = CallFormResultEvent(user_id, {})
+
+        self.assertEqual(event.user_id, 42)

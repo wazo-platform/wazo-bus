@@ -23,7 +23,7 @@ class CallFormResultEvent(object):
     name = 'call_form_result'
 
     def __init__(self, user_id, variables):
-        self.user_id = user_id
+        self.user_id = int(user_id)
         self.variables = variables
 
     def marshal(self):
