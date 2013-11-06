@@ -69,7 +69,7 @@ class TestAMQPTransportServer(unittest.TestCase):
         method = Mock()
         method.delivery_tag = 'delivery_tag'
 
-        body = '{"cmd": {"a": 1}, "name": "foobar"}'
+        body = '{"data": {"a": 1}, "name": "foobar"}'
 
         transport = self._new_transport(request_callback)
         transport._on_request(None, method, properties, body)
@@ -91,7 +91,7 @@ class TestAMQPTransportServer(unittest.TestCase):
         method = Mock()
         method.delivery_tag = 'delivery_tag'
 
-        body = '{"cmd": {"a": 1}, "name": "foobar"}'
+        body = '{"data": {"a": 1}, "name": "foobar"}'
 
         transport = self._new_transport(request_callback)
         transport._on_request(None, method, properties, body)

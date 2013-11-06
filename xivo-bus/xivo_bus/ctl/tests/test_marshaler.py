@@ -34,7 +34,7 @@ class TestMarshaler(unittest.TestCase):
         result = marshal.marshal_command(command)
 
         command.marshal.assert_called_once_with()
-        self.assertEquals(result, ('{"cmd": {"a": 1}, "name": "foobar"}'))
+        self.assertEquals(result, ('{"data": {"a": 1}, "name": "foobar"}'))
 
     def test_marshal_response(self):
         response = Mock()
@@ -48,7 +48,7 @@ class TestMarshaler(unittest.TestCase):
         self.assertEquals(result, '{"value": "success", "error": null}')
 
     def test_unmarshal_command(self):
-        json = '{"name": "foobar", "cmd": {"a":1}}'
+        json = '{"name": "foobar", "data": {"a":1}}'
 
         command = Mock()
         registry = {'foobar': command}
