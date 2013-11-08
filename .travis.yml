@@ -5,4 +5,7 @@ python:
 script: nosetests xivo-bus
 notifications:
   email:
-    - tests-reports@avencall.com
+    recipients:
+      - tests-reports@avencall.com
+    on_success: change
+    on_failure: change
