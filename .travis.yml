@@ -9,3 +9,6 @@ notifications:
       - tests-reports@avencall.com
     on_success: change
     on_failure: change
+branches:
+  only:
+    - master
