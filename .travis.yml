@@ -2,7 +2,7 @@ language: python
 python:
   - "2.6"
   - "2.7"
-script: nosetests
+script: nosetests xivo-bus
 notifications:
   email:
     - tests-reports@avencall.com
