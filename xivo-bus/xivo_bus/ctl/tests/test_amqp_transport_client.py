@@ -36,6 +36,9 @@ class TestAMQPTransportClient(unittest.TestCase):
     def tearDown(self):
         self.patcher.stop()
 
+    def test_failing_test(self):
+        self.assertTrue(False)
+
     def test_create_and_connect(self):
         config = Mock(Config)
 
