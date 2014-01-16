@@ -45,11 +45,17 @@ class BusCtlClient(object):
     def _new_transport(self):
         return AMQPTransportClient.create_and_connect()
 
+    def declare_ami_exchange(self):
+        self._transport.exchange_declare('xivo-ami', 'topic', durable=True)
+
     def declare_cti_exchange(self):
         self._transport.exchange_declare('xivo-cti', 'direct', durable=True)
 
     def declare_xivo_exchange(self):
         self._transport.exchange_declare('xivo', 'fanout', durable=False)
+
+    def publish_ami_event(self, event):
+        self._publish_event('xivo-ami', event.name, event)
 
     def publish_cti_event(self, event):
         self._publish_event('xivo-cti', event.name, event)

@@ -83,3 +83,19 @@ class TestBusCtlClient(unittest.TestCase):
 
         self.marshaler.marshal_command.assert_called_once_with(event)
         self.transport.send.assert_called_once_with(ANY, '', request)
+
+    def test_declare_ami_exchange(self):
+        self.bus_ctl_client.declare_ami_exchange()
+
+        self.transport.exchange_declare.assert_called_one_with('xivo-ami''', 'topic', durable=True)
+
+    def test_publish_ami_event(self):
+        event = Mock()
+        event.name = 'foobar'
+        request = Mock()
+        self.marshaler.marshal_command.return_value = request
+
+        self.bus_ctl_client.publish_ami_event(event)
+
+        self.marshaler.marshal_command.assert_called_once_with(event)
+        self.transport.send.assert_called_once_with('xivo-ami', event.name, request)
