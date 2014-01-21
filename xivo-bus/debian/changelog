@@ -1,0 +1,11 @@
+xivo-bus (13.24~20131129.185349.2599ff5-3) squeeze-xivo-skaro-dev; urgency=low
+
+  * move python-pika dependency from xivo-agent to xivo-bus
+
+ -- Pascal Cadotte Michaud <pcadottemichaud@avencall.com>  Mon, 02 Dec 2013 10:47:10 -0500
+
+xivo-bus (0.1) squeeze-xivo-skaro-dev; urgency=low
+
+  * Initial release. (Closes: #XXXXXX)
+
+ -- Cedric Abunar <cabunar@avencall.com>  Mon, 21 Oct 2013 12:56:50 -0400
