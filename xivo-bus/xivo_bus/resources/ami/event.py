@@ -27,7 +27,4 @@ class AMIEvent(object):
         self.variables = variables
 
     def marshal(self):
-        return {
-            'name': self.name,
-            'variables': self.variables,
-        }
+        return self.variables
