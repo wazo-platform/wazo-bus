@@ -30,7 +30,7 @@ class TestAMIEvent(unittest.TestCase):
 
         msg = event.marshal()
 
-        self.assertEqual(msg, {'name': 'EventName', 'variables': {'a': 'b'}})
+        self.assertEqual(msg, {'a': 'b'})
 
     def test_string_name(self):
         name = "EventName"
