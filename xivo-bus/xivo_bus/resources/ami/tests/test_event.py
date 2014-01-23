@@ -18,23 +18,20 @@
 from __future__ import unicode_literals
 
 import unittest
+from mock import sentinel
 from ..event import AMIEvent
 
 
 class TestAMIEvent(unittest.TestCase):
 
     def test_marshal(self):
-        name = 'EventName'
-        variables = {'a': 'b'}
-        event = AMIEvent(name, variables)
+        event = AMIEvent(sentinel.name, sentinel.variables)
 
-        msg = event.marshal()
+        result = event.marshal()
 
-        self.assertEqual(msg, {'a': 'b'})
+        self.assertEqual(result, sentinel.variables)
 
     def test_string_name(self):
-        name = "EventName"
+        event = AMIEvent(sentinel.name, sentinel.variables)
 
-        event = AMIEvent(name, {})
-
-        self.assertEqual(event.name, 'EventName')
+        self.assertEqual(event.name, sentinel.name)
