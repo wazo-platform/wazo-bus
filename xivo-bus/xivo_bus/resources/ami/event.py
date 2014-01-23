@@ -20,11 +20,9 @@ from __future__ import unicode_literals
 
 class AMIEvent(object):
 
-    name = 'ami_event'
-
     def __init__(self, name, variables):
         self.name = name
-        self.variables = variables
+        self._variables = variables
 
     def marshal(self):
-        return self.variables
+        return self._variables
