@@ -22,7 +22,7 @@ class AMIEvent(object):
 
     def __init__(self, name, variables):
         self.name = name
-        self._variables = variables
+        self.variables = variables
 
     def marshal(self):
-        return self._variables
+        return self.variables
