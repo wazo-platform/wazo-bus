@@ -31,6 +31,7 @@ class ConcreteUserCtiProfileConfigEvent(UserCtiProfileConfigEvent):
 USER_ID = 1
 CTI_PROFILE_ID = 2
 
+
 class TestUserVoicemailConfigEvent(unittest.TestCase):
 
     def setUp(self):

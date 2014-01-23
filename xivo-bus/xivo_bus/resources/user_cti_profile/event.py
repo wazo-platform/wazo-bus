@@ -42,5 +42,6 @@ class UserCtiProfileConfigEvent(ResourceConfigEvent):
 class UserCtiProfileAssociatedEvent(UserCtiProfileConfigEvent):
     name = 'cti_profile_associated'
 
+
 class UserCtiProfileDissociatedEvent(UserCtiProfileConfigEvent):
     name = 'cti_profile_dissociated'
