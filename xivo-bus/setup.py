@@ -1,7 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
+import fnmatch
+import os
+
 from distutils.core import setup
+
+
+def is_package(path):
+    is_svn_dir = fnmatch.fnmatch(path, '*/.svn/*')
+    is_test_module = fnmatch.fnmatch(path, '*tests')
+    return not (is_svn_dir or is_test_module)
+
+packages = [p for p, _, _ in os.walk('xivo_bus') if is_package(p)]
 
 setup(
     name='xivo-bus',
@@ -11,22 +22,5 @@ setup(
     author_email='dev@avencall.com',
     url='http://git.xivo.fr/',
     license='GPLv3',
-    packages=[
-        'xivo_bus',
-        'xivo_bus.ctl',
-        'xivo_bus.resources',
-        'xivo_bus.resources.agent',
-        'xivo_bus.resources.agent.command',
-        'xivo_bus.resources.common',
-        'xivo_bus.resources.cti',
-        'xivo_bus.resources.device',
-        'xivo_bus.resources.extension',
-        'xivo_bus.resources.line',
-        'xivo_bus.resources.line_extension',
-        'xivo_bus.resources.user',
-        'xivo_bus.resources.user_line',
-        'xivo_bus.resources.user_line_extension',
-        'xivo_bus.resources.user_voicemail',
-        'xivo_bus.resources.voicemail',
-    ]
+    packages=packages,
 )
