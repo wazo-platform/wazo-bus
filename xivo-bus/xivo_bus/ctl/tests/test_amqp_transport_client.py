@@ -68,11 +68,11 @@ class TestAMQPTransportClient(unittest.TestCase):
                 send_request.assert_called_once()
                 wait_for_response.assert_called_once()
 
-    @patch('xivo_bus.ctl.amqp_transport_client.AMQPTransportClient._build_rpc_call_properties')
-    def test_send_request(self, build_properties):
+    def test_send_request(self):
         self.connection.closed = False
         transport = self._new_transport()
-        transport._send_request('exchange', 'key', 'blah', None)
+
+        transport.send('exchange', 'key', 'blah')
 
         self.channel.basic_publish.assert_called_once_with(
             exchange='exchange',
@@ -81,11 +81,11 @@ class TestAMQPTransportClient(unittest.TestCase):
             body='blah'
         )
 
-    @patch('xivo_bus.ctl.amqp_transport_client.AMQPTransportClient._build_rpc_call_properties')
-    def test_send_request_raises_ioerror_when_connection_is_closed(self, build_properties):
+    def test_send_request_raises_ioerror_when_connection_is_closed(self):
         self.connection.closed = True
         transport = self._new_transport()
-        self.assertRaises(IOError, transport._send_request, 'exchange', 'key', 'blah', None)
+
+        self.assertRaises(IOError, transport.send, 'exchange', 'key', 'blah')
 
     def test_build_properties(self):
         transport = self._new_transport()
