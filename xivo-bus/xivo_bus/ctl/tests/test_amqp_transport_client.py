@@ -70,6 +70,7 @@ class TestAMQPTransportClient(unittest.TestCase):
 
     @patch('xivo_bus.ctl.amqp_transport_client.AMQPTransportClient._build_rpc_call_properties')
     def test_send_request(self, build_properties):
+        self.connection.closed = False
         transport = self._new_transport()
         transport._send_request('exchange', 'key', 'blah', None)
 
@@ -79,6 +80,12 @@ class TestAMQPTransportClient(unittest.TestCase):
             properties=None,
             body='blah'
         )
+
+    @patch('xivo_bus.ctl.amqp_transport_client.AMQPTransportClient._build_rpc_call_properties')
+    def test_send_request_raises_ioerror_when_connection_is_closed(self, build_properties):
+        self.connection.closed = True
+        transport = self._new_transport()
+        self.assertRaises(IOError, transport._send_request, 'exchange', 'key', 'blah', None)
 
     def test_build_properties(self):
         transport = self._new_transport()
