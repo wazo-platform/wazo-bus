@@ -42,13 +42,5 @@ class UserCtiProfileConfigEvent(ResourceConfigEvent):
             msg['enabled'])
 
 
-class UserCtiProfileAssociatedEvent(UserCtiProfileConfigEvent):
-    name = 'cti_profile_associated'
-
-
-class UserCtiProfileDissociatedEvent(UserCtiProfileConfigEvent):
-    name = 'cti_profile_dissociated'
-
-
 class UserCtiProfileEditedEvent(UserCtiProfileConfigEvent):
     name = 'cti_profile_edited'
