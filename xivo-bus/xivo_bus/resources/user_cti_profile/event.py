@@ -22,21 +22,24 @@ from xivo_bus.resources.common.event import ResourceConfigEvent
 
 class UserCtiProfileConfigEvent(ResourceConfigEvent):
 
-    def __init__(self, user_id, cti_profile_id):
+    def __init__(self, user_id, cti_profile_id, enabled):
         self.user_id = user_id
         self.cti_profile_id = cti_profile_id
+        self.enabled = enabled
 
     def marshal(self):
         return {
             'user_id': self.user_id,
-            'cti_profile_id': self.cti_profile_id
+            'cti_profile_id': self.cti_profile_id,
+            'enabled': self.enabled
         }
 
     @classmethod
     def unmarshal(cls, msg):
         return cls(
             msg['user_id'],
-            msg['cti_profile_id'])
+            msg['cti_profile_id'],
+            msg['enabled'])
 
 
 class UserCtiProfileAssociatedEvent(UserCtiProfileConfigEvent):
@@ -45,3 +48,7 @@ class UserCtiProfileAssociatedEvent(UserCtiProfileConfigEvent):
 
 class UserCtiProfileDissociatedEvent(UserCtiProfileConfigEvent):
     name = 'cti_profile_dissociated'
+
+
+class UserCtiProfileEditedEvent(UserCtiProfileConfigEvent):
+    name = 'cti_profile_edited'
