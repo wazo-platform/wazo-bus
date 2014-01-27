@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import unittest
-from mock import Mock, patch, ANY
+from mock import Mock, patch
 from xivo_bus.ctl.marshaler import Marshaler
 from xivo_bus.ctl.amqp_transport_client import AMQPTransportClient
 from xivo_bus.ctl.client import BusCtlClient
@@ -63,39 +63,24 @@ class TestBusCtlClient(unittest.TestCase):
         amqp_client.create_and_connect.assert_called_once_with()
         transport.close.assert_called_once_with()
 
-    def test_publish_cti_event(self):
+    def test_declare_exchange(self):
+        name = 'xivo-ami'
+        exchange_type = 'topic'
+        durable = True
+
+        self.bus_ctl_client.declare_exchange(name, exchange_type, durable)
+
+        self.transport.exchange_declare.assert_called_one_with(name, exchange_type, durable)
+
+    def test_publish_event(self):
         event = Mock()
         event.name = 'foobar'
+        exchange = 'xivo-ami'
+        routing_key = event.name
         request = Mock()
         self.marshaler.marshal_command.return_value = request
 
-        self.bus_ctl_client.publish_cti_event(event)
+        self.bus_ctl_client.publish_event(exchange, routing_key, event)
 
         self.marshaler.marshal_command.assert_called_once_with(event)
-        self.transport.send.assert_called_once_with(ANY, event.name, request)
-
-    def test_publish_xivo_event(self):
-        event = Mock()
-        request = Mock()
-        self.marshaler.marshal_command.return_value = request
-
-        self.bus_ctl_client.publish_xivo_event(event)
-
-        self.marshaler.marshal_command.assert_called_once_with(event)
-        self.transport.send.assert_called_once_with(ANY, '', request)
-
-    def test_declare_ami_exchange(self):
-        self.bus_ctl_client.declare_ami_exchange()
-
-        self.transport.exchange_declare.assert_called_one_with('xivo-ami''', 'topic', durable=True)
-
-    def test_publish_ami_event(self):
-        event = Mock()
-        event.name = 'foobar'
-        request = Mock()
-        self.marshaler.marshal_command.return_value = request
-
-        self.bus_ctl_client.publish_ami_event(event)
-
-        self.marshaler.marshal_command.assert_called_once_with(event)
-        self.transport.send.assert_called_once_with('xivo-ami', event.name, request)
+        self.transport.send.assert_called_once_with(exchange, routing_key, request)
