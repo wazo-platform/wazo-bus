@@ -46,7 +46,7 @@ class BusCtlClient(object):
         return AMQPTransportClient.create_and_connect()
 
     def declare_exchange(self, name, exchange_type, durable):
-        self._transport.exchange_declare('name', exchange_type, durable)
+        self._transport.exchange_declare(name, exchange_type, durable)
 
     def publish_event(self, exchange, routing_key, event):
         body = self._marshaler.marshal_command(event)

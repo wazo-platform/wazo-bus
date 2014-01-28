@@ -70,7 +70,7 @@ class TestBusCtlClient(unittest.TestCase):
 
         self.bus_ctl_client.declare_exchange(name, exchange_type, durable)
 
-        self.transport.exchange_declare.assert_called_one_with(name, exchange_type, durable)
+        self.transport.exchange_declare.assert_called_once_with(name, exchange_type, durable)
 
     def test_publish_event(self):
         event = Mock()
