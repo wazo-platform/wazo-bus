@@ -17,6 +17,7 @@
 
 import logging
 import pika
+from pika.exceptions import AMQPConnectionError
 
 logger = logging.getLogger(__name__)
 
@@ -37,8 +38,12 @@ class BusConsumer(object):
         self.channel.queue_bind(queue=queue_name, exchange=exchange, routing_key=key)
 
     def run(self):
-        self.channel.basic_consume(self.callback, self.queue_name)
-        self.channel.start_consuming()
+        logger.info('Running...')
+        try:
+            self.channel.basic_consume(self.callback, self.queue_name)
+            self.channel.start_consuming()
+        except AMQPConnectionError:
+            raise BusConnectionError()
 
     def stop(self):
         self.channel.stop_consuming()

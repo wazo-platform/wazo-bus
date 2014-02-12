@@ -17,7 +17,8 @@
 
 from mock import Mock, patch
 import unittest
-from xivo_bus.ctl.consumer import BusConsumer
+from pika.exceptions import AMQPConnectionError
+from xivo_bus.ctl.consumer import BusConsumer, BusConnectionError
 
 QUEUE_NAME = 'xivo-call-logd-queue'
 
@@ -56,6 +57,13 @@ class TestBusConsumer(unittest.TestCase):
 
         self.consumer.channel.basic_consume.assert_called_once_with(self.callback, QUEUE_NAME)
         self.consumer.channel.start_consuming.assert_called_once_with()
+
+    def test_rabbitmq_down_when_run_then_raise_busconnectionerror(self):
+        self.consumer.channel.start_consuming.side_effect = [AMQPConnectionError()]
+        self.consumer.callback = self.callback
+        self.consumer.queue_name = QUEUE_NAME
+
+        self.assertRaises(BusConnectionError, self.consumer.run)
 
     @patch('pika.BlockingConnection')
     @patch('pika.ConnectionParameters')
