@@ -46,8 +46,9 @@ class BusConsumer(object):
             raise BusConnectionError()
 
     def stop(self):
-        self.channel.stop_consuming()
-        self.connection.close()
+        if self.connection.is_open:
+            self.channel.stop_consuming()
+            self.connection.close()
         self.connection.disconnect()
 
 

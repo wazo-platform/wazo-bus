@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+from hamcrest import assert_that, equal_to
 from mock import Mock, patch
 import unittest
 from pika.exceptions import AMQPConnectionError
@@ -73,4 +74,16 @@ class TestBusConsumer(unittest.TestCase):
 
         self.consumer.channel.stop_consuming.assert_called_once_with()
         self.consumer.connection.close.assert_called_once_with()
+        self.consumer.connection.disconnect.assert_called_once_with()
+
+    @patch('pika.BlockingConnection', Mock())
+    @patch('pika.ConnectionParameters', Mock())
+    def test_rabbitmq_down_when_stop_then_only_disconnect(self):
+        self.consumer.connect()
+        self.consumer.connection.is_open = False
+
+        self.consumer.stop()
+
+        assert_that(self.consumer.channel.stop_consuming.call_count, equal_to(0))
+        assert_that(self.consumer.connection.close.call_count, equal_to(0))
         self.consumer.connection.disconnect.assert_called_once_with()
