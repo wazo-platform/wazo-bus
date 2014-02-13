@@ -19,13 +19,15 @@ import logging
 import pika
 from pika.exceptions import AMQPConnectionError
 
+from xivo_bus.ctl.marshaler import Marshaler
+
 logger = logging.getLogger(__name__)
 
 
 class BusConsumer(object):
 
     def __init__(self):
-        pass
+        self._marshaler = Marshaler()
 
     def connect(self):
         self.connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
@@ -36,6 +38,12 @@ class BusConsumer(object):
         self.queue_name = queue_name
         self.channel.queue_declare(queue=queue_name, exclusive=False, durable=True)
         self.channel.queue_bind(queue=queue_name, exchange=exchange, routing_key=key)
+
+    def on_message(self, channel, method, header, body):
+        body = self._marshaler.unmarshal_message(body)
+        logger.debug('Received new event : %s', body)
+        self.callback(body)
+        self.channel.basic_ack(delivery_tag=method.delivery_tag)
 
     def run(self):
         logger.info('Running...')

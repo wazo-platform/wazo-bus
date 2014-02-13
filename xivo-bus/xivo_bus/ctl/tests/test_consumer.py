@@ -16,9 +16,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from hamcrest import assert_that, equal_to
-from mock import Mock, patch
+from mock import Mock, patch, sentinel
 import unittest
 from pika.exceptions import AMQPConnectionError
+from pika.spec import Basic
 from xivo_bus.ctl.consumer import BusConsumer, BusConnectionError
 
 QUEUE_NAME = 'xivo-call-logd-queue'
@@ -87,3 +88,34 @@ class TestBusConsumer(unittest.TestCase):
         assert_that(self.consumer.channel.stop_consuming.call_count, equal_to(0))
         assert_that(self.consumer.connection.close.call_count, equal_to(0))
         self.consumer.connection.disconnect.assert_called_once_with()
+
+    def test_when_on_message_then_unmarshal_callback_and_ack(self):
+        channel = self.consumer.channel
+        method = Mock(Basic.Deliver)
+        method.delivery_tag = sentinel.tag
+        linkedid = '1391789340.26'
+        body = """
+            {
+            "data": {
+                "EventTime": "2014-02-07 11:09:03",
+                "LinkedID": "%s",
+                "UniqueID": "1391789340.26",
+                "EventName": "LINKEDID_END"
+            },
+            "name": "CEL"
+            }
+        """ % linkedid
+
+        unmarshaled_body = {u'data':
+                            {u'EventName': u'LINKEDID_END',
+                             u'EventTime': u'2014-02-07 11:09:03',
+                             u'LinkedID': u'1391789340.26',
+                             u'UniqueID': u'1391789340.26'},
+                            u'name': u'CEL'}
+
+        self.consumer.callback = Mock()
+
+        self.consumer.on_message(channel, method, sentinel.header, body)
+
+        self.consumer.callback.assert_called_once_with(unmarshaled_body)
+        channel.basic_ack.assert_called_once_with(delivery_tag=method.delivery_tag)
