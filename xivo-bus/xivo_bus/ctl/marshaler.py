@@ -31,12 +31,15 @@ class Marshaler(object):
         return json.dumps(response.marshal())
 
     def unmarshal_command(self, data):
-        msg = json.loads(data)
+        msg = self.unmarshal_message(data)
         msg_name = msg['name']
         msg_cmd = msg['data']
         cmd_class = self._commands_registry[msg_name]
         return cmd_class.unmarshal(msg_cmd)
 
     def unmarshal_response(self, data):
-        msg = json.loads(data)
+        msg = self.unmarshal_message(data)
         return CommandResponse.unmarshal(msg)
+
+    def unmarshal_message(self, data):
+        return json.loads(data)
