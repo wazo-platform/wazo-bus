@@ -68,6 +68,15 @@ class TestMarshaler(unittest.TestCase):
         self.assertEquals(result.value, 'foobar')
         self.assertEquals(result.error, None)
 
+    def test_unmarshal_message(self):
+        json = '{"error": null, "value": "foobar"}'
+        expected = {'value': 'foobar', 'error': None}
+        marshal = Marshaler({})
+
+        result = marshal.unmarshal_message(json)
+
+        self.assertEquals(result, expected)
+
 
 if __name__ == "__main__":
     unittest.main()
