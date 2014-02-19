@@ -48,7 +48,7 @@ class BusConsumer(object):
     def run(self):
         logger.info('Running...')
         try:
-            self.channel.basic_consume(self.callback, self.queue_name)
+            self.channel.basic_consume(self.on_message, self.queue_name)
             self.channel.start_consuming()
         except AMQPConnectionError:
             raise BusConnectionError()

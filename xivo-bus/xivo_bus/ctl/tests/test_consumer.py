@@ -57,7 +57,8 @@ class TestBusConsumer(unittest.TestCase):
 
         self.consumer.run()
 
-        self.consumer.channel.basic_consume.assert_called_once_with(self.callback, QUEUE_NAME)
+        self.consumer.channel.basic_consume.assert_called_once_with(
+            self.consumer.on_message, QUEUE_NAME)
         self.consumer.channel.start_consuming.assert_called_once_with()
 
     def test_rabbitmq_down_when_run_then_raise_busconnectionerror(self):
