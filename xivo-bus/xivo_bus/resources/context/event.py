@@ -22,8 +22,7 @@ from xivo_bus.resources.common.event import ResourceConfigEvent
 
 class ContextConfigEvent(ResourceConfigEvent):
 
-    def __init__(self, context_id, context_name, display_name, description, context_type):
-        self.id = int(context_id)
+    def __init__(self, context_name, display_name, description, context_type):
         self.context_name = context_name
         self.display_name = display_name
         self.description = description
@@ -31,7 +30,6 @@ class ContextConfigEvent(ResourceConfigEvent):
 
     def marshal(self):
         return {
-            'id': self.id,
             'name': self.context_name,
             'display_name': self.display_name,
             'description': self.description,
@@ -40,7 +38,7 @@ class ContextConfigEvent(ResourceConfigEvent):
 
     @classmethod
     def unmarshal(cls, msg):
-        return cls(msg['id'], msg['name'], msg['display_name'], msg['description'], msg['type'])
+        return cls(msg['name'], msg['display_name'], msg['description'], msg['type'])
 
 
 class CreateContextEvent(ContextConfigEvent):

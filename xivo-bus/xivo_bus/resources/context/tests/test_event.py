@@ -26,7 +26,6 @@ class ConcreteContextConfigEvent(ContextConfigEvent):
     name = 'foo'
 
 
-ID = 1
 NAME = 'foo_context'
 DISPLAY_NAME = 'Foo Context'
 DESCRIPTION = 'description'
@@ -37,7 +36,6 @@ class TestAbstractContextConfigEvent(unittest.TestCase):
 
     def setUp(self):
         self.msg = {
-            'id': ID,
             'name': NAME,
             'display_name': DISPLAY_NAME,
             'description': DESCRIPTION,
@@ -45,7 +43,7 @@ class TestAbstractContextConfigEvent(unittest.TestCase):
         }
 
     def test_marshal(self):
-        command = ConcreteContextConfigEvent(ID, NAME, DISPLAY_NAME, DESCRIPTION, TYPE)
+        command = ConcreteContextConfigEvent(NAME, DISPLAY_NAME, DESCRIPTION, TYPE)
 
         msg = command.marshal()
 
@@ -55,7 +53,6 @@ class TestAbstractContextConfigEvent(unittest.TestCase):
         command = ConcreteContextConfigEvent.unmarshal(self.msg)
 
         self.assertEqual(command.name, ConcreteContextConfigEvent.name)
-        self.assertEqual(command.id, ID)
         self.assertEqual(command.context_name, NAME)
         self.assertEqual(command.display_name, DISPLAY_NAME)
         self.assertEqual(command.description, DESCRIPTION)
