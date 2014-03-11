@@ -48,5 +48,6 @@ class UserVoicemailConfigEvent(ResourceConfigEvent):
 class UserVoicemailAssociatedEvent(UserVoicemailConfigEvent):
     name = 'voicemail_associated'
 
+
 class UserVoicemailDissociatedEvent(UserVoicemailConfigEvent):
     name = 'voicemail_dissociated'

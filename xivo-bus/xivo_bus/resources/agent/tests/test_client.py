@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import unittest
-from mock import ANY, Mock, patch
+from mock import Mock, patch
 from xivo_bus.ctl.amqp_transport_client import AMQPTransportClient
 from xivo_bus.ctl.marshaler import Marshaler
 from ..client import AgentClient, _AgentStatus

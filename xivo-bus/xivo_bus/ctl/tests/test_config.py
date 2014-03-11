@@ -18,6 +18,7 @@
 import unittest
 from xivo_bus.ctl.config import Config, default_config
 
+
 class TestConfig(unittest.TestCase):
 
     def test_to_connection_params(self):

@@ -68,9 +68,9 @@ class TestBusConsumer(unittest.TestCase):
 
         self.assertRaises(BusConnectionError, self.consumer.run)
 
-    @patch('pika.BlockingConnection')
-    @patch('pika.ConnectionParameters')
-    def test_when_stop_then_stop_and_disconnect(self, parameters_mock, connection_mock):
+    @patch('pika.BlockingConnection', Mock())
+    @patch('pika.ConnectionParameters', Mock())
+    def test_when_stop_then_stop_and_disconnect(self):
         self.consumer.connect()
         self.consumer.stop()
 

@@ -22,9 +22,9 @@ from xivo_bus.resources.common.event import ResourceConfigEvent
 
 class FuncKeyConfigEvent(ResourceConfigEvent):
 
-    def __init__(self, func_key_id, type, destination, destination_id):
+    def __init__(self, func_key_id, func_key_type, destination, destination_id):
         self.id = int(func_key_id)
-        self.type = type
+        self.type = func_key_type
         self.destination = destination
         self.destination_id = destination_id
 
