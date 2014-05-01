@@ -69,7 +69,7 @@ class TestAMQPTransportClient(unittest.TestCase):
                 wait_for_response.assert_called_once()
 
     def test_send_request(self):
-        self.connection.closed = False
+        self.connection.is_closed = False
         transport = self._new_transport()
 
         transport.send('exchange', 'key', 'blah')
@@ -82,7 +82,7 @@ class TestAMQPTransportClient(unittest.TestCase):
         )
 
     def test_send_request_raises_ioerror_when_connection_is_closed(self):
-        self.connection.closed = True
+        self.connection.is_closed = True
         transport = self._new_transport()
 
         self.assertRaises(IOError, transport.send, 'exchange', 'key', 'blah')

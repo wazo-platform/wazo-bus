@@ -66,7 +66,7 @@ class AMQPTransportClient(object):
         self._send_request(exchange, routing_key, body, None)
 
     def _send_request(self, exchange, routing_key, body, properties):
-        if self._connection.closed:
+        if self._connection.is_closed:
             raise IOError('Bus connection is closed')
         self._channel.basic_publish(
             exchange=exchange,
