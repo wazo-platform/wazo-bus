@@ -76,7 +76,7 @@ class TestBusConsumer(unittest.TestCase):
 
         self.consumer.channel.stop_consuming.assert_called_once_with()
         self.consumer.connection.close.assert_called_once_with()
-        self.consumer.connection.disconnect.assert_called_once_with()
+        self.consumer.connection.close.assert_called_once_with()
 
     @patch('pika.BlockingConnection', Mock())
     @patch('pika.ConnectionParameters', Mock())
@@ -88,7 +88,6 @@ class TestBusConsumer(unittest.TestCase):
 
         assert_that(self.consumer.channel.stop_consuming.call_count, equal_to(0))
         assert_that(self.consumer.connection.close.call_count, equal_to(0))
-        self.consumer.connection.disconnect.assert_called_once_with()
 
     def test_when_on_message_then_unmarshal_callback_and_ack(self):
         channel = self.consumer.channel
