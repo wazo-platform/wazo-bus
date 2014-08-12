@@ -24,6 +24,10 @@ _AgentStatus = namedtuple('_AgentStatus', ['id', 'number', 'extension', 'context
 
 
 class AgentClient(BusCtlClient):
+    """
+    This class (and its parent class) is thread safe. You can call any of its method
+    from multiple threads.
+    """
 
     _QUEUE_NAME = 'xivo_agent'
 
@@ -114,14 +118,16 @@ class AgentClient(BusCtlClient):
             return self._execute_request_no_fetch_response(request)
 
     def _execute_request_fetch_response(self, request):
-        raw_response = self._transport.rpc_call('', self._QUEUE_NAME, request)
+        with self._lock:
+            raw_response = self._transport.rpc_call('', self._QUEUE_NAME, request)
         response = self._marshaler.unmarshal_response(raw_response)
         if response.error is not None:
             raise AgentClientError(response.error)
         return response.value
 
     def _execute_request_no_fetch_response(self, request):
-        self._transport.send('', self._QUEUE_NAME, request)
+        with self._lock:
+            self._transport.send('', self._QUEUE_NAME, request)
 
     def _convert_agent_status(self, status):
         return _AgentStatus(status['id'], status['number'], status['extension'],

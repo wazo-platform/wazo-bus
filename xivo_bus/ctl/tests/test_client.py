@@ -38,12 +38,13 @@ class TestBusCtlClient(unittest.TestCase):
 
         amqp_client_constructor.create_and_connect.assert_called_once_with()
 
-    @patch('xivo_bus.ctl.client.AMQPTransportClient', Mock())
-    def test_connect_already_connected(self):
+    @patch('xivo_bus.ctl.client.AMQPTransportClient')
+    def test_connect_already_connected(self, amqp_client_constructor):
         client = BusCtlClient()
         client.connect()
+        client.connect()
 
-        self.assertRaises(Exception, client.connect)
+        amqp_client_constructor.create_and_connect.assert_called_once_with()
 
     @patch('xivo_bus.ctl.client.AMQPTransportClient')
     def test_close_transport_with_no_connection(self, amqp_client):
