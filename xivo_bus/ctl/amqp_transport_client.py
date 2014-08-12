@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import pika
+import threading
 import uuid
 from xivo_bus.ctl.config import default_config
 
@@ -28,6 +29,7 @@ class AMQPTransportClient(object):
         return cls(connection_params)
 
     def __init__(self, connection_params):
+        self._lock = threading.Lock()
         self._connect(connection_params)
         self._setup_queue()
         self._correlation_id = None
@@ -52,18 +54,21 @@ class AMQPTransportClient(object):
             self._response = body
 
     def exchange_declare(self, name, type_, durable):
-        self._channel.exchange_declare(exchange=name, type=type_, durable=durable)
+        with self._lock:
+            self._channel.exchange_declare(exchange=name, type=type_, durable=durable)
 
     def rpc_call(self, exchange, routing_key, request):
-        self._response = None
-        self._correlation_id = str(uuid.uuid4())
-        properties = self._build_rpc_call_properties()
+        with self._lock:
+            self._response = None
+            self._correlation_id = str(uuid.uuid4())
+            properties = self._build_rpc_call_properties()
 
-        self._send_request(exchange, routing_key, request, properties)
-        return self._wait_for_response()
+            self._send_request(exchange, routing_key, request, properties)
+            return self._wait_for_response()
 
     def send(self, exchange, routing_key, body):
-        self._send_request(exchange, routing_key, body, None)
+        with self._lock:
+            self._send_request(exchange, routing_key, body, None)
 
     def _send_request(self, exchange, routing_key, body, properties):
         if self._connection.is_closed:
@@ -90,6 +95,7 @@ class AMQPTransportClient(object):
         return self._response
 
     def close(self):
-        self._connection.close()
-        self._channel = None
-        self._connection = None
+        with self._lock:
+            self._connection.close()
+            self._channel = None
+            self._connection = None
