@@ -22,13 +22,20 @@ class Config(object):
 
     DEFAULT_HOST = 'localhost'
     DEFAULT_PORT = 5672
+    DEFAULT_VIRTUAL_HOST = 'xivo'
 
-    def __init__(self, host=DEFAULT_HOST, port=DEFAULT_PORT):
+    def __init__(self,
+                 host=DEFAULT_HOST,
+                 port=DEFAULT_PORT,
+                 virtual_host=DEFAULT_VIRTUAL_HOST):
         self.host = host
         self.port = port
+        self.virtual_host = virtual_host
 
     def to_connection_params(self):
-        return pika.ConnectionParameters(self.host, self.port)
+        return pika.ConnectionParameters(host=self.host,
+                                         port=self.port,
+                                         virtual_host=self.virtual_host)
 
 
 default_config = Config()
