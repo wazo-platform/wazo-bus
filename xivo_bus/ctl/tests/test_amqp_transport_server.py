@@ -19,8 +19,8 @@ import pika
 import unittest
 
 from mock import Mock, patch, ANY
-from xivo_bus.ctl.amqp_transport_server import AMQPTransportServer
-from xivo_bus.ctl.config import Config
+from xivo_bus.ctl.rpc.amqp_transport_server import AMQPTransportServer
+from xivo_bus.ctl.rpc.config import Config
 
 
 class TestAMQPTransportServer(unittest.TestCase):

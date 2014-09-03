@@ -20,7 +20,7 @@ import pika
 
 from mock import Mock, patch, ANY
 from xivo_bus.ctl.amqp_transport_client import AMQPTransportClient
-from xivo_bus.ctl.config import Config
+from xivo_bus.ctl.rpc.config import Config
 
 
 class TestAMQPTransportClient(unittest.TestCase):

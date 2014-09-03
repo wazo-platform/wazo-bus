@@ -17,15 +17,15 @@
 
 import unittest
 from mock import Mock, patch
-from xivo_bus.ctl.server import BusCtlServer
-from xivo_bus.ctl.response import CommandResponse
+from xivo_bus.ctl.rpc.server import BusCtlServer
+from xivo_bus.ctl.rpc.response import CommandResponse
 from xivo_bus.ctl.exception import BusCtlServerError
 from xivo_bus.ctl.marshaler import Marshaler
 
 
 class TestBusCtlServer(unittest.TestCase):
 
-    @patch('xivo_bus.ctl.amqp_transport_server.AMQPTransportServer.create_and_connect', Mock())
+    @patch('xivo_bus.ctl.rpc.amqp_transport_server.AMQPTransportServer.create_and_connect', Mock())
     def test_command_callback_is_called_by_process_next_command(self):
         callback = Mock()
         marshaler = Mock()
@@ -46,8 +46,8 @@ class TestBusCtlServer(unittest.TestCase):
 
         callback.assert_called_once_with(command)
 
-    @patch('xivo_bus.ctl.amqp_transport_server.AMQPTransportServer.create_and_connect', Mock())
-    @patch('xivo_bus.ctl.server.CommandResponse')
+    @patch('xivo_bus.ctl.rpc.amqp_transport_server.AMQPTransportServer.create_and_connect', Mock())
+    @patch('xivo_bus.ctl.rpc.server.CommandResponse')
     def test_server_sends_marshaled_exception_when_callback_raises_exception(self, mock_command_response):
         request = '{"name": "foobar", "arg": {"arg1": "value"}}'
 

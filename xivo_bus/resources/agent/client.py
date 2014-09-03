@@ -18,12 +18,12 @@
 from collections import namedtuple
 from xivo_bus.resources.agent import command
 from xivo_bus.resources.agent.exception import AgentClientError
-from xivo_bus.ctl.client import BusCtlClient
+from xivo_bus.ctl.producer import BusProducer
 
 _AgentStatus = namedtuple('_AgentStatus', ['id', 'number', 'extension', 'context', 'logged'])
 
 
-class AgentClient(BusCtlClient):
+class AgentClient(BusProducer):
     """
     This class (and its parent class) is thread safe. You can call any of its method
     from multiple threads.
@@ -32,7 +32,7 @@ class AgentClient(BusCtlClient):
     _QUEUE_NAME = 'xivo_agent'
 
     def __init__(self, fetch_response=True):
-        BusCtlClient.__init__(self)
+        BusProducer.__init__(self)
         self._fetch_response = fetch_response
 
     def add_agent_to_queue(self, agent_id, queue_id):

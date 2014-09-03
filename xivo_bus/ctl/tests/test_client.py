@@ -19,44 +19,44 @@ import unittest
 from mock import Mock, patch
 from xivo_bus.ctl.marshaler import Marshaler
 from xivo_bus.ctl.amqp_transport_client import AMQPTransportClient
-from xivo_bus.ctl.client import BusCtlClient
+from xivo_bus.ctl.producer import BusProducer
 
 
-class TestBusCtlClient(unittest.TestCase):
+class TestBusProducer(unittest.TestCase):
 
     def setUp(self):
         self.marshaler = Mock(Marshaler)
         self.transport = Mock(AMQPTransportClient)
-        self.bus_ctl_client = BusCtlClient()
-        self.bus_ctl_client._marshaler = self.marshaler
-        self.bus_ctl_client._transport = self.transport
+        self.bus_producer = BusProducer()
+        self.bus_producer._marshaler = self.marshaler
+        self.bus_producer._transport = self.transport
 
-    @patch('xivo_bus.ctl.client.AMQPTransportClient')
+    @patch('xivo_bus.ctl.producer.AMQPTransportClient')
     def test_connect_no_transport(self, amqp_client_constructor):
-        client = BusCtlClient()
+        client = BusProducer()
         client.connect()
 
         amqp_client_constructor.create_and_connect.assert_called_once_with()
 
-    @patch('xivo_bus.ctl.client.AMQPTransportClient', Mock())
+    @patch('xivo_bus.ctl.producer.AMQPTransportClient', Mock())
     def test_connect_already_connected(self):
-        client = BusCtlClient()
+        client = BusProducer()
         client.connect()
 
         self.assertRaises(Exception, client.connect)
 
-    @patch('xivo_bus.ctl.client.AMQPTransportClient')
+    @patch('xivo_bus.ctl.producer.AMQPTransportClient')
     def test_close_transport_with_no_connection(self, amqp_client):
-        client = BusCtlClient()
+        client = BusProducer()
         client.close()
         self.assertFalse(amqp_client.create_and_connect.called)
 
-    @patch('xivo_bus.ctl.client.AMQPTransportClient')
+    @patch('xivo_bus.ctl.producer.AMQPTransportClient')
     def test_connect_and_close_opens_and_closes_transport(self, amqp_client):
         transport = Mock()
         amqp_client.create_and_connect.return_value = transport
 
-        client = BusCtlClient()
+        client = BusProducer()
         client.connect()
         client.close()
 
@@ -68,7 +68,7 @@ class TestBusCtlClient(unittest.TestCase):
         exchange_type = 'topic'
         durable = True
 
-        self.bus_ctl_client.declare_exchange(name, exchange_type, durable)
+        self.bus_producer.declare_exchange(name, exchange_type, durable)
 
         self.transport.exchange_declare.assert_called_once_with(name, exchange_type, durable)
 
@@ -80,7 +80,7 @@ class TestBusCtlClient(unittest.TestCase):
         request = Mock()
         self.marshaler.marshal_command.return_value = request
 
-        self.bus_ctl_client.publish_event(exchange, routing_key, event)
+        self.bus_producer.publish_event(exchange, routing_key, event)
 
         self.marshaler.marshal_command.assert_called_once_with(event)
         self.transport.send.assert_called_once_with(exchange, routing_key, request)

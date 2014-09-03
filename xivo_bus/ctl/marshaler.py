@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import json
-from xivo_bus.ctl.response import CommandResponse
+from xivo_bus.ctl.rpc.response import CommandResponse
 
 
 class Marshaler(object):

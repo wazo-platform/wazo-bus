@@ -16,8 +16,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import logging
-from xivo_bus.ctl.amqp_transport_server import AMQPTransportServer
-from xivo_bus.ctl.response import CommandResponse
+from xivo_bus.ctl.rpc.amqp_transport_server import AMQPTransportServer
+from xivo_bus.ctl.rpc.response import CommandResponse
 from xivo_bus.ctl.marshaler import Marshaler
 from xivo_bus.resources.agent import error
 from xivo_bus.ctl.exception import BusCtlServerError

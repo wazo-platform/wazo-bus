@@ -19,7 +19,7 @@ from xivo_bus.ctl.amqp_transport_client import AMQPTransportClient
 from xivo_bus.ctl.marshaler import Marshaler
 
 
-class BusCtlClient(object):
+class BusProducer(object):
     """
     The methods on this class are thread safe except for the following:
 

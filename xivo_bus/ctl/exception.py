@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 
-class BusCtlClientError(Exception):
+class BusProducerError(Exception):
 
     def __init__(self, error):
         Exception.__init__(self, error)

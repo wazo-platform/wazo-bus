@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import pika
-from xivo_bus.ctl.config import default_config
+from xivo_bus.ctl.rpc.config import default_config
 
 
 class AMQPTransportServer(object):

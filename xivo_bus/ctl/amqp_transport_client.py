@@ -18,7 +18,7 @@
 import pika
 import threading
 import uuid
-from xivo_bus.ctl.config import default_config
+from xivo_bus.ctl.rpc.config import default_config
 
 
 class AMQPTransportClient(object):

@@ -19,7 +19,7 @@ import unittest
 
 from mock import Mock
 from xivo_bus.ctl.marshaler import Marshaler
-from xivo_bus.ctl.response import CommandResponse
+from xivo_bus.ctl.rpc.response import CommandResponse
 
 
 class TestMarshaler(unittest.TestCase):
