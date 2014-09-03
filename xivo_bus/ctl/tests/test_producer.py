@@ -18,7 +18,7 @@
 import unittest
 from mock import Mock, patch
 from xivo_bus.ctl.marshaler import Marshaler
-from xivo_bus.ctl.amqp_transport_client import AMQPTransportClient
+from xivo_bus.ctl.rpc.amqp_transport_client import AMQPTransportClient
 from xivo_bus.ctl.producer import BusProducer
 from xivo_bus.ctl.config import Config
 

@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_bus.ctl.amqp_transport_client import AMQPTransportClient
+from xivo_bus.ctl.rpc.amqp_transport_client import AMQPTransportClient
 from xivo_bus.ctl.config import default_config
 from xivo_bus.ctl.marshaler import Marshaler
 
