@@ -20,6 +20,13 @@ from xivo_bus.ctl.config import default_config
 from xivo_bus.ctl.marshaler import Marshaler
 
 
+class BusProducerError(Exception):
+
+    def __init__(self, error):
+        Exception.__init__(self, error)
+        self.error = error
+
+
 class BusProducer(object):
     """
     The methods on this class are thread safe except for the following:
