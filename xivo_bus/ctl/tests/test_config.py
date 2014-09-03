@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import unittest
-from xivo_bus.ctl.rpc.config import Config, default_config
+from xivo_bus.ctl.config import Config, default_config
 
 
 class TestConfig(unittest.TestCase):
