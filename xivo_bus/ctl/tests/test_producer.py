@@ -20,6 +20,7 @@ from mock import Mock, patch
 from xivo_bus.ctl.marshaler import Marshaler
 from xivo_bus.ctl.amqp_transport_client import AMQPTransportClient
 from xivo_bus.ctl.producer import BusProducer
+from xivo_bus.ctl.config import Config
 
 
 class TestBusProducer(unittest.TestCase):
@@ -27,16 +28,17 @@ class TestBusProducer(unittest.TestCase):
     def setUp(self):
         self.marshaler = Mock(Marshaler)
         self.transport = Mock(AMQPTransportClient)
+        self.config = Mock(Config)
         self.bus_producer = BusProducer()
         self.bus_producer._marshaler = self.marshaler
         self.bus_producer._transport = self.transport
 
     @patch('xivo_bus.ctl.producer.AMQPTransportClient')
     def test_connect_no_transport(self, amqp_client_constructor):
-        client = BusProducer()
+        client = BusProducer(self.config)
         client.connect()
 
-        amqp_client_constructor.create_and_connect.assert_called_once_with()
+        amqp_client_constructor.create_and_connect.assert_called_once_with(config=self.config)
 
     @patch('xivo_bus.ctl.producer.AMQPTransportClient', Mock())
     def test_connect_already_connected(self):
@@ -56,11 +58,11 @@ class TestBusProducer(unittest.TestCase):
         transport = Mock()
         amqp_client.create_and_connect.return_value = transport
 
-        client = BusProducer()
+        client = BusProducer(self.config)
         client.connect()
         client.close()
 
-        amqp_client.create_and_connect.assert_called_once_with()
+        amqp_client.create_and_connect.assert_called_once_with(config=self.config)
         transport.close.assert_called_once_with()
 
     def test_declare_exchange(self):

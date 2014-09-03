@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from xivo_bus.ctl.amqp_transport_client import AMQPTransportClient
+from xivo_bus.ctl.config import default_config
 from xivo_bus.ctl.marshaler import Marshaler
 
 
@@ -28,7 +29,8 @@ class BusProducer(object):
 
     """
 
-    def __init__(self):
+    def __init__(self, config=default_config):
+        self._config = config
         self._transport = None
         self._marshaler = Marshaler()
 
@@ -50,7 +52,7 @@ class BusProducer(object):
         return self._transport is not None
 
     def _new_transport(self):
-        return AMQPTransportClient.create_and_connect()
+        return AMQPTransportClient.create_and_connect(config=self._config)
 
     def declare_exchange(self, name, exchange_type, durable):
         self._transport.exchange_declare(name, exchange_type, durable)
