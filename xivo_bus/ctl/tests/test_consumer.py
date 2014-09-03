@@ -21,6 +21,7 @@ import unittest
 from pika.exceptions import AMQPConnectionError
 from pika.spec import Basic
 from xivo_bus.ctl.consumer import BusConsumer, BusConnectionError
+from xivo_bus.ctl.config import Config
 
 QUEUE_NAME = 'xivo-call-logd-queue'
 
@@ -28,18 +29,21 @@ QUEUE_NAME = 'xivo-call-logd-queue'
 class TestBusConsumer(unittest.TestCase):
 
     def setUp(self):
+        self.config = Mock(Config)
+        self.config.to_connection_params.return_value = 'config'
+        self.consumer_with_config = BusConsumer(self.config)
         self.consumer = BusConsumer()
         self.consumer.channel = Mock()
         self.callback = Mock()
 
+        self.config.to_connection_params.assert_called_once_with()
+
     @patch('pika.BlockingConnection')
-    @patch('pika.ConnectionParameters')
-    def test_when_connect_then_instantiate_connection_and_channel(self, parameters_mock, connection_mock):
-        parameters = parameters_mock('localhost')
+    def test_when_connect_then_instantiate_connection_and_channel_with_config(self, connection_mock):
+        self.consumer_with_config.connect()
 
-        self.consumer.connect()
-
-        connection_mock.assert_called_once_with(parameters)
+        self.config.to_connection_params.assert_called_once_with()
+        connection_mock.assert_called_once_with('config')
 
     def test_when_add_binding_then_channel_queue_bind(self):
         exchange = 'xivo-ami'
