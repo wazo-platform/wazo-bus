@@ -18,24 +18,34 @@
 import pika
 
 
-class Config(object):
+class BusConfig(object):
 
-    DEFAULT_HOST = 'localhost'
-    DEFAULT_PORT = 5672
-    DEFAULT_VIRTUAL_HOST = 'xivo'
+    DEFAULT_HOST = pika.connection.Parameters.DEFAULT_HOST
+    DEFAULT_PORT = pika.connection.Parameters.DEFAULT_PORT
+    DEFAULT_VIRTUAL_HOST = pika.connection.Parameters.DEFAULT_VIRTUAL_HOST
+    DEFAULT_USERNAME = pika.connection.Parameters.DEFAULT_USERNAME
+    DEFAULT_PASSWORD = pika.connection.Parameters.DEFAULT_PASSWORD
 
     def __init__(self,
                  host=DEFAULT_HOST,
                  port=DEFAULT_PORT,
-                 virtual_host=DEFAULT_VIRTUAL_HOST):
+                 virtual_host=DEFAULT_VIRTUAL_HOST,
+                 username=DEFAULT_USERNAME,
+                 password=DEFAULT_PASSWORD):
         self.host = host
         self.port = port
         self.virtual_host = virtual_host
+        self.username = username
+        self.password = password
 
     def to_connection_params(self):
         return pika.ConnectionParameters(host=self.host,
                                          port=self.port,
-                                         virtual_host=self.virtual_host)
+                                         virtual_host=self.virtual_host,
+                                         credentials=self.pika_credentials)
 
+    @property
+    def pika_credentials(self):
+        return pika.PlainCredentials(self.username, self.password)
 
-default_config = Config()
+default_config = BusConfig()
