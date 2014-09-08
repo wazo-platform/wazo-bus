@@ -20,9 +20,7 @@ from __future__ import unicode_literals
 from xivo_bus.resources.common.event import ResourceConfigEvent
 
 
-class AgentQueueAssociationEditedEvent(ResourceConfigEvent):
-    name = 'agent_queue_association_edited'
-
+class AgentQueueConfigEvent(ResourceConfigEvent):
     def __init__(self, queue_id, agent_id, penalty):
         self.queue_id = queue_id
         self.agent_id = agent_id
@@ -33,8 +31,34 @@ class AgentQueueAssociationEditedEvent(ResourceConfigEvent):
             'queue_id': self.queue_id,
             'agent_id': self.agent_id,
             'penalty': self.penalty
-            }
+        }
 
     @classmethod
     def unmarshal(cls, msg):
         return cls(msg['queue_id'], msg['agent_id'], msg['penalty'])
+
+
+class AgentQueueAssociationEditedEvent(AgentQueueConfigEvent):
+    name = 'agent_queue_association_edited'
+
+
+class AgentQueueAssociatedEvent(AgentQueueConfigEvent):
+    name = 'agent_queue_associated'
+
+
+class AgentRemovedFromQueueEvent(AgentQueueConfigEvent):
+    name = "agent_removed_from_queue"
+
+    def __init__(self, agent_id, queue_id):
+        self.queue_id = queue_id
+        self.agent_id = agent_id
+
+    def marshal(self):
+        return {
+            'queue_id': self.queue_id,
+            'agent_id': self.agent_id,
+        }
+
+    @classmethod
+    def unmarshal(cls, msg):
+        return cls(msg['agent_id'], msg['queue_id'])
