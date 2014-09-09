@@ -17,20 +17,23 @@
 
 import logging
 import pika
+
 from pika.exceptions import AMQPConnectionError
 
 from xivo_bus.ctl.marshaler import Marshaler
+from xivo_bus.ctl.config import default_config
 
 logger = logging.getLogger(__name__)
 
 
 class BusConsumer(object):
 
-    def __init__(self):
+    def __init__(self, config=default_config):
+        self._connection_params = config.to_connection_params()
         self._marshaler = Marshaler()
 
     def connect(self):
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+        self.connection = pika.BlockingConnection(self._connection_params)
         self.channel = self.connection.channel()
 
     def add_binding(self, callback, queue_name, exchange, key):

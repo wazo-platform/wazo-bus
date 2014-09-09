@@ -17,9 +17,8 @@
 
 import unittest
 from mock import Mock, patch
-from xivo_bus.ctl.rpc.server import BusCtlServer
+from xivo_bus.ctl.rpc.server import BusCtlServer, BusCtlServerError
 from xivo_bus.ctl.rpc.response import CommandResponse
-from xivo_bus.ctl.exception import BusCtlServerError
 from xivo_bus.ctl.marshaler import Marshaler
 
 
