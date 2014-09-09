@@ -20,7 +20,7 @@ import unittest
 
 from mock import Mock, patch, ANY
 from xivo_bus.ctl.rpc.amqp_transport_server import AMQPTransportServer
-from xivo_bus.ctl.config import Config
+from xivo_bus.ctl.config import BusConfig
 
 
 class TestAMQPTransportServer(unittest.TestCase):
@@ -38,7 +38,7 @@ class TestAMQPTransportServer(unittest.TestCase):
 
     def test_create_and_connect(self):
         callback = Mock()
-        config = Mock(Config)
+        config = Mock(BusConfig)
 
         AMQPTransportServer.create_and_connect(callback, 'queue_name', config)
 

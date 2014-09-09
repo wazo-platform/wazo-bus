@@ -20,7 +20,7 @@ from mock import Mock, patch
 from xivo_bus.ctl.marshaler import Marshaler
 from xivo_bus.ctl.rpc.amqp_transport_client import AMQPTransportClient
 from xivo_bus.ctl.producer import BusProducer
-from xivo_bus.ctl.config import Config
+from xivo_bus.ctl.config import BusConfig
 
 
 class TestBusProducer(unittest.TestCase):
@@ -28,7 +28,7 @@ class TestBusProducer(unittest.TestCase):
     def setUp(self):
         self.marshaler = Mock(Marshaler)
         self.transport = Mock(AMQPTransportClient)
-        self.config = Mock(Config)
+        self.config = Mock(BusConfig)
         self.bus_producer = BusProducer()
         self.bus_producer._marshaler = self.marshaler
         self.bus_producer._transport = self.transport
