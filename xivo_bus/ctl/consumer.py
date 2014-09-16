@@ -18,12 +18,17 @@
 import logging
 import pika
 
-from pika.exceptions import AMQPConnectionError
-
 from xivo_bus.ctl.marshaler import Marshaler
 from xivo_bus.ctl.config import default_config
 
 logger = logging.getLogger(__name__)
+
+
+class BusConsumerError(Exception):
+
+    def __init__(self, error):
+        Exception.__init__(self, error)
+        self.error = error
 
 
 class BusConsumer(object):
@@ -33,14 +38,20 @@ class BusConsumer(object):
         self._marshaler = Marshaler()
 
     def connect(self):
-        self.connection = pika.BlockingConnection(self._connection_params)
-        self.channel = self.connection.channel()
+        try:
+            self.connection = pika.BlockingConnection(self._connection_params)
+            self.channel = self.connection.channel()
+        except pika.exceptions.AMQPConnectionError, e:
+            raise BusConsumerError(e)
 
     def add_binding(self, callback, queue_name, exchange, key):
         self.callback = callback
         self.queue_name = queue_name
         self.channel.queue_declare(queue=queue_name, exclusive=False, durable=True)
-        self.channel.queue_bind(queue=queue_name, exchange=exchange, routing_key=key)
+        try:
+            self.channel.queue_bind(queue=queue_name, exchange=exchange, routing_key=key)
+        except pika.exceptions.ChannelClosed, e:
+            logger.error(e)
 
     def on_message(self, channel, method, header, body):
         body = self._marshaler.unmarshal_message(body)
@@ -53,14 +64,12 @@ class BusConsumer(object):
         try:
             self.channel.basic_consume(self.on_message, self.queue_name)
             self.channel.start_consuming()
-        except AMQPConnectionError:
-            raise BusConnectionError()
+        except pika.exceptions.AMQPConnectionError, e:
+            raise BusConsumerError(e)
+        except pika.exceptions.ChannelClosed, e:
+            raise BusConsumerError(e)
 
     def stop(self):
         if self.connection.is_open:
             self.channel.stop_consuming()
             self.connection.close()
-
-
-class BusConnectionError(Exception):
-    pass
