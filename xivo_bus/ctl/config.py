@@ -31,12 +31,22 @@ class BusConfig(object):
                  port=DEFAULT_PORT,
                  virtual_host=DEFAULT_VIRTUAL_HOST,
                  username=DEFAULT_USERNAME,
-                 password=DEFAULT_PASSWORD):
+                 password=DEFAULT_PASSWORD,
+                 exchange_name='xivo',
+                 exchange_type='topic',
+                 exchange_durable=True,
+                 queue_name='xivo-queue',
+                 default_routing_key='#'):
         self.host = host
         self.port = port
         self.virtual_host = virtual_host
         self.username = username
         self.password = password
+        self.exchange_name = exchange_name
+        self.exchange_type = exchange_type
+        self.exchange_durable = exchange_durable
+        self.queue_name = queue_name
+        self.default_routing_key = default_routing_key
 
     def to_connection_params(self):
         return pika.ConnectionParameters(host=self.host,
