@@ -15,8 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+import pika
+
 from xivo_bus.ctl.rpc.amqp_transport_client import AMQPTransportClient
-from xivo_bus.ctl.config import default_config
+from xivo_bus.ctl.config import BusConfig
 from xivo_bus.ctl.marshaler import Marshaler
 
 
@@ -36,7 +38,9 @@ class BusProducer(object):
 
     """
 
-    def __init__(self, config=default_config):
+    def __init__(self, config=None):
+        if not config:
+            config = BusConfig()
         self._config = config
         self._transport = None
         self._marshaler = Marshaler()
@@ -59,7 +63,10 @@ class BusProducer(object):
         return self._transport is not None
 
     def _new_transport(self):
-        return AMQPTransportClient.create_and_connect(config=self._config)
+        try:
+            return AMQPTransportClient.create_and_connect(config=self._config)
+        except pika.exceptions.AMQPConnectionError, e:
+            raise BusProducerError(e)
 
     def declare_exchange(self, name, exchange_type, durable):
         self._transport.exchange_declare(name, exchange_type, durable)

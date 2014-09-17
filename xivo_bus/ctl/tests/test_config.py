@@ -16,7 +16,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import unittest
-from xivo_bus.ctl.config import BusConfig, default_config
+
+from xivo_bus.ctl.config import BusConfig
 
 
 class TestBusConfig(unittest.TestCase):
@@ -28,7 +29,3 @@ class TestBusConfig(unittest.TestCase):
 
         self.assertEqual(params.host, 'foobar')
         self.assertEqual(params.port, 42)
-
-    def test_default_config(self):
-        self.assertEqual(default_config.host, BusConfig.DEFAULT_HOST)
-        self.assertEqual(default_config.port, BusConfig.DEFAULT_PORT)

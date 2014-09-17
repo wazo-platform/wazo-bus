@@ -20,7 +20,7 @@ from mock import Mock, patch, sentinel
 import unittest
 from pika.exceptions import AMQPConnectionError
 from pika.spec import Basic
-from xivo_bus.ctl.consumer import BusConsumer, BusConnectionError
+from xivo_bus.ctl.consumer import BusConsumer, BusConsumerError
 from xivo_bus.ctl.config import BusConfig
 
 QUEUE_NAME = 'xivo-call-logd-queue'
@@ -70,7 +70,7 @@ class TestBusConsumer(unittest.TestCase):
         self.consumer.callback = self.callback
         self.consumer.queue_name = QUEUE_NAME
 
-        self.assertRaises(BusConnectionError, self.consumer.run)
+        self.assertRaises(BusConsumerError, self.consumer.run)
 
     @patch('pika.BlockingConnection', Mock())
     @patch('pika.ConnectionParameters', Mock())

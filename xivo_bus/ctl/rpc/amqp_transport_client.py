@@ -18,13 +18,16 @@
 import pika
 import threading
 import uuid
-from xivo_bus.ctl.config import default_config
+
+from xivo_bus.ctl.config import BusConfig
 
 
 class AMQPTransportClient(object):
 
     @classmethod
-    def create_and_connect(cls, config=default_config):
+    def create_and_connect(cls, config=None):
+        if not config:
+            config = BusConfig()
         connection_params = config.to_connection_params()
         return cls(connection_params)
 

@@ -25,18 +25,32 @@ class BusConfig(object):
     DEFAULT_VIRTUAL_HOST = pika.connection.Parameters.DEFAULT_VIRTUAL_HOST
     DEFAULT_USERNAME = pika.connection.Parameters.DEFAULT_USERNAME
     DEFAULT_PASSWORD = pika.connection.Parameters.DEFAULT_PASSWORD
+    DEFAULT_EXCHANGE = 'xivo'
+    DEFAULT_QUEUE = 'xivo-queue'
+    DEFAULT_ROUTING_KEY = '#'
+    DEFAULT_EXCHANGE_TYPE = 'topic'
 
     def __init__(self,
                  host=DEFAULT_HOST,
                  port=DEFAULT_PORT,
                  virtual_host=DEFAULT_VIRTUAL_HOST,
                  username=DEFAULT_USERNAME,
-                 password=DEFAULT_PASSWORD):
+                 password=DEFAULT_PASSWORD,
+                 exchange_name=DEFAULT_EXCHANGE,
+                 exchange_type=DEFAULT_EXCHANGE_TYPE,
+                 exchange_durable=True,
+                 queue_name=DEFAULT_QUEUE,
+                 default_routing_key=DEFAULT_ROUTING_KEY):
         self.host = host
         self.port = port
         self.virtual_host = virtual_host
         self.username = username
         self.password = password
+        self.exchange_name = exchange_name
+        self.exchange_type = exchange_type
+        self.exchange_durable = exchange_durable
+        self.queue_name = queue_name
+        self.default_routing_key = default_routing_key
 
     def to_connection_params(self):
         return pika.ConnectionParameters(host=self.host,
@@ -47,5 +61,3 @@ class BusConfig(object):
     @property
     def pika_credentials(self):
         return pika.PlainCredentials(self.username, self.password)
-
-default_config = BusConfig()
