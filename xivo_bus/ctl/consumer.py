@@ -63,9 +63,7 @@ class BusConsumer(object):
         try:
             self.channel.basic_consume(self.on_message, self.queue_name)
             self.channel.start_consuming()
-        except pika.exceptions.AMQPConnectionError, e:
-            raise BusConsumerError(e)
-        except pika.exceptions.ChannelClosed, e:
+        except (pika.exceptions.AMQPConnectionError, pika.exceptions.ChannelClosed) as e:
             raise BusConsumerError(e)
 
     def stop(self):
