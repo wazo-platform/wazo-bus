@@ -18,7 +18,7 @@
 import pika
 
 from xivo_bus.ctl.rpc.amqp_transport_client import AMQPTransportClient
-from xivo_bus.ctl.config import default_config
+from xivo_bus.ctl.config import BusConfig
 from xivo_bus.ctl.marshaler import Marshaler
 
 
@@ -38,7 +38,9 @@ class BusProducer(object):
 
     """
 
-    def __init__(self, config=default_config):
+    def __init__(self, config=None):
+        if not config:
+            config = BusConfig()
         self._config = config
         self._transport = None
         self._marshaler = Marshaler()

@@ -61,5 +61,3 @@ class BusConfig(object):
     @property
     def pika_credentials(self):
         return pika.PlainCredentials(self.username, self.password)
-
-default_config = BusConfig()

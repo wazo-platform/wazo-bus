@@ -19,7 +19,7 @@ import logging
 import pika
 
 from xivo_bus.ctl.marshaler import Marshaler
-from xivo_bus.ctl.config import default_config
+from xivo_bus.ctl.config import BusConfig
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +33,9 @@ class BusConsumerError(Exception):
 
 class BusConsumer(object):
 
-    def __init__(self, config=default_config):
+    def __init__(self, config=None):
+        if not config:
+            config = BusConfig()
         self._connection_params = config.to_connection_params()
         self._marshaler = Marshaler()
 

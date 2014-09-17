@@ -16,13 +16,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import pika
-from xivo_bus.ctl.config import default_config
+
+from xivo_bus.ctl.config import BusConfig
 
 
 class AMQPTransportServer(object):
 
     @classmethod
-    def create_and_connect(cls, request_callback, queue_name=None, config=default_config):
+    def create_and_connect(cls, request_callback, queue_name=None, config=None):
+        if not config:
+            config = BusConfig()
         connection_params = config.to_connection_params()
         return cls(connection_params, request_callback, queue_name)
 
