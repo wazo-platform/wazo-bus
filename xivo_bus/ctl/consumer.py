@@ -60,7 +60,6 @@ class BusConsumer(object):
         self.channel.basic_ack(delivery_tag=method.delivery_tag)
 
     def run(self):
-        logger.info('Running...')
         try:
             self.channel.basic_consume(self.on_message, self.queue_name)
             self.channel.start_consuming()
