@@ -33,7 +33,25 @@ class UserFuncKeyEvent(ResourceConfigEvent):
 
     @classmethod
     def unmarshal(cls, msg):
-        return cls(msg['id'], cls['user_id'])
+        return cls(msg['id'], msg['user_id'])
+
+
+class BSFilterFuncKeyEvent(ResourceConfigEvent):
+
+    def __init__(self, func_key_id, filter_id, secretary_id):
+        self.func_key_id = func_key_id
+        self.filter_id = filter_id
+        self.secretary_id = secretary_id
+
+    def marshal(self):
+        return {'id': self.func_key_id,
+                'destination': 'bsfilter',
+                'filter_id': self.filter_id,
+                'secretary_id': self.secretary_id}
+
+    @classmethod
+    def unmarshal(cls, msg):
+        return cls(msg['id'], msg['filter_id'], msg['secretary_id'])
 
 
 class UserCreateFuncKeyEvent(UserFuncKeyEvent):
@@ -41,4 +59,12 @@ class UserCreateFuncKeyEvent(UserFuncKeyEvent):
 
 
 class UserDeleteFuncKeyEvent(UserFuncKeyEvent):
+    name = 'func_key_deleted'
+
+
+class BSFilterCreateFuncKeyEvent(BSFilterFuncKeyEvent):
+    name = 'func_key_created'
+
+
+class BSFilterDeleteFuncKeyEvent(BSFilterFuncKeyEvent):
     name = 'func_key_deleted'
