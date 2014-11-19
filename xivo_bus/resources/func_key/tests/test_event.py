@@ -18,41 +18,67 @@
 from __future__ import unicode_literals
 
 import unittest
-from ..event import FuncKeyConfigEvent
+from ..event import UserFuncKeyEvent, BSFilterFuncKeyEvent
 
 ID = 1
-TYPE = 'speeddial'
-DESTINATION = 'user'
-DESTINATION_ID = 2
+USER_ID = 2
+FILTER_ID = 3
+SECRETARY_ID = 4
 
 
-class ConcreteFuncKeyConfigEvent(FuncKeyConfigEvent):
+class ConcreteUserFuncKeyEvent(UserFuncKeyEvent):
+    name = 'user_func_key'
 
-    name = 'func_key'
+
+class ConcreteBSFilterFuncKeyEvent(BSFilterFuncKeyEvent):
+    name = 'bsfilter_func_key'
 
 
-class TestAbstractFuncKeyConfigEvent(unittest.TestCase):
+class TestAbstractUserFuncKeyEvent(unittest.TestCase):
 
     def setUp(self):
         self.msg = {
             'id': ID,
-            'type': TYPE,
-            'destination': DESTINATION,
-            'destination_id': DESTINATION_ID,
+            'destination': 'user',
+            'user_id': USER_ID,
         }
 
     def test_marshal(self):
-        command = ConcreteFuncKeyConfigEvent(ID, TYPE, DESTINATION, DESTINATION_ID)
+        command = ConcreteUserFuncKeyEvent(ID, USER_ID)
 
         msg = command.marshal()
 
         self.assertEqual(msg, self.msg)
 
     def test_unmarshal(self):
-        command = ConcreteFuncKeyConfigEvent.unmarshal(self.msg)
+        command = ConcreteUserFuncKeyEvent.unmarshal(self.msg)
 
-        self.assertEqual(command.name, ConcreteFuncKeyConfigEvent.name)
-        self.assertEqual(command.id, ID)
-        self.assertEqual(command.type, TYPE)
-        self.assertEqual(command.destination, DESTINATION)
-        self.assertEqual(command.destination_id, DESTINATION_ID)
+        self.assertEqual(command.name, ConcreteUserFuncKeyEvent.name)
+        self.assertEqual(command.func_key_id, ID)
+        self.assertEqual(command.user_id, USER_ID)
+
+
+class TestAbstractBSFilterFuncKeyEvent(unittest.TestCase):
+
+    def setUp(self):
+        self.msg = {
+            'id': ID,
+            'destination': 'bsfilter',
+            'secretary_id': SECRETARY_ID,
+            'filter_id': FILTER_ID,
+        }
+
+    def test_marshal(self):
+        command = ConcreteBSFilterFuncKeyEvent(ID, FILTER_ID, SECRETARY_ID)
+
+        msg = command.marshal()
+
+        self.assertEqual(msg, self.msg)
+
+    def test_unmarshal(self):
+        command = ConcreteBSFilterFuncKeyEvent.unmarshal(self.msg)
+
+        self.assertEqual(command.name, ConcreteBSFilterFuncKeyEvent.name)
+        self.assertEqual(command.func_key_id, ID)
+        self.assertEqual(command.filter_id, FILTER_ID)
+        self.assertEqual(command.secretary_id, SECRETARY_ID)

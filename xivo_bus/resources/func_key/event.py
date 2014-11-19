@@ -20,26 +20,51 @@ from __future__ import unicode_literals
 from xivo_bus.resources.common.event import ResourceConfigEvent
 
 
-class FuncKeyConfigEvent(ResourceConfigEvent):
+class UserFuncKeyEvent(ResourceConfigEvent):
 
-    def __init__(self, func_key_id, func_key_type, destination, destination_id):
-        self.id = int(func_key_id)
-        self.type = func_key_type
-        self.destination = destination
-        self.destination_id = destination_id
+    def __init__(self, func_key_id, user_id):
+        self.func_key_id = func_key_id
+        self.user_id = user_id
 
     def marshal(self):
-        return {
-            'id': self.id,
-            'type': self.type,
-            'destination': self.destination,
-            'destination_id': self.destination_id
-        }
+        return {'id': self.func_key_id,
+                'destination': 'user',
+                'user_id': self.user_id}
 
     @classmethod
     def unmarshal(cls, msg):
-        return cls(msg['id'], msg['type'], msg['destination'], msg['destination_id'])
+        return cls(msg['id'], msg['user_id'])
 
 
-class CreateFuncKeyEvent(FuncKeyConfigEvent):
+class BSFilterFuncKeyEvent(ResourceConfigEvent):
+
+    def __init__(self, func_key_id, filter_id, secretary_id):
+        self.func_key_id = func_key_id
+        self.filter_id = filter_id
+        self.secretary_id = secretary_id
+
+    def marshal(self):
+        return {'id': self.func_key_id,
+                'destination': 'bsfilter',
+                'filter_id': self.filter_id,
+                'secretary_id': self.secretary_id}
+
+    @classmethod
+    def unmarshal(cls, msg):
+        return cls(msg['id'], msg['filter_id'], msg['secretary_id'])
+
+
+class UserCreateFuncKeyEvent(UserFuncKeyEvent):
     name = 'func_key_created'
+
+
+class UserDeleteFuncKeyEvent(UserFuncKeyEvent):
+    name = 'func_key_deleted'
+
+
+class BSFilterCreateFuncKeyEvent(BSFilterFuncKeyEvent):
+    name = 'func_key_created'
+
+
+class BSFilterDeleteFuncKeyEvent(BSFilterFuncKeyEvent):
+    name = 'func_key_deleted'
