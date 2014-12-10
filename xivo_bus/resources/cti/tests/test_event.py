@@ -48,22 +48,26 @@ class TestUserStatusUpdateEvent(unittest.TestCase):
 
     def test_marchal(self):
         user_id = 42
+        xivo_id = 'ca7f87e9-c2c8-5fad-ba1b-c3140ebb9be3'
         status = 'busy'
 
-        event = UserStatusUpdateEvent(user_id, status)
+        event = UserStatusUpdateEvent(xivo_id, user_id, status)
 
         msg = event.marshal()
 
         assert_that(msg, equal_to({'user_id': 42,
+                                   'xivo_id': 'ca7f87e9-c2c8-5fad-ba1b-c3140ebb9be3',
                                    'status': status}))
 
     def test_that_string_user_ids_are_not_leaked(self):
         user_id = '42'
+        xivo_id = 'ca7f87e9-c2c8-5fad-ba1b-c3140ebb9be3'
         status = 'busy'
 
-        event = UserStatusUpdateEvent(user_id, status)
+        event = UserStatusUpdateEvent(xivo_id, user_id, status)
 
         msg = event.marshal()
 
         assert_that(msg, equal_to({'user_id': 42,
+                                   'xivo_id': 'ca7f87e9-c2c8-5fad-ba1b-c3140ebb9be3',
                                    'status': status}))
