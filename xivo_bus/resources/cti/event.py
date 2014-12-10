@@ -31,3 +31,18 @@ class CallFormResultEvent(object):
             'user_id': self.user_id,
             'variables': self.variables,
         }
+
+
+class UserStatusUpdateEvent(object):
+
+    name = 'user_status_update'
+
+    def __init__(self, user_id, status):
+        self.user_id = int(user_id)
+        self.status = status
+
+    def marshal(self):
+        return {
+            'user_id': self.user_id,
+            'status': self.status,
+        }

@@ -19,6 +19,9 @@ from __future__ import unicode_literals
 
 import unittest
 from ..event import CallFormResultEvent
+from ..event import UserStatusUpdateEvent
+from hamcrest import assert_that
+from hamcrest import equal_to
 
 
 class TestCallFormResultEvent(unittest.TestCase):
@@ -38,3 +41,28 @@ class TestCallFormResultEvent(unittest.TestCase):
         event = CallFormResultEvent(user_id, {})
 
         self.assertEqual(event.user_id, 42)
+
+
+class TestUserStatusUpdateEvent(unittest.TestCase):
+
+    def test_marchal(self):
+        user_id = 42
+        status = 'busy'
+
+        event = UserStatusUpdateEvent(user_id, status)
+
+        msg = event.marshal()
+
+        assert_that(msg, equal_to({'user_id': 42,
+                                   'status': status}))
+
+    def test_that_string_user_ids_are_not_leaked(self):
+        user_id = '42'
+        status = 'busy'
+
+        event = UserStatusUpdateEvent(user_id, status)
+
+        msg = event.marshal()
+
+        assert_that(msg, equal_to({'user_id': 42,
+                                   'status': status}))
