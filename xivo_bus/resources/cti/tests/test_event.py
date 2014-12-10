@@ -33,14 +33,15 @@ class TestCallFormResultEvent(unittest.TestCase):
 
         msg = event.marshal()
 
-        self.assertEqual(msg, {'user_id': 42, 'variables': {'a': 'b'}})
+        assert_that(msg, equal_to({'user_id': 42,
+                                   'variables': {'a': 'b'}}))
 
     def test_string_user_id(self):
         user_id = "42"
 
         event = CallFormResultEvent(user_id, {})
 
-        self.assertEqual(event.user_id, 42)
+        assert_that(event.user_id, equal_to(42))
 
 
 class TestUserStatusUpdateEvent(unittest.TestCase):
