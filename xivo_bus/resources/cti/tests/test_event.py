@@ -22,6 +22,8 @@ from ..event import CallFormResultEvent
 from ..event import UserStatusUpdateEvent
 from hamcrest import assert_that
 from hamcrest import equal_to
+from hamcrest import is_not
+from mock import sentinel
 
 
 class TestCallFormResultEvent(unittest.TestCase):
@@ -71,3 +73,19 @@ class TestUserStatusUpdateEvent(unittest.TestCase):
         assert_that(msg, equal_to({'user_id': 42,
                                    'xivo_id': 'ca7f87e9-c2c8-5fad-ba1b-c3140ebb9be3',
                                    'status': status}))
+
+    def test_equality(self):
+        xivo_id = 'xivo-id'
+        user_id = 42
+        status = 'some_value'
+
+        e1 = UserStatusUpdateEvent(xivo_id, user_id, status)
+        e2 = UserStatusUpdateEvent(xivo_id, user_id, status)
+        e3 = UserStatusUpdateEvent(xivo_id, user_id, 'other_value')
+        e4 = UserStatusUpdateEvent(xivo_id, 666, status)
+        e5 = UserStatusUpdateEvent('other-uuid', user_id, status)
+
+        assert_that(e1, equal_to(e2))
+        assert_that(e1, is_not(equal_to(e3)))
+        assert_that(e1, is_not(equal_to(e4)))
+        assert_that(e1, is_not(equal_to(e5)))

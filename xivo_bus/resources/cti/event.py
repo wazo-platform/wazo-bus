@@ -48,3 +48,8 @@ class UserStatusUpdateEvent(object):
             'user_id': self.user_id,
             'status': self.status,
         }
+
+    def __eq__(self, other):
+        return (self.xivo_id == other.xivo_id
+                and self.user_id == other.user_id
+                and self.status == other.status)
