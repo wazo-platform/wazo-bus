@@ -37,6 +37,14 @@ class _StatusUpdateEvent(object):
                 and self.id_ == other.id_
                 and self.status == other.status)
 
+    def __repr__(self):
+        return '{}({}, {}, {})'.format(
+            self.__class__.__name__,
+            repr(self.xivo_id),
+            repr(self.id_),
+            repr(self.status),
+        )
+
 
 class CallFormResultEvent(object):
 
