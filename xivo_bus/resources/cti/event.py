@@ -33,6 +33,23 @@ class CallFormResultEvent(object):
         }
 
 
+class EndpointStatusUpdateEvent(object):
+
+    name = 'endpoint_status_update'
+
+    def __init__(self, xivo_id, endpoint_id, status):
+        self.xivo_id = xivo_id
+        self.endpoint_id = endpoint_id
+        self.status = status
+
+    def marshal(self):
+        return {
+            'xivo_id': self.xivo_id,
+            'endpoint_id': self.endpoint_id,
+            'status': self.status,
+        }
+
+
 class UserStatusUpdateEvent(object):
 
     name = 'user_status_update'

@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 import unittest
 from ..event import CallFormResultEvent
 from ..event import UserStatusUpdateEvent
+from ..event import EndpointStatusUpdateEvent
 from hamcrest import assert_that
 from hamcrest import equal_to
 from hamcrest import is_not
@@ -43,6 +44,21 @@ class TestCallFormResultEvent(unittest.TestCase):
         event = CallFormResultEvent(user_id, {})
 
         assert_that(event.user_id, equal_to(42))
+
+
+class TestEndpointStatusUpdateEvent(unittest.TestCase):
+
+    def test_marshal(self):
+        endpoint_id = 42
+        xivo_id = 'ca7f87e9-c2c8-5fad-ba1b-c3140ebb9be3'
+        status = 8
+
+        event = EndpointStatusUpdateEvent(xivo_id, endpoint_id, status)
+        msg = event.marshal()
+
+        assert_that(msg, equal_to({'xivo_id': xivo_id,
+                                   'endpoint_id': endpoint_id,
+                                   'status': status}))
 
 
 class TestUserStatusUpdateEvent(unittest.TestCase):
