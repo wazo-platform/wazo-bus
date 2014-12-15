@@ -60,6 +60,19 @@ class TestEndpointStatusUpdateEvent(unittest.TestCase):
                                    'endpoint_id': endpoint_id,
                                    'status': status}))
 
+    def test_that_string_endpoint_ids_are_not_leaked(self):
+        endpoint_id = '42'
+        xivo_id = 'ca7f87e9-c2c8-5fad-ba1b-c3140ebb9be3'
+        status = 8
+
+        event = EndpointStatusUpdateEvent(xivo_id, endpoint_id, status)
+
+        msg = event.marshal()
+
+        assert_that(msg, equal_to({'endpoint_id': 42,
+                                   'xivo_id': xivo_id,
+                                   'status': status}))
+
 
 class TestUserStatusUpdateEvent(unittest.TestCase):
 

@@ -18,6 +18,26 @@
 from __future__ import unicode_literals
 
 
+class _StatusUpdateEvent(object):
+
+    def __init__(self, xivo_id, id_, status):
+        self.xivo_id = xivo_id
+        self.id_ = int(id_)
+        self.status = status
+
+    def marshal(self):
+        return {
+            'xivo_id': self.xivo_id,
+            self.id_field: self.id_,
+            'status': self.status,
+        }
+
+    def __eq__(self, other):
+        return (self.xivo_id == other.xivo_id
+                and self.id_ == other.id_
+                and self.status == other.status)
+
+
 class CallFormResultEvent(object):
 
     name = 'call_form_result'
@@ -33,40 +53,13 @@ class CallFormResultEvent(object):
         }
 
 
-class EndpointStatusUpdateEvent(object):
+class EndpointStatusUpdateEvent(_StatusUpdateEvent):
 
     name = 'endpoint_status_update'
-
-    def __init__(self, xivo_id, endpoint_id, status):
-        self.xivo_id = xivo_id
-        self.endpoint_id = endpoint_id
-        self.status = status
-
-    def marshal(self):
-        return {
-            'xivo_id': self.xivo_id,
-            'endpoint_id': self.endpoint_id,
-            'status': self.status,
-        }
+    id_field = 'endpoint_id'
 
 
-class UserStatusUpdateEvent(object):
+class UserStatusUpdateEvent(_StatusUpdateEvent):
 
     name = 'user_status_update'
-
-    def __init__(self, xivo_id, user_id, status):
-        self.user_id = int(user_id)
-        self.xivo_id = xivo_id
-        self.status = status
-
-    def marshal(self):
-        return {
-            'xivo_id': self.xivo_id,
-            'user_id': self.user_id,
-            'status': self.status,
-        }
-
-    def __eq__(self, other):
-        return (self.xivo_id == other.xivo_id
-                and self.user_id == other.user_id
-                and self.status == other.status)
+    id_field = 'user_id'
