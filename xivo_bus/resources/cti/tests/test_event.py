@@ -23,7 +23,6 @@ from ..event import UserStatusUpdateEvent
 from hamcrest import assert_that
 from hamcrest import equal_to
 from hamcrest import is_not
-from mock import sentinel
 
 
 class TestCallFormResultEvent(unittest.TestCase):
