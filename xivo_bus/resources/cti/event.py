@@ -66,6 +66,9 @@ class EndpointStatusUpdateEvent(_StatusUpdateEvent):
     name = 'endpoint_status_update'
     id_field = 'endpoint_id'
 
+    def __init__(self, xivo_id, id_, status):
+        super(EndpointStatusUpdateEvent, self).__init__(xivo_id, id_, int(status))
+
 
 class UserStatusUpdateEvent(_StatusUpdateEvent):
 
