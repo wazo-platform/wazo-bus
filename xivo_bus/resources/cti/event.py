@@ -53,3 +53,6 @@ class UserStatusUpdateEvent(object):
         return (self.xivo_id == other.xivo_id
                 and self.user_id == other.user_id
                 and self.status == other.status)
+
+    def __ne__(self, other):
+        return not self == other

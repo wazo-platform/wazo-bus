@@ -22,8 +22,6 @@ from ..event import CallFormResultEvent
 from ..event import UserStatusUpdateEvent
 from hamcrest import assert_that
 from hamcrest import equal_to
-from hamcrest import is_not
-from mock import sentinel
 
 
 class TestCallFormResultEvent(unittest.TestCase):
@@ -85,7 +83,11 @@ class TestUserStatusUpdateEvent(unittest.TestCase):
         e4 = UserStatusUpdateEvent(xivo_id, 666, status)
         e5 = UserStatusUpdateEvent('other-uuid', user_id, status)
 
-        assert_that(e1, equal_to(e2))
-        assert_that(e1, is_not(equal_to(e3)))
-        assert_that(e1, is_not(equal_to(e4)))
-        assert_that(e1, is_not(equal_to(e5)))
+        assert_that(e1 == e2, equal_to(True))
+        assert_that(e1 == e3, equal_to(False))
+        assert_that(e1 == e4, equal_to(False))
+        assert_that(e1 == e5, equal_to(False))
+        assert_that(e1 != e2, equal_to(False))
+        assert_that(e1 != e3, equal_to(True))
+        assert_that(e1 != e4, equal_to(True))
+        assert_that(e1 != e5, equal_to(True))
