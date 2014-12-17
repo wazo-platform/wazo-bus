@@ -31,3 +31,28 @@ class CallFormResultEvent(object):
             'user_id': self.user_id,
             'variables': self.variables,
         }
+
+
+class UserStatusUpdateEvent(object):
+
+    name = 'user_status_update'
+
+    def __init__(self, xivo_id, user_id, status):
+        self.user_id = int(user_id)
+        self.xivo_id = xivo_id
+        self.status = status
+
+    def marshal(self):
+        return {
+            'xivo_id': self.xivo_id,
+            'user_id': self.user_id,
+            'status': self.status,
+        }
+
+    def __eq__(self, other):
+        return (self.xivo_id == other.xivo_id
+                and self.user_id == other.user_id
+                and self.status == other.status)
+
+    def __ne__(self, other):
+        return not self == other
