@@ -18,6 +18,7 @@
 from __future__ import unicode_literals
 
 import unittest
+from ..event import AgentStatusUpdateEvent
 from ..event import CallFormResultEvent
 from ..event import UserStatusUpdateEvent
 from ..event import EndpointStatusUpdateEvent
@@ -44,6 +45,33 @@ class TestCallFormResultEvent(unittest.TestCase):
         event = CallFormResultEvent(user_id, {})
 
         assert_that(event.user_id, equal_to(42))
+
+
+class TestAgentStatusUpdateEvent(unittest.TestCase):
+
+    def test_marshal(self):
+        agent_id = 42
+        xivo_id = 'ca7f87e9-c2c8-5fad-ba1b-c3140ebb9be3'
+        status = 'logged_in'
+
+        event = AgentStatusUpdateEvent(xivo_id, agent_id, status)
+        msg = event.marshal()
+
+        assert_that(msg, equal_to({'xivo_id': xivo_id,
+                                   'agent_id': 42,
+                                   'status': 'logged_in'}))
+
+    def test_that_string_ids_are_not_leaked(self):
+        agent_id = '42'
+        xivo_id = 'ca7f87e9-c2c8-5fad-ba1b-c3140ebb9be3'
+        status = 'logged_in'
+
+        event = AgentStatusUpdateEvent(xivo_id, agent_id, status)
+        msg = event.marshal()
+
+        assert_that(msg, equal_to({'xivo_id': xivo_id,
+                                   'agent_id': 42,
+                                   'status': 'logged_in'}))
 
 
 class TestEndpointStatusUpdateEvent(unittest.TestCase):
