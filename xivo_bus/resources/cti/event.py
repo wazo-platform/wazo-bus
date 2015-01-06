@@ -18,6 +18,37 @@
 from __future__ import unicode_literals
 
 
+class _StatusUpdateEvent(object):
+
+    def __init__(self, xivo_id, id_, status):
+        self.xivo_id = xivo_id
+        self.id_ = int(id_)
+        self.status = status
+
+    def marshal(self):
+        return {
+            'xivo_id': self.xivo_id,
+            self.id_field: self.id_,
+            'status': self.status,
+        }
+
+    def __eq__(self, other):
+        return (self.xivo_id == other.xivo_id
+                and self.id_ == other.id_
+                and self.status == other.status)
+
+    def __ne__(self, other):
+        return not self == other
+
+    def __repr__(self):
+        return '{}({}, {}, {})'.format(
+            self.__class__.__name__,
+            repr(self.xivo_id),
+            repr(self.id_),
+            repr(self.status),
+        )
+
+
 class CallFormResultEvent(object):
 
     name = 'call_form_result'
@@ -33,26 +64,16 @@ class CallFormResultEvent(object):
         }
 
 
-class UserStatusUpdateEvent(object):
+class EndpointStatusUpdateEvent(_StatusUpdateEvent):
+
+    name = 'endpoint_status_update'
+    id_field = 'endpoint_id'
+
+    def __init__(self, xivo_id, id_, status):
+        super(EndpointStatusUpdateEvent, self).__init__(xivo_id, id_, int(status))
+
+
+class UserStatusUpdateEvent(_StatusUpdateEvent):
 
     name = 'user_status_update'
-
-    def __init__(self, xivo_id, user_id, status):
-        self.user_id = int(user_id)
-        self.xivo_id = xivo_id
-        self.status = status
-
-    def marshal(self):
-        return {
-            'xivo_id': self.xivo_id,
-            'user_id': self.user_id,
-            'status': self.status,
-        }
-
-    def __eq__(self, other):
-        return (self.xivo_id == other.xivo_id
-                and self.user_id == other.user_id
-                and self.status == other.status)
-
-    def __ne__(self, other):
-        return not self == other
+    id_field = 'user_id'
