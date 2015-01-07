@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2012-2014 Avencall
+# Copyright (C) 2012-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import logging
-from xivo_bus.ctl.rpc.amqp_transport_server import AMQPTransportServer
+from xivo_bus.ctl.producer import BusProducer
+from xivo_bus.ctl.rpc.amqp_transport import AMQPTransportServer
 from xivo_bus.ctl.rpc.response import CommandResponse
 from xivo_bus.ctl.marshaler import Marshaler
 from xivo_bus.resources.agent import error
@@ -29,19 +30,20 @@ class BusCtlServerError(Exception):
     error = 'server error'
 
 
-class BusCtlServer(object):
+class BusCtlServer(BusProducer):
 
     _QUEUE_NAME = 'xivo'
 
-    def __init__(self):
+    def __init__(self, config=None):
+        super(BusCtlServer, self).__init__(config)
         self._transport = self._setup_transport()
-        self._marshaler = None
         self._commands_registry = {}
         self._commands_callback = {}
 
     def _setup_transport(self):
         transport = AMQPTransportServer.create_and_connect(self._process_next_command,
-                                                           self._QUEUE_NAME)
+                                                           self._QUEUE_NAME,
+                                                           config=self._config)
         return transport
 
     def add_command(self, cmd_class, callback):

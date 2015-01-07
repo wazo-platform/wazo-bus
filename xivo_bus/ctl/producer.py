@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2012-2014 Avencall
+# Copyright (C) 2012-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 
 import pika
 
-from xivo_bus.ctl.rpc.amqp_transport_client import AMQPTransportClient
+from xivo_bus.ctl.rpc.amqp_transport import AMQPTransportClient
 from xivo_bus.ctl.config import BusConfig
 from xivo_bus.ctl.marshaler import Marshaler
 
