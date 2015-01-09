@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2012-2014 Avencall
+# Copyright (C) 2012-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -31,8 +31,8 @@ class AgentClient(BusProducer):
 
     _QUEUE_NAME = 'xivo_agent'
 
-    def __init__(self, fetch_response=True):
-        BusProducer.__init__(self)
+    def __init__(self, fetch_response=True, config=None):
+        super(AgentClient, self).__init__(config=config)
         self._fetch_response = fetch_response
 
     def add_agent_to_queue(self, agent_id, queue_id):
