@@ -64,6 +64,12 @@ class CallFormResultEvent(object):
         }
 
 
+class AgentStatusUpdateEvent(_StatusUpdateEvent):
+
+    name = 'agent_status_update'
+    id_field = 'agent_id'
+
+
 class EndpointStatusUpdateEvent(_StatusUpdateEvent):
 
     name = 'endpoint_status_update'
