@@ -69,7 +69,6 @@ class BusProducer(object):
             raise BusProducerError(e)
 
     def declare_exchange(self, name, exchange_type, durable):
-        self.exchange_name = name
         self._transport.exchange_declare(name, exchange_type, durable)
 
     def publish_event(self, exchange, routing_key, event):
