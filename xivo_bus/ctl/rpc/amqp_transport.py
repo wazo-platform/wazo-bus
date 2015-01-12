@@ -24,7 +24,7 @@ from xivo_bus.ctl.config import BusConfig
 
 class _AMQPTransport(object):
 
-    def __init__(self, connection_params):
+    def __init__(self):
         self._lock = threading.Lock()
 
     def exchange_declare(self, name, type_, durable):
@@ -66,7 +66,7 @@ class AMQPTransportServer(_AMQPTransport):
         return cls(connection_params, request_callback, queue_name)
 
     def __init__(self, connection_params, request_callback, queue_name):
-        super(AMQPTransportServer, self).__init__(connection_params)
+        super(AMQPTransportServer, self).__init__()
         self._queue_name = queue_name
         self._request_callback = request_callback
         self._connect(connection_params)
@@ -129,7 +129,7 @@ class AMQPTransportClient(_AMQPTransport):
         return cls(connection_params)
 
     def __init__(self, connection_params):
-        super(AMQPTransportClient, self).__init__(connection_params)
+        super(AMQPTransportClient, self).__init__()
         self._connect(connection_params)
         self._setup_queue()
         self._correlation_id = None
