@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2012-2014 Avencall
+# Copyright (C) 2012-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,10 +25,13 @@ class Marshaler(object):
         self._commands_registry = commands_registry
 
     def marshal_command(self, command):
-        return json.dumps({'name': command.name, 'data': command.marshal()})
+        return json.dumps({'name': command.name,
+                           'data': command.marshal()})
 
     def marshal_response(self, response):
         return json.dumps(response.marshal())
+
+    marshal_message = marshal_command
 
     def unmarshal_command(self, data):
         msg = self.unmarshal_message(data)
