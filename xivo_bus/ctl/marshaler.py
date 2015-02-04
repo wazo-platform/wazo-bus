@@ -16,29 +16,18 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import json
-from xivo_bus.ctl.rpc.response import CommandResponse
+
+from xivo_agent.ctl.response import CommandResponse
 
 
 class Marshaler(object):
 
-    def __init__(self, commands_registry=None):
-        self._commands_registry = commands_registry
-
-    def marshal_command(self, command):
+    def marshal_message(self, command):
         return json.dumps({'name': command.name,
                            'data': command.marshal()})
 
-    def marshal_response(self, response):
-        return json.dumps(response.marshal())
-
-    marshal_message = marshal_command
-
-    def unmarshal_command(self, data):
-        msg = self.unmarshal_message(data)
-        msg_name = msg['name']
-        msg_cmd = msg['data']
-        cmd_class = self._commands_registry[msg_name]
-        return cmd_class.unmarshal(msg_cmd)
+    def marshal_command(self, command):
+        return self.marshal_message(command)
 
     def unmarshal_response(self, data):
         msg = self.unmarshal_message(data)

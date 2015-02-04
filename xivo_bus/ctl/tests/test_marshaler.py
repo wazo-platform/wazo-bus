@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2012-2014 Avencall
+# Copyright (C) 2012-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,8 +18,7 @@
 import unittest
 
 from mock import Mock
-from xivo_bus.ctl.marshaler import Marshaler
-from xivo_bus.ctl.rpc.response import CommandResponse
+from xivo_bus.ctl.marshaler import Marshaler, CommandResponse
 
 
 class TestMarshaler(unittest.TestCase):
@@ -29,39 +28,17 @@ class TestMarshaler(unittest.TestCase):
         command.name = 'foobar'
         command.marshal.return_value = {'a': 1}
 
-        marshal = Marshaler({})
+        marshal = Marshaler()
 
         result = marshal.marshal_command(command)
 
         command.marshal.assert_called_once_with()
         self.assertEquals(result, ('{"data": {"a": 1}, "name": "foobar"}'))
 
-    def test_marshal_response(self):
-        response = Mock()
-        response.marshal.return_value = {'value': 'success', 'error': None}
-
-        marshal = Marshaler({})
-
-        result = marshal.marshal_response(response)
-
-        response.marshal.assert_called_once_with()
-        self.assertEquals(result, '{"value": "success", "error": null}')
-
-    def test_unmarshal_command(self):
-        json = '{"name": "foobar", "data": {"a":1}}'
-
-        command = Mock()
-        registry = {'foobar': command}
-
-        marshal = Marshaler(registry)
-        marshal.unmarshal_command(json)
-
-        command.unmarshal.assert_called_once_with({'a': 1})
-
     def test_unmarshal_response(self):
         json = '{"error": null, "value": "foobar"}'
 
-        marshal = Marshaler({})
+        marshal = Marshaler()
         result = marshal.unmarshal_response(json)
 
         self.assertTrue(isinstance(result, CommandResponse))
@@ -71,12 +48,8 @@ class TestMarshaler(unittest.TestCase):
     def test_unmarshal_message(self):
         json = '{"error": null, "value": "foobar"}'
         expected = {'value': 'foobar', 'error': None}
-        marshal = Marshaler({})
+        marshal = Marshaler()
 
         result = marshal.unmarshal_message(json)
 
         self.assertEquals(result, expected)
-
-
-if __name__ == "__main__":
-    unittest.main()
