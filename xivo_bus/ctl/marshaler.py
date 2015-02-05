@@ -17,21 +17,12 @@
 
 import json
 
-from xivo_agent.ctl.response import CommandResponse
-
 
 class Marshaler(object):
 
     def marshal_message(self, command):
         return json.dumps({'name': command.name,
                            'data': command.marshal()})
-
-    def marshal_command(self, command):
-        return self.marshal_message(command)
-
-    def unmarshal_response(self, data):
-        msg = self.unmarshal_message(data)
-        return CommandResponse.unmarshal(msg)
 
     def unmarshal_message(self, data):
         return json.loads(data)

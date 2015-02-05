@@ -18,32 +18,22 @@
 import unittest
 
 from mock import Mock
-from xivo_bus.ctl.marshaler import Marshaler, CommandResponse
+from xivo_bus.ctl.marshaler import Marshaler
 
 
 class TestMarshaler(unittest.TestCase):
 
-    def test_marshal_command(self):
+    def test_marshal_message(self):
         command = Mock()
         command.name = 'foobar'
         command.marshal.return_value = {'a': 1}
 
         marshal = Marshaler()
 
-        result = marshal.marshal_command(command)
+        result = marshal.marshal_message(command)
 
         command.marshal.assert_called_once_with()
         self.assertEquals(result, ('{"data": {"a": 1}, "name": "foobar"}'))
-
-    def test_unmarshal_response(self):
-        json = '{"error": null, "value": "foobar"}'
-
-        marshal = Marshaler()
-        result = marshal.unmarshal_response(json)
-
-        self.assertTrue(isinstance(result, CommandResponse))
-        self.assertEquals(result.value, 'foobar')
-        self.assertEquals(result.error, None)
 
     def test_unmarshal_message(self):
         json = '{"error": null, "value": "foobar"}'
