@@ -18,7 +18,8 @@
 import unittest
 
 from mock import Mock
-from xivo_bus.ctl.marshaler import Marshaler
+
+from xivo_bus.marshaler import Marshaler
 
 
 class TestMarshaler(unittest.TestCase):
