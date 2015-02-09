@@ -20,8 +20,12 @@ import json
 
 class Marshaler(object):
 
+    def __init__(self, uuid):
+        self._uuid = uuid
+
     def marshal_message(self, command):
         return json.dumps({'name': command.name,
+                           'origin_uuid': self._uuid,
                            'data': command.marshal()})
 
     def unmarshal_message(self, data):
