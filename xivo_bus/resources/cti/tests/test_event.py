@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2014 Avencall
+# Copyright (C) 2013-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -50,26 +50,22 @@ class TestAgentStatusUpdateEvent(unittest.TestCase):
 
     def test_marshal(self):
         agent_id = 42
-        xivo_id = 'ca7f87e9-c2c8-5fad-ba1b-c3140ebb9be3'
         status = 'logged_in'
 
-        event = AgentStatusUpdateEvent(xivo_id, agent_id, status)
+        event = AgentStatusUpdateEvent(agent_id, status)
         msg = event.marshal()
 
-        assert_that(msg, equal_to({'xivo_id': xivo_id,
-                                   'agent_id': 42,
+        assert_that(msg, equal_to({'agent_id': 42,
                                    'status': 'logged_in'}))
 
     def test_that_string_ids_are_not_leaked(self):
         agent_id = '42'
-        xivo_id = 'ca7f87e9-c2c8-5fad-ba1b-c3140ebb9be3'
         status = 'logged_in'
 
-        event = AgentStatusUpdateEvent(xivo_id, agent_id, status)
+        event = AgentStatusUpdateEvent(agent_id, status)
         msg = event.marshal()
 
-        assert_that(msg, equal_to({'xivo_id': xivo_id,
-                                   'agent_id': 42,
+        assert_that(msg, equal_to({'agent_id': 42,
                                    'status': 'logged_in'}))
 
 
@@ -77,38 +73,32 @@ class TestEndpointStatusUpdateEvent(unittest.TestCase):
 
     def test_marshal(self):
         endpoint_id = 42
-        xivo_id = 'ca7f87e9-c2c8-5fad-ba1b-c3140ebb9be3'
         status = 8
 
-        event = EndpointStatusUpdateEvent(xivo_id, endpoint_id, status)
+        event = EndpointStatusUpdateEvent(endpoint_id, status)
         msg = event.marshal()
 
-        assert_that(msg, equal_to({'xivo_id': xivo_id,
-                                   'endpoint_id': endpoint_id,
+        assert_that(msg, equal_to({'endpoint_id': endpoint_id,
                                    'status': status}))
 
     def test_marshal_with_string_status(self):
         endpoint_id = 42
-        xivo_id = 'ca7f87e9-c2c8-5fad-ba1b-c3140ebb9be3'
 
-        event = EndpointStatusUpdateEvent(xivo_id, endpoint_id, '8')
+        event = EndpointStatusUpdateEvent(endpoint_id, '8')
         msg = event.marshal()
 
-        assert_that(msg, equal_to({'xivo_id': xivo_id,
-                                   'endpoint_id': endpoint_id,
+        assert_that(msg, equal_to({'endpoint_id': endpoint_id,
                                    'status': 8}))
 
     def test_that_string_endpoint_ids_are_not_leaked(self):
         endpoint_id = '42'
-        xivo_id = 'ca7f87e9-c2c8-5fad-ba1b-c3140ebb9be3'
         status = 8
 
-        event = EndpointStatusUpdateEvent(xivo_id, endpoint_id, status)
+        event = EndpointStatusUpdateEvent(endpoint_id, status)
 
         msg = event.marshal()
 
         assert_that(msg, equal_to({'endpoint_id': 42,
-                                   'xivo_id': xivo_id,
                                    'status': status}))
 
 
@@ -116,46 +106,38 @@ class TestUserStatusUpdateEvent(unittest.TestCase):
 
     def test_marchal(self):
         user_id = 42
-        xivo_id = 'ca7f87e9-c2c8-5fad-ba1b-c3140ebb9be3'
         status = 'busy'
 
-        event = UserStatusUpdateEvent(xivo_id, user_id, status)
+        event = UserStatusUpdateEvent(user_id, status)
 
         msg = event.marshal()
 
         assert_that(msg, equal_to({'user_id': 42,
-                                   'xivo_id': xivo_id,
                                    'status': status}))
 
     def test_that_string_user_ids_are_not_leaked(self):
         user_id = '42'
-        xivo_id = 'ca7f87e9-c2c8-5fad-ba1b-c3140ebb9be3'
         status = 'busy'
 
-        event = UserStatusUpdateEvent(xivo_id, user_id, status)
+        event = UserStatusUpdateEvent(user_id, status)
 
         msg = event.marshal()
 
         assert_that(msg, equal_to({'user_id': 42,
-                                   'xivo_id': xivo_id,
                                    'status': status}))
 
     def test_equality(self):
-        xivo_id = 'xivo-id'
         user_id = 42
         status = 'some_value'
 
-        e1 = UserStatusUpdateEvent(xivo_id, user_id, status)
-        e2 = UserStatusUpdateEvent(xivo_id, user_id, status)
-        e3 = UserStatusUpdateEvent(xivo_id, user_id, 'other_value')
-        e4 = UserStatusUpdateEvent(xivo_id, 666, status)
-        e5 = UserStatusUpdateEvent('other-uuid', user_id, status)
+        e1 = UserStatusUpdateEvent(user_id, status)
+        e2 = UserStatusUpdateEvent(user_id, status)
+        e3 = UserStatusUpdateEvent(user_id, 'other_value')
+        e4 = UserStatusUpdateEvent(666, status)
 
         assert_that(e1 == e2, equal_to(True))
+        assert_that(e1 != e2, equal_to(False))
         assert_that(e1 == e3, equal_to(False))
         assert_that(e1 == e4, equal_to(False))
-        assert_that(e1 == e5, equal_to(False))
-        assert_that(e1 != e2, equal_to(False))
         assert_that(e1 != e3, equal_to(True))
         assert_that(e1 != e4, equal_to(True))
-        assert_that(e1 != e5, equal_to(True))
