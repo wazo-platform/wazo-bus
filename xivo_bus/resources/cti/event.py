@@ -48,6 +48,7 @@ class _StatusUpdateEvent(object):
 class CallFormResultEvent(object):
 
     name = 'call_form_result'
+    routing_key = 'call_form_result'
 
     def __init__(self, user_id, variables):
         self.user_id = int(user_id)
@@ -63,12 +64,17 @@ class CallFormResultEvent(object):
 class AgentStatusUpdateEvent(_StatusUpdateEvent):
 
     name = 'agent_status_update'
+    routing_key = 'status.agent'
     id_field = 'agent_id'
+
+    STATUS_LOGGED_IN = 'logged_in'
+    STATUS_LOGGED_OUT = 'logged_out'
 
 
 class EndpointStatusUpdateEvent(_StatusUpdateEvent):
 
     name = 'endpoint_status_update'
+    routing_key = 'status.endpoint'
     id_field = 'endpoint_id'
 
     def __init__(self, id_, status):
@@ -78,4 +84,5 @@ class EndpointStatusUpdateEvent(_StatusUpdateEvent):
 class UserStatusUpdateEvent(_StatusUpdateEvent):
 
     name = 'user_status_update'
+    routing_key = 'status.user'
     id_field = 'user_id'
