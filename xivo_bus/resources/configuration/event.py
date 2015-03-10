@@ -29,6 +29,7 @@ class ConfigurationEvent(ResourceConfigEvent):
 
 class LiveReloadEditedEvent(ConfigurationEvent):
     name = 'live_reload_edited'
+    routing_key = 'config.live_reload.edited'
 
     def __init__(self, live_reload_enabled):
         self.live_reload_enabled = live_reload_enabled
