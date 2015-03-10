@@ -27,7 +27,7 @@ class ConfigurationEvent(ResourceConfigEvent):
         return cls(msg['live_reload_enabled'])
 
 
-class LiveRealoadEditedEvent(ConfigurationEvent):
+class LiveReloadEditedEvent(ConfigurationEvent):
     name = 'live_reload_edited'
 
     def __init__(self, live_reload_enabled):
