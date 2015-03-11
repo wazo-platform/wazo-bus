@@ -21,6 +21,8 @@ from xivo_bus.resources.common.event import ResourceConfigEvent
 
 
 class AgentQueueConfigEvent(ResourceConfigEvent):
+    routing_key = 'config.agent_queue_association.{}'
+
     def __init__(self, queue_id, agent_id, penalty):
         self.queue_id = queue_id
         self.agent_id = agent_id
@@ -40,14 +42,17 @@ class AgentQueueConfigEvent(ResourceConfigEvent):
 
 class AgentQueueAssociationEditedEvent(AgentQueueConfigEvent):
     name = 'agent_queue_association_edited'
+    routing_key = AgentQueueConfigEvent.routing_key.format('edited')
 
 
 class AgentQueueAssociatedEvent(AgentQueueConfigEvent):
     name = 'agent_queue_associated'
+    routing_key = AgentQueueConfigEvent.routing_key.format('created')
 
 
 class AgentRemovedFromQueueEvent(AgentQueueConfigEvent):
     name = "agent_removed_from_queue"
+    routing_key = AgentQueueConfigEvent.routing_key.format('deleted')
 
     def __init__(self, agent_id, queue_id):
         self.queue_id = queue_id
