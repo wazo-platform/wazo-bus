@@ -21,7 +21,7 @@ import unittest
 from hamcrest import assert_that, equal_to, has_property
 
 
-from ..event import LiveRealoadEditedEvent
+from ..event import LiveReloadEditedEvent
 
 
 class TestLiveRealoadEditedEvent(unittest.TestCase):
@@ -32,13 +32,13 @@ class TestLiveRealoadEditedEvent(unittest.TestCase):
         }
 
     def test_marshal(self):
-        command = LiveRealoadEditedEvent(True)
+        command = LiveReloadEditedEvent(True)
 
         msg = command.marshal()
 
         assert_that(msg, equal_to(self.msg))
 
     def test_unmarshal(self):
-        event = LiveRealoadEditedEvent.unmarshal(self.msg)
+        event = LiveReloadEditedEvent.unmarshal(self.msg)
 
         assert_that(event, has_property('live_reload_enabled', True))
