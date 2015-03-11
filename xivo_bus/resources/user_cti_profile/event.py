@@ -21,6 +21,7 @@ from xivo_bus.resources.common.event import ResourceConfigEvent
 
 
 class UserCtiProfileConfigEvent(ResourceConfigEvent):
+    routing_key = 'config.user_cti_profile_association.{}'
 
     def __init__(self, user_id, cti_profile_id, enabled):
         self.user_id = user_id
@@ -44,3 +45,4 @@ class UserCtiProfileConfigEvent(ResourceConfigEvent):
 
 class UserCtiProfileEditedEvent(UserCtiProfileConfigEvent):
     name = 'cti_profile_edited'
+    routing_key = UserCtiProfileConfigEvent.routing_key.format('edited')
