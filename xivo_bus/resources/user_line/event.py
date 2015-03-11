@@ -21,6 +21,7 @@ from xivo_bus.resources.common.event import ResourceConfigEvent
 
 
 class UserLineConfigEvent(ResourceConfigEvent):
+    routing_key = 'config.user_line_association.{}'
 
     def __init__(self,
                  user_id,
@@ -51,7 +52,9 @@ class UserLineConfigEvent(ResourceConfigEvent):
 
 class UserLineAssociatedEvent(UserLineConfigEvent):
     name = 'line_associated'
+    routing_key = UserLineConfigEvent.routing_key.format('created')
 
 
 class UserLineDissociatedEvent(UserLineConfigEvent):
     name = 'line_dissociated'
+    routing_key = UserLineConfigEvent.routing_key.format('deleted')
