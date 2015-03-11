@@ -21,6 +21,7 @@ from xivo_bus.resources.common.event import ResourceConfigEvent
 
 
 class ExtensionConfigEvent(ResourceConfigEvent):
+    routing_key = 'config.extension.{}'
 
     def __init__(self, extension_id, exten, context):
         self.id = int(extension_id)
@@ -41,11 +42,14 @@ class ExtensionConfigEvent(ResourceConfigEvent):
 
 class EditExtensionEvent(ExtensionConfigEvent):
     name = 'extension_edited'
+    routing_key = ExtensionConfigEvent.routing_key.format('edited')
 
 
 class CreateExtensionEvent(ExtensionConfigEvent):
     name = 'extension_created'
+    routing_key = ExtensionConfigEvent.routing_key.format('created')
 
 
 class DeleteExtensionEvent(ExtensionConfigEvent):
     name = 'extension_deleted'
+    routing_key = ExtensionConfigEvent.routing_key.format('deleted')

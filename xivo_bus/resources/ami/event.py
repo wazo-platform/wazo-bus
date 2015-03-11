@@ -23,6 +23,7 @@ class AMIEvent(object):
     def __init__(self, name, variables):
         self.name = name
         self.variables = variables
+        self.routing_key = 'ami.{}'.format(self.name)
 
     def marshal(self):
         return self.variables

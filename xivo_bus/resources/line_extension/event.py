@@ -21,6 +21,7 @@ from xivo_bus.resources.common.event import ResourceConfigEvent
 
 
 class LineExtensionConfigEvent(ResourceConfigEvent):
+    routing_key = 'config.line_extension_association.{}'
 
     def __init__(self,
                  line_id,
@@ -43,7 +44,9 @@ class LineExtensionConfigEvent(ResourceConfigEvent):
 
 class LineExtensionAssociatedEvent(LineExtensionConfigEvent):
     name = 'line_extension_associated'
+    routing_key = LineExtensionConfigEvent.routing_key.format('created')
 
 
 class LineExtensionDissociatedEvent(LineExtensionConfigEvent):
     name = 'line_extension_dissociated'
+    routing_key = LineExtensionConfigEvent.routing_key.format('deleted')

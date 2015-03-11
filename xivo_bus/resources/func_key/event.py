@@ -21,6 +21,7 @@ from xivo_bus.resources.common.event import ResourceConfigEvent
 
 
 class UserFuncKeyEvent(ResourceConfigEvent):
+    routing_key = 'config.user.{}'
 
     def __init__(self, func_key_id, user_id):
         self.func_key_id = func_key_id
@@ -37,6 +38,7 @@ class UserFuncKeyEvent(ResourceConfigEvent):
 
 
 class BSFilterFuncKeyEvent(ResourceConfigEvent):
+    routing_key = 'config.bsfilter.{}'
 
     def __init__(self, func_key_id, filter_id, secretary_id):
         self.func_key_id = func_key_id
@@ -56,15 +58,19 @@ class BSFilterFuncKeyEvent(ResourceConfigEvent):
 
 class UserCreateFuncKeyEvent(UserFuncKeyEvent):
     name = 'func_key_created'
+    routing_key = UserFuncKeyEvent.routing_key.format('created')
 
 
 class UserDeleteFuncKeyEvent(UserFuncKeyEvent):
     name = 'func_key_deleted'
+    routing_key = UserFuncKeyEvent.routing_key.format('deleted')
 
 
 class BSFilterCreateFuncKeyEvent(BSFilterFuncKeyEvent):
     name = 'func_key_created'
+    routing_key = BSFilterFuncKeyEvent.routing_key.format('created')
 
 
 class BSFilterDeleteFuncKeyEvent(BSFilterFuncKeyEvent):
     name = 'func_key_deleted'
+    routing_key = BSFilterFuncKeyEvent.routing_key.format('deleted')

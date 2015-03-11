@@ -43,3 +43,4 @@ class ContextConfigEvent(ResourceConfigEvent):
 
 class CreateContextEvent(ContextConfigEvent):
     name = 'context_created'
+    routing_key = 'config.context.created'
