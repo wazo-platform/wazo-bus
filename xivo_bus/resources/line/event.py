@@ -22,11 +22,14 @@ from xivo_bus.resources.common.event import ResourceConfigEvent
 
 class EditLineEvent(ResourceConfigEvent):
     name = 'line_edited'
+    routing_key = 'config.line.edited'
 
 
 class CreateLineEvent(ResourceConfigEvent):
     name = 'line_created'
+    routing_key = 'config.line.created'
 
 
 class DeleteLineEvent(ResourceConfigEvent):
     name = 'line_deleted'
+    routing_key = 'config.line.deleted'
