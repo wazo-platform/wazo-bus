@@ -22,11 +22,14 @@ from xivo_bus.resources.common.event import ResourceConfigEvent
 
 class EditUserEvent(ResourceConfigEvent):
     name = 'user_edited'
+    routing_key = 'config.user.edited'
 
 
 class CreateUserEvent(ResourceConfigEvent):
     name = 'user_created'
+    routing_key = 'config.user.created'
 
 
 class DeleteUserEvent(ResourceConfigEvent):
     name = 'user_deleted'
+    routing_key = 'config.user.deleted'
