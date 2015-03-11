@@ -22,11 +22,14 @@ from xivo_bus.resources.common.event import ResourceConfigEvent
 
 class EditVoicemailEvent(ResourceConfigEvent):
     name = 'voicemail_edited'
+    routing_key = 'config.voicemail.edited'
 
 
 class CreateVoicemailEvent(ResourceConfigEvent):
     name = 'voicemail_created'
+    routing_key = 'config.voicemail.created'
 
 
 class DeleteVoicemailEvent(ResourceConfigEvent):
     name = 'voicemail_deleted'
+    routing_key = 'config.voicemail.deleted'
