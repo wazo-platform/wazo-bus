@@ -21,6 +21,7 @@ from xivo_bus.resources.common.event import ResourceConfigEvent
 
 
 class UserVoicemailConfigEvent(ResourceConfigEvent):
+    routing_key = 'config.user_voicemail_association.{}'
 
     def __init__(self,
                  user_id,
@@ -47,7 +48,9 @@ class UserVoicemailConfigEvent(ResourceConfigEvent):
 
 class UserVoicemailAssociatedEvent(UserVoicemailConfigEvent):
     name = 'voicemail_associated'
+    routing_key = UserVoicemailConfigEvent.routing_key.format('created')
 
 
 class UserVoicemailDissociatedEvent(UserVoicemailConfigEvent):
     name = 'voicemail_dissociated'
+    routing_key = UserVoicemailConfigEvent.routing_key.format('deleted')
