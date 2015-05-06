@@ -60,6 +60,10 @@ class CallFormResultEvent(object):
             'variables': self.variables,
         }
 
+    def __eq__(self, other):
+        return (self.user_id == other.user_id
+                and self.variables == other.variables)
+
 
 class AgentStatusUpdateEvent(_StatusUpdateEvent):
 
