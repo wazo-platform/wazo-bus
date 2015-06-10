@@ -18,7 +18,7 @@
 from __future__ import unicode_literals
 
 import unittest
-from ..event import UserFuncKeyEvent, BSFilterFuncKeyEvent
+from ..event import UserFuncKeyEvent, BSFilterFuncKeyEvent, FuncKeyTemplateEvent
 
 ID = 1
 USER_ID = 2
@@ -32,6 +32,10 @@ class ConcreteUserFuncKeyEvent(UserFuncKeyEvent):
 
 class ConcreteBSFilterFuncKeyEvent(BSFilterFuncKeyEvent):
     name = 'bsfilter_func_key'
+
+
+class ConcreteFuncKeyTemplateEvent(FuncKeyTemplateEvent):
+    name = 'func_key_template'
 
 
 class TestAbstractUserFuncKeyEvent(unittest.TestCase):
@@ -82,3 +86,24 @@ class TestAbstractBSFilterFuncKeyEvent(unittest.TestCase):
         self.assertEqual(command.func_key_id, ID)
         self.assertEqual(command.filter_id, FILTER_ID)
         self.assertEqual(command.secretary_id, SECRETARY_ID)
+
+
+class TestAbstractFuncKeyTemplateEvent(unittest.TestCase):
+
+    def setUp(self):
+        self.msg = {
+            'id': ID,
+        }
+
+    def test_marshal(self):
+        command = ConcreteFuncKeyTemplateEvent(ID)
+
+        msg = command.marshal()
+
+        self.assertEqual(msg, self.msg)
+
+    def test_unmarshal(self):
+        command = ConcreteFuncKeyTemplateEvent.unmarshal(self.msg)
+
+        self.assertEqual(command.name, ConcreteFuncKeyTemplateEvent.name)
+        self.assertEqual(command.id, ID)

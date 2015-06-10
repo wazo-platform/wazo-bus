@@ -19,6 +19,24 @@ from __future__ import unicode_literals
 
 from xivo_bus.resources.common.event import ResourceConfigEvent
 
+class FuncKeyTemplateEvent(ResourceConfigEvent):
+    routing_key = 'config.funckey.template.{}'
+
+
+class CreateFuncKeyTemplateEvent(ResourceConfigEvent):
+    name = 'func_key_template_created'
+    routing_key = FuncKeyTemplateEvent.routing_key.format('created')
+
+
+class DeleteFuncKeyTemplateEvent(ResourceConfigEvent):
+    name = 'func_key_template_deleted'
+    routing_key = FuncKeyTemplateEvent.routing_key.format('deleted')
+
+
+class EditFuncKeyTemplateEvent(ResourceConfigEvent):
+    name = 'func_key_template_edited'
+    routing_key = FuncKeyTemplateEvent.routing_key.format('edited')
+
 
 class UserFuncKeyEvent(ResourceConfigEvent):
     routing_key = 'config.user.{}'
