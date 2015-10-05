@@ -19,13 +19,12 @@
 class ServiceRegisteredEvent(object):
 
     name = 'service_registered_event'
-    routing_key_fmt = 'service.registered.{service_name}.{uuid}'
+    routing_key_fmt = 'service.registered.{service_name}'
 
-    def __init__(self, service_name, service_id, config_uuid, advertise_address, advertise_port, tags):
-        self.routing_key = self.routing_key_fmt.format(service_name=service_name, uuid=config_uuid)
+    def __init__(self, service_name, service_id, advertise_address, advertise_port, tags):
+        self.routing_key = self.routing_key_fmt.format(service_name=service_name)
         self._service_name = service_name
         self._service_id = service_id
-        self._uuid = config_uuid
         self._advertise_address = advertise_address
         self._advertise_port = advertise_port
         self._tags = tags
@@ -33,26 +32,23 @@ class ServiceRegisteredEvent(object):
     def marshal(self):
         return {'service_name': self._service_name,
                 'service_id': self._service_id,
-                'uuid': self._uuid,
                 'address': self._advertise_address,
                 'port': self._advertise_port,
                 'tags': self._tags}
 
 
-class ServiceUnregisteredEvent(object):
+class ServiceDeregisteredEvent(object):
 
-    name = 'service_unregistered_event'
-    routing_key_fmt = 'service.unregistered.{service_name}.{uuid}'
+    name = 'service_deregistered_event'
+    routing_key_fmt = 'service.deregistered.{service_name}'
 
-    def __init__(self, service_name, service_id, config_uuid, tags):
-        self.routing_key = self.routing_key_fmt.format(service_name=service_name, uuid=config_uuid)
+    def __init__(self, service_name, service_id, tags):
+        self.routing_key = self.routing_key_fmt.format(service_name=service_name)
         self._service_name = service_name
         self._service_id = service_id
-        self._uuid = config_uuid
         self._tags = tags
 
     def marshal(self):
         return {'service_name': self._service_name,
                 'service_id': self._service_id,
-                'uuid': self._uuid,
                 'tags': self._tags}

@@ -18,7 +18,7 @@
 import unittest
 import uuid
 
-from ..event import ServiceRegisteredEvent, ServiceUnregisteredEvent
+from ..event import ServiceRegisteredEvent, ServiceDeregisteredEvent
 
 from hamcrest import assert_that, equal_to
 from mock import sentinel as s
@@ -29,12 +29,10 @@ class TestServiceRegisteredEvent(unittest.TestCase):
     def test_marshal(self):
         service_name = 'xivo-ctid'
         service_id = str(uuid.uuid4())
-        config_uuid = str(uuid.uuid4())
         service_tags = ['tag1', 'tag2']
 
         event = ServiceRegisteredEvent(service_name,
                                        service_id,
-                                       config_uuid,
                                        s.address,
                                        s.port,
                                        service_tags)
@@ -43,28 +41,24 @@ class TestServiceRegisteredEvent(unittest.TestCase):
 
         assert_that(msg, equal_to({'service_name': service_name,
                                    'service_id': service_id,
-                                   'uuid': config_uuid,
                                    'address': s.address,
                                    'port': s.port,
                                    'tags': service_tags}))
 
 
-class TestServiceUnregisteredEvent(unittest.TestCase):
+class TestServiceDeregisteredEvent(unittest.TestCase):
 
     def test_marshal(self):
         service_name = 'xivo-ctid'
         service_id = str(uuid.uuid4())
-        config_uuid = str(uuid.uuid4())
         service_tags = ['tag1', 'tag2']
 
-        event = ServiceUnregisteredEvent(service_name,
+        event = ServiceDeregisteredEvent(service_name,
                                          service_id,
-                                         config_uuid,
                                          service_tags)
 
         msg = event.marshal()
 
         assert_that(msg, equal_to({'service_name': service_name,
                                    'service_id': service_id,
-                                   'uuid': config_uuid,
                                    'tags': service_tags}))
