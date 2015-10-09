@@ -37,16 +37,14 @@ class ServiceRegisteredEvent(object):
                 'tags': self._tags}
 
     def __eq__(self, other):
-        return not self.__ne__(other)
+        return (self._service_name == other._service_name and
+                self._service_id == other._service_id and
+                self._advertise_address == other._advertise_address and
+                self._advertise_port == other._advertise_port and
+                sorted(self._tags) == sorted(other._tags))
 
     def __ne__(self, other):
-        return any([
-            self._service_name != other._service_name,
-            self._service_id != other._service_id,
-            self._advertise_address != other._advertise_address,
-            self._advertise_port != other._advertise_port,
-            sorted(self._tags) != sorted(other._tags)
-        ])
+        return not self.__eq__(other)
 
 
 class ServiceDeregisteredEvent(object):
@@ -66,11 +64,9 @@ class ServiceDeregisteredEvent(object):
                 'tags': self._tags}
 
     def __eq__(self, other):
-        return not self.__ne__(other)
+        return (self._service_name == other._service_name and
+                self._service_id == other._service_id and
+                sorted(self._tags) == sorted(other._tags))
 
     def __ne__(self, other):
-        return any([
-            self._service_name != other._service_name,
-            self._service_id != other._service_id,
-            sorted(self._tags) != sorted(other._tags),
-        ])
+        return not self.__eq__(other)
