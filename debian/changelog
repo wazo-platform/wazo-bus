@@ -1,4 +1,4 @@
-xivo-bus (13.24~20131129.185349.2599ff5-3) squeeze-xivo-skaro-dev; urgency=low
+xivo-bus (13.24~20131129.185349.2599ff5) xivo-dev; urgency=low
 
   * move python-pika dependency from xivo-agent to xivo-bus
 
