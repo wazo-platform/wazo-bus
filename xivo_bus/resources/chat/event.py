@@ -33,3 +33,12 @@ class ChatMessageEvent(object):
                 'to': self._to,
                 'alias': self._alias,
                 'msg': self._msg}
+
+    def __eq__(self, other):
+        return (self._from == other._from
+                and self._to == other._to
+                and self._alias == other._alias
+                and self._msg == other._msg)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
