@@ -17,26 +17,25 @@
 
 import unittest
 
-from hamcrest import assert_that, equal_to
-
-from ..event import CreateCallEvent
+from ..event import _CallEvent
 
 
-class TestCreateCallEvent(unittest.TestCase):
+class ConcreteCallEvent(_CallEvent):
+
+    name = 'foo'
+
+
+RESOURCE_DATA = {'test': 'test'}
+
+
+class TestCallEvent(unittest.TestCase):
+
+    def setUp(self):
+        self.msg = RESOURCE_DATA
 
     def test_marshal(self):
-        data = {
-            'test': 'test'
-        }
+        command = ConcreteCallEvent(RESOURCE_DATA)
 
-        event = CreateCallEvent(data)
+        msg = command.marshal()
 
-        result = event.marshal()
-
-        expected_payload = { 'data': {
-                                  'test': 'test' }
-                           }
-        expected_routing_key = 'calls.call.created'
-
-        assert_that(result, equal_to(expected_payload))
-        assert_that(event.routing_key, equal_to(expected_routing_key))
+        self.assertEqual(msg, self.msg)

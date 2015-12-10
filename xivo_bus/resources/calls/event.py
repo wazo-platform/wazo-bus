@@ -24,7 +24,7 @@ class _CallEvent(object):
         self._data = data
 
     def marshal(self):
-        return {'data': self._data }
+        return self._data
 
     def __eq__(self, other):
         return (self._data == other._data)
@@ -72,25 +72,25 @@ class DeleteWaitingRoomEvent(_CallEvent):
 class JoinCallWaitingRoomEvent(_CallEvent):
 
     name = 'waiting_room_call_joined'
-    routing_key = 'calls.waiting_room.call.joined'
+    routing_key = 'calls.waiting_room.call_joined'
 
 
-class LeftCallWaitingRoomEvent(_CallEvent):
+class LeaveCallWaitingRoomEvent(_CallEvent):
 
     name = 'waiting_room_call_left'
-    routing_key = 'calls.waiting_room.call.left'
+    routing_key = 'calls.waiting_room.call_left'
 
 
 class JoinCallIncomingRoomEvent(_CallEvent):
 
     name = 'incoming_room_call_joined'
-    routing_key = 'calls.incoming_room.call.joined'
+    routing_key = 'calls.incoming_room.call_joined'
 
 
-class LeftCallIncomingRoomEvent(_CallEvent):
+class LeaveCallIncomingRoomEvent(_CallEvent):
 
     name = 'incoming_room_call_left'
-    routing_key = 'calls.incoming_room.call.left'
+    routing_key = 'calls.incoming_room.call_left'
 
 
 class StartBlindTransferEvent(_CallEvent):
@@ -107,5 +107,5 @@ class CompletedBlindTransferEvent(_CallEvent):
 
 class CancelBlindTransferEvent(_CallEvent):
 
-    name = 'blind_transfer_canceled'
-    routing_key = 'calls.transfer.blind.canceled'
+    name = 'blind_transfer_cancelled'
+    routing_key = 'calls.transfer.blind.cancelled'
