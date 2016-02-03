@@ -3,3 +3,13 @@ xivo-bus [![Build Status](https://travis-ci.org/xivo-pbx/xivo-bus.png?branch=mas
 
 xivo-bus is a library used internally in XiVO to communicate with other components
 of XiVO using RabbitMQ
+
+
+Running unit tests
+------------------
+
+```
+apt-get install libpq-dev python-dev libffi-dev libyaml-dev
+pip install tox
+tox --recreate -e py27
+```
