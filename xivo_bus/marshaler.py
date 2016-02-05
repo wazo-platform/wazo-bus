@@ -32,3 +32,31 @@ class Marshaler(object):
 
     def unmarshal_message(self, data):
         return json.loads(data)
+
+
+class CollectdMarshaler(object):
+
+    content_type = 'text/collectd'
+
+    def __init__(self, uuid):
+        self._uuid = uuid
+
+    def marshal_message(self, command):
+        if not command.is_valid():
+            raise ValueError(command)
+
+        message = 'PUTVAL {host}/{plugin}/{type_}-{type_instance} interval={interval} N:{values}'
+
+        if command.plugin_instance:
+            plugin = '{}-{}'.format(command.plugin, command.plugin_instance)
+        else:
+            plugin = command.plugin
+
+        return message.format(
+            host=self._uuid,
+            plugin=plugin,
+            type_=command.type_,
+            type_instance=command.type_instance,
+            interval=command.interval,
+            values=':'.join(command.values)
+        )
