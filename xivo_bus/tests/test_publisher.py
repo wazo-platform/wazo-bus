@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -36,8 +36,9 @@ class TestPublisher(unittest.TestCase):
     def test_publish(self):
         event = Mock()
         event.routing_key = 'foobar'
+        self.marshaler.content_type = 'bazglop'
 
         self.publisher.publish(event)
 
         self.marshaler.marshal_message.assert_called_once_with(event)
-        self.publish.assert_called_once_with(sentinel.data, routing_key='foobar')
+        self.publish.assert_called_once_with(sentinel.data, routing_key='foobar', content_type='bazglop')

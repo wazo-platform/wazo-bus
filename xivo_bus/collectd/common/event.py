@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2016 Avencall
+# Copyright (C) 2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,6 +15,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from xivo_bus.marshaler import CollectdMarshaler, Marshaler  # noqa
-from xivo_bus.publisher import Publisher  # noqa
-from xivo_bus.publishing_queue import PublishingQueue  # noqa
+
+class CollectdEvent(object):
+    interval = 10
+    plugin = None
+    plugin_instance = None
+    type_ = None
+    type_instance = None
+    values = ()
+
+    def is_valid(self):
+        return (self.plugin is not None and
+                self.plugin_instance is not None and
+                self.type_ is not None and
+                self.type_instance is not None and
+                len(self.values) > 0)

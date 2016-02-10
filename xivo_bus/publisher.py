@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2012-2015 Avencall
+# Copyright (C) 2012-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -39,4 +39,4 @@ class Publisher(object):
 
     def publish(self, event):
         data = self._marshaler.marshal_message(event)
-        self._publish(data, routing_key=event.routing_key)
+        self._publish(data, content_type=self._marshaler.content_type, routing_key=event.routing_key)
