@@ -18,13 +18,17 @@
 from xivo_bus.collectd.common.event import CollectdEvent
 
 
-class ChannelCreatedCollectdEvent(CollectdEvent):
+class ChannelCollectdEvent(CollectdEvent):
     plugin = 'channels'
-    plugin_instance = None
+    plugin_instance = 'global'
     routing_key = 'collectd.channels'
     type_ = 'counter'
-    type_instance = 'channel-created'
     values = ('1',)
 
-    def __init__(self, channel_id):
-        self.plugin_instance = channel_id
+
+class ChannelCreatedCollectdEvent(ChannelCollectdEvent):
+    type_instance = 'created'
+
+
+class ChannelEndedCollectdEvent(ChannelCollectdEvent):
+    type_instance = 'ended'
