@@ -16,7 +16,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import logging
-import Queue
+
+from six.moves import queue
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +27,7 @@ class PublishingQueue(object):
     def __init__(self, publisher_factory):
         self._publisher = None
         self._publisher_factory = publisher_factory
-        self._queue = Queue.Queue()
+        self._queue = queue.Queue()
         self._running = False
         self._should_stop = False
 
@@ -36,7 +37,7 @@ class PublishingQueue(object):
         while not self._should_stop:
             try:
                 message = self._queue.get(timeout=0.1)
-            except Queue.Empty:
+            except queue.Empty:
                 continue
 
             if not self._publisher:
