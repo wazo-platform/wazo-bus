@@ -23,6 +23,7 @@ class ChannelCollectdEvent(CollectdEvent):
     plugin_instance = 'global'
     routing_key = 'collectd.channels'
     type_ = 'counter'
+    type_instance = None
     values = ('1',)
 
 
