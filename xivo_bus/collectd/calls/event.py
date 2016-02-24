@@ -52,4 +52,4 @@ class CallDurationCollectdEvent(CallCollectdEvent):
 
     def __init__(self, application, application_id, duration):
         super(CallDurationCollectdEvent, self).__init__(application, application_id)
-        self.values = (str(duration),)
+        self.values = (str(round(duration, 3)),)
