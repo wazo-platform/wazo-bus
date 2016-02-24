@@ -77,7 +77,8 @@ class TestMarshalerCollectd(unittest.TestCase):
         command.type_ = 'mytype'
         command.type_instance = 'myinstance'
         command.interval = '1'
-        command.values = ('2','3')
+        command.values = ('2', '3')
+        command.time = 'N'
 
         result = self.marshaler.marshal_message(command)
 
