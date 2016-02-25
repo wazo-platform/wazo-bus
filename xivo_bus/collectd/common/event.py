@@ -30,5 +30,5 @@ class CollectdEvent(object):
                 self.plugin_instance is not None and
                 self.type_ is not None and
                 self.type_instance is not None and
-                self.time == 'N' or isinstance(self.time, int) and
+                (self.time == 'N' or isinstance(self.time, int)) and
                 len(self.values) > 0)
