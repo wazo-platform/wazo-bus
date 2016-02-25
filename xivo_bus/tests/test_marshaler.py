@@ -77,10 +77,28 @@ class TestMarshalerCollectd(unittest.TestCase):
         command.type_ = 'mytype'
         command.type_instance = 'myinstance'
         command.interval = '1'
-        command.values = ('2','3')
+        command.values = ('2', '3')
+        command.time = 'N'
 
         result = self.marshaler.marshal_message(command)
 
         expected = 'PUTVAL {uuid}/my-plugin/mytype-myinstance interval=1 N:2:3'.format(uuid=self.uuid)
+
+        assert_that(result, equal_to(expected))
+
+    def test_marshal_valid_with_time(self):
+        command = Mock()
+        command.is_valid.return_value = True
+        command.plugin = 'my'
+        command.plugin_instance = 'plugin'
+        command.type_ = 'mytype'
+        command.type_instance = 'myinstance'
+        command.interval = '1'
+        command.values = ('2', '3')
+        command.time = 42
+
+        result = self.marshaler.marshal_message(command)
+
+        expected = 'PUTVAL {uuid}/my-plugin/mytype-myinstance interval=1 42:2:3'.format(uuid=self.uuid)
 
         assert_that(result, equal_to(expected))

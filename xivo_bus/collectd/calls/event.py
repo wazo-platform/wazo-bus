@@ -26,7 +26,10 @@ class CallCollectdEvent(CollectdEvent):
     type_instance = None
     values = ('1',)
 
-    def __init__(self, application, application_id):
+    def __init__(self, application, application_id, time=None):
+        if time:
+            self.time = int(time)
+
         self.plugin_instance = '{}.{}'.format(application, application_id)
 
 
@@ -50,6 +53,6 @@ class CallDurationCollectdEvent(CallCollectdEvent):
     type_ = 'gauge'
     type_instance = 'duration'
 
-    def __init__(self, application, application_id, duration):
-        super(CallDurationCollectdEvent, self).__init__(application, application_id)
-        self.values = (str(duration),)
+    def __init__(self, application, application_id, duration, time=None):
+        super(CallDurationCollectdEvent, self).__init__(application, application_id, time)
+        self.values = (str(round(duration, 3)),)

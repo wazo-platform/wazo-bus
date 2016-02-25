@@ -45,7 +45,7 @@ class CollectdMarshaler(object):
         if not command.is_valid():
             raise ValueError(command)
 
-        message = 'PUTVAL {host}/{plugin}/{type_}-{type_instance} interval={interval} N:{values}'
+        message = 'PUTVAL {host}/{plugin}/{type_}-{type_instance} interval={interval} {time}:{values}'
 
         if command.plugin_instance:
             plugin = '{}-{}'.format(command.plugin, command.plugin_instance)
@@ -58,5 +58,6 @@ class CollectdMarshaler(object):
             type_=command.type_,
             type_instance=command.type_instance,
             interval=command.interval,
+            time=command.time,
             values=':'.join(command.values)
         )
