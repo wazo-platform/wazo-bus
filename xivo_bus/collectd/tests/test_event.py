@@ -18,7 +18,7 @@
 from hamcrest import assert_that, is_
 from unittest import TestCase
 
-from ..event import CollectdEvent
+from ..common import CollectdEvent
 
 
 class NoPluginCollectdEvent(CollectdEvent):
