@@ -50,8 +50,8 @@ class SwitchboardForwardedEvent(_SwitchboardCollectdEvent):
     type_instance = 'forwarded'
 
 
-class SwitchboardTransferedEvent(_SwitchboardCollectdEvent):
-    type_instance = 'transfered'
+class SwitchboardTransferredEvent(_SwitchboardCollectdEvent):
+    type_instance = 'transferred'
 
 
 class SwitchboardWaitTimeEvent(_SwitchboardCollectdEvent):
