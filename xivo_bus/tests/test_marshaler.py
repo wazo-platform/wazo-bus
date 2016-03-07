@@ -34,19 +34,35 @@ class TestMarshaler(unittest.TestCase):
     def setUp(self):
         self.uuid = SOME_UUID
         self.marshaler = Marshaler(self.uuid)
+        self.command = Mock()
+        self.command.name = 'foobar'
+        self.command.required_acl = 'some.acl'
+        self.command.marshal.return_value = {'a': 1}
+        self.expected = {'name': 'foobar',
+                         'required_acl': 'some.acl',
+                         'origin_uuid': self.uuid,
+                         'data': {'a': 1}}
 
     def test_marshal_message(self):
-        command = Mock()
-        command.name = 'foobar'
-        command.marshal.return_value = {'a': 1}
+        result = self.marshaler.marshal_message(self.command)
 
-        result = self.marshaler.marshal_message(command)
+        assert_that(json.loads(result), equal_to(self.expected))
 
-        expected = {'name': 'foobar',
-                    'origin_uuid': self.uuid,
-                    'data': {'a': 1}}
+    def test_marshal_message_without_required_acl(self):
+        del self.command.required_acl
+        del self.expected['required_acl']
 
-        assert_that(json.loads(result), equal_to(expected))
+        result = self.marshaler.marshal_message(self.command)
+
+        assert_that(json.loads(result), equal_to(self.expected))
+
+    def test_marshal_message_with_none_required_acl(self):
+        self.command.required_acl = None
+        self.expected['required_acl'] = None
+
+        result = self.marshaler.marshal_message(self.command)
+
+        assert_that(json.loads(result), equal_to(self.expected))
 
     def test_unmarshal_message(self):
         json = '{"error": null, "value": "foobar"}'
