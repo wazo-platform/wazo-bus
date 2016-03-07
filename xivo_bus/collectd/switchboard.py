@@ -31,7 +31,7 @@ class _SwitchboardCollectdEvent(CollectdEvent):
         if time:
             self.time = int(time)
 
-        self.plugin_instance = 'switchboard.{}'.format(switchboard_name)
+        self.plugin_instance = switchboard_name
 
 
 class SwitchboardEnteredEvent(_SwitchboardCollectdEvent):
