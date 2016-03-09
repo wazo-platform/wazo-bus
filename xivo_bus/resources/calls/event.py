@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 from __future__ import unicode_literals
 
 
-class _CallEvent(object):
+class _BaseEvent(object):
 
     def __init__(self, data):
         self._data = data
@@ -31,6 +31,22 @@ class _CallEvent(object):
 
     def __ne__(self, other):
         return not self == other
+
+
+class _CallEvent(_BaseEvent):
+
+    def __init__(self, data):
+        super(_CallEvent, self).__init__(data)
+        user_uuid = data.get('user_uuid')
+        if user_uuid:
+            self.required_acl = 'events.calls.{}'.format(user_uuid)
+        else:
+            self.required_acl = None
+
+
+class _SwitchboardEvent(_BaseEvent):
+
+    required_acl = 'events.switchboards'
 
 
 class CreateCallEvent(_CallEvent):
@@ -51,43 +67,43 @@ class EndCallEvent(_CallEvent):
     routing_key = 'calls.call.ended'
 
 
-class CreateWaitingRoomEvent(_CallEvent):
+class CreateWaitingRoomEvent(_SwitchboardEvent):
 
     name = 'waiting_room_created'
     routing_key = 'calls.waiting_room.created'
 
 
-class UpdateWaitingRoomEvent(_CallEvent):
+class UpdateWaitingRoomEvent(_SwitchboardEvent):
 
     name = 'waiting_room_updated'
     routing_key = 'calls.waiting_room.updated'
 
 
-class DeleteWaitingRoomEvent(_CallEvent):
+class DeleteWaitingRoomEvent(_SwitchboardEvent):
 
     name = 'waiting_room_deleted'
     routing_key = 'calls.waiting_room.deleted'
 
 
-class JoinCallWaitingRoomEvent(_CallEvent):
+class JoinCallWaitingRoomEvent(_SwitchboardEvent):
 
     name = 'waiting_room_call_joined'
     routing_key = 'calls.waiting_room.call_joined'
 
 
-class LeaveCallWaitingRoomEvent(_CallEvent):
+class LeaveCallWaitingRoomEvent(_SwitchboardEvent):
 
     name = 'waiting_room_call_left'
     routing_key = 'calls.waiting_room.call_left'
 
 
-class JoinCallIncomingRoomEvent(_CallEvent):
+class JoinCallIncomingRoomEvent(_SwitchboardEvent):
 
     name = 'incoming_room_call_joined'
     routing_key = 'calls.incoming_room.call_joined'
 
 
-class LeaveCallIncomingRoomEvent(_CallEvent):
+class LeaveCallIncomingRoomEvent(_SwitchboardEvent):
 
     name = 'incoming_room_call_left'
     routing_key = 'calls.incoming_room.call_left'

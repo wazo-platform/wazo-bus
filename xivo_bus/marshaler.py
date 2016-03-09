@@ -26,9 +26,12 @@ class Marshaler(object):
         self._uuid = uuid
 
     def marshal_message(self, command):
-        return json.dumps({'name': command.name,
-                           'origin_uuid': self._uuid,
-                           'data': command.marshal()})
+        obj = {'name': command.name,
+               'origin_uuid': self._uuid,
+               'data': command.marshal()}
+        if hasattr(command, 'required_acl'):
+            obj['required_acl'] = command.required_acl
+        return json.dumps(obj)
 
     def unmarshal_message(self, data):
         return json.loads(data)

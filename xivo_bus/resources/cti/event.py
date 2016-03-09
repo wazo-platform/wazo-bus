@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2015 Avencall
+# Copyright (C) 2013-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -68,6 +68,7 @@ class CallFormResultEvent(object):
 class AgentStatusUpdateEvent(_StatusUpdateEvent):
 
     name = 'agent_status_update'
+    required_acl = 'events.statuses.agents'
     routing_key = 'status.agent'
     id_field = 'agent_id'
 
@@ -78,6 +79,7 @@ class AgentStatusUpdateEvent(_StatusUpdateEvent):
 class EndpointStatusUpdateEvent(_StatusUpdateEvent):
 
     name = 'endpoint_status_update'
+    required_acl = 'events.statuses.endpoints'
     routing_key = 'status.endpoint'
     id_field = 'endpoint_id'
 
@@ -88,5 +90,6 @@ class EndpointStatusUpdateEvent(_StatusUpdateEvent):
 class UserStatusUpdateEvent(_StatusUpdateEvent):
 
     name = 'user_status_update'
+    required_acl = 'events.statuses.users'
     routing_key = 'status.user'
     id_field = 'user_id'
