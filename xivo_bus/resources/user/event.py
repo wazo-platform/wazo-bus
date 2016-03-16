@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2014 Avencall
+# Copyright (C) 2013-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -33,3 +33,56 @@ class CreateUserEvent(ResourceConfigEvent):
 class DeleteUserEvent(ResourceConfigEvent):
     name = 'user_deleted'
     routing_key = 'config.user.deleted'
+
+
+class _BaseConfigUserEvent(ResourceConfigEvent):
+    def __init__(self, resource_id, resource_uuid):
+        super(_BaseConfigUserEvent, self).__init__(resource_id)
+        self.uuid = resource_uuid
+
+
+class EditUserServiceEvent(_BaseConfigUserEvent):
+    def __init__(self, resource_id, resource_uuid, service_name, service_enabled):
+        super(EditUserServiceEvent, self).__init__(resource_id, resource_uuid)
+        self.service_enabled = service_enabled
+        self.name = 'users_services_{}_updated'.format(service_name)
+        self.routing_key = 'config.users.{}.services.{}.update'.format(resource_uuid, service_name)
+        self.required_acl = 'events.{}'.format(self.routing_key)
+
+    def marshal(self):
+        return {
+            'id': self.id,
+            'uuid': self.uuid,
+            'enabled': self.service_enabled
+        }
+
+    @classmethod
+    def unmarshal(cls, msg):
+        return cls(msg['id'],
+                   msg['uuid'],
+                   msg['enabled'])
+
+
+class EditUserForwardEvent(_BaseConfigUserEvent):
+    def __init__(self, resource_id, resource_uuid, forward_name, forward_enabled, forward_destination):
+        super(EditUserForwardEvent, self).__init__(resource_id, resource_uuid)
+        self.forward_enabled = forward_enabled
+        self.forward_destination = forward_destination
+        self.name = 'users_forwards_{}_updated'.format(forward_name)
+        self.routing_key = 'config.users.{}.forwards.{}.update'.format(resource_uuid, forward_name)
+        self.required_acl = 'events.{}'.format(self.routing_key)
+
+    def marshal(self):
+        return {
+            'id': self.id,
+            'uuid': self.uuid,
+            'enabled': self.forward_enabled,
+            'destination': self.forward_destination
+        }
+
+    @classmethod
+    def unmarshal(cls, msg):
+        return cls(msg['id'],
+                   msg['uuid'],
+                   msg['enabled'],
+                   msg['destination'])
