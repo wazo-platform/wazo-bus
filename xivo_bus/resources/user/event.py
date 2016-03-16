@@ -58,7 +58,7 @@ class EditUserServiceEvent(_BaseConfigUserEvent):
         super(EditUserServiceEvent, self).__init__(resource_uuid)
         self.service_enabled = service_enabled
         self.name = 'users_services_{}_updated'.format(service_name)
-        self.routing_key = 'config.users.{}.services.{}.update'.format(resource_uuid, service_name)
+        self.routing_key = 'config.users.{}.services.{}.updated'.format(resource_uuid, service_name)
         self.required_acl = 'events.{}'.format(self.routing_key)
 
     def marshal(self):
@@ -79,7 +79,7 @@ class EditUserForwardEvent(_BaseConfigUserEvent):
         self.forward_enabled = forward_enabled
         self.forward_destination = forward_destination
         self.name = 'users_forwards_{}_updated'.format(forward_name)
-        self.routing_key = 'config.users.{}.forwards.{}.update'.format(resource_uuid, forward_name)
+        self.routing_key = 'config.users.{}.forwards.{}.updated'.format(resource_uuid, forward_name)
         self.required_acl = 'events.{}'.format(self.routing_key)
 
     def marshal(self):
