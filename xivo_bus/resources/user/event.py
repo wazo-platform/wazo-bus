@@ -36,61 +36,54 @@ class DeleteUserEvent(ResourceConfigEvent):
 
 
 class _BaseConfigUserEvent(object):
-    def __init__(self, resource_uuid):
-        self.uuid = resource_uuid
-
-    def marshal(self):
-        return {'uuid': self.uuid}
-
-    @classmethod
-    def unmarshal(cls, msg):
-        return cls(msg['uuid'])
+    def __init__(self, user_uuid):
+        self.user_uuid = user_uuid
 
     def __eq__(self, other):
-        return self.uuid == other.uuid
+        return self.user_uuid == other.user_uuid
 
     def __ne__(self, other):
         return not self == other
 
 
 class EditUserServiceEvent(_BaseConfigUserEvent):
-    def __init__(self, resource_uuid, service_name, service_enabled):
-        super(EditUserServiceEvent, self).__init__(resource_uuid)
+    def __init__(self, user_uuid, service_name, service_enabled):
+        super(EditUserServiceEvent, self).__init__(user_uuid)
         self.service_enabled = service_enabled
         self.name = 'users_services_{}_updated'.format(service_name)
-        self.routing_key = 'config.users.{}.services.{}.updated'.format(resource_uuid, service_name)
+        self.routing_key = 'config.users.{}.services.{}.updated'.format(user_uuid, service_name)
         self.required_acl = 'events.{}'.format(self.routing_key)
 
     def marshal(self):
         return {
-            'uuid': self.uuid,
+            'user_uuid': self.uuid,
             'enabled': self.service_enabled
         }
 
     @classmethod
     def unmarshal(cls, msg):
-        return cls(msg['uuid'],
+        return cls(msg['user_uuid'],
                    msg['enabled'])
 
 
 class EditUserForwardEvent(_BaseConfigUserEvent):
-    def __init__(self, resource_uuid, forward_name, forward_enabled, forward_destination):
-        super(EditUserForwardEvent, self).__init__(resource_uuid)
+    def __init__(self, user_uuid, forward_name, forward_enabled, forward_destination):
+        super(EditUserForwardEvent, self).__init__(user_uuid)
         self.forward_enabled = forward_enabled
         self.forward_destination = forward_destination
         self.name = 'users_forwards_{}_updated'.format(forward_name)
-        self.routing_key = 'config.users.{}.forwards.{}.updated'.format(resource_uuid, forward_name)
+        self.routing_key = 'config.users.{}.forwards.{}.updated'.format(user_uuid, forward_name)
         self.required_acl = 'events.{}'.format(self.routing_key)
 
     def marshal(self):
         return {
-            'uuid': self.uuid,
+            'user_uuid': self.uuid,
             'enabled': self.forward_enabled,
             'destination': self.forward_destination
         }
 
     @classmethod
     def unmarshal(cls, msg):
-        return cls(msg['uuid'],
+        return cls(msg['user_uuid'],
                    msg['enabled'],
                    msg['destination'])
