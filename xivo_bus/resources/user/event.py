@@ -56,7 +56,7 @@ class EditUserServiceEvent(_BaseConfigUserEvent):
 
     def marshal(self):
         return {
-            'user_uuid': self.uuid,
+            'user_uuid': self.user_uuid,
             'enabled': self.service_enabled
         }
 
@@ -77,7 +77,7 @@ class EditUserForwardEvent(_BaseConfigUserEvent):
 
     def marshal(self):
         return {
-            'user_uuid': self.uuid,
+            'user_uuid': self.user_uuid,
             'enabled': self.forward_enabled,
             'destination': self.forward_destination
         }
