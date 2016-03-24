@@ -20,16 +20,16 @@ from __future__ import unicode_literals
 from xivo_bus.resources.common.event import ResourceConfigEvent
 
 
-class EditPermissionEvent(ResourceConfigEvent):
-    name = 'permission_edited'
-    routing_key = 'config.permission.edited'
+class EditCallPermissionEvent(ResourceConfigEvent):
+    name = 'call_permission_edited'
+    routing_key = 'config.callpermission.edited'
 
 
-class CreatePermissionEvent(ResourceConfigEvent):
-    name = 'permission_created'
-    routing_key = 'config.permission.created'
+class CreateCallPermissionEvent(ResourceConfigEvent):
+    name = 'call_permission_created'
+    routing_key = 'config.callpermission.created'
 
 
-class DeletePermissionEvent(ResourceConfigEvent):
-    name = 'permission_deleted'
-    routing_key = 'config.permission.deleted'
+class DeleteCallPermissionEvent(ResourceConfigEvent):
+    name = 'call_permission_deleted'
+    routing_key = 'config.callpermission.deleted'
