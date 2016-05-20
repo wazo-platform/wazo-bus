@@ -20,17 +20,42 @@ from __future__ import unicode_literals
 from xivo_bus.resources.common.event import ResourceConfigEvent
 
 
-class EditUserEvent(ResourceConfigEvent):
+class ResourceWithUUIDConfigEvent(ResourceConfigEvent):
+
+    def __init__(self, resource_id, resource_uuid):
+        super(ResourceWithUUIDConfigEvent, self).__init__(resource_id)
+        self._uuid = resource_uuid
+
+    def marsharl(self):
+        dict_ = super(ResourceWithUUIDConfigEvent, self).marshal()
+        dict_['uuid'] = self._uuid
+        return dict_
+
+    @classmethod
+    def unmarshal(cls, msg):
+        return cls(msg['id'], msg['uuid'])
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+
+class EditUserEvent(ResourceWithUUIDConfigEvent):
+
     name = 'user_edited'
     routing_key = 'config.user.edited'
 
 
-class CreateUserEvent(ResourceConfigEvent):
+class CreateUserEvent(ResourceWithUUIDConfigEvent):
+
     name = 'user_created'
     routing_key = 'config.user.created'
 
 
-class DeleteUserEvent(ResourceConfigEvent):
+class DeleteUserEvent(ResourceWithUUIDConfigEvent):
+
     name = 'user_deleted'
     routing_key = 'config.user.deleted'
 
