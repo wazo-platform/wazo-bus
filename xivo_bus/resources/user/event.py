@@ -26,7 +26,7 @@ class ResourceWithUUIDConfigEvent(ResourceConfigEvent):
         super(ResourceWithUUIDConfigEvent, self).__init__(resource_id)
         self._uuid = resource_uuid
 
-    def marsharl(self):
+    def marshal(self):
         dict_ = super(ResourceWithUUIDConfigEvent, self).marshal()
         dict_['uuid'] = self._uuid
         return dict_
