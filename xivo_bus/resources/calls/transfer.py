@@ -40,3 +40,8 @@ class CreateTransferEvent(BaseTransferEvent):
 
     name = 'transfer_created'
     routing_key = 'calls.transfer.created'
+
+
+class AnswerTransferEvent(BaseTransferEvent):
+    name = 'transfer_answered'
+    routing_key = 'calls.transfer.edited'
