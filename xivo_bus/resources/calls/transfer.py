@@ -45,3 +45,23 @@ class CreateTransferEvent(BaseTransferEvent):
 class AnswerTransferEvent(BaseTransferEvent):
     name = 'transfer_answered'
     routing_key = 'calls.transfer.edited'
+
+
+class CancelTransferEvent(BaseTransferEvent):
+    name = 'transfer_cancelled'
+    routing_key = 'calls.transfer.edited'
+
+
+class CompleteTransferEvent(BaseTransferEvent):
+    name = 'transfer_completed'
+    routing_key = 'calls.transfer.edited'
+
+
+class AbandonTransferEvent(BaseTransferEvent):
+    name = 'transfer_abandoned'
+    routing_key = 'calls.transfer.edited'
+
+
+class EndTransferEvent(BaseTransferEvent):
+    name = 'transfer_ended'
+    routing_key = 'calls.transfer.deleted'
