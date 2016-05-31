@@ -24,11 +24,11 @@ class ResourceWithUUIDConfigEvent(ResourceConfigEvent):
 
     def __init__(self, resource_id, resource_uuid):
         super(ResourceWithUUIDConfigEvent, self).__init__(resource_id)
-        self._uuid = resource_uuid
+        self.uuid = resource_uuid
 
     def marshal(self):
         dict_ = super(ResourceWithUUIDConfigEvent, self).marshal()
-        dict_['uuid'] = self._uuid
+        dict_['uuid'] = self.uuid
         return dict_
 
     @classmethod
