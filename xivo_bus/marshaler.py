@@ -18,6 +18,10 @@
 import json
 
 
+class InvalidMessage(ValueError):
+    pass
+
+
 class Marshaler(object):
 
     content_type = 'application/json'
@@ -33,8 +37,18 @@ class Marshaler(object):
             obj['required_acl'] = command.required_acl
         return json.dumps(obj)
 
-    def unmarshal_message(self, data):
-        return json.loads(data)
+    @classmethod
+    def unmarshal_message(cls, obj, event_class):
+        if not isinstance(obj, dict):
+            raise InvalidMessage(obj)
+        if 'data' not in obj:
+            raise InvalidMessage(obj)
+        if 'origin_uuid' not in obj:
+            raise InvalidMessage(obj)
+
+        event = event_class.unmarshal(obj['data'])
+        event.metadata = {'origin_uuid': obj['origin_uuid']}
+        return event
 
 
 class CollectdMarshaler(object):
