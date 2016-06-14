@@ -26,6 +26,7 @@ class BaseTransferEvent(object):
     def marshal(self):
         return self.transfer
 
+    @classmethod
     def unmarshal(cls, msg):
         return cls(msg)
 
