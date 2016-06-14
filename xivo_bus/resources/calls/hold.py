@@ -26,6 +26,7 @@ class _BaseHoldEvent(object):
     def marshal(self):
         return {'call_id': self._call_id}
 
+    @classmethod
     def unmarshal(cls, msg):
         return cls(msg['call_id'])
 
