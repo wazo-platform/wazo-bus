@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ class ChatMessageEvent(object):
 
     def __init__(self, from_, to, alias, msg):
         self.routing_key = self.routing_key_fmt.format(*to)
+        self.required_acl = 'events.{}'.format(self.routing_key)
         self._from = from_
         self._to = to
         self._alias = alias
