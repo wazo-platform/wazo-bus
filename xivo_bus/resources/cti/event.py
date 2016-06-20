@@ -92,4 +92,8 @@ class UserStatusUpdateEvent(_StatusUpdateEvent):
     name = 'user_status_update'
     required_acl = 'events.statuses.users'
     routing_key = 'status.user'
-    id_field = 'user_id'
+    id_field = 'user_uuid'
+
+    def __init__(self, uuid, status):
+        self.id_ = uuid
+        self.status = status
