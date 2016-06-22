@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2015 Avencall
+# Copyright (C) 2013-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -104,7 +104,7 @@ class TestEndpointStatusUpdateEvent(unittest.TestCase):
 
 class TestUserStatusUpdateEvent(unittest.TestCase):
 
-    def test_marchal(self):
+    def test_marshal(self):
         user_id = 42
         status = 'busy'
 
