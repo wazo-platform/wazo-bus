@@ -29,7 +29,7 @@ class BaseTransferEvent(object):
 
     @classmethod
     def unmarshal(cls, msg):
-        return cls(msg)
+        return cls(None, msg)
 
     def __eq__(self, other):
         return self.transfer == other.transfer
