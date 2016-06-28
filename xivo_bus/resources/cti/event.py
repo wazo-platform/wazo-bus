@@ -30,6 +30,11 @@ class _StatusUpdateEvent(object):
             'status': self.status,
         }
 
+    @classmethod
+    def unmarshal(cls, msg):
+        return cls(msg[cls.id_field],
+                   msg['status'])
+
     def __eq__(self, other):
         return (self.id_ == other.id_
                 and self.status == other.status)
