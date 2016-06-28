@@ -109,7 +109,7 @@ class TestEndpointStatusUpdateEvent(unittest.TestCase):
 
 class TestUserStatusUpdateEvent(unittest.TestCase):
 
-    def test_marchal(self):
+    def test_marshal(self):
         user_uuid = SOME_UUID
         status = 'busy'
 
