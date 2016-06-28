@@ -18,12 +18,17 @@
 from __future__ import unicode_literals
 
 import unittest
+import uuid
+
 from ..event import AgentStatusUpdateEvent
 from ..event import CallFormResultEvent
 from ..event import UserStatusUpdateEvent
 from ..event import EndpointStatusUpdateEvent
 from hamcrest import assert_that
 from hamcrest import equal_to
+
+
+SOME_UUID = str(uuid.uuid4())
 
 
 class TestCallFormResultEvent(unittest.TestCase):
@@ -105,34 +110,23 @@ class TestEndpointStatusUpdateEvent(unittest.TestCase):
 class TestUserStatusUpdateEvent(unittest.TestCase):
 
     def test_marshal(self):
-        user_id = 42
+        user_uuid = SOME_UUID
         status = 'busy'
 
-        event = UserStatusUpdateEvent(user_id, status)
+        event = UserStatusUpdateEvent(user_uuid, status)
 
         msg = event.marshal()
 
-        assert_that(msg, equal_to({'user_id': 42,
-                                   'status': status}))
-
-    def test_that_string_user_ids_are_not_leaked(self):
-        user_id = '42'
-        status = 'busy'
-
-        event = UserStatusUpdateEvent(user_id, status)
-
-        msg = event.marshal()
-
-        assert_that(msg, equal_to({'user_id': 42,
+        assert_that(msg, equal_to({'user_uuid': SOME_UUID,
                                    'status': status}))
 
     def test_equality(self):
-        user_id = 42
+        user_uuid = SOME_UUID
         status = 'some_value'
 
-        e1 = UserStatusUpdateEvent(user_id, status)
-        e2 = UserStatusUpdateEvent(user_id, status)
-        e3 = UserStatusUpdateEvent(user_id, 'other_value')
+        e1 = UserStatusUpdateEvent(user_uuid, status)
+        e2 = UserStatusUpdateEvent(user_uuid, status)
+        e3 = UserStatusUpdateEvent(user_uuid, 'other_value')
         e4 = UserStatusUpdateEvent(666, status)
 
         assert_that(e1 == e2, equal_to(True))

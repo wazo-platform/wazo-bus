@@ -30,6 +30,11 @@ class _StatusUpdateEvent(object):
             'status': self.status,
         }
 
+    @classmethod
+    def unmarshal(cls, msg):
+        return cls(msg[cls.id_field],
+                   msg['status'])
+
     def __eq__(self, other):
         return (self.id_ == other.id_
                 and self.status == other.status)
@@ -92,4 +97,8 @@ class UserStatusUpdateEvent(_StatusUpdateEvent):
     name = 'user_status_update'
     required_acl = 'events.statuses.users'
     routing_key = 'status.user'
-    id_field = 'user_id'
+    id_field = 'user_uuid'
+
+    def __init__(self, uuid, status):
+        self.id_ = uuid
+        self.status = status
