@@ -25,6 +25,11 @@ class CreateEntityEvent(ResourceConfigEvent):
     routing_key = 'config.entity.created'
 
 
+class EditEntityEvent(ResourceConfigEvent):
+    name = 'entity_deleted'
+    routing_key = 'config.entity.edited'
+
+
 class DeleteEntityEvent(ResourceConfigEvent):
     name = 'entity_deleted'
     routing_key = 'config.entity.deleted'
