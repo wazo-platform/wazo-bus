@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2014 Avencall
+# Copyright (C) 2013-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -39,6 +39,14 @@ class AgentQueueConfigEvent(ResourceConfigEvent):
     def unmarshal(cls, msg):
         return cls(msg['queue_id'], msg['agent_id'], msg['penalty'])
 
+    def __eq__(self, other):
+        return (self.queue_id == other.queue_id and
+                self.agent_id == other.agent_id and
+                self.penalty == other.penalty)
+
+    def __ne__(self, other):
+        return not self == other
+
 
 class AgentQueueAssociationEditedEvent(AgentQueueConfigEvent):
     name = 'agent_queue_association_edited'
@@ -67,3 +75,10 @@ class AgentRemovedFromQueueEvent(AgentQueueConfigEvent):
     @classmethod
     def unmarshal(cls, msg):
         return cls(msg['agent_id'], msg['queue_id'])
+
+    def __eq__(self, other):
+        return (self.queue_id == other.queue_id and
+                self.agent_id == other.agent_id)
+
+    def __ne__(self, other):
+        return not self == other
