@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,10 +18,10 @@
 import unittest
 import uuid
 
-from ..event import ServiceRegisteredEvent, ServiceDeregisteredEvent
-
 from hamcrest import assert_that, equal_to
 from mock import sentinel as s
+
+from ..event import ServiceRegisteredEvent, ServiceDeregisteredEvent
 
 
 class TestServiceRegisteredEvent(unittest.TestCase):

@@ -20,12 +20,13 @@ from __future__ import unicode_literals
 import unittest
 import uuid
 
+from hamcrest import assert_that
+from hamcrest import equal_to
+
 from ..event import AgentStatusUpdateEvent
 from ..event import CallFormResultEvent
 from ..event import UserStatusUpdateEvent
 from ..event import EndpointStatusUpdateEvent
-from hamcrest import assert_that
-from hamcrest import equal_to
 
 
 SOME_UUID = str(uuid.uuid4())

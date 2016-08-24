@@ -43,7 +43,7 @@ class UserAgentConfigEvent(ResourceConfigEvent):
                 self.agent_id == other.agent_id)
 
     def __ne__(self, other):
-        return not(self == other)
+        return not self == other
 
 
 class UserAgentAssociatedEvent(UserAgentConfigEvent):

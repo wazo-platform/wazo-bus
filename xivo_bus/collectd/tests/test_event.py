@@ -15,8 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from hamcrest import assert_that, is_
 from unittest import TestCase
+
+from hamcrest import assert_that, is_
 
 from ..common import CollectdEvent
 

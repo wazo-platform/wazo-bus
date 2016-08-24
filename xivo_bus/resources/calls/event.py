@@ -27,7 +27,7 @@ class _BaseEvent(object):
         return self._data
 
     def __eq__(self, other):
-        return (self._data == other._data)
+        return self._data == other._data
 
     def __ne__(self, other):
         return not self == other

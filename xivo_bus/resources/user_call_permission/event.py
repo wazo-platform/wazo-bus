@@ -43,7 +43,7 @@ class UserCallPermissionConfigEvent(ResourceConfigEvent):
                 self.call_permission_id == other.call_permission_id)
 
     def __ne__(self, other):
-        return not(self == other)
+        return not self == other
 
 
 class UserCallPermissionAssociatedEvent(UserCallPermissionConfigEvent):

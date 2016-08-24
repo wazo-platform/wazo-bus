@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 class _StatusUpdateEvent(object):
 
     def __init__(self, id_, status):
-        self.id_ = int(id_)
+        self.id_ = id_
         self.status = status
 
     def marshal(self):
@@ -36,8 +36,8 @@ class _StatusUpdateEvent(object):
                    msg['status'])
 
     def __eq__(self, other):
-        return (self.id_ == other.id_
-                and self.status == other.status)
+        return (self.id_ == other.id_ and
+                self.status == other.status)
 
     def __ne__(self, other):
         return not self == other
@@ -66,8 +66,8 @@ class CallFormResultEvent(object):
         }
 
     def __eq__(self, other):
-        return (self.user_id == other.user_id
-                and self.variables == other.variables)
+        return (self.user_id == other.user_id and
+                self.variables == other.variables)
 
 
 class AgentStatusUpdateEvent(_StatusUpdateEvent):
@@ -80,6 +80,9 @@ class AgentStatusUpdateEvent(_StatusUpdateEvent):
     STATUS_LOGGED_IN = 'logged_in'
     STATUS_LOGGED_OUT = 'logged_out'
 
+    def __init__(self, id_, status):
+        super(AgentStatusUpdateEvent, self).__init__(int(id_), status)
+
 
 class EndpointStatusUpdateEvent(_StatusUpdateEvent):
 
@@ -89,7 +92,7 @@ class EndpointStatusUpdateEvent(_StatusUpdateEvent):
     id_field = 'endpoint_id'
 
     def __init__(self, id_, status):
-        super(EndpointStatusUpdateEvent, self).__init__(id_, int(status))
+        super(EndpointStatusUpdateEvent, self).__init__(int(id_), int(status))
 
 
 class UserStatusUpdateEvent(_StatusUpdateEvent):
@@ -98,7 +101,3 @@ class UserStatusUpdateEvent(_StatusUpdateEvent):
     required_acl = 'events.statuses.users'
     routing_key = 'status.user'
     id_field = 'user_uuid'
-
-    def __init__(self, uuid, status):
-        self.id_ = uuid
-        self.status = status
