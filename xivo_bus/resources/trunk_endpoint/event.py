@@ -47,10 +47,10 @@ class TrunkEndpointConfigEvent(ResourceConfigEvent):
 
 
 class TrunkEndpointAssociatedEvent(TrunkEndpointConfigEvent):
-    name = 'endpoint_associated'
+    name = 'trunk_endpoint_associated'
     routing_key = 'config.trunks.endpoints.updated'
 
 
 class TrunkEndpointDissociatedEvent(TrunkEndpointConfigEvent):
-    name = 'endpoint_dissociated'
+    name = 'trunk_endpoint_dissociated'
     routing_key = 'config.trunks.endpoints.deleted'
