@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2014 Avencall
+# Copyright (C) 2013-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -40,6 +40,13 @@ class LineExtensionConfigEvent(ResourceConfigEvent):
         return cls(
             msg['line_id'],
             msg['extension_id'])
+
+    def __eq__(self, other):
+        return (self.line_id == other.line_id and
+                self.extension_id == other.extension_id)
+
+    def __ne__(self, other):
+        return not (self == other)
 
 
 class LineExtensionAssociatedEvent(LineExtensionConfigEvent):
