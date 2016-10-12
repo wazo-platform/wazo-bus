@@ -18,6 +18,11 @@
 from .common import CollectdEvent
 
 
+def validate_plugin_instance_fragment(plugin_instance_fragment):
+    result = ''.join(c for c in plugin_instance_fragment if c.isalnum() or c == '-')
+    return result or '<unknown>'
+
+
 class CallCollectdEvent(CollectdEvent):
     plugin = 'calls'
     plugin_instance = None
@@ -29,6 +34,9 @@ class CallCollectdEvent(CollectdEvent):
     def __init__(self, application, application_id, time=None):
         if time:
             self.time = int(time)
+
+        application = validate_plugin_instance_fragment(application)
+        application_id = validate_plugin_instance_fragment(application_id)
 
         self.plugin_instance = '{}.{}'.format(application, application_id)
 
