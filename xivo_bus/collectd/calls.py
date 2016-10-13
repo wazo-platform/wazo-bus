@@ -15,11 +15,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+from __future__ import unicode_literals
+
+import string
+
 from .common import CollectdEvent
 
 
 def validate_plugin_instance_fragment(plugin_instance_fragment):
-    result = ''.join(c for c in plugin_instance_fragment if c.isalnum() or c == '-')
+    result = ''.join(c for c in plugin_instance_fragment if (c in string.ascii_letters or
+                                                             c in string.digits or
+                                                             c == '-'))
     return result or '<unknown>'
 
 
