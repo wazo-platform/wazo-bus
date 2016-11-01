@@ -20,21 +20,24 @@ from __future__ import unicode_literals
 
 class _BaseHoldEvent(object):
 
-    def __init__(self, call_id):
+    def __init__(self, call_id, user_uuid=None):
         self._call_id = call_id
+        self._user_uuid = user_uuid
+        self.required_acl = 'events.calls.{}'.format(user_uuid) if user_uuid else None
 
     def marshal(self):
-        return {'call_id': self._call_id}
+        return {'call_id': self._call_id,
+                'user_uuid': self._user_uuid}
 
     @classmethod
     def unmarshal(cls, msg):
-        return cls(msg['call_id'])
+        return cls(msg['call_id'], msg['user_uuid'])
 
     def __eq__(self, other):
-        return self._call_id == other._call_id
+        return self.marshal() == other.marshal()
 
     def __ne__(self, other):
-        return self._call_id != other._call_id
+        return not self == other
 
 
 class CallOnHoldEvent(_BaseHoldEvent):
