@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2013-2014 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,36 +22,37 @@ from xivo_bus.resources.common.event import ResourceConfigEvent
 
 
 class UserVoicemailConfigEvent(ResourceConfigEvent):
-    routing_key = 'config.user_voicemail_association.{}'
 
-    def __init__(self,
-                 user_id,
-                 voicemail_id,
-                 enabled):
-        self.user_id = int(user_id)
+    def __init__(self, user_uuid, voicemail_id):
+        self.user_uuid = user_uuid
         self.voicemail_id = int(voicemail_id)
-        self.enabled = bool(enabled)
 
     def marshal(self):
         return {
-            'user_id': self.user_id,
+            'user_uuid': self.user_uuid,
             'voicemail_id': self.voicemail_id,
-            'enabled': self.enabled
         }
 
     @classmethod
     def unmarshal(cls, msg):
         return cls(
-            msg['user_id'],
-            msg['voicemail_id'],
-            msg['enabled'])
+            msg['user_uuid'],
+            msg['voicemail_id'])
 
 
 class UserVoicemailAssociatedEvent(UserVoicemailConfigEvent):
     name = 'voicemail_associated'
-    routing_key = UserVoicemailConfigEvent.routing_key.format('created')
+
+    def __init__(self, user_uuid, voicemail_id):
+        super(UserVoicemailAssociatedEvent, self).__init__(user_uuid, voicemail_id)
+        self.routing_key = 'config.users.{}.voicemails.updated'.format(self.user_uuid)
+        self.required_acl = 'events.{}'.format(self.routing_key)
 
 
 class UserVoicemailDissociatedEvent(UserVoicemailConfigEvent):
     name = 'voicemail_dissociated'
-    routing_key = UserVoicemailConfigEvent.routing_key.format('deleted')
+
+    def __init__(self, user_uuid, voicemail_id):
+        super(UserVoicemailDissociatedEvent, self).__init__(user_uuid, voicemail_id)
+        self.routing_key = 'config.users.{}.voicemails.deleted'.format(self.user_uuid)
+        self.required_acl = 'events.{}'.format(self.routing_key)
