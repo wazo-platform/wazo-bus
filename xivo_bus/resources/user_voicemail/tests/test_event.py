@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2013-2014 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,22 +29,20 @@ class ConcreteUserVoicemailConfigEvent(UserVoicemailConfigEvent):
     name = 'voicemail_event'
 
 
-USER_ID = 1
+USER_UUID = 'abcd-1234'
 VOICEMAIL_ID = 2
-ENABLED = True
 
 
 class TestUserVoicemailConfigEvent(unittest.TestCase):
 
     def setUp(self):
         self.msg = {
-            'user_id': USER_ID,
+            'user_uuid': USER_UUID,
             'voicemail_id': VOICEMAIL_ID,
-            'enabled': ENABLED
         }
 
     def test_marshal(self):
-        command = ConcreteUserVoicemailConfigEvent(USER_ID, VOICEMAIL_ID, ENABLED)
+        command = ConcreteUserVoicemailConfigEvent(USER_UUID, VOICEMAIL_ID)
 
         msg = command.marshal()
 
@@ -53,6 +52,5 @@ class TestUserVoicemailConfigEvent(unittest.TestCase):
         event = ConcreteUserVoicemailConfigEvent.unmarshal(self.msg)
 
         assert_that(event, all_of(
-            has_property('user_id', USER_ID),
-            has_property('voicemail_id', VOICEMAIL_ID),
-            has_property('enabled', ENABLED)))
+            has_property('user_uuid', USER_UUID),
+            has_property('voicemail_id', VOICEMAIL_ID)))
