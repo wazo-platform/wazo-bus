@@ -33,3 +33,8 @@ class CreateGroupEvent(ResourceConfigEvent):
 class DeleteGroupEvent(ResourceConfigEvent):
     name = 'group_deleted'
     routing_key = 'config.groups.deleted'
+
+
+class EditGroupFallbackEvent(ResourceConfigEvent):
+    name = 'group_fallback_edited'
+    routing_key = 'config.groups.fallbacks.edited'
