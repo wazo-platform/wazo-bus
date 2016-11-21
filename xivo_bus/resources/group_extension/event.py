@@ -17,10 +17,8 @@
 
 from __future__ import unicode_literals
 
-from xivo_bus.resources.common.event import ResourceConfigEvent
 
-
-class GroupExtensionConfigEvent(ResourceConfigEvent):
+class GroupExtensionConfigEvent(object):
 
     def __init__(self, group_id, extension_id):
         self.group_id = group_id
@@ -43,7 +41,7 @@ class GroupExtensionConfigEvent(ResourceConfigEvent):
                 self.extension_id == other.extension_id)
 
     def __ne__(self, other):
-        return not (self == other)
+        return not self == other
 
 
 class GroupExtensionAssociatedEvent(GroupExtensionConfigEvent):

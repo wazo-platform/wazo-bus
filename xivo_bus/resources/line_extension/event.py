@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2013-2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,10 +18,8 @@
 
 from __future__ import unicode_literals
 
-from xivo_bus.resources.common.event import ResourceConfigEvent
 
-
-class LineExtensionConfigEvent(ResourceConfigEvent):
+class LineExtensionConfigEvent(object):
     routing_key = 'config.line_extension_association.{}'
 
     def __init__(self,
@@ -46,7 +45,7 @@ class LineExtensionConfigEvent(ResourceConfigEvent):
                 self.extension_id == other.extension_id)
 
     def __ne__(self, other):
-        return not (self == other)
+        return not self == other
 
 
 class LineExtensionAssociatedEvent(LineExtensionConfigEvent):
