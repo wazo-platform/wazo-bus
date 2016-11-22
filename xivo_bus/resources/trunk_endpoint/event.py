@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,10 +18,8 @@
 
 from __future__ import unicode_literals
 
-from xivo_bus.resources.common.event import ResourceConfigEvent
 
-
-class TrunkEndpointConfigEvent(ResourceConfigEvent):
+class TrunkEndpointConfigEvent(object):
 
     def __init__(self, trunk_id, endpoint_id):
         self.trunk_id = trunk_id
@@ -43,7 +42,7 @@ class TrunkEndpointConfigEvent(ResourceConfigEvent):
                 self.endpoint_id == other.endpoint_id)
 
     def __ne__(self, other):
-        return not (self == other)
+        return not self == other
 
 
 class TrunkEndpointAssociatedEvent(TrunkEndpointConfigEvent):

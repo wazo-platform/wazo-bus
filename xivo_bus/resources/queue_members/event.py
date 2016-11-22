@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2013-2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,10 +18,8 @@
 
 from __future__ import unicode_literals
 
-from xivo_bus.resources.common.event import ResourceConfigEvent
 
-
-class AgentQueueConfigEvent(ResourceConfigEvent):
+class AgentQueueConfigEvent(object):
     routing_key = 'config.agent_queue_association.{}'
 
     def __init__(self, queue_id, agent_id, penalty):

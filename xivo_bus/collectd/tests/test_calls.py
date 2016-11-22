@@ -17,9 +17,10 @@
 
 from __future__ import unicode_literals
 
+from unittest import TestCase
+
 from hamcrest import assert_that
 from hamcrest import equal_to
-from unittest import TestCase
 
 from ..calls import CallCollectdEvent
 

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,10 +18,8 @@
 
 from __future__ import unicode_literals
 
-from xivo_bus.resources.common.event import ResourceConfigEvent
 
-
-class UserEntityConfigEvent(ResourceConfigEvent):
+class UserEntityConfigEvent(object):
 
     def __init__(self, user_uuid, entity_id):
         self.user_uuid = user_uuid
@@ -43,7 +42,7 @@ class UserEntityConfigEvent(ResourceConfigEvent):
                 self.entity_id == other.entity_id)
 
     def __ne__(self, other):
-        return not(self == other)
+        return not self == other
 
 
 class UserEntityAssociatedEvent(UserEntityConfigEvent):
