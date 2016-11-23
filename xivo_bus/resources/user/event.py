@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2013-2016 Avencall
+# Copyright (C) 2016 Proformatique Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -58,6 +59,11 @@ class DeleteUserEvent(ResourceWithUUIDConfigEvent):
 
     name = 'user_deleted'
     routing_key = 'config.user.deleted'
+
+
+class EditUserFallbackEvent(ResourceWithUUIDConfigEvent):
+    name = 'user_fallback_edited'
+    routing_key = 'config.users.fallbacks.edited'
 
 
 class _BaseConfigUserEvent(object):
