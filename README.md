@@ -1,4 +1,4 @@
-xivo-bus [![Build Status](https://travis-ci.org/xivo-pbx/xivo-bus.png?branch=master)](https://travis-ci.org/xivo-pbx/xivo-bus)
+xivo-bus [![Build Status](https://travis-ci.org/wazo-pbx/xivo-bus.png?branch=master)](https://travis-ci.org/wazo-pbx/xivo-bus)
 ========
 
 xivo-bus is a library used internally in XiVO to communicate with other components
