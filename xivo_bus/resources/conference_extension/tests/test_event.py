@@ -28,7 +28,7 @@ class ConcreteConferenceExtensionConfigEvent(ConferenceExtensionConfigEvent):
     name = 'trunk_endpoint_event'
 
 
-INCALL_ID = 1
+CONFERENCE_ID = 1
 EXTENSION_ID = 2
 
 
@@ -36,12 +36,12 @@ class TestConferenceExtensionConfigEvent(unittest.TestCase):
 
     def setUp(self):
         self.msg = {
-            'conference_id': INCALL_ID,
+            'conference_id': CONFERENCE_ID,
             'extension_id': EXTENSION_ID,
         }
 
     def test_marshal(self):
-        command = ConcreteConferenceExtensionConfigEvent(INCALL_ID, EXTENSION_ID)
+        command = ConcreteConferenceExtensionConfigEvent(CONFERENCE_ID, EXTENSION_ID)
 
         msg = command.marshal()
 
@@ -51,5 +51,5 @@ class TestConferenceExtensionConfigEvent(unittest.TestCase):
         event = ConcreteConferenceExtensionConfigEvent.unmarshal(self.msg)
 
         assert_that(event, all_of(
-            has_property('conference_id', INCALL_ID),
+            has_property('conference_id', CONFERENCE_ID),
             has_property('extension_id', EXTENSION_ID)))
