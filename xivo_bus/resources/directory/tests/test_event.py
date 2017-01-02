@@ -52,7 +52,7 @@ class TestFavoriteAddedEvent(unittest.TestCase):
 
     def test_required_acl(self):
         required_acl = self.event.required_acl
-        expected_required_acl = 'event.directory.{}.favorite.created'.format(self.user_uuid)
+        expected_required_acl = 'events.directory.{}.favorite.created'.format(self.user_uuid)
 
         assert_that(required_acl, equal_to(expected_required_acl))
 
@@ -84,6 +84,6 @@ class TestFavoriteDeletedEvent(unittest.TestCase):
 
     def test_required_acl(self):
         required_acl = self.event.required_acl
-        expected_required_acl = 'event.directory.{}.favorite.deleted'.format(self.user_uuid)
+        expected_required_acl = 'events.directory.{}.favorite.deleted'.format(self.user_uuid)
 
         assert_that(required_acl, equal_to(expected_required_acl))
