@@ -39,11 +39,11 @@ class FavoriteAddedEvent(_BaseFavoriteEvent):
 
     name = 'favorite_added'
     _routing_key_fmt = 'directory.{}.favorite.created'
-    _required_acl_fmt = 'event.directory.{}.favorite.created'
+    _required_acl_fmt = 'events.directory.{}.favorite.created'
 
 
 class FavoriteDeletedEvent(_BaseFavoriteEvent):
 
     name = 'favorite_deleted'
     _routing_key_fmt = 'directory.{}.favorite.deleted'
-    _required_acl_fmt = 'event.directory.{}.favorite.deleted'
+    _required_acl_fmt = 'events.directory.{}.favorite.deleted'
