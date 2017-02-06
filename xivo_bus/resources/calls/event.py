@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2015-2016 Avencall
+# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -44,11 +44,6 @@ class _CallEvent(_BaseEvent):
             self.required_acl = None
 
 
-class _SwitchboardEvent(_BaseEvent):
-
-    required_acl = 'events.switchboards'
-
-
 class CreateCallEvent(_CallEvent):
 
     name = 'call_created'
@@ -65,63 +60,3 @@ class EndCallEvent(_CallEvent):
 
     name = 'call_ended'
     routing_key = 'calls.call.ended'
-
-
-class CreateWaitingRoomEvent(_SwitchboardEvent):
-
-    name = 'waiting_room_created'
-    routing_key = 'calls.waiting_room.created'
-
-
-class UpdateWaitingRoomEvent(_SwitchboardEvent):
-
-    name = 'waiting_room_updated'
-    routing_key = 'calls.waiting_room.updated'
-
-
-class DeleteWaitingRoomEvent(_SwitchboardEvent):
-
-    name = 'waiting_room_deleted'
-    routing_key = 'calls.waiting_room.deleted'
-
-
-class JoinCallWaitingRoomEvent(_SwitchboardEvent):
-
-    name = 'waiting_room_call_joined'
-    routing_key = 'calls.waiting_room.call_joined'
-
-
-class LeaveCallWaitingRoomEvent(_SwitchboardEvent):
-
-    name = 'waiting_room_call_left'
-    routing_key = 'calls.waiting_room.call_left'
-
-
-class JoinCallIncomingRoomEvent(_SwitchboardEvent):
-
-    name = 'incoming_room_call_joined'
-    routing_key = 'calls.incoming_room.call_joined'
-
-
-class LeaveCallIncomingRoomEvent(_SwitchboardEvent):
-
-    name = 'incoming_room_call_left'
-    routing_key = 'calls.incoming_room.call_left'
-
-
-class StartBlindTransferEvent(_CallEvent):
-
-    name = 'blind_transfer_started'
-    routing_key = 'calls.transfer.blind.started'
-
-
-class CompletedBlindTransferEvent(_CallEvent):
-
-    name = 'blind_transfer_completed'
-    routing_key = 'calls.transfer.blind.completed'
-
-
-class CancelBlindTransferEvent(_CallEvent):
-
-    name = 'blind_transfer_cancelled'
-    routing_key = 'calls.transfer.blind.cancelled'
