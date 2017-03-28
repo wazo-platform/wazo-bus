@@ -1,7 +1,7 @@
 language: python
 python:
   - "2.7"
-  - "3.4"
+  - "3.5"
 install:
   - "pip install -r requirements.txt"
   - "pip install -r test-requirements.txt"
@@ -9,7 +9,7 @@ script: nosetests xivo_bus
 notifications:
   email:
     recipients:
-      - dev.wazo+tests-reports@gmail.com
+      - dev+tests-reports@wazo.community
     on_success: change
     on_failure: change
 branches:

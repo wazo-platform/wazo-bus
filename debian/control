@@ -1,16 +1,26 @@
 Source: xivo-bus
 Section: python
 Priority: extra
-Maintainer: Wazo Maintainers <dev.wazo@gmail.com>
-Build-Depends: debhelper (>= 9), dh-python, python-all (>= 2.7), python-setuptools
+Maintainer: Wazo Maintainers <dev@wazo.community>
+Build-Depends: debhelper (>= 9), dh-python, python-all (>= 2.7), python-setuptools, python3-all, python3-setuptools
 Standards-Version: 3.9.6
 X-Python-Version: >= 2.7
+X-Python3-Version: >= 3.5
 
 Package: xivo-bus
 Architecture: all
 Section: python
 Depends: ${python:Depends}, ${misc:Depends}, python-six
-Description: Wazo telephony systems library for directories manager
+Description: Wazo message bus library - Python 2
+ Wazo is a system based on a powerful IPBX, to bring an easy to
+ install solution for telephony and related services.
+ .
+
+Package: xivo-bus-python3
+Architecture: all
+Section: python
+Depends: ${python3:Depends}, ${misc:Depends}, python-six
+Description: Wazo message bus library - Python 3
  Wazo is a system based on a powerful IPBX, to bring an easy to
  install solution for telephony and related services.
  .
