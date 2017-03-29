@@ -19,7 +19,7 @@ Description: Wazo message bus library - Python 2
 Package: xivo-bus-python3
 Architecture: all
 Section: python
-Depends: ${python3:Depends}, ${misc:Depends}, python-six
+Depends: ${python3:Depends}, ${misc:Depends}, python3-six
 Description: Wazo message bus library - Python 3
  Wazo is a system based on a powerful IPBX, to bring an easy to
  install solution for telephony and related services.
