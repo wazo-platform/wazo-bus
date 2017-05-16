@@ -25,6 +25,7 @@ class PluginInstallProgressEvent(object):
         self._uuid = uuid_
         self._status = status
         self.routing_key = self.routing_key_fmt.format(uuid=uuid_, status=status)
+        self.required_acl = 'events.{}'.format(self.routing_key)
 
     def marshal(self):
         return {
