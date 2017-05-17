@@ -16,10 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 
-class PluginInstallProgressEvent(object):
-
-    name = 'plugin_install_progress'
-    routing_key_fmt = 'plugin.install.{uuid}.{status}'
+class _ProgressEvent(object):
 
     def __init__(self, uuid_, status):
         self._uuid = uuid_
@@ -42,3 +39,15 @@ class PluginInstallProgressEvent(object):
     @classmethod
     def unmarshal(cls, body):
         return cls(body['uuid'], body['status'])
+
+
+class PluginInstallProgressEvent(_ProgressEvent):
+
+    name = 'plugin_install_progress'
+    routing_key_fmt = 'plugin.install.{uuid}.{status}'
+
+
+class PluginUninstallProgressEvent(_ProgressEvent):
+
+    name = 'plugin_uninstall_progress'
+    routing_key_fmt = 'plugin.uninstall.{uuid}.{status}'
