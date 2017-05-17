@@ -18,7 +18,7 @@
 from unittest import TestCase
 from uuid import uuid4
 from hamcrest import assert_that, equal_to
-from ..events import PluginInstallProgressEvent
+from ..events import PluginInstallProgressEvent, PluginUninstallProgressEvent
 
 
 def new_uuid():
@@ -45,5 +45,29 @@ class TestPluginInstallProgressEvent(TestCase):
         body = {'uuid': uuid_, 'status': status}
         event = PluginInstallProgressEvent.unmarshal(body)
         expected = PluginInstallProgressEvent(uuid_, status)
+
+        assert_that(event, equal_to(expected))
+
+
+class TestPluginUninstallProgressEvent(TestCase):
+
+    def test_marshal(self):
+        uuid_ = new_uuid()
+        status = 'start'
+
+        event = PluginUninstallProgressEvent(uuid_, status)
+
+        result = event.marshal()
+        expected = {'uuid': uuid_, 'status': status}
+
+        assert_that(result, equal_to(expected))
+
+    def test_unmarshal(self):
+        uuid_ = new_uuid()
+        status = 'deleting'
+
+        body = {'uuid': uuid_, 'status': status}
+        event = PluginInstallProgressEvent.unmarshal(body)
+        expected = PluginUninstallProgressEvent(uuid_, status)
 
         assert_that(event, equal_to(expected))
