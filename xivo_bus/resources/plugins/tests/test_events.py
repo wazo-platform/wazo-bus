@@ -38,6 +38,23 @@ class TestPluginInstallProgressEvent(TestCase):
 
         assert_that(result, equal_to(expected))
 
+    def test_marshal_on_error(self):
+        uuid_ = new_uuid()
+        status = 'error'
+        errors = {
+            'error_id': 'packaging_error',
+            'message': 'Packaging Error',
+            'resource': 'plugins',
+            'details': {},
+        }
+
+        event = PluginInstallProgressEvent(uuid_, status, errors=errors)
+
+        result = event.marshal()
+        expected = {'uuid': uuid_, 'status': status, 'errors': errors}
+
+        assert_that(result, equal_to(expected))
+
     def test_unmarshal(self):
         uuid_ = new_uuid()
         status = 'building'
@@ -45,6 +62,22 @@ class TestPluginInstallProgressEvent(TestCase):
         body = {'uuid': uuid_, 'status': status}
         event = PluginInstallProgressEvent.unmarshal(body)
         expected = PluginInstallProgressEvent(uuid_, status)
+
+        assert_that(event, equal_to(expected))
+
+    def test_unmarshal_on_error(self):
+        uuid_ = new_uuid()
+        status = 'building'
+        errors = {
+            'error_id': 'packaging_error',
+            'message': 'Packaging Error',
+            'resource': 'plugins',
+            'details': {},
+        }
+
+        body = {'uuid': uuid_, 'status': status, 'errors': errors}
+        event = PluginInstallProgressEvent.unmarshal(body)
+        expected = PluginInstallProgressEvent(uuid_, status, errors=errors)
 
         assert_that(event, equal_to(expected))
 
@@ -62,6 +95,23 @@ class TestPluginUninstallProgressEvent(TestCase):
 
         assert_that(result, equal_to(expected))
 
+    def test_marshal_on_error(self):
+        uuid_ = new_uuid()
+        status = 'error'
+        errors = {
+            'error_id': 'packaging_error',
+            'message': 'Packaging Error',
+            'resource': 'plugins',
+            'details': {},
+        }
+
+        event = PluginUninstallProgressEvent(uuid_, status, errors=errors)
+
+        result = event.marshal()
+        expected = {'uuid': uuid_, 'status': status, 'errors': errors}
+
+        assert_that(result, equal_to(expected))
+
     def test_unmarshal(self):
         uuid_ = new_uuid()
         status = 'deleting'
@@ -69,5 +119,21 @@ class TestPluginUninstallProgressEvent(TestCase):
         body = {'uuid': uuid_, 'status': status}
         event = PluginUninstallProgressEvent.unmarshal(body)
         expected = PluginUninstallProgressEvent(uuid_, status)
+
+        assert_that(event, equal_to(expected))
+
+    def test_unmarshal_on_error(self):
+        uuid_ = new_uuid()
+        status = 'building'
+        errors = {
+            'error_id': 'packaging_error',
+            'message': 'Packaging Error',
+            'resource': 'plugins',
+            'details': {},
+        }
+
+        body = {'uuid': uuid_, 'status': status, 'errors': errors}
+        event = PluginUninstallProgressEvent.unmarshal(body)
+        expected = PluginUninstallProgressEvent(uuid_, status, errors=errors)
 
         assert_that(event, equal_to(expected))
