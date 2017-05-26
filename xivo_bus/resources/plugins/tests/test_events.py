@@ -67,7 +67,7 @@ class TestPluginUninstallProgressEvent(TestCase):
         status = 'deleting'
 
         body = {'uuid': uuid_, 'status': status}
-        event = PluginInstallProgressEvent.unmarshal(body)
+        event = PluginUninstallProgressEvent.unmarshal(body)
         expected = PluginUninstallProgressEvent(uuid_, status)
 
         assert_that(event, equal_to(expected))
