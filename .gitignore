@@ -4,3 +4,5 @@
 coverage.xml
 *.egg-info
 nosetests-*.xml
+pep8.txt
+pylint.txt
