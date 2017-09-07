@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2015-2016 Avencall
+# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -37,8 +37,10 @@ class TestPublisher(unittest.TestCase):
         event = Mock()
         event.routing_key = 'foobar'
         self.marshaler.content_type = 'bazglop'
+        self.marshaler.metadata.return_value = sentinel.headers
 
         self.publisher.publish(event)
 
         self.marshaler.marshal_message.assert_called_once_with(event)
-        self.publish.assert_called_once_with(sentinel.data, routing_key='foobar', content_type='bazglop')
+        self.publish.assert_called_once_with(
+            sentinel.data, routing_key='foobar', headers=sentinel.headers, content_type='bazglop')
