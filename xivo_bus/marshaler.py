@@ -86,3 +86,6 @@ class CollectdMarshaler(object):
             time=command.time,
             values=':'.join(command.values)
         )
+
+    def metadata(self, _):
+        return {}
