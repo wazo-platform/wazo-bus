@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -36,19 +36,20 @@ class PublishingQueue(object):
 
         while not self._should_stop:
             try:
-                message = self._queue.get(timeout=0.1)
+                message, headers = self._queue.get(timeout=0.1)
             except queue.Empty:
                 continue
 
             if not self._publisher:
                 self._publisher = self._publisher_factory()
-            self._publisher.publish(message)
+            self._publisher.publish(message, headers=headers)
 
         self._running = False
         self._should_stop = False
 
-    def publish(self, event):
-        self._queue.put(event)
+    def publish(self, event, headers=None):
+        headers = headers or {}
+        self._queue.put((event, headers))
 
     def stop(self):
         if self._running:
