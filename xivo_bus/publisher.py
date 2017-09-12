@@ -37,9 +37,11 @@ class Publisher(object):
         logger.error('Error: %s', exc, exc_info=1)
         logger.info('Retry in %s seconds...', interval)
 
-    def publish(self, event):
+    def publish(self, event, headers=None):
         data = self._marshaler.marshal_message(event)
+        all_headers = dict(self._marshaler.metadata(event))
+        all_headers.update(headers or {})
         self._publish(data,
                       content_type=self._marshaler.content_type,
                       routing_key=event.routing_key,
-                      headers=self._marshaler.metadata(event))
+                      headers=all_headers)
