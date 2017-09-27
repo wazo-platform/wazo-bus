@@ -40,9 +40,12 @@ class PublishingQueue(object):
             except queue.Empty:
                 continue
 
-            if not self._publisher:
-                self._publisher = self._publisher_factory()
-            self._publisher.publish(message, headers=headers)
+            try:
+                if not self._publisher:
+                    self._publisher = self._publisher_factory()
+                self._publisher.publish(message, headers=headers)
+            except Exception as e:
+                logger.exception('Error while publishing: %s', e)
 
         self._running = False
         self._should_stop = False
