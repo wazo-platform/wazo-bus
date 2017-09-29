@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2015-2016 Avencall
+# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,13 +16,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 
-class ChatMessageEvent(object):
-
-    name = 'chat_message_event'
-    routing_key_fmt = 'chat.message.{}.{}'
+class BaseChatMessageEvent(object):
 
     def __init__(self, from_, to, alias, msg):
-        self.routing_key = self.routing_key_fmt.format(*to)
         self.required_acl = 'events.{}'.format(self.routing_key)
         self._from = from_
         self._to = to
@@ -43,3 +39,33 @@ class ChatMessageEvent(object):
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+
+class ChatMessageEvent(BaseChatMessageEvent):
+
+    name = 'chat_message_event'
+    routing_key_fmt = 'chat.message.{}.{}'
+
+    def __init__(self, from_, to, alias, msg):
+        self.routing_key = self.routing_key_fmt.format(*to)
+        super(ChatMessageEvent, self).__init__(from_, to, alias, msg)
+
+
+class ChatMessageReceived(BaseChatMessageEvent):
+
+    name = 'chat_message_received'
+    routing_key_fmt = 'chat.message.{}.{}.received'
+
+    def __init__(self, from_, to, alias, msg):
+        self.routing_key = self.routing_key_fmt.format(*to)
+        super(ChatMessageReceived, self).__init__(from_, to, alias, msg)
+
+
+class ChatMessageSent(BaseChatMessageEvent):
+
+    name = 'chat_message_sent'
+    routing_key_fmt = 'chat.message.{}.{}.sent'
+
+    def __init__(self, from_, to, alias, msg):
+        self.routing_key = self.routing_key_fmt.format(*from_)
+        super(ChatMessageSent, self).__init__(from_, to, alias, msg)
