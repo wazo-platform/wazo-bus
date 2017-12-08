@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2013-2014 Avencall
+# Copyright 2013-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from __future__ import unicode_literals
 
 import unittest
-from hamcrest import assert_that, equal_to, has_property, all_of
+from hamcrest import assert_that, equal_to, has_entries
 
 
 from ..event import UserCtiProfileConfigEvent
@@ -38,7 +38,8 @@ class TestUserCtiProfileEvent(unittest.TestCase):
     def test_unmarshal(self):
         event = ConcreteUserCtiProfileConfigEvent.unmarshal(self.msg)
 
-        assert_that(event, all_of(
-            has_property('user_id', USER_ID),
-            has_property('cti_profile_id', CTI_PROFILE_ID),
-            has_property('enabled', True)))
+        assert_that(event._body, has_entries(
+            user_id=USER_ID,
+            cti_profile_id=CTI_PROFILE_ID,
+            enabled=True
+        ))
