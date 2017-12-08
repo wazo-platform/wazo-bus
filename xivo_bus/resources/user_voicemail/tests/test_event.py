@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2013-2014 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2013-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from __future__ import unicode_literals
 
 import unittest
-from hamcrest import assert_that, equal_to, has_property, all_of
+from hamcrest import assert_that, equal_to, has_entries
 
 
 from ..event import UserVoicemailConfigEvent
@@ -38,6 +37,7 @@ class TestUserVoicemailConfigEvent(unittest.TestCase):
     def test_unmarshal(self):
         event = ConcreteUserVoicemailConfigEvent.unmarshal(self.msg)
 
-        assert_that(event, all_of(
-            has_property('user_uuid', USER_UUID),
-            has_property('voicemail_id', VOICEMAIL_ID)))
+        assert_that(event._body, has_entries(
+            user_uuid=USER_UUID,
+            voicemail_id=VOICEMAIL_ID
+        ))
