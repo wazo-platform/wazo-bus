@@ -20,3 +20,18 @@ class CreateRegisterSIPEvent(ResourceConfigEvent):
 class DeleteRegisterSIPEvent(ResourceConfigEvent):
     name = 'register_sip_deleted'
     routing_key = 'config.register.sip.deleted'
+
+
+class EditRegisterIAXEvent(ResourceConfigEvent):
+    name = 'register_iax_edited'
+    routing_key = 'config.register.iax.edited'
+
+
+class CreateRegisterIAXEvent(ResourceConfigEvent):
+    name = 'register_iax_created'
+    routing_key = 'config.register.iax.created'
+
+
+class DeleteRegisterIAXEvent(ResourceConfigEvent):
+    name = 'register_iax_deleted'
+    routing_key = 'config.register.iax.deleted'
