@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2013-2014 Avencall
+# Copyright 2013-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from __future__ import unicode_literals
@@ -11,23 +11,24 @@ class UserCtiProfileConfigEvent(ResourceConfigEvent):
     routing_key = 'config.user_cti_profile_association.{}'
 
     def __init__(self, user_id, cti_profile_id, enabled):
-        self.user_id = user_id
-        self.cti_profile_id = cti_profile_id
-        self.enabled = enabled
-
-    def marshal(self):
-        return {
-            'user_id': self.user_id,
-            'cti_profile_id': self.cti_profile_id,
-            'enabled': self.enabled
+        self._body = {
+            'user_id': user_id,
+            'cti_profile_id': cti_profile_id,
+            'enabled': enabled
         }
 
+    def marshal(self):
+        return self._body
+
+    def __ne__(self, other):
+        return not self._body == other._body
+
+    def __eq__(self, other):
+        return self.__class__ == other.__class__ and self._body == other._body
+
     @classmethod
-    def unmarshal(cls, msg):
-        return cls(
-            msg['user_id'],
-            msg['cti_profile_id'],
-            msg['enabled'])
+    def unmarshal(cls, body):
+        return cls(**body)
 
 
 class UserCtiProfileEditedEvent(UserCtiProfileConfigEvent):

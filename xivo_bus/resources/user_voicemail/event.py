@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2013-2014 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2013-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from __future__ import unicode_literals
@@ -12,19 +11,23 @@ class UserVoicemailConfigEvent(ResourceConfigEvent):
 
     def __init__(self, user_uuid, voicemail_id):
         self.user_uuid = user_uuid
-        self.voicemail_id = int(voicemail_id)
-
-    def marshal(self):
-        return {
-            'user_uuid': self.user_uuid,
-            'voicemail_id': self.voicemail_id,
+        self._body = {
+            'user_uuid': user_uuid,
+            'voicemail_id': int(voicemail_id),
         }
 
+    def marshal(self):
+        return self._body
+
+    def __ne__(self, other):
+        return not self._body == other._body
+
+    def __eq__(self, other):
+        return self.__class__ == other.__class__ and self._body == other._body
+
     @classmethod
-    def unmarshal(cls, msg):
-        return cls(
-            msg['user_uuid'],
-            msg['voicemail_id'])
+    def unmarshal(cls, body):
+        return cls(**body)
 
 
 class UserVoicemailAssociatedEvent(UserVoicemailConfigEvent):
