@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import uuid
@@ -28,6 +28,11 @@ class _BaseTestCase(TestCase):
 class TestUserExternalAuthAddedEvent(_BaseTestCase):
 
     Event = events.UserExternalAuthAdded
+
+
+class TestUserExternalAuthAuthorizedEvent(_BaseTestCase):
+
+    Event = events.UserExternalAuthAuthorized
 
 
 class TestUserExternalAuthDeletedEvent(_BaseTestCase):

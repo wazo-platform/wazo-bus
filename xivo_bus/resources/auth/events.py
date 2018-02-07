@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 
@@ -30,6 +30,12 @@ class UserExternalAuthAdded(_BaseExternalAuthEvent):
 
     name = 'auth_user_external_auth_added'
     routing_key_fmt = 'auth.users.{user_uuid}.external.{external_auth_name}.created'
+
+
+class UserExternalAuthAuthorized(_BaseExternalAuthEvent):
+
+    name = 'auth_user_external_auth_authorized'
+    routing_key_fmt = 'auth.users.{user_uuid}.external.{external_auth_name}.authorized'
 
 
 class UserExternalAuthDeleted(_BaseExternalAuthEvent):
