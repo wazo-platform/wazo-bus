@@ -20,3 +20,8 @@ class CreateCallFilterEvent(ResourceConfigEvent):
 class DeleteCallFilterEvent(ResourceConfigEvent):
     name = 'call_filter_deleted'
     routing_key = 'config.callfilter.deleted'
+
+
+class EditCallFilterFallbackEvent(ResourceConfigEvent):
+    name = 'call_filter_fallback_edited'
+    routing_key = 'config.callfilters.fallbacks.edited'
