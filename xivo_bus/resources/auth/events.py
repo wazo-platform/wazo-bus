@@ -24,6 +24,44 @@ class _BaseExternalAuthEvent(object):
         return cls(**body)
 
 
+class _BaseTenantEvent(object):
+
+    def __init__(self):
+        self.routing_key = self.routing_key_fmt.format(**self._body)
+        self.required_acl = 'events.{}'.format(self.routing_key)
+
+    def marshal(self):
+        return self._body
+
+    def __ne__(self, other):
+        return not self == other
+
+    def __eq__(self, other):
+        return self.__class__ == other.__class__ and self._body == other._body
+
+    @classmethod
+    def unmarshal(cls, body):
+        return cls(**body)
+
+
+class TenantCreatedEvent(_BaseTenantEvent):
+
+    name = 'auth_tenant_added'
+    routing_key_fmt = 'auth.tenants.{uuid}.created'
+
+    def __init__(self, uuid, name):
+        self._body = {'uuid': uuid, 'name': name}
+        super(TenantCreatedEvent, self).__init__()
+
+
+class TenantDeletedEvent(_BaseTenantEvent):
+
+    name = 'auth_tenant_deleted'
+    routing_key_fmt = 'auth.tenants.{uuid}.deleted'
+
+    def __init__(self, uuid):
+        self._body = {'uuid': uuid}
+        super(TenantDeletedEvent, self).__init__()
 
 
 class UserExternalAuthAdded(_BaseExternalAuthEvent):
