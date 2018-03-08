@@ -54,6 +54,16 @@ class TenantCreatedEvent(_BaseTenantEvent):
         super(TenantCreatedEvent, self).__init__()
 
 
+class TenantUpdatedEvent(_BaseTenantEvent):
+
+    name = 'auth_tenant_updated'
+    routing_key_fmt = 'auth.tenants.{uuid}.updated'
+
+    def __init__(self, uuid, name):
+        self._body = {'uuid': uuid, 'name': name}
+        super(TenantUpdatedEvent, self).__init__()
+
+
 class TenantDeletedEvent(_BaseTenantEvent):
 
     name = 'auth_tenant_deleted'
