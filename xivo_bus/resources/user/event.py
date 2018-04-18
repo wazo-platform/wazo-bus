@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2013-2016 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2013-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from __future__ import unicode_literals
@@ -10,24 +9,29 @@ from xivo_bus.resources.common.event import ResourceConfigEvent
 
 class ResourceWithUUIDConfigEvent(ResourceConfigEvent):
 
-    def __init__(self, resource_id, resource_uuid):
-        super(ResourceWithUUIDConfigEvent, self).__init__(resource_id)
-        self.uuid = resource_uuid
+    def __init__(self, id_, uuid, **kwargs):
+        self.id = int(id_)
+        self.uuid = str(uuid)
+        self._body = {
+            'id': self.id,
+            'uuid': self.uuid,
+            'subscription_type': kwargs.get('subscription_type'),
+            'created_at': kwargs.get('created_at'),
+        }
 
     def marshal(self):
-        dict_ = super(ResourceWithUUIDConfigEvent, self).marshal()
-        dict_['uuid'] = self.uuid
-        return dict_
+        return self._body
 
     @classmethod
-    def unmarshal(cls, msg):
-        return cls(msg['id'], msg['uuid'])
+    def unmarshal(cls, body):
+        body['id_'] = body.pop('id')
+        return cls(**body)
 
     def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+        return self.__class__ == other.__class__ and self._body == other._body
 
     def __ne__(self, other):
-        return not self.__eq__(other)
+        return not self._body == other._body
 
 
 class EditUserEvent(ResourceWithUUIDConfigEvent):
