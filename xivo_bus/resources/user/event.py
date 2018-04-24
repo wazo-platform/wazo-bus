@@ -17,6 +17,7 @@ class ResourceWithUUIDConfigEvent(ResourceConfigEvent):
             'uuid': self.uuid,
             'subscription_type': kwargs.get('subscription_type'),
             'created_at': str(kwargs['created_at']) if kwargs.get('created_at') else None,
+            'tenant_uuid': kwargs.get('tenant_uuid'),
         }
 
     def marshal(self):
