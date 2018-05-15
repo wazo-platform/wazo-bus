@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 
@@ -13,9 +13,9 @@ class CollectdEvent(object):
     time = 'N'
 
     def is_valid(self):
-        return (self.plugin is not None and
-                self.plugin_instance is not None and
-                self.type_ is not None and
-                self.type_instance is not None and
-                (self.time == 'N' or isinstance(self.time, int)) and
-                len(self.values) > 0)
+        return (self.plugin is not None
+                and self.plugin_instance is not None
+                and self.type_ is not None
+                and self.type_instance is not None
+                and (self.time == 'N' or isinstance(self.time, int))
+                and len(self.values) > 0)

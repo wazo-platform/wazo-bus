@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2013-2014 Avencall
+# Copyright 2013-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from __future__ import unicode_literals
@@ -11,6 +11,7 @@ from ..event import UserLineExtensionConfigEvent
 class ConcreteUserLineExtensionConfigEvent(UserLineExtensionConfigEvent):
 
     name = 'foo'
+
 
 ID = 4221
 USER_ID = 4321

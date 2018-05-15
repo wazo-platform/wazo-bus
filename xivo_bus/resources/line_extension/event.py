@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2013-2016 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2013-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from __future__ import unicode_literals
@@ -28,8 +27,8 @@ class LineExtensionConfigEvent(object):
             msg['extension_id'])
 
     def __eq__(self, other):
-        return (self.line_id == other.line_id and
-                self.extension_id == other.extension_id)
+        return (self.line_id == other.line_id
+                and self.extension_id == other.extension_id)
 
     def __ne__(self, other):
         return not self == other

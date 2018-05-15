@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015 Avencall
-# Copyright (C) 2016 Proformatique, Inc.
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 
@@ -33,11 +32,11 @@ class ServiceRegisteredEvent(object):
                    body['tags'])
 
     def __eq__(self, other):
-        return (self.service_name == other.service_name and
-                self.service_id == other.service_id and
-                self.advertise_address == other.advertise_address and
-                self.advertise_port == other.advertise_port and
-                sorted(self.tags) == sorted(other.tags))
+        return (self.service_name == other.service_name
+                and self.service_id == other.service_id
+                and self.advertise_address == other.advertise_address
+                and self.advertise_port == other.advertise_port
+                and sorted(self.tags) == sorted(other.tags))
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -60,9 +59,9 @@ class ServiceDeregisteredEvent(object):
                 'tags': self._tags}
 
     def __eq__(self, other):
-        return (self._service_name == other._service_name and
-                self._service_id == other._service_id and
-                sorted(self._tags) == sorted(other._tags))
+        return (self._service_name == other._service_name
+                and self._service_id == other._service_id
+                and sorted(self._tags) == sorted(other._tags))
 
     def __ne__(self, other):
         return not self.__eq__(other)

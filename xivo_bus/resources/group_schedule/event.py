@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from __future__ import unicode_literals
@@ -24,8 +24,8 @@ class GroupScheduleConfigEvent(object):
             msg['schedule_id'])
 
     def __eq__(self, other):
-        return (self.group_id == other.group_id and
-                self.schedule_id == other.schedule_id)
+        return (self.group_id == other.group_id
+                and self.schedule_id == other.schedule_id)
 
     def __ne__(self, other):
         return not self == other

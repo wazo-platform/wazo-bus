@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2013-2014 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2013-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from __future__ import unicode_literals
@@ -35,8 +34,8 @@ class EditUserVoicemailEvent(object):
             msg['voicemail_id'])
 
     def __eq__(self, other):
-        return (self.user_uuid == other.user_uuid and
-                self.voicemail_id == other.voicemail_id)
+        return (self.user_uuid == other.user_uuid
+                and self.voicemail_id == other.voicemail_id)
 
     def __ne__(self, other):
         return not self == other

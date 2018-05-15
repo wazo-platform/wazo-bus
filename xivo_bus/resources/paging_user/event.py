@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from __future__ import unicode_literals
@@ -24,8 +24,8 @@ class PagingMemberUserConfigEvent(object):
             msg['user_uuids'])
 
     def __eq__(self, other):
-        return (self.paging_id == other.paging_id and
-                self.user_uuids == other.user_uuids)
+        return (self.paging_id == other.paging_id
+                and self.user_uuids == other.user_uuids)
 
     def __ne__(self, other):
         return not self == other

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from __future__ import unicode_literals
@@ -25,8 +24,8 @@ class TrunkEndpointConfigEvent(object):
             msg['endpoint_id'])
 
     def __eq__(self, other):
-        return (self.trunk_id == other.trunk_id and
-                self.endpoint_id == other.endpoint_id)
+        return (self.trunk_id == other.trunk_id
+                and self.endpoint_id == other.endpoint_id)
 
     def __ne__(self, other):
         return not self == other

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from __future__ import unicode_literals
@@ -24,8 +24,8 @@ class GroupMemberUserConfigEvent(object):
             msg['user_uuids'])
 
     def __eq__(self, other):
-        return (self.group_id == other.group_id and
-                self.user_uuids == other.user_uuids)
+        return (self.group_id == other.group_id
+                and self.user_uuids == other.user_uuids)
 
     def __ne__(self, other):
         return not self == other
@@ -55,8 +55,8 @@ class GroupMemberExtensionsConfigEvent(object):
             msg['extensions'])
 
     def __eq__(self, other):
-        return (self.group_id == other.group_id and
-                self.extensions == other.extensions)
+        return (self.group_id == other.group_id
+                and self.extensions == other.extensions)
 
     def __ne__(self, other):
         return not self == other

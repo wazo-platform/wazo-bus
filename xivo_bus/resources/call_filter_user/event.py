@@ -25,8 +25,8 @@ class CallFilterUserConfigEvent(object):
         )
 
     def __eq__(self, other):
-        return (self.call_filter_id == other.call_filter_id and
-                self.user_uuids == other.user_uuids)
+        return (self.call_filter_id == other.call_filter_id
+                and self.user_uuids == other.user_uuids)
 
     def __ne__(self, other):
         return not self == other

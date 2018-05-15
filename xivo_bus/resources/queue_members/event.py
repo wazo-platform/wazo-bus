@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2013-2016 Avencall
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2013-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from __future__ import unicode_literals
@@ -26,9 +25,9 @@ class AgentQueueConfigEvent(object):
         return cls(msg['queue_id'], msg['agent_id'], msg['penalty'])
 
     def __eq__(self, other):
-        return (self.queue_id == other.queue_id and
-                self.agent_id == other.agent_id and
-                self.penalty == other.penalty)
+        return (self.queue_id == other.queue_id
+                and self.agent_id == other.agent_id
+                and self.penalty == other.penalty)
 
     def __ne__(self, other):
         return not self == other
@@ -63,8 +62,8 @@ class AgentRemovedFromQueueEvent(AgentQueueConfigEvent):
         return cls(msg['agent_id'], msg['queue_id'])
 
     def __eq__(self, other):
-        return (self.queue_id == other.queue_id and
-                self.agent_id == other.agent_id)
+        return (self.queue_id == other.queue_id
+                and self.agent_id == other.agent_id)
 
     def __ne__(self, other):
         return not self == other

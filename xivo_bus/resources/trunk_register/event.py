@@ -24,8 +24,8 @@ class TrunkRegisterConfigEvent(object):
             msg['register_id'])
 
     def __eq__(self, other):
-        return (self.trunk_id == other.trunk_id and
-                self.register_id == other.register_id)
+        return (self.trunk_id == other.trunk_id
+                and self.register_id == other.register_id)
 
     def __ne__(self, other):
         return not self == other
