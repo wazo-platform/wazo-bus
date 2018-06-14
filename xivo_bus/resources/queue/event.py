@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015 Avencall
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from __future__ import unicode_literals
@@ -20,3 +20,8 @@ class CreateQueueEvent(ResourceConfigEvent):
 class DeleteQueueEvent(ResourceConfigEvent):
     name = 'queue_deleted'
     routing_key = 'config.queue.deleted'
+
+
+class EditQueueFallbackEvent(ResourceConfigEvent):
+    name = 'queue_fallback_edited'
+    routing_key = 'config.queues.fallbacks.edited'
