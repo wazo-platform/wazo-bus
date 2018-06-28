@@ -58,3 +58,37 @@ class QueueMemberAgentDissociatedEvent(object):
 
     def __ne__(self, other):
         return not self == other
+
+
+class QueueMemberUserConfigEvent(object):
+
+    def __init__(self, queue_id, user_uuid):
+        self.queue_id = queue_id
+        self.user_uuid = user_uuid
+
+    def marshal(self):
+        return {
+            'queue_id': self.queue_id,
+            'user_uuid': self.user_uuid,
+        }
+
+    @classmethod
+    def unmarshal(cls, msg):
+        return cls(msg['queue_id'], msg['user_uuid'])
+
+    def __eq__(self, other):
+        return (self.queue_id == other.queue_id
+                and self.user_uuid == other.user_uuid)
+
+    def __ne__(self, other):
+        return not self == other
+
+
+class QueueMemberUserAssociatedEvent(QueueMemberUserConfigEvent):
+    name = 'user_queue_associated'
+    routing_key = 'config.user_queue_association.created'
+
+
+class QueueMemberUserDissociatedEvent(QueueMemberUserConfigEvent):
+    name = "user_removed_from_queue"
+    routing_key = 'config.user_queue_association.deleted'
