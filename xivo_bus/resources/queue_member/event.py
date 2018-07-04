@@ -5,8 +5,9 @@
 from __future__ import unicode_literals
 
 
-class AgentQueueConfigEvent(object):
-    routing_key = 'config.agent_queue_association.{}'
+class QueueMemberAgentAssociatedEvent(object):
+    name = 'agent_queue_associated'
+    routing_key = 'config.agent_queue_association.created'
 
     def __init__(self, queue_id, agent_id, penalty):
         self.queue_id = queue_id
@@ -33,21 +34,11 @@ class AgentQueueConfigEvent(object):
         return not self == other
 
 
-class AgentQueueAssociationEditedEvent(AgentQueueConfigEvent):
-    name = 'agent_queue_association_edited'
-    routing_key = AgentQueueConfigEvent.routing_key.format('edited')
-
-
-class AgentQueueAssociatedEvent(AgentQueueConfigEvent):
-    name = 'agent_queue_associated'
-    routing_key = AgentQueueConfigEvent.routing_key.format('created')
-
-
-class AgentRemovedFromQueueEvent(AgentQueueConfigEvent):
+class QueueMemberAgentDissociatedEvent(object):
     name = "agent_removed_from_queue"
-    routing_key = AgentQueueConfigEvent.routing_key.format('deleted')
+    routing_key = 'config.agent_queue_association.deleted'
 
-    def __init__(self, agent_id, queue_id):
+    def __init__(self, queue_id, agent_id):
         self.queue_id = queue_id
         self.agent_id = agent_id
 
@@ -59,7 +50,7 @@ class AgentRemovedFromQueueEvent(AgentQueueConfigEvent):
 
     @classmethod
     def unmarshal(cls, msg):
-        return cls(msg['agent_id'], msg['queue_id'])
+        return cls(msg['queue_id'], msg['agent_id'])
 
     def __eq__(self, other):
         return (self.queue_id == other.queue_id
@@ -67,3 +58,37 @@ class AgentRemovedFromQueueEvent(AgentQueueConfigEvent):
 
     def __ne__(self, other):
         return not self == other
+
+
+class QueueMemberUserConfigEvent(object):
+
+    def __init__(self, queue_id, user_uuid):
+        self.queue_id = queue_id
+        self.user_uuid = user_uuid
+
+    def marshal(self):
+        return {
+            'queue_id': self.queue_id,
+            'user_uuid': self.user_uuid,
+        }
+
+    @classmethod
+    def unmarshal(cls, msg):
+        return cls(msg['queue_id'], msg['user_uuid'])
+
+    def __eq__(self, other):
+        return (self.queue_id == other.queue_id
+                and self.user_uuid == other.user_uuid)
+
+    def __ne__(self, other):
+        return not self == other
+
+
+class QueueMemberUserAssociatedEvent(QueueMemberUserConfigEvent):
+    name = 'user_queue_associated'
+    routing_key = 'config.user_queue_association.created'
+
+
+class QueueMemberUserDissociatedEvent(QueueMemberUserConfigEvent):
+    name = "user_removed_from_queue"
+    routing_key = 'config.user_queue_association.deleted'
