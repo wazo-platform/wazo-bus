@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from unittest import TestCase
@@ -29,7 +29,7 @@ class TestPluginInstallProgressEvent(TestCase):
         uuid_ = new_uuid()
         status = 'error'
         errors = {
-            'error_id': 'packaging_error',
+            'error_id': 'packaging-error',
             'message': 'Packaging Error',
             'resource': 'plugins',
             'details': {},
@@ -56,7 +56,7 @@ class TestPluginInstallProgressEvent(TestCase):
         uuid_ = new_uuid()
         status = 'building'
         errors = {
-            'error_id': 'packaging_error',
+            'error_id': 'packaging-error',
             'message': 'Packaging Error',
             'resource': 'plugins',
             'details': {},
@@ -86,7 +86,7 @@ class TestPluginUninstallProgressEvent(TestCase):
         uuid_ = new_uuid()
         status = 'error'
         errors = {
-            'error_id': 'packaging_error',
+            'error_id': 'packaging-error',
             'message': 'Packaging Error',
             'resource': 'plugins',
             'details': {},
@@ -113,7 +113,7 @@ class TestPluginUninstallProgressEvent(TestCase):
         uuid_ = new_uuid()
         status = 'building'
         errors = {
-            'error_id': 'packaging_error',
+            'error_id': 'packaging-error',
             'message': 'Packaging Error',
             'resource': 'plugins',
             'details': {},
