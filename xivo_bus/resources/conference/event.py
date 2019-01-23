@@ -64,3 +64,47 @@ class ParticipantLeftConferenceEvent(object):
         participant = dict(msg)
         conference_id = participant.pop('conference_id')
         return cls(conference_id=conference_id, participant=msg)
+
+
+class ParticipantMutedConferenceEvent(object):
+    name = 'conference_participant_muted'
+
+    def __init__(self, conference_id, participant_dict):
+        self.conference_id = conference_id
+        self.participant = participant_dict
+        self.required_acl = 'events.conferences.{conference_id}.participants.mute'.format(conference_id=conference_id)
+        self.routing_key = 'conferences.{conference_id}.participants.mute'.format(conference_id=conference_id)
+
+    def marshal(self):
+        result = dict()
+        result.update(self.participant)
+        result['conference_id'] = self.conference_id
+        return result
+
+    @classmethod
+    def unmarshal(cls, msg):
+        participant = dict(msg)
+        conference_id = participant.pop('conference_id')
+        return cls(conference_id=conference_id, participant=msg)
+
+
+class ParticipantUnmutedConferenceEvent(object):
+    name = 'conference_participant_unmuted'
+
+    def __init__(self, conference_id, participant_dict):
+        self.conference_id = conference_id
+        self.participant = participant_dict
+        self.required_acl = 'events.conferences.{conference_id}.participants.mute'.format(conference_id=conference_id)
+        self.routing_key = 'conferences.{conference_id}.participants.mute'.format(conference_id=conference_id)
+
+    def marshal(self):
+        result = dict()
+        result.update(self.participant)
+        result['conference_id'] = self.conference_id
+        return result
+
+    @classmethod
+    def unmarshal(cls, msg):
+        participant = dict(msg)
+        conference_id = participant.pop('conference_id')
+        return cls(conference_id=conference_id, participant=msg)
