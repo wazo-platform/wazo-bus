@@ -108,3 +108,41 @@ class ParticipantUnmutedConferenceEvent(object):
         participant = dict(msg)
         conference_id = participant.pop('conference_id')
         return cls(conference_id=conference_id, participant=msg)
+
+
+class RecordStartedConferenceEvent(object):
+    name = 'conference_record_started'
+
+    def __init__(self, conference_id):
+        self.conference_id = conference_id
+        self.required_acl = 'events.conferences.{conference_id}.record'.format(conference_id=conference_id)
+        self.routing_key = 'conferences.{conference_id}.record'.format(conference_id=conference_id)
+
+    def marshal(self):
+        result = {
+            'id': self.conference_id,
+        }
+        return result
+
+    @classmethod
+    def unmarshal(cls, msg):
+        return cls(msg['id'])
+
+
+class RecordStoppedConferenceEvent(object):
+    name = 'conference_record_stopped'
+
+    def __init__(self, conference_id):
+        self.conference_id = conference_id
+        self.required_acl = 'events.conferences.{conference_id}.record'.format(conference_id=conference_id)
+        self.routing_key = 'conferences.{conference_id}.record'.format(conference_id=conference_id)
+
+    def marshal(self):
+        result = {
+            'id': self.conference_id,
+        }
+        return result
+
+    @classmethod
+    def unmarshal(cls, msg):
+        return cls(msg['id'])
