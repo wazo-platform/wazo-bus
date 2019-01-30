@@ -148,14 +148,14 @@ class RecordStoppedConferenceEvent(object):
         return cls(msg['id'])
 
 
-class ParticipantStartedTalkingConferenceEvent(object):
-    name = 'participant_started_talking'
+class ParticipantTalkStartedConferenceEvent(object):
+    name = 'conference_participant_talk_started'
 
     def __init__(self, conference_id, participant_dict):
         self.conference_id = conference_id
         self.participant = participant_dict
-        self.required_acl = 'events.conferences.{conference_id}.participants.talking'.format(conference_id=conference_id)
-        self.routing_key = 'conferences.{conference_id}.participants.talking'.format(conference_id=conference_id)
+        self.required_acl = 'events.conferences.{conference_id}.participants.talk'.format(conference_id=conference_id)
+        self.routing_key = 'conferences.{conference_id}.participants.talk'.format(conference_id=conference_id)
 
     def marshal(self):
         result = dict()
@@ -170,8 +170,8 @@ class ParticipantStartedTalkingConferenceEvent(object):
         return cls(conference_id=conference_id, participant=msg)
 
 
-class ParticipantStoppedTalkingConferenceEvent(object):
-    name = 'participant_stopped_talking'
+class ParticipantTalkStoppedConferenceEvent(object):
+    name = 'conference_participant_stopped_talking'
 
     def __init__(self, conference_id, participant_dict):
         self.conference_id = conference_id
