@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
@@ -90,3 +90,13 @@ class UserExternalAuthDeleted(_BaseExternalAuthEvent):
 
     name = 'auth_user_external_auth_deleted'
     routing_key_fmt = 'auth.users.{user_uuid}.external.{external_auth_name}.deleted'
+
+
+class SessionCreatedEvent(_BaseTenantEvent):
+
+    name = 'auth_session_created'
+    routing_key_fmt = 'auth.sessions.{uuid}.created'
+
+    def __init__(self, uuid, **kwargs):
+        self._body = {'uuid': uuid, 'mobile': kwargs.get('mobile', False)}
+        super(SessionCreatedEvent, self).__init__()
