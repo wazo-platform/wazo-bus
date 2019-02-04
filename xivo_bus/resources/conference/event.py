@@ -171,13 +171,13 @@ class ParticipantTalkStartedConferenceEvent(object):
 
 
 class ParticipantTalkStoppedConferenceEvent(object):
-    name = 'conference_participant_stopped_talking'
+    name = 'conference_participant_talk_stopped'
 
     def __init__(self, conference_id, participant_dict):
         self.conference_id = conference_id
         self.participant = participant_dict
-        self.required_acl = 'events.conferences.{conference_id}.participants.talking'.format(conference_id=conference_id)
-        self.routing_key = 'conferences.{conference_id}.participants.talking'.format(conference_id=conference_id)
+        self.required_acl = 'events.conferences.{conference_id}.participants.talk'.format(conference_id=conference_id)
+        self.routing_key = 'conferences.{conference_id}.participants.talk'.format(conference_id=conference_id)
 
     def marshal(self):
         result = dict()
