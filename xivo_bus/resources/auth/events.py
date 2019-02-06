@@ -97,8 +97,12 @@ class SessionCreatedEvent(_BaseTenantEvent):
     name = 'auth_session_created'
     routing_key_fmt = 'auth.sessions.{uuid}.created'
 
-    def __init__(self, uuid, **kwargs):
-        self._body = {'uuid': uuid, 'mobile': kwargs.get('mobile', False)}
+    def __init__(self, uuid, user_uuid, **kwargs):
+        self._body = {
+            'uuid': uuid,
+            'user_uuid': user_uuid,
+            'mobile': kwargs.get('mobile', False),
+        }
         super(SessionCreatedEvent, self).__init__()
 
 
