@@ -97,9 +97,10 @@ class SessionCreatedEvent(_BaseTenantEvent):
     name = 'auth_session_created'
     routing_key_fmt = 'auth.sessions.{uuid}.created'
 
-    def __init__(self, uuid, user_uuid, **kwargs):
+    def __init__(self, uuid, tenant_uuid, user_uuid, **kwargs):
         self._body = {
             'uuid': uuid,
+            'tenant_uuid': tenant_uuid,
             'user_uuid': user_uuid,
             'mobile': kwargs.get('mobile', False),
         }
@@ -111,6 +112,10 @@ class SessionDeletedEvent(_BaseTenantEvent):
     name = 'auth_session_deleted'
     routing_key_fmt = 'auth.sessions.{uuid}.deleted'
 
-    def __init__(self, uuid):
-        self._body = {'uuid': uuid}
+    def __init__(self, uuid, tenant_uuid, user_uuid):
+        self._body = {
+            'uuid': uuid,
+            'tenant_uuid': tenant_uuid,
+            'user_uuid': user_uuid,
+        }
         super(SessionDeletedEvent, self).__init__()
