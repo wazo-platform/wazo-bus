@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2013-2017 The Wazo Authors  (see AUTHORS file)
+# Copyright 2013-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
@@ -34,3 +34,13 @@ class ArbitraryEvent(object):
 
     def marshal(self):
         return self._body
+
+    def __eq__(self, other):
+        return (
+            self.name == other.name and
+            self._body == other._body and
+            self.required_acl == other.required_acl
+        )
+
+    def __ne__(self, other):
+        return self != other
