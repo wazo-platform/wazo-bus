@@ -3,28 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
-class _BaseExternalAuthEvent(object):
-
-    def __init__(self, user_uuid, external_auth_name):
-        self._body = dict(user_uuid=str(user_uuid), external_auth_name=external_auth_name)
-        self.routing_key = self.routing_key_fmt.format(**self._body)
-        self.required_acl = 'events.{}'.format(self.routing_key)
-
-    def marshal(self):
-        return self._body
-
-    def __ne__(self, other):
-        return not self._body == other._body
-
-    def __eq__(self, other):
-        return self.__class__ == other.__class__ and self._body == other._body
-
-    @classmethod
-    def unmarshal(cls, body):
-        return cls(**body)
-
-
-class _BaseTenantEvent(object):
+class _BaseEvent(object):
 
     def __init__(self):
         self.routing_key = self.routing_key_fmt.format(**self._body)
@@ -44,7 +23,14 @@ class _BaseTenantEvent(object):
         return cls(**body)
 
 
-class TenantCreatedEvent(_BaseTenantEvent):
+class _BaseExternalAuthEvent(_BaseEvent):
+
+    def __init__(self, user_uuid, external_auth_name):
+        self._body = dict(user_uuid=str(user_uuid), external_auth_name=external_auth_name)
+        super(_BaseExternalAuthEvent, self).__init__()
+
+
+class TenantCreatedEvent(_BaseEvent):
 
     name = 'auth_tenant_added'
     routing_key_fmt = 'auth.tenants.{uuid}.created'
@@ -54,7 +40,7 @@ class TenantCreatedEvent(_BaseTenantEvent):
         super(TenantCreatedEvent, self).__init__()
 
 
-class TenantUpdatedEvent(_BaseTenantEvent):
+class TenantUpdatedEvent(_BaseEvent):
 
     name = 'auth_tenant_updated'
     routing_key_fmt = 'auth.tenants.{uuid}.updated'
@@ -64,7 +50,7 @@ class TenantUpdatedEvent(_BaseTenantEvent):
         super(TenantUpdatedEvent, self).__init__()
 
 
-class TenantDeletedEvent(_BaseTenantEvent):
+class TenantDeletedEvent(_BaseEvent):
 
     name = 'auth_tenant_deleted'
     routing_key_fmt = 'auth.tenants.{uuid}.deleted'
@@ -92,7 +78,7 @@ class UserExternalAuthDeleted(_BaseExternalAuthEvent):
     routing_key_fmt = 'auth.users.{user_uuid}.external.{external_auth_name}.deleted'
 
 
-class SessionCreatedEvent(_BaseTenantEvent):
+class SessionCreatedEvent(_BaseEvent):
 
     name = 'auth_session_created'
     routing_key_fmt = 'auth.sessions.{uuid}.created'
@@ -107,7 +93,7 @@ class SessionCreatedEvent(_BaseTenantEvent):
         super(SessionCreatedEvent, self).__init__()
 
 
-class SessionDeletedEvent(_BaseTenantEvent):
+class SessionDeletedEvent(_BaseEvent):
 
     name = 'auth_session_deleted'
     routing_key_fmt = 'auth.sessions.{uuid}.deleted'
