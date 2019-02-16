@@ -7,14 +7,12 @@ from __future__ import unicode_literals
 import uuid
 import unittest
 
-from hamcrest import assert_that, equal_to, has_entries
+from hamcrest import assert_that, equal_to
 
-from ..event import UserLineConfigEvent
-
-
-class ConcreteUserLineConfigEvent(UserLineConfigEvent):
-    name = 'line_event'
-
+from ..event import (
+    UserLineAssociatedEvent,
+    UserLineDissociatedEvent,
+)
 
 USER_UUID = str(uuid.uuid4())
 USER_ID = 1
@@ -24,20 +22,10 @@ MAIN_LINE = True
 TENANT_UUID = str(uuid.uuid4())
 
 
-class TestUserLineConfigEvent(unittest.TestCase):
+class TestUserLineEvent(unittest.TestCase):
 
-    def setUp(self):
-        self.msg = {
-            'user_uuid': USER_UUID,
-            'user_id': USER_ID,
-            'line_id': LINE_ID,
-            'main_user': MAIN_USER,
-            'main_line': MAIN_LINE,
-            'tenant_uuid': TENANT_UUID,
-        }
-
-    def test_marshal(self):
-        command = ConcreteUserLineConfigEvent(
+    def test_associated_routing_key_fmt(self):
+        msg = UserLineAssociatedEvent(
             USER_UUID,
             USER_ID,
             LINE_ID,
@@ -45,19 +33,21 @@ class TestUserLineConfigEvent(unittest.TestCase):
             MAIN_LINE,
             TENANT_UUID,
         )
+        assert_that(
+            msg.routing_key,
+            equal_to('config.user_line_association.created')
+        )
 
-        msg = command.marshal()
-
-        assert_that(msg, equal_to(self.msg))
-
-    def test_unmarshal(self):
-        event = ConcreteUserLineConfigEvent.unmarshal(self.msg)
-
-        assert_that(event._body, has_entries(
-            user_uuid=USER_UUID,
-            user_id=USER_ID,
-            line_id=LINE_ID,
-            main_user=MAIN_USER,
-            main_line=MAIN_LINE,
-            tenant_uuid=TENANT_UUID,
-        ))
+    def test_dissociated_routing_key_fmt(self):
+        msg = UserLineDissociatedEvent(
+            USER_UUID,
+            USER_ID,
+            LINE_ID,
+            MAIN_USER,
+            MAIN_LINE,
+            TENANT_UUID,
+        )
+        assert_that(
+            msg.routing_key,
+            equal_to('config.user_line_association.deleted')
+        )

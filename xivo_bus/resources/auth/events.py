@@ -2,35 +2,17 @@
 # Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-
-class _BaseEvent(object):
-
-    def __init__(self):
-        self.routing_key = self.routing_key_fmt.format(**self._body)
-        self.required_acl = 'events.{}'.format(self.routing_key)
-
-    def marshal(self):
-        return self._body
-
-    def __ne__(self, other):
-        return not self == other
-
-    def __eq__(self, other):
-        return self.__class__ == other.__class__ and self._body == other._body
-
-    @classmethod
-    def unmarshal(cls, body):
-        return cls(**body)
+from ..common.event import BaseEvent
 
 
-class _BaseExternalAuthEvent(_BaseEvent):
+class _BaseExternalAuthEvent(BaseEvent):
 
     def __init__(self, user_uuid, external_auth_name):
         self._body = dict(user_uuid=str(user_uuid), external_auth_name=external_auth_name)
         super(_BaseExternalAuthEvent, self).__init__()
 
 
-class TenantCreatedEvent(_BaseEvent):
+class TenantCreatedEvent(BaseEvent):
 
     name = 'auth_tenant_added'
     routing_key_fmt = 'auth.tenants.{uuid}.created'
@@ -40,7 +22,7 @@ class TenantCreatedEvent(_BaseEvent):
         super(TenantCreatedEvent, self).__init__()
 
 
-class TenantUpdatedEvent(_BaseEvent):
+class TenantUpdatedEvent(BaseEvent):
 
     name = 'auth_tenant_updated'
     routing_key_fmt = 'auth.tenants.{uuid}.updated'
@@ -50,7 +32,7 @@ class TenantUpdatedEvent(_BaseEvent):
         super(TenantUpdatedEvent, self).__init__()
 
 
-class TenantDeletedEvent(_BaseEvent):
+class TenantDeletedEvent(BaseEvent):
 
     name = 'auth_tenant_deleted'
     routing_key_fmt = 'auth.tenants.{uuid}.deleted'
@@ -78,7 +60,7 @@ class UserExternalAuthDeleted(_BaseExternalAuthEvent):
     routing_key_fmt = 'auth.users.{user_uuid}.external.{external_auth_name}.deleted'
 
 
-class SessionCreatedEvent(_BaseEvent):
+class SessionCreatedEvent(BaseEvent):
 
     name = 'auth_session_created'
     routing_key_fmt = 'auth.sessions.{uuid}.created'
@@ -93,7 +75,7 @@ class SessionCreatedEvent(_BaseEvent):
         super(SessionCreatedEvent, self).__init__()
 
 
-class SessionDeletedEvent(_BaseEvent):
+class SessionDeletedEvent(BaseEvent):
 
     name = 'auth_session_deleted'
     routing_key_fmt = 'auth.sessions.{uuid}.deleted'

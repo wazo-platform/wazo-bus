@@ -4,11 +4,10 @@
 
 from __future__ import unicode_literals
 
-from xivo_bus.resources.common.event import ResourceConfigEvent
+from ..common.event import BaseEvent
 
 
-class UserLineConfigEvent(ResourceConfigEvent):
-    routing_key = 'config.user_line_association.{}'
+class _BaseUserLineEvent(BaseEvent):
 
     def __init__(self, user_uuid, user_id, line_id, main_user, main_line, tenant_uuid):
         self._body = {
@@ -19,26 +18,16 @@ class UserLineConfigEvent(ResourceConfigEvent):
             'main_line': bool(main_line),
             'tenant_uuid': str(tenant_uuid),
         }
-
-    def marshal(self):
-        return self._body
-
-    def __ne__(self, other):
-        return not self._body == other._body
-
-    def __eq__(self, other):
-        return self.__class__ == other.__class__ and self._body == other._body
-
-    @classmethod
-    def unmarshal(cls, body):
-        return cls(**body)
+        super(_BaseUserLineEvent, self).__init__()
 
 
-class UserLineAssociatedEvent(UserLineConfigEvent):
+class UserLineAssociatedEvent(_BaseUserLineEvent):
+
     name = 'line_associated'
-    routing_key = UserLineConfigEvent.routing_key.format('created')
+    routing_key_fmt = 'config.user_line_association.created'
 
 
-class UserLineDissociatedEvent(UserLineConfigEvent):
+class UserLineDissociatedEvent(_BaseUserLineEvent):
+
     name = 'line_dissociated'
-    routing_key = UserLineConfigEvent.routing_key.format('deleted')
+    routing_key_fmt = 'config.user_line_association.deleted'

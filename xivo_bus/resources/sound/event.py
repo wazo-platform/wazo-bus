@@ -1,36 +1,26 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
 
+from ..common.event import BaseEvent
 
-class _SoundConfigurationEvent(object):
+
+class _BaseSoundEvent(BaseEvent):
 
     def __init__(self, sound_name):
         self._body = {
             'name': sound_name,
         }
-
-    def marshal(self):
-        return self._body
-
-    def __ne__(self, other):
-        return not self._body == other._body
-
-    def __eq__(self, other):
-        return self.__class__ == other.__class__ and self._body == other._body
-
-    @classmethod
-    def unmarshal(cls, body):
-        return cls(**body)
+        super(_BaseSoundEvent, self).__init__()
 
 
-class CreateSoundEvent(_SoundConfigurationEvent):
+class CreateSoundEvent(_BaseSoundEvent):
     name = 'sound_created'
-    routing_key = 'config.sounds.created'
+    routing_key_fmt = 'config.sounds.created'
 
 
-class DeleteSoundEvent(_SoundConfigurationEvent):
+class DeleteSoundEvent(_BaseSoundEvent):
     name = 'sound_deleted'
-    routing_key = 'config.sounds.deleted'
+    routing_key_fmt = 'config.sounds.deleted'

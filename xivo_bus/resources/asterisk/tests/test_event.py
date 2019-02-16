@@ -1,32 +1,24 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import uuid
-from unittest import TestCase
+import unittest
+
 from hamcrest import assert_that, equal_to
 
 from ..event import AsteriskReloadProgressEvent
 
-
-class _BaseTestCase(TestCase):
-
-    def setUp(self):
-        self.uuid = str(uuid.uuid4())
-        self.status = 'starting'
-        self.command = 'core reload'
-        self.body = {'uuid': self.uuid, 'status': self.status, 'command': self.command}
-
-    def test_marshal(self):
-        event = self.Event(self.uuid, self.status, self.command)
-        assert_that(event.marshal(), equal_to(self.body))
-
-    def test_unmarshal(self):
-        event = self.Event.unmarshal(self.body)
-        expected = self.Event(self.uuid, self.status, self.command)
-        assert_that(event, equal_to(expected))
+ASTERISK_UUID = str(uuid.uuid4)
+STATUS = 'starting'
+COMMAND = 'core reload'
 
 
-class TestAsteriskReloadProgressEvent(_BaseTestCase):
+class TestUserVoicemailEvent(unittest.TestCase):
 
-    Event = AsteriskReloadProgressEvent
+    def test_reload_routing_key_fmt(self):
+        msg = AsteriskReloadProgressEvent(ASTERISK_UUID, STATUS, COMMAND)
+        assert_that(
+            msg.routing_key,
+            equal_to('sysconfd.asterisk.reload.{}.{}'.format(ASTERISK_UUID, STATUS))
+        )
