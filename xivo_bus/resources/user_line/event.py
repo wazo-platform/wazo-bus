@@ -9,25 +9,23 @@ from ..common.event import BaseEvent
 
 class _BaseUserLineEvent(BaseEvent):
 
-    def __init__(self, user_uuid, user_id, line_id, main_user, main_line, tenant_uuid):
+    def __init__(self, user, line, main_user, main_line):
         self._body = {
-            'user_uuid': str(user_uuid),
-            'user_id': int(user_id),
-            'line_id': int(line_id),
-            'main_user': bool(main_user),
-            'main_line': bool(main_line),
-            'tenant_uuid': str(tenant_uuid),
+            'line': line,
+            'main_line': main_line,
+            'main_user': main_user,
+            'user': user,
         }
         super(_BaseUserLineEvent, self).__init__()
 
 
 class UserLineAssociatedEvent(_BaseUserLineEvent):
 
-    name = 'line_associated'
-    routing_key_fmt = 'config.user_line_association.created'
+    name = 'user_line_associated'
+    routing_key_fmt = 'config.users.{user[uuid]}.lines.{line[id]}.updated'
 
 
 class UserLineDissociatedEvent(_BaseUserLineEvent):
 
-    name = 'line_dissociated'
-    routing_key_fmt = 'config.user_line_association.deleted'
+    name = 'user_line_dissociated'
+    routing_key_fmt = 'config.users.{user[uuid]}.lines.{line[id]}.deleted'
