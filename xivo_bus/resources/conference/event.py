@@ -42,6 +42,26 @@ class ParticipantLeftConferenceEvent(BaseEvent):
         super(ParticipantLeftConferenceEvent, self).__init__()
 
 
+class UserParticipantJoinedConferenceEvent(BaseEvent):
+    name = 'conference_user_participant_joined'
+    routing_key_fmt = 'conferences.users.{user_uuid}.participants.joined'
+
+    def __init__(self, conference_id, participant_dict):
+        self._body = {'conference_id': conference_id}
+        self._body.update(participant_dict)
+        super(UserParticipantJoinedConferenceEvent, self).__init__()
+
+
+class UserParticipantLeftConferenceEvent(BaseEvent):
+    name = 'conference_user_participant_left'
+    routing_key_fmt = 'conferences.users.{user_uuid}.participants.left'
+
+    def __init__(self, conference_id, participant_dict):
+        self._body = {'conference_id': conference_id}
+        self._body.update(participant_dict)
+        super(UserParticipantLeftConferenceEvent, self).__init__()
+
+
 class ParticipantMutedConferenceEvent(BaseEvent):
     name = 'conference_participant_muted'
     routing_key_fmt = 'conferences.{conference_id}.participants.mute'
