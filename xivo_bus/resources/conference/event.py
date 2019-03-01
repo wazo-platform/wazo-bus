@@ -4,7 +4,7 @@
 
 from __future__ import unicode_literals
 
-from xivo_bus.resources.common.event import ResourceConfigEvent
+from xivo_bus.resources.common.event import BaseEvent, ResourceConfigEvent
 
 
 class EditConferenceEvent(ResourceConfigEvent):
@@ -22,171 +22,99 @@ class DeleteConferenceEvent(ResourceConfigEvent):
     routing_key = 'config.conferences.deleted'
 
 
-class ParticipantJoinedConferenceEvent(object):
+class ParticipantJoinedConferenceEvent(BaseEvent):
     name = 'conference_participant_joined'
+    routing_key_fmt = 'conferences.{conference_id}.participants.joined'
 
     def __init__(self, conference_id, participant_dict):
-        self.conference_id = conference_id
-        self.participant = participant_dict
-        self.required_acl = 'events.conferences.{conference_id}.participants.joined'.format(conference_id=conference_id)
-        self.routing_key = 'conferences.{conference_id}.participants.joined'.format(conference_id=conference_id)
-
-    def marshal(self):
-        result = dict()
-        result.update(self.participant)
-        result['conference_id'] = self.conference_id
-        return result
-
-    @classmethod
-    def unmarshal(cls, msg):
-        participant = dict(msg)
-        conference_id = participant.pop('conference_id')
-        return cls(conference_id=conference_id, participant=msg)
+        self._body = {'conference_id': conference_id}
+        self._body.update(participant_dict)
+        super(ParticipantJoinedConferenceEvent, self).__init__()
 
 
-class ParticipantLeftConferenceEvent(object):
+class ParticipantLeftConferenceEvent(BaseEvent):
     name = 'conference_participant_left'
+    routing_key_fmt = 'conferences.{conference_id}.participants.left'
 
     def __init__(self, conference_id, participant_dict):
-        self.conference_id = conference_id
-        self.participant = participant_dict
-        self.required_acl = 'events.conferences.{conference_id}.participants.left'.format(conference_id=conference_id)
-        self.routing_key = 'conferences.{conference_id}.participants.left'.format(conference_id=conference_id)
-
-    def marshal(self):
-        result = dict()
-        result.update(self.participant)
-        result['conference_id'] = self.conference_id
-        return result
-
-    @classmethod
-    def unmarshal(cls, msg):
-        participant = dict(msg)
-        conference_id = participant.pop('conference_id')
-        return cls(conference_id=conference_id, participant=msg)
+        self._body = {'conference_id': conference_id}
+        self._body.update(participant_dict)
+        super(ParticipantLeftConferenceEvent, self).__init__()
 
 
-class ParticipantMutedConferenceEvent(object):
+class UserParticipantJoinedConferenceEvent(BaseEvent):
+    name = 'conference_user_participant_joined'
+    routing_key_fmt = 'conferences.users.{user_uuid}.participants.joined'
+
+    def __init__(self, conference_id, participant_dict):
+        self._body = {'conference_id': conference_id}
+        self._body.update(participant_dict)
+        super(UserParticipantJoinedConferenceEvent, self).__init__()
+
+
+class UserParticipantLeftConferenceEvent(BaseEvent):
+    name = 'conference_user_participant_left'
+    routing_key_fmt = 'conferences.users.{user_uuid}.participants.left'
+
+    def __init__(self, conference_id, participant_dict):
+        self._body = {'conference_id': conference_id}
+        self._body.update(participant_dict)
+        super(UserParticipantLeftConferenceEvent, self).__init__()
+
+
+class ParticipantMutedConferenceEvent(BaseEvent):
     name = 'conference_participant_muted'
+    routing_key_fmt = 'conferences.{conference_id}.participants.mute'
 
     def __init__(self, conference_id, participant_dict):
-        self.conference_id = conference_id
-        self.participant = participant_dict
-        self.required_acl = 'events.conferences.{conference_id}.participants.mute'.format(conference_id=conference_id)
-        self.routing_key = 'conferences.{conference_id}.participants.mute'.format(conference_id=conference_id)
-
-    def marshal(self):
-        result = dict()
-        result.update(self.participant)
-        result['conference_id'] = self.conference_id
-        return result
-
-    @classmethod
-    def unmarshal(cls, msg):
-        participant = dict(msg)
-        conference_id = participant.pop('conference_id')
-        return cls(conference_id=conference_id, participant=msg)
+        self._body = {'conference_id': conference_id}
+        self._body.update(participant_dict)
+        super(ParticipantMutedConferenceEvent, self).__init__()
 
 
-class ParticipantUnmutedConferenceEvent(object):
+class ParticipantUnmutedConferenceEvent(BaseEvent):
     name = 'conference_participant_unmuted'
+    routing_key_fmt = 'conferences.{conference_id}.participants.mute'
 
     def __init__(self, conference_id, participant_dict):
-        self.conference_id = conference_id
-        self.participant = participant_dict
-        self.required_acl = 'events.conferences.{conference_id}.participants.mute'.format(conference_id=conference_id)
-        self.routing_key = 'conferences.{conference_id}.participants.mute'.format(conference_id=conference_id)
-
-    def marshal(self):
-        result = dict()
-        result.update(self.participant)
-        result['conference_id'] = self.conference_id
-        return result
-
-    @classmethod
-    def unmarshal(cls, msg):
-        participant = dict(msg)
-        conference_id = participant.pop('conference_id')
-        return cls(conference_id=conference_id, participant=msg)
+        self._body = {'conference_id': conference_id}
+        self._body.update(participant_dict)
+        super(ParticipantUnmutedConferenceEvent, self).__init__()
 
 
-class RecordStartedConferenceEvent(object):
+class RecordStartedConferenceEvent(BaseEvent):
     name = 'conference_record_started'
+    routing_key_fmt = 'conferences.{id}.record'
 
     def __init__(self, conference_id):
-        self.conference_id = conference_id
-        self.required_acl = 'events.conferences.{conference_id}.record'.format(conference_id=conference_id)
-        self.routing_key = 'conferences.{conference_id}.record'.format(conference_id=conference_id)
-
-    def marshal(self):
-        result = {
-            'id': self.conference_id,
-        }
-        return result
-
-    @classmethod
-    def unmarshal(cls, msg):
-        return cls(msg['id'])
+        self._body = {'id': conference_id}
+        super(RecordStartedConferenceEvent, self).__init__()
 
 
-class RecordStoppedConferenceEvent(object):
+class RecordStoppedConferenceEvent(BaseEvent):
     name = 'conference_record_stopped'
+    routing_key_fmt = 'conferences.{id}.record'
 
     def __init__(self, conference_id):
-        self.conference_id = conference_id
-        self.required_acl = 'events.conferences.{conference_id}.record'.format(conference_id=conference_id)
-        self.routing_key = 'conferences.{conference_id}.record'.format(conference_id=conference_id)
-
-    def marshal(self):
-        result = {
-            'id': self.conference_id,
-        }
-        return result
-
-    @classmethod
-    def unmarshal(cls, msg):
-        return cls(msg['id'])
+        self._body = {'id': conference_id}
+        super(RecordStoppedConferenceEvent, self).__init__()
 
 
-class ParticipantTalkStartedConferenceEvent(object):
+class ParticipantTalkStartedConferenceEvent(BaseEvent):
     name = 'conference_participant_talk_started'
+    routing_key_fmt = 'conferences.{conference_id}.participants.talk'
 
     def __init__(self, conference_id, participant_dict):
-        self.conference_id = conference_id
-        self.participant = participant_dict
-        self.required_acl = 'events.conferences.{conference_id}.participants.talk'.format(conference_id=conference_id)
-        self.routing_key = 'conferences.{conference_id}.participants.talk'.format(conference_id=conference_id)
-
-    def marshal(self):
-        result = dict()
-        result.update(self.participant)
-        result['conference_id'] = self.conference_id
-        return result
-
-    @classmethod
-    def unmarshal(cls, msg):
-        participant = dict(msg)
-        conference_id = participant.pop('conference_id')
-        return cls(conference_id=conference_id, participant=msg)
+        self._body = {'conference_id': conference_id}
+        self._body.update(participant_dict)
+        super(ParticipantTalkStartedConferenceEvent, self).__init__()
 
 
-class ParticipantTalkStoppedConferenceEvent(object):
+class ParticipantTalkStoppedConferenceEvent(BaseEvent):
     name = 'conference_participant_talk_stopped'
+    routing_key_fmt = 'conferences.{conference_id}.participants.talk'
 
     def __init__(self, conference_id, participant_dict):
-        self.conference_id = conference_id
-        self.participant = participant_dict
-        self.required_acl = 'events.conferences.{conference_id}.participants.talk'.format(conference_id=conference_id)
-        self.routing_key = 'conferences.{conference_id}.participants.talk'.format(conference_id=conference_id)
-
-    def marshal(self):
-        result = dict()
-        result.update(self.participant)
-        result['conference_id'] = self.conference_id
-        return result
-
-    @classmethod
-    def unmarshal(cls, msg):
-        participant = dict(msg)
-        conference_id = participant.pop('conference_id')
-        return cls(conference_id=conference_id, participant=msg)
+        self._body = {'conference_id': conference_id}
+        self._body.update(participant_dict)
+        super(ParticipantTalkStoppedConferenceEvent, self).__init__()
