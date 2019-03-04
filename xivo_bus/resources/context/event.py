@@ -1,22 +1,32 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
 
-from xivo_bus.resources.common.event import ResourceConfigEvent
+from ..common.event import BaseEvent
 
 
-class EditContextEvent(ResourceConfigEvent):
+class _BaseContextEvent(BaseEvent):
+
+    def __init__(self, context):
+        self._body = context
+        super(_BaseContextEvent, self).__init__()
+
+
+class EditContextEvent(_BaseContextEvent):
+
     name = 'context_edited'
-    routing_key = 'config.contexts.edited'
+    routing_key_fmt = 'config.contexts.edited'
 
 
-class CreateContextEvent(ResourceConfigEvent):
+class CreateContextEvent(_BaseContextEvent):
+
     name = 'context_created'
-    routing_key = 'config.contexts.created'
+    routing_key_fmt = 'config.contexts.created'
 
 
-class DeleteContextEvent(ResourceConfigEvent):
+class DeleteContextEvent(_BaseContextEvent):
+
     name = 'context_deleted'
-    routing_key = 'config.contexts.deleted'
+    routing_key_fmt = 'config.contexts.deleted'
