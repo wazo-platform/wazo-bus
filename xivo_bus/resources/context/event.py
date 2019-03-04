@@ -9,7 +9,7 @@ from ..common.event import BaseEvent
 
 class _BaseContextEvent(BaseEvent):
 
-    def __init__(self, context):
+    def __init__(self, **context):
         self._body = context
         super(_BaseContextEvent, self).__init__()
 
