@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2016 Avencall
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -14,7 +14,7 @@ from ..event import ServiceRegisteredEvent, ServiceDeregisteredEvent
 class TestServiceRegisteredEvent(unittest.TestCase):
 
     def test_marshal(self):
-        service_name = 'xivo-ctid'
+        service_name = 'xivo-ctid-ng'
         service_id = str(uuid.uuid4())
         service_tags = ['tag1', 'tag2']
 
@@ -36,7 +36,7 @@ class TestServiceRegisteredEvent(unittest.TestCase):
 class TestServiceDeregisteredEvent(unittest.TestCase):
 
     def test_marshal(self):
-        service_name = 'xivo-ctid'
+        service_name = 'xivo-ctid-ng'
         service_id = str(uuid.uuid4())
         service_tags = ['tag1', 'tag2']
 
