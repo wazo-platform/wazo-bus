@@ -12,11 +12,14 @@ from hamcrest import assert_that, equal_to
 from ..events import (
     PresenceUpdatedEvent,
     UserRoomCreatedEvent,
+    UserRoomMessageCreatedEvent,
 )
 
 USER_UUID = str(uuid.uuid4())
+ROOM_UUID = str(uuid.uuid4())
 USER = {'uuid': USER_UUID}
 ROOM = {}
+MESSAGE = {}
 
 
 class TestPresenceEvent(unittest.TestCase):
@@ -36,4 +39,14 @@ class TestRoomEvent(unittest.TestCase):
         assert_that(
             msg.routing_key,
             equal_to('chatd.users.{}.rooms.created'.format(USER_UUID))
+        )
+
+
+class TestUserRoomMessageCreatedEvent(unittest.TestCase):
+
+    def test_updated_routing_key_fmt(self):
+        msg = UserRoomMessageCreatedEvent(USER_UUID, ROOM_UUID, MESSAGE)
+        assert_that(
+            msg.routing_key,
+            equal_to('chatd.users.{}.rooms.{}.messages.created'.format(USER_UUID, ROOM_UUID))
         )
