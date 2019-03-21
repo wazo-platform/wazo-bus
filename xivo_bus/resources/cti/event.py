@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2013-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
@@ -80,11 +80,3 @@ class EndpointStatusUpdateEvent(_StatusUpdateEvent):
 
     def __init__(self, id_, status):
         super(EndpointStatusUpdateEvent, self).__init__(int(id_), int(status))
-
-
-class UserStatusUpdateEvent(_StatusUpdateEvent):
-
-    name = 'user_status_update'
-    required_acl = 'events.statuses.users'
-    routing_key = 'status.user'
-    id_field = 'user_uuid'
