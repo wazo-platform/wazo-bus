@@ -4,15 +4,14 @@
 
 from __future__ import unicode_literals
 
-from xivo_bus.resources.common.event import ArbitraryEvent
+from xivo_bus.resources.common.event import BaseEvent
 
 
-class EditProvisioningNetworkingEvent(ArbitraryEvent):
+class EditProvisioningNetworkingEvent(BaseEvent):
+
+    name = 'provisioning_networking_edited'
+    routing_key_fmt = 'config.provisioning.networking.edited'
 
     def __init__(self):
-        super(EditProvisioningNetworkingEvent, self).__init__(
-            name='provisioning_networking_edited',
-            body={},
-            required_acl='events.config.provisioning.networking.edited',
-        )
-        self.routing_key = 'config.provisioning.networking.edited'
+        self._body = {}
+        super(EditProvisioningNetworkingEvent, self).__init__()
