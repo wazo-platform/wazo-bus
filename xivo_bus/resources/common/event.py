@@ -25,6 +25,7 @@ class BaseEvent(object):
         return cls(**body)
 
 
+# Deprecated and should not be used for new events
 class ResourceConfigEvent(object):
 
     def __init__(self, resource_id):
@@ -44,6 +45,7 @@ class ResourceConfigEvent(object):
         return self.id != other.id
 
 
+# Deprecated and should not be used for new events
 class ArbitraryEvent(object):
 
     def __init__(self, name, body, required_acl=None):
