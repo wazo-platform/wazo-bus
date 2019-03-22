@@ -13,3 +13,25 @@ class PresenceUpdatedEvent(BaseEvent):
     def __init__(self, user):
         self._body = user
         super(PresenceUpdatedEvent, self).__init__()
+
+
+class UserRoomCreatedEvent(BaseEvent):
+
+    name = 'chatd_user_room_created'
+    routing_key_fmt = 'chatd.users.{user_uuid}.rooms.created'
+
+    def __init__(self, user_uuid, room):
+        self._body = room
+        self.routing_key = self.routing_key_fmt.format(user_uuid=user_uuid)
+        self.required_acl = 'events.{}'.format(self.routing_key)
+
+
+class UserRoomMessageCreatedEvent(BaseEvent):
+
+    name = 'chatd_user_room_message_created'
+    routing_key_fmt = 'chatd.users.{user_uuid}.rooms.{room_uuid}.messages.created'
+
+    def __init__(self, user_uuid, room_uuid, message):
+        self._body = message
+        self.routing_key = self.routing_key_fmt.format(user_uuid=user_uuid, room_uuid=room_uuid)
+        self.required_acl = 'events.{}'.format(self.routing_key)
