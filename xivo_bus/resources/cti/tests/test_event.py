@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2013-2016 Avencall
+# Copyright 2013-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
@@ -12,7 +12,6 @@ from hamcrest import equal_to
 
 from ..event import AgentStatusUpdateEvent
 from ..event import CallFormResultEvent
-from ..event import UserStatusUpdateEvent
 from ..event import EndpointStatusUpdateEvent
 
 
@@ -93,33 +92,3 @@ class TestEndpointStatusUpdateEvent(unittest.TestCase):
 
         assert_that(msg, equal_to({'endpoint_id': 42,
                                    'status': status}))
-
-
-class TestUserStatusUpdateEvent(unittest.TestCase):
-
-    def test_marshal(self):
-        user_uuid = SOME_UUID
-        status = 'busy'
-
-        event = UserStatusUpdateEvent(user_uuid, status)
-
-        msg = event.marshal()
-
-        assert_that(msg, equal_to({'user_uuid': SOME_UUID,
-                                   'status': status}))
-
-    def test_equality(self):
-        user_uuid = SOME_UUID
-        status = 'some_value'
-
-        e1 = UserStatusUpdateEvent(user_uuid, status)
-        e2 = UserStatusUpdateEvent(user_uuid, status)
-        e3 = UserStatusUpdateEvent(user_uuid, 'other_value')
-        e4 = UserStatusUpdateEvent(666, status)
-
-        assert_that(e1 == e2, equal_to(True))
-        assert_that(e1 != e2, equal_to(False))
-        assert_that(e1 == e3, equal_to(False))
-        assert_that(e1 == e4, equal_to(False))
-        assert_that(e1 != e3, equal_to(True))
-        assert_that(e1 != e4, equal_to(True))
