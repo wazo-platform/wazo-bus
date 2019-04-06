@@ -4,22 +4,14 @@
 
 from __future__ import unicode_literals
 
-
-class _HEPConfigurationEvent(object):
-    def marshal(self):
-        return {}
-
-    @classmethod
-    def unmarshal(cls, msg):
-        return cls()
-
-    def __eq__(self, other):
-        return self.name == other.name
-
-    def __ne__(self, other):
-        return not self == other
+from ..common.event import BaseEvent
 
 
-class EditHEPGeneralEvent(_HEPConfigurationEvent):
-    name = 'hep_general_edited'
-    routing_key = 'config.hep_general.edited'
+class HEPGeneralUpdatedEvent(BaseEvent):
+
+    name = 'hep_general_updated'
+    routing_key_fmt = 'config.hep_general.updated'
+
+    def __init__(self):
+        self._body = {}
+        super(HEPGeneralUpdatedEvent, self).__init__()
