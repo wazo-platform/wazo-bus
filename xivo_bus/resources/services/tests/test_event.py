@@ -14,7 +14,7 @@ from ..event import ServiceRegisteredEvent, ServiceDeregisteredEvent
 class TestServiceRegisteredEvent(unittest.TestCase):
 
     def test_marshal(self):
-        service_name = 'xivo-ctid-ng'
+        service_name = 'wazo-calld'
         service_id = str(uuid.uuid4())
         service_tags = ['tag1', 'tag2']
 
@@ -36,7 +36,7 @@ class TestServiceRegisteredEvent(unittest.TestCase):
 class TestServiceDeregisteredEvent(unittest.TestCase):
 
     def test_marshal(self):
-        service_name = 'xivo-ctid-ng'
+        service_name = 'wazo-calld'
         service_id = str(uuid.uuid4())
         service_tags = ['tag1', 'tag2']
 
