@@ -46,20 +46,26 @@ class UserParticipantJoinedConferenceEvent(BaseEvent):
     name = 'conference_user_participant_joined'
     routing_key_fmt = 'conferences.users.{user_uuid}.participants.joined'
 
-    def __init__(self, conference_id, participant_dict):
+    def __init__(self, conference_id, participant_dict, user_uuid=None):
         self._body = {'conference_id': conference_id}
         self._body.update(participant_dict)
         super(UserParticipantJoinedConferenceEvent, self).__init__()
+        if user_uuid:
+            self.routing_key = self.routing_key_fmt.format(user_uuid=user_uuid)
+            self.required_acl = 'events.{}'.format(self.routing_key)
 
 
 class UserParticipantLeftConferenceEvent(BaseEvent):
     name = 'conference_user_participant_left'
     routing_key_fmt = 'conferences.users.{user_uuid}.participants.left'
 
-    def __init__(self, conference_id, participant_dict):
+    def __init__(self, conference_id, participant_dict, user_uuid=None):
         self._body = {'conference_id': conference_id}
         self._body.update(participant_dict)
         super(UserParticipantLeftConferenceEvent, self).__init__()
+        if user_uuid:
+            self.routing_key = self.routing_key_fmt.format(user_uuid=user_uuid)
+            self.required_acl = 'events.{}'.format(self.routing_key)
 
 
 class ParticipantMutedConferenceEvent(BaseEvent):
