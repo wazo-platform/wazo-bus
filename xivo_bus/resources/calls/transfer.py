@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
@@ -29,6 +29,12 @@ class CreateTransferEvent(BaseTransferEvent):
 
     name = 'transfer_created'
     routing_key = 'calls.transfer.created'
+
+
+class UpdateTransferEvent(BaseTransferEvent):
+
+    name = 'transfer_updated'
+    routing_key = 'calls.transfer.updated'
 
 
 class AnswerTransferEvent(BaseTransferEvent):
