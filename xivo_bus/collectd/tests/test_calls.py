@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
@@ -13,10 +13,16 @@ from ..calls import CallCollectdEvent
 
 
 class TestCallCollectdEvent(TestCase):
+
     def test_plugin_instance_validation_when_empty(self):
         event = CallCollectdEvent('', '')
 
         assert_that(event.plugin_instance, equal_to('<unknown>.<unknown>'))
+
+    def test_plugin_validation_when_no_instance(self):
+        event = CallCollectdEvent('', None)
+
+        assert_that(event.plugin_instance, equal_to('<unknown>'))
 
     def test_plugin_instance_validation_when_only_invalid_chars(self):
         event = CallCollectdEvent('_&!* <,(*&^ .%#@$#)&(^', 'ééé')
