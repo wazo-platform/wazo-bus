@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
@@ -29,9 +29,11 @@ class CallCollectdEvent(CollectdEvent):
             self.time = int(time)
 
         application = validate_plugin_instance_fragment(application)
-        application_id = validate_plugin_instance_fragment(application_id)
-
-        self.plugin_instance = '{}.{}'.format(application, application_id)
+        if application_id is not None:
+            application_id = validate_plugin_instance_fragment(application_id)
+            self.plugin_instance = '{}.{}'.format(application, application_id)
+        else:
+            self.plugin_instance = application
 
 
 class CallStartCollectdEvent(CallCollectdEvent):
