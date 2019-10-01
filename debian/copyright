@@ -1,6 +1,6 @@
 Format: http://dep.debian.net/deps/dep5
 Upstream-Name: xivo-bus
-Source: https://github.com/wazo-pbx/xivo-bus.git
+Source: https://github.com/wazo-platform/xivo-bus.git
 
 Files: *
 Copyright: 2013 Avencall
