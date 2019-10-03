@@ -92,7 +92,7 @@ class SessionDeletedEvent(BaseEvent):
 class SessionExpireSoonEvent(BaseEvent):
 
     name = 'auth_session_expire_soon'
-    routing_key_fmt = 'auth.sessions.{uuid}.expire_soon'
+    routing_key_fmt = 'auth.users.{user_uuid}.sessions.{uuid}.expire_soon'
 
     def __init__(self, uuid, tenant_uuid, user_uuid):
         self._body = {
