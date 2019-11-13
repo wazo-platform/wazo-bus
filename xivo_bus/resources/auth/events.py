@@ -60,6 +60,36 @@ class UserExternalAuthDeleted(_BaseExternalAuthEvent):
     routing_key_fmt = 'auth.users.{user_uuid}.external.{external_auth_name}.deleted'
 
 
+class RefreshTokenCreatedEvent(BaseEvent):
+
+    name = 'auth_refresh_token_created'
+    routing_key_fmt = 'auth.users.{user_uuid}.tokens.{client_id}.created'
+
+    def __init__(self, user_uuid, client_id, mobile, tenant_uuid, **ignored):
+        self._body = {
+            'user_uuid': user_uuid,
+            'client_id': client_id,
+            'tenant_uuid': tenant_uuid,
+            'mobile': mobile,
+        }
+        super(RefreshTokenCreatedEvent, self).__init__()
+
+
+class RefreshTokenDeletedEvent(BaseEvent):
+
+    name = 'auth_refresh_token_deleted'
+    routing_key_fmt = 'auth.users.{user_uuid}.tokens.{client_id}.deleted'
+
+    def __init__(self, user_uuid, client_id, mobile, tenant_uuid, **ignored):
+        self._body = {
+            'user_uuid': user_uuid,
+            'client_id': client_id,
+            'tenant_uuid': tenant_uuid,
+            'mobile': mobile,
+        }
+        super(RefreshTokenDeletedEvent, self).__init__()
+
+
 class SessionCreatedEvent(BaseEvent):
 
     name = 'auth_session_created'
