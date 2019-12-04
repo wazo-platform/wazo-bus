@@ -1,22 +1,29 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
 
-from xivo_bus.resources.common.event import ResourceConfigEvent
+from ..common.event import BaseEvent
 
 
-class EditIAXEndpointEvent(ResourceConfigEvent):
-    name = 'iax_endpoint_edited'
-    routing_key = 'config.iax_endpoint.edited'
+class _BaseIAXEndpointEvent(BaseEvent):
+
+    def __init__(self, endpoint_iax):
+        self._body = endpoint_iax
+        super(_BaseIAXEndpointEvent, self).__init__()
 
 
-class CreateIAXEndpointEvent(ResourceConfigEvent):
+class EditIAXEndpointEvent(_BaseIAXEndpointEvent):
+    name = 'iax_endpoint_updated'
+    routing_key_fmt = 'config.iax_endpoint.updated'
+
+
+class CreateIAXEndpointEvent(_BaseIAXEndpointEvent):
     name = 'iax_endpoint_created'
-    routing_key = 'config.iax_endpoint.created'
+    routing_key_fmt = 'config.iax_endpoint.created'
 
 
-class DeleteIAXEndpointEvent(ResourceConfigEvent):
+class DeleteIAXEndpointEvent(_BaseIAXEndpointEvent):
     name = 'iax_endpoint_deleted'
-    routing_key = 'config.iax_endpoint.deleted'
+    routing_key_fmt = 'config.iax_endpoint.deleted'
