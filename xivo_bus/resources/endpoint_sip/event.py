@@ -1,26 +1,29 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015 Avencall
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
 
-from xivo_bus.resources.common.event import ResourceConfigEvent
+from ..common.event import BaseEvent
 
 
-class SipEndpointConfigEvent(ResourceConfigEvent):
-    pass
+class _BaseSipEndpointEvent(BaseEvent):
+
+    def __init__(self, endpoint_sip):
+        self._body = endpoint_sip
+        super(_BaseSipEndpointEvent, self).__init__()
 
 
-class EditSipEndpointEvent(SipEndpointConfigEvent):
-    name = 'sip_endpoint_edited'
-    routing_key = 'config.sip_endpoint.edited'
+class EditSipEndpointEvent(_BaseSipEndpointEvent):
+    name = 'sip_endpoint_updated'
+    routing_key_fmt = 'config.sip_endpoint.updated'
 
 
-class CreateSipEndpointEvent(SipEndpointConfigEvent):
+class CreateSipEndpointEvent(_BaseSipEndpointEvent):
     name = 'sip_endpoint_created'
-    routing_key = 'config.sip_endpoint.created'
+    routing_key_fmt = 'config.sip_endpoint.created'
 
 
-class DeleteSipEndpointEvent(SipEndpointConfigEvent):
+class DeleteSipEndpointEvent(_BaseSipEndpointEvent):
     name = 'sip_endpoint_deleted'
-    routing_key = 'config.sip_endpoint.deleted'
+    routing_key_fmt = 'config.sip_endpoint.deleted'

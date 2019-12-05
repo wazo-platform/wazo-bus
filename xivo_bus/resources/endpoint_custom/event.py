@@ -1,39 +1,29 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
 
-from xivo_bus.resources.common.event import ResourceConfigEvent
+from ..common.event import BaseEvent
 
 
-class CustomEndpointConfigEvent(ResourceConfigEvent):
+class _BaseCustomEndpointEvent(BaseEvent):
 
-    def __init__(self, custom_id, interface):
-        self.id = int(custom_id)
-        self.interface = interface
-
-    def marshal(self):
-        return {
-            'id': self.id,
-            'interface': self.interface,
-        }
-
-    @classmethod
-    def unmarshal(cls, msg):
-        return cls(msg['id'], msg['interface'])
+    def __init__(self, endpoint_iax):
+        self._body = endpoint_iax
+        super(_BaseCustomEndpointEvent, self).__init__()
 
 
-class EditCustomEndpointEvent(CustomEndpointConfigEvent):
-    name = 'custom_endpoint_edited'
-    routing_key = 'config.custom_endpoint.edited'
+class EditCustomEndpointEvent(_BaseCustomEndpointEvent):
+    name = 'custom_endpoint_updated'
+    routing_key_fmt = 'config.custom_endpoint.updated'
 
 
-class CreateCustomEndpointEvent(CustomEndpointConfigEvent):
+class CreateCustomEndpointEvent(_BaseCustomEndpointEvent):
     name = 'custom_endpoint_created'
-    routing_key = 'config.custom_endpoint.created'
+    routing_key_fmt = 'config.custom_endpoint.created'
 
 
-class DeleteCustomEndpointEvent(CustomEndpointConfigEvent):
+class DeleteCustomEndpointEvent(_BaseCustomEndpointEvent):
     name = 'custom_endpoint_deleted'
-    routing_key = 'config.custom_endpoint.deleted'
+    routing_key_fmt = 'config.custom_endpoint.deleted'
