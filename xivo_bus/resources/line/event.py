@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 
 from ..common.event import BaseEvent
 
+
 class LineStatusUpdatedEvent(BaseEvent):
 
     name = 'line_status_updated'
