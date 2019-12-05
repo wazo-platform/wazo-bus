@@ -14,7 +14,7 @@ class TrunkStatusUpdatedEvent(BaseEvent):
 
     def __init__(self, status):
         self._body = status
-        super(TrunkStatusUpdated, self).__init__()
+        super(TrunkStatusUpdatedEvent, self).__init__()
 
 
 class EditTrunkEvent(ResourceConfigEvent):
