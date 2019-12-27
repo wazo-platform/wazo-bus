@@ -1,22 +1,28 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2013-2014 Avencall
+# Copyright 2013-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
 
-from xivo_bus.resources.common.event import ResourceConfigEvent
+from ..common.event import BaseEvent
+
+class _BaseLineEvent(BaseEvent):
+
+    def __init__(self, line):
+        self._body = line
+        super(_BaseLineEvent, self).__init__()
 
 
-class EditLineEvent(ResourceConfigEvent):
+class EditLineEvent(_BaseLineEvent):
     name = 'line_edited'
-    routing_key = 'config.line.edited'
+    routing_key_fmt = 'config.line.edited'
 
 
-class CreateLineEvent(ResourceConfigEvent):
+class CreateLineEvent(_BaseLineEvent):
     name = 'line_created'
-    routing_key = 'config.line.created'
+    routing_key_fmt = 'config.line.created'
 
 
-class DeleteLineEvent(ResourceConfigEvent):
+class DeleteLineEvent(_BaseLineEvent):
     name = 'line_deleted'
-    routing_key = 'config.line.deleted'
+    routing_key_fmt = 'config.line.deleted'
