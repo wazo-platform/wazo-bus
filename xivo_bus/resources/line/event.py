@@ -6,6 +6,16 @@ from __future__ import unicode_literals
 
 from ..common.event import BaseEvent
 
+class LineStatusUpdatedEvent(BaseEvent):
+
+    name = 'line_status_updated'
+    routing_key_fmt = 'lines.{id}.status.updated'
+
+    def __init__(self, status):
+        self._body = status
+        super(LineStatusUpdatedEvent, self).__init__()
+
+
 class _BaseLineEvent(BaseEvent):
 
     def __init__(self, line):
