@@ -59,9 +59,9 @@ class ArbitraryEvent(object):
 
     def __eq__(self, other):
         return (
-            self.name == other.name and
-            self._body == other._body and
-            self.required_acl == other.required_acl
+            self.name == other.name
+            and self._body == other._body
+            and self.required_acl == other.required_acl
         )
 
     def __ne__(self, other):
