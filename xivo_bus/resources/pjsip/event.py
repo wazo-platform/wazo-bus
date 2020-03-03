@@ -15,3 +15,13 @@ class PJSIPGlobalUpdatedEvent(BaseEvent):
     def __init__(self):
         self._body = {}
         super(PJSIPGlobalUpdatedEvent, self).__init__()
+
+
+class PJSIPSystemUpdatedEvent(BaseEvent):
+
+    name = 'pjsip_system_updated'
+    routing_key_fmt = 'config.pjsip_system.updated'
+
+    def __init__(self):
+        self._body = {}
+        super(PJSIPSystemUpdatedEvent, self).__init__()
