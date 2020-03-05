@@ -25,3 +25,25 @@ class PJSIPSystemUpdatedEvent(BaseEvent):
     def __init__(self):
         self._body = {}
         super(PJSIPSystemUpdatedEvent, self).__init__()
+
+
+class _BasePJSIPTransportEvent(BaseEvent):
+
+    def __init__(self, transport):
+        self._body = transport
+        super(_BasePJSIPTransportEvent, self).__init__()
+
+
+class EditSIPTransportEvent(_BasePJSIPTransportEvent):
+    name = 'sip_transport_edited'
+    routing_key_fmt = 'config.sip.transports.edited'
+
+
+class CreateSIPTransportEvent(_BasePJSIPTransportEvent):
+    name = 'sip_transport_created'
+    routing_key_fmt = 'config.sip.transports.created'
+
+
+class DeleteSIPTransportEvent(_BasePJSIPTransportEvent):
+    name = 'sip_transport_deleted'
+    routing_key_fmt = 'config.sip.transports.deleted'
