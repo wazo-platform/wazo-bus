@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
@@ -124,3 +124,27 @@ class ParticipantTalkStoppedConferenceEvent(BaseEvent):
         self._body = {'conference_id': conference_id}
         self._body.update(participant_dict)
         super(ParticipantTalkStoppedConferenceEvent, self).__init__()
+
+
+class UserParticipantTalkStartedConferenceEvent(BaseEvent):
+    name = 'conference_user_participant_talk_started'
+    routing_key_fmt = 'conferences.users.{user_uuid}.participants.talk'
+
+    def __init__(self, conference_id, participant_dict, user_uuid):
+        self._body = {'conference_id': conference_id}
+        self._body.update(participant_dict)
+        super(UserParticipantTalkStartedConferenceEvent, self).__init__()
+        self.routing_key = self.routing_key_fmt.format(user_uuid=user_uuid)
+        self.required_acl = 'events.{}'.format(self.routing_key)
+
+
+class UserParticipantTalkStoppedConferenceEvent(BaseEvent):
+    name = 'conference_user_participant_talk_stopped'
+    routing_key_fmt = 'conferences.users.{user_uuid}.participants.talk'
+
+    def __init__(self, conference_id, participant_dict, user_uuid):
+        self._body = {'conference_id': conference_id}
+        self._body.update(participant_dict)
+        super(UserParticipantTalkStoppedConferenceEvent, self).__init__()
+        self.routing_key = self.routing_key_fmt.format(user_uuid=user_uuid)
+        self.required_acl = 'events.{}'.format(self.routing_key)
