@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
@@ -20,13 +20,13 @@ class _BaseLineEndpointSIPEvent(BaseEvent):
 class LineEndpointSIPAssociatedEvent(_BaseLineEndpointSIPEvent):
 
     name = 'line_endpoint_sip_associated'
-    routing_key_fmt = 'config.lines.{line[id]}.endpoints.sip.{endpoint_sip[id]}.updated'
+    routing_key_fmt = 'config.lines.{line[id]}.endpoints.sip.{endpoint_sip[uuid]}.updated'
 
 
 class LineEndpointSIPDissociatedEvent(_BaseLineEndpointSIPEvent):
 
     name = 'line_endpoint_sip_dissociated'
-    routing_key_fmt = 'config.lines.{line[id]}.endpoints.sip.{endpoint_sip[id]}.deleted'
+    routing_key_fmt = 'config.lines.{line[id]}.endpoints.sip.{endpoint_sip[uuid]}.deleted'
 
 
 class _BaseLineEndpointSCCPEvent(BaseEvent):
