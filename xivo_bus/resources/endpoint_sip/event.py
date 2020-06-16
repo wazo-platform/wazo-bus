@@ -13,21 +13,6 @@ class _BaseSipEndpointEvent(BaseEvent):
         self._body = endpoint_sip
         super(_BaseSipEndpointEvent, self).__init__()
 
-    def __eq__(self, other):
-        if self is other:
-            return True
-
-        return self.__class__ == other.__class__ and self._body == other._body
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-    def __str__(self):
-        return '{}({})'.format(self.__class__.__name__, self._body)
-
-    def __repr__(self):
-        return self.__str__()
-
 
 class EditSipEndpointEvent(_BaseSipEndpointEvent):
     name = 'sip_endpoint_updated'
