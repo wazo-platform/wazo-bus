@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
@@ -39,13 +39,3 @@ class TrunkRegisterIAXAssociatedEvent(TrunkRegisterConfigEvent):
 class TrunkRegisterIAXDissociatedEvent(TrunkRegisterConfigEvent):
     name = 'trunk_register_iax_dissociated'
     routing_key = 'config.trunks.registers.iax.deleted'
-
-
-class TrunkRegisterSIPAssociatedEvent(TrunkRegisterConfigEvent):
-    name = 'trunk_register_sip_associated'
-    routing_key = 'config.trunks.registers.sip.updated'
-
-
-class TrunkRegisterSIPDissociatedEvent(TrunkRegisterConfigEvent):
-    name = 'trunk_register_sip_dissociated'
-    routing_key = 'config.trunks.registers.sip.deleted'
