@@ -5,41 +5,23 @@ from __future__ import unicode_literals
 from xivo_bus.resources.common.event import BaseEvent
 
 
-class AdhocConferenceCreatedUserEvent(BaseEvent):
+class AdhocConferenceUserEvent(BaseEvent):
+    def __init__(self, conference_id, user_uuid):
+        self._body = {'conference_id': conference_id, 'user_uuid': user_uuid}
+        super(AdhocConferenceUserEvent, self).__init__()
+
+
+class AdhocConferenceCreatedUserEvent(AdhocConferenceUserEvent):
     name = 'adhoc_conference_created'
     routing_key_fmt = 'adhoc_conferences.users.{user_uuid}.created'
 
-    def __init__(self, conference_id, user_uuid):
-        self._body = {'conference_id': conference_id, 'user_uuid': user_uuid}
-        super(AdhocConferenceCreatedUserEvent, self).__init__()
 
-
-class AdhocConferenceDeletedUserEvent(BaseEvent):
+class AdhocConferenceDeletedUserEvent(AdhocConferenceUserEvent):
     name = 'adhoc_conference_deleted'
     routing_key_fmt = 'adhoc_conferences.users.{user_uuid}.deleted'
 
-    def __init__(self, conference_id, user_uuid):
-        self._body = {'conference_id': conference_id, 'user_uuid': user_uuid}
-        super(AdhocConferenceDeletedUserEvent, self).__init__()
 
-
-class AdhocConferenceParticipantJoinedUserEvent(BaseEvent):
-    name = 'adhoc_conference_participant_joined'
-    routing_key_fmt = 'adhoc_conferences.users.{user_uuid}.participants.joined'
-
-    def __init__(self, conference_id, user_uuid, participant_call):
-        self._body = {
-            'conference_id': conference_id,
-            'user_uuid': user_uuid,
-            'participant_call': participant_call,
-        }
-        super(AdhocConferenceParticipantJoinedUserEvent, self).__init__()
-
-
-class AdhocConferenceParticipantLeftUserEvent(BaseEvent):
-    name = 'adhoc_conference_participant_left'
-    routing_key_fmt = 'adhoc_conferences.users.{user_uuid}.participants.left'
-
+class AdhocConferenceParticipantUserEvent(BaseEvent):
     def __init__(self, conference_id, user_uuid, participant_call):
         self._body = {
             'conference_id': conference_id,
@@ -47,3 +29,13 @@ class AdhocConferenceParticipantLeftUserEvent(BaseEvent):
             'participant_call': participant_call,
         }
         super(AdhocConferenceParticipantLeftUserEvent, self).__init__()
+
+
+class AdhocConferenceParticipantJoinedUserEvent(AdhocConferenceParticipantUserEvent):
+    name = 'adhoc_conference_participant_joined'
+    routing_key_fmt = 'adhoc_conferences.users.{user_uuid}.participants.joined'
+
+
+class AdhocConferenceParticipantLeftUserEvent(AdhocConferenceParticipantUserEvent):
+    name = 'adhoc_conference_participant_left'
+    routing_key_fmt = 'adhoc_conferences.users.{user_uuid}.participants.left'
