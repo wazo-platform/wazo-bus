@@ -7,7 +7,8 @@ from xivo_bus.resources.common.event import BaseEvent
 
 class AdhocConferenceUserEvent(BaseEvent):
     def __init__(self, conference_id, user_uuid):
-        self._body = {'conference_id': conference_id, 'user_uuid': user_uuid}
+        self._body = {'conference_id': conference_id}
+        self.routing_key_fmt = self.routing_key_fmt.format(user_uuid=user_uuid)
         super(AdhocConferenceUserEvent, self).__init__()
 
 
@@ -25,10 +26,10 @@ class AdhocConferenceParticipantUserEvent(BaseEvent):
     def __init__(self, conference_id, user_uuid, participant_call):
         self._body = {
             'conference_id': conference_id,
-            'user_uuid': user_uuid,
             'participant_call': participant_call,
         }
-        super(AdhocConferenceParticipantLeftUserEvent, self).__init__()
+        self.routing_key_fmt = self.routing_key_fmt.format(user_uuid=user_uuid)
+        super(AdhocConferenceParticipantUserEvent, self).__init__()
 
 
 class AdhocConferenceParticipantJoinedUserEvent(AdhocConferenceParticipantUserEvent):
