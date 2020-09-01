@@ -13,30 +13,30 @@ class AdhocConferenceUserEvent(BaseEvent):
 
 
 class AdhocConferenceCreatedUserEvent(AdhocConferenceUserEvent):
-    name = 'adhoc_conference_created'
-    routing_key_fmt = 'adhoc_conferences.users.{user_uuid}.created'
+    name = 'conference_adhoc_created'
+    routing_key_fmt = 'conferences.users.{user_uuid}.adhoc.created'
 
 
 class AdhocConferenceDeletedUserEvent(AdhocConferenceUserEvent):
-    name = 'adhoc_conference_deleted'
-    routing_key_fmt = 'adhoc_conferences.users.{user_uuid}.deleted'
+    name = 'conference_adhoc_deleted'
+    routing_key_fmt = 'conferences.users.{user_uuid}.adhoc.deleted'
 
 
 class AdhocConferenceParticipantUserEvent(BaseEvent):
     def __init__(self, conference_id, user_uuid, participant_call):
         self._body = {
             'conference_id': conference_id,
-            'participant_call': participant_call,
+            'call_id': participant_call['call_id'],
         }
         self.routing_key_fmt = self.routing_key_fmt.format(user_uuid=user_uuid)
         super(AdhocConferenceParticipantUserEvent, self).__init__()
 
 
 class AdhocConferenceParticipantJoinedUserEvent(AdhocConferenceParticipantUserEvent):
-    name = 'adhoc_conference_participant_joined'
-    routing_key_fmt = 'adhoc_conferences.users.{user_uuid}.participants.joined'
+    name = 'conference_adhoc_participant_joined'
+    routing_key_fmt = 'conferences.users.{user_uuid}.adhoc.participants.joined'
 
 
 class AdhocConferenceParticipantLeftUserEvent(AdhocConferenceParticipantUserEvent):
-    name = 'adhoc_conference_participant_left'
-    routing_key_fmt = 'adhoc_conferences.users.{user_uuid}.participants.left'
+    name = 'conference_adhoc_participant_left'
+    routing_key_fmt = 'conferences.users.{user_uuid}.adhoc.participants.left'
