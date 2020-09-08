@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
@@ -27,3 +27,18 @@ class CreateSipEndpointEvent(_BaseSipEndpointEvent):
 class DeleteSipEndpointEvent(_BaseSipEndpointEvent):
     name = 'sip_endpoint_deleted'
     routing_key_fmt = 'config.sip_endpoint.deleted'
+
+
+class EditSipEndpointTemplateEvent(_BaseSipEndpointEvent):
+    name = 'sip_endpoint_template_updated'
+    routing_key_fmt = 'config.sip_endpoint_template.updated'
+
+
+class CreateSipEndpointTemplateEvent(_BaseSipEndpointEvent):
+    name = 'sip_endpoint_template_created'
+    routing_key_fmt = 'config.sip_endpoint_template.created'
+
+
+class DeleteSipEndpointTemplateEvent(_BaseSipEndpointEvent):
+    name = 'sip_endpoint_template_deleted'
+    routing_key_fmt = 'config.sip_endpoint_template.deleted'
