@@ -12,6 +12,7 @@ class ResourceWithUUIDConfigEvent(ResourceConfigEvent):
     def __init__(self, id_, uuid, **kwargs):
         self.id = int(id_)
         self.uuid = str(uuid)
+        self.required_acl = 'events.{}'.format(self.routing_key)
         self._body = {
             'id': self.id,
             'uuid': self.uuid,
