@@ -29,6 +29,7 @@ class Publisher(object):
         data = self._marshaler.marshal_message(event)
         all_headers = dict(self._marshaler.metadata(event))
         all_headers.update(headers or {})
+        logger.debug('Publishing to bus: %s', event)
         self._publish(
             data,
             content_type=self._marshaler.content_type,
