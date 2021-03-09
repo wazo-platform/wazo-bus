@@ -1,41 +1,24 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
 
+from xivo_bus.resources.common.event import BaseEvent
 
-class GroupExtensionConfigEvent(object):
 
-    def __init__(self, group_id, extension_id):
-        self.group_id = group_id
-        self.extension_id = extension_id
+class GroupExtensionConfigEvent(BaseEvent):
 
-    def marshal(self):
-        return {
-            'group_id': self.group_id,
-            'extension_id': self.extension_id,
-        }
-
-    @classmethod
-    def unmarshal(cls, msg):
-        return cls(
-            msg['group_id'],
-            msg['extension_id'])
-
-    def __eq__(self, other):
-        return (self.group_id == other.group_id
-                and self.extension_id == other.extension_id)
-
-    def __ne__(self, other):
-        return not self == other
+    def __init__(self, **body):
+        self._body = body
+        super(GroupExtensionConfigEvent, self).__init__()
 
 
 class GroupExtensionAssociatedEvent(GroupExtensionConfigEvent):
     name = 'group_extension_associated'
-    routing_key = 'config.groups.extensions.updated'
+    routing_key_fmt = 'config.groups.extensions.updated'
 
 
 class GroupExtensionDissociatedEvent(GroupExtensionConfigEvent):
     name = 'group_extension_dissociated'
-    routing_key = 'config.groups.extensions.deleted'
+    routing_key_fmt = 'config.groups.extensions.deleted'
