@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from ..common.event import BaseEvent
@@ -17,8 +17,8 @@ class TenantCreatedEvent(BaseEvent):
     name = 'auth_tenant_added'
     routing_key_fmt = 'auth.tenants.{uuid}.created'
 
-    def __init__(self, uuid, name):
-        self._body = {'uuid': uuid, 'name': name}
+    def __init__(self, **body):
+        self._body = body
         super(TenantCreatedEvent, self).__init__()
 
 
