@@ -25,3 +25,4 @@ parent directory.
 dch -i  # Increment the version in the changelog
 dpkg-buildpackage -us -uc
 ```
+
