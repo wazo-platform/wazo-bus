@@ -5,13 +5,13 @@
 import json
 import unittest
 
-from hamcrest import assert_that
+from datetime import datetime
+from hamcrest import assert_that, has_entry, has_entries
 from hamcrest import calling
 from hamcrest import equal_to
 from hamcrest import instance_of
 from hamcrest import raises
-from mock import Mock
-
+from mock import Mock, patch
 from xivo_bus.marshaler import CollectdMarshaler, Marshaler, InvalidMessage
 
 SOME_UUID = '15924520-1b3b-4ee4-xivo-8ce47a1e6c01'
@@ -46,7 +46,7 @@ class TestMarshaler(unittest.TestCase):
     def test_marshal_message(self):
         result = self.marshaler.marshal_message(self.command)
 
-        assert_that(json.loads(result), equal_to(self.expected))
+        assert_that(json.loads(result), has_entries(self.expected))
 
     def test_marshal_message_without_required_acl(self):
         del self.command.required_acl
@@ -54,7 +54,7 @@ class TestMarshaler(unittest.TestCase):
 
         result = self.marshaler.marshal_message(self.command)
 
-        assert_that(json.loads(result), equal_to(self.expected))
+        assert_that(json.loads(result), has_entries(self.expected))
 
     def test_marshal_message_with_none_required_acl(self):
         self.command.required_acl = None
@@ -62,7 +62,7 @@ class TestMarshaler(unittest.TestCase):
 
         result = self.marshaler.marshal_message(self.command)
 
-        assert_that(json.loads(result), equal_to(self.expected))
+        assert_that(json.loads(result), has_entries(self.expected))
 
     def test_given_invalid_message_when_unmarshal_message_then_raise(self):
         for invalid_message in ('asdlfkassdfsdfasdgas',
@@ -81,6 +81,14 @@ class TestMarshaler(unittest.TestCase):
         assert_that(result, instance_of(EventTest))
         assert_that(result.value, equal_to(1234))
         assert_that(result.metadata, equal_to({'origin_uuid': 'some-origin'}))
+
+    @patch('xivo_bus.marshaler.datetime')
+    def test_timestamp_exist(self, mock_datetime):
+        now = datetime.now()
+        mock_datetime.now.return_value = now
+        event_json = self.marshaler.marshal_message(self.command)
+        event = json.loads(event_json)
+        assert_that(event, has_entry('timestamp', now.isoformat()))
 
 
 class TestMarshalerCollectd(unittest.TestCase):

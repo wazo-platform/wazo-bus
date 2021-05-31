@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import json
+from datetime import datetime
 
 
 class InvalidMessage(ValueError):
@@ -20,6 +21,7 @@ class Marshaler(object):
         result = {
             'name': command.name,
             'origin_uuid': self._uuid,
+            'timestamp': datetime.now().isoformat(),
         }
 
         if hasattr(command, 'required_acl'):
