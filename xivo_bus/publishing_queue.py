@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -17,14 +17,16 @@ class PublishingQueue(object):
         self._queue = queue.Queue()
         self._running = False
         self._should_stop = False
+        self._flushing = False
 
     def run(self):
         self._running = True
 
-        while not self._should_stop:
+        while not self._should_stop or self._flushing:
             try:
                 message, headers = self._queue.get(timeout=0.1)
             except queue.Empty:
+                self._flushing = False
                 continue
 
             try:
@@ -44,3 +46,8 @@ class PublishingQueue(object):
     def stop(self):
         if self._running:
             self._should_stop = True
+
+    def flush_and_stop(self):
+        if self._running:
+            self._should_stop = True
+            self._flushing = True
