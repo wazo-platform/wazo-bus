@@ -27,6 +27,27 @@ class DeleteMeetingEvent(_BaseMeetingEvent):
     routing_key_fmt = 'config.meetings.deleted'
 
 
+class MeetingProgressEvent(BaseEvent):
+    name = 'meeting_progress'
+    routing_key_fmt = 'config.meetings.progress'
+
+    def __init__(self, meeting, status):
+        self._body = dict(meeting)
+        self._body['status'] = status
+        super(MeetingProgressEvent, self).__init__()
+
+
+class UserMeetingProgressEvent(BaseEvent):
+    name = 'meeting_user_progress'
+    routing_key_fmt = 'config.users.{user_uuid}.meetings.progress'
+
+    def __init__(self, meeting, user_uuid, status):
+        self._body = dict(meeting)
+        self._body['user_uuid'] = user_uuid
+        self._body['status'] = status
+        super(UserMeetingProgressEvent, self).__init__()
+
+
 class _BaseParticipantMeetingEvent(BaseEvent):
     def __init__(self, meeting_uuid, participant_dict):
         self._body = {'meeting_uuid': meeting_uuid}
