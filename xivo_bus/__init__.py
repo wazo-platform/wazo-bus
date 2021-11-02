@@ -5,3 +5,11 @@
 from xivo_bus.marshaler import CollectdMarshaler, Marshaler  # noqa
 from xivo_bus.publisher import Publisher, FailFastPublisher, LongLivedPublisher  # noqa
 from xivo_bus.publishing_queue import PublishingQueue  # noqa
+
+from xivo_bus.consumer import BusConsumer  # noqa: F401
+from xivo_bus.publisher import BusPublisherFailFast, BusPublisherLongLived  # noqa: F401
+from xivo_bus.middlewares import (  # noqa: F401
+    EventPublisherMiddleware,
+    EventConsumerMiddleware,
+    EchoMiddleware,
+)
