@@ -1,0 +1,20 @@
+FROM python:3.7-buster
+
+COPY integration_tests/assets/bin/entrypoint.sh /usr/bin/entrypoint.sh
+
+COPY . /usr/src/xivo-bus
+
+WORKDIR /usr/src/xivo-bus
+
+RUN apt-get update && apt-get install netcat -y && \
+    pip install --upgrade pip && \
+    pip install -r requirements.txt requests flask && \
+    python setup.py develop
+
+COPY integration_tests/assets/services/bus-test/. /app/services/bus-test
+
+WORKDIR /app/services
+
+RUN pip install -e bus-test
+
+ENTRYPOINT ["bash", "-c", "/usr/bin/entrypoint.sh"]
