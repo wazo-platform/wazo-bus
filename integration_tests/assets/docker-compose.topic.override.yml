@@ -1,0 +1,5 @@
+version: '3'
+services:
+  xivo-bus:
+    environment:
+      - EXCHANGE=topic

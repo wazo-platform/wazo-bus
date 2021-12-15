@@ -3,4 +3,8 @@
       - wazo-tox-linters
       - wazo-tox-py27
       - wazo-tox-py37
+      - wazo-tox-integration
       - debian-packaging-template
+    vars:
+      docker_compose_services_override:
+        - xivo-bus

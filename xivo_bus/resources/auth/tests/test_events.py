@@ -8,7 +8,7 @@ from hamcrest import assert_that, equal_to
 from .. import events
 
 
-class _BaseTestCase(TestCase):
+class _BaseTestCase:
 
     def setUp(self):
         self.user_uuid = uuid.uuid4()
@@ -25,16 +25,16 @@ class _BaseTestCase(TestCase):
         assert_that(event, equal_to(expected))
 
 
-class TestUserExternalAuthAddedEvent(_BaseTestCase):
+class TestUserExternalAuthAddedEvent(_BaseTestCase, TestCase):
 
     Event = events.UserExternalAuthAdded
 
 
-class TestUserExternalAuthAuthorizedEvent(_BaseTestCase):
+class TestUserExternalAuthAuthorizedEvent(_BaseTestCase, TestCase):
 
     Event = events.UserExternalAuthAuthorized
 
 
-class TestUserExternalAuthDeletedEvent(_BaseTestCase):
+class TestUserExternalAuthDeletedEvent(_BaseTestCase, TestCase):
 
     Event = events.UserExternalAuthDeleted

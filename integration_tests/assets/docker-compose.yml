@@ -1,0 +1,27 @@
+version: '3'
+services:
+  sync:
+    image: wazoplatform/wait
+    depends_on:
+      - rabbitmq
+      - xivo-bus
+    environment:
+      TARGETS: "rabbitmq:5672 xivo-bus:5000"
+
+  rabbitmq:
+    image: rabbitmq:management
+    ports:
+      - "5672"
+      - "8080:15672"
+    volumes:
+      - type: tmpfs
+        target: /var/lib/rabbitmq
+
+  xivo-bus:
+    image: xivo-bus
+    volumes:
+      - ../..:/usr/src/xivo-bus:ro
+    ports:
+      - "6444:5000"
+    environment:
+      - FLASK_APP=bus_test
