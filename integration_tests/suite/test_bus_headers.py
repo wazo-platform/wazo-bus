@@ -9,13 +9,11 @@ from .helpers import BusIntegrationTest
 class TestHeaders(BusIntegrationTest):
     asset = 'headers'
 
-    def test_bind_unbind(self):
+    def test_event_binding(self):
         event = 'binding_test'
 
-        self.bus.bind(event)
-        self.bus.publish(event, "first payload")
-
-        self.bus.unbind(event)
+        with self.use_event(event):
+            self.bus.publish(event, "first payload")
         self.bus.publish(event, "second payload")
 
         assert_that(self.bus.get_messages(event), has_item("first payload"))
