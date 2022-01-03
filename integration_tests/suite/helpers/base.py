@@ -5,7 +5,7 @@ import os
 from contextlib import contextmanager
 from hamcrest import assert_that, is_
 
-from xivo_test_helpers.asset_launching_test_case import AssetLaunchingTestCase
+from wazo_test_helpers.asset_launching_test_case import AssetLaunchingTestCase
 from .busclient import BusApiClient
 
 
