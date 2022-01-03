@@ -4,56 +4,49 @@
 import logging
 import inspect
 import os
-import six
 
-from collections import defaultdict
-from threading import Lock
+from inspect import isclass
 from contextlib import contextmanager
 from threading import Thread
+from six import raise_from
 from kombu import Exchange
+from kombu.utils.url import as_url
+
+from .middlewares import Middleware
 
 
-class MiddlewareError(Exception):
-    def __init__(self, middleware):
-        self.message = 'Error during middleware \'{}\' execution'.format(
-            type(middleware).__name__
-        )
+class CommonBase(object):
+    context = None
 
-
-class ConsumerProducerBase(object):
     def __init__(
-        self,
-        username='guest',
-        password='guest',
-        host='localhost',
-        port=5672,
-        exchange_name=None,
-        exchange_type=None,
-        use_thread=True,
-        middlewares=None,
-        **kwargs
+        self, url, exchange_name, exchange_type, use_thread=True, middlewares=None
     ):
-        if not all({username, password, host, port, exchange_name, exchange_type}):
+        if not all({url, exchange_name, exchange_type}):
             raise ValueError(
                 '''Invalid bus configuration, please check values.
                 At the very least, an exchange_name and exchange_type must be provided.'''
             )
-        middlewares = middlewares or []
+        self._init_logger()
+        self._init_middlewares(middlewares, self.context)
 
-        self._exchange = Exchange(name=exchange_name, type=exchange_type)
-
-        self._url = 'amqp://{username}:{password}@{host}:{port}//'.format(
-            username=username, password=password, host=host, port=port
-        )
-
+        self.url = url
         self.should_stop = False
-        self.connection = None
+        self._exchange = Exchange(exchange_name, exchange_type)
         self._use_thread = use_thread
-        self._middlewares = []
         self._thread = None
 
-        self._init_logger()
-        self.register_middleware(*(middleware for middleware in middlewares))
+    @staticmethod
+    def make_url(
+        scheme='amqp', user='guest', password='guest', host='localhost', port=5672
+    ):
+        return as_url(scheme, host, port, user, password)
+
+    def _init_middlewares(self, middlewares, context):
+        self._manager = MiddlewareManager(context, self._logger)
+        setattr(self, 'register_middleware', self._manager.register)
+        setattr(self, 'unregister_middleware', self._manager.unregister)
+        if middlewares:
+            self.register_middleware(*middlewares)
 
     def _init_logger(self):
         filename = ''
@@ -65,33 +58,17 @@ class ConsumerProducerBase(object):
         self._clsname = type(self).__name__
         self._logger = logging.getLogger(self._clsname)
 
-    @staticmethod
-    def _split_bus_options(options, **kwargs):
-        bus_kwargs = {
-            'username',
-            'password',
-            'host',
-            'port',
-            'exchange_name',
-            'exchange_type',
-            'use_thread',
-            'middlewares',
-        }
-
-        config_opts = {}
-        other_opts = {}
-        options.update(kwargs or {})
-
-        for key, value in six.iteritems(options):
-            if key in bus_kwargs:
-                config_opts[key] = value
-                continue
-            other_opts[key] = value
-        return config_opts, other_opts
-
     @property
     def use_thread(self):
         return self._use_thread
+
+    @property
+    def log(self):
+        return self._logger
+
+    @property
+    def exchange(self):
+        return self._exchange
 
     @property
     @contextmanager
@@ -100,11 +77,12 @@ class ConsumerProducerBase(object):
             self.start()
         except RuntimeError:
             pass
-        finally:
+        try:
             yield
+        finally:
             self.stop()
 
-    def start(self):
+    def start(self, **kwargs):
         if not self.use_thread:
             raise ValueError('Cannot start thread (option \'use_thread\' is disabled)')
 
@@ -114,87 +92,103 @@ class ConsumerProducerBase(object):
             )
 
         name = 'thread-{}.{}'.format(self._filename, self._clsname.lower())
-        self._thread = Thread(target=self.run, name=name)
+        self._thread = Thread(target=self._ensure_run, name=name, kwargs=kwargs)
         self._logger.info("Starting AMQP thread '%s'", name)
         self._thread.start()
 
     def stop(self):
+        self.should_stop = True
         if not self.is_running():
             return
-        self.should_stop = True
         self._logger.info("Stopping AMQP thread '%s'", self._thread.name)
         self._thread.join()
         self._thread = None
+        self.should_stop = False
 
     def is_running(self):
         return self.use_thread and self._thread and self._thread.is_alive()
 
+    def _ensure_run(self, **kwargs):
+        while not self.should_stop:
+            try:
+                self.run(**kwargs)
+            except Exception:
+                self._logger.exception(
+                    'Exception occured in thread \'%s\', restarting...',
+                    self._thread.name,
+                )
+
     def run(self, **kwargs):
         raise NotImplementedError('Must be defined in subclass')
 
-    def register_middleware(self, *middlewares):
-        for middleware in middlewares:
-            middleware = middleware() if isinstance(middleware, type) else middleware
-            if not callable(middleware):
-                raise ValueError(
-                    'Middleware \'{}\' must be callable'.format(type(middleware))
-                )
-            self._middlewares.append(middleware)
-            self._logger.info('Registered middleware: {}'.format(middleware))
+    def register_middleware(self, *middleware):
+        pass
 
     def unregister_middleware(self, middleware):
-        for element in self._middlewares:
-            if element == middleware or isinstance(element, middleware):
-                self._middlewares.remove(element)
-                self._logger.info('Unregistered middleware: {}'.format(middleware))
-                return True
-        return False
+        pass
 
     def __repr__(self):
-        return '{name}(exchange: {exchange}[{type}])'.format(
+        return '<{name} (exchange: {exchange}[{type}])>'.format(
             name=self._clsname, exchange=self._exchange.name, type=self._exchange.type
         )
 
 
-class EventMessageBroker(object):
-    def __init__(self):
-        self._subscriptions = defaultdict(list)
-        self._logger = logging.getLogger(type(self).__name__)
-        self._lock = Lock()
-
-    def subscribe(self, event, handler):
-        self._logger.debug(
-            'Subscribed handler \'%s\' to event \'%s\'', handler.__name__, event
+class MiddlewareError(Exception):
+    def __init__(self, middleware):
+        self.message = 'Error during middleware \'{}\' execution'.format(
+            type(middleware).__name__
         )
-        with self._lock:
-            self._subscriptions[event].append(handler)
 
-    def unsubscribe(self, event, handler):
-        try:
-            with self._lock:
-                self._subscriptions[event].remove(handler)
-        except ValueError:
-            pass
-        else:
-            self._logger.debug(
-                'Unsubscribed handler \'%s\' from event \'%s\'', handler.__name__, event
-            )
 
-        if not self._subscriptions[event]:
-            with self._lock:
-                self._subscriptions.pop(event, None)
+class MiddlewareManager(object):
+    _func = dict(consumer='marshal', publisher='unmarshal')
 
-    def dispatch(self, event, payload):
-        with self._lock:
-            subscribers = self._subscriptions[event].copy()
+    def __init__(self, context=None, logger=None):
+        self._middlewares = []
+        self.log = logger or logging.getLogger(__name__)
+        self.context = context
 
-        for handler in subscribers:
-            try:
-                handler(payload)
-            except Exception:
-                self._logger.exception(
-                    'Handler \'%s\' dispatching failed for event \'%s\'',
-                    handler.__name__,
-                    event,
+    @property
+    def context(self):
+        return self._context
+
+    @context.setter
+    def context(self, context):
+        if context not in self._func:
+            raise ValueError('Context must be either \'consumer\' or \'publisher\'')
+        self._context = context
+
+    def register(self, *middlewares):
+        for middleware in middlewares:
+            if isclass(middleware):
+                middleware = middleware()
+
+            if not callable(middleware) and not isinstance(middleware, Middleware):
+                raise ValueError(
+                    'Middleware \'{}\' is not a callable or doesn\'t inherit from Middleware class'.format(
+                        middleware
+                    )
                 )
-            continue
+            self._middlewares.append(middleware)
+            self.log.info('Registered middleware \'%s\'', middleware)
+
+    def unregister(self, middleware):
+        for ite in self._middlewares:
+            if ite == middleware or isinstance(ite, middleware):
+                self._middlewares.remove(ite)
+                self.log.info('Unregistered middleware \'%s\'', middleware)
+                return True
+        self.log.error('No middleware \'%s\' could be found', middleware)
+        return False
+
+    def _get_middleware_op(self, middleware):
+        return getattr(middleware, self._func[self.context], middleware)
+
+    def process(self, event, headers, payload):
+        for middleware in self._middlewares:
+            op = self._get_middleware_op(middleware)
+            try:
+                headers, payload = op(event, headers, payload)
+            except Exception as exc:
+                raise_from(MiddlewareError(middleware), exc)
+        return headers, payload

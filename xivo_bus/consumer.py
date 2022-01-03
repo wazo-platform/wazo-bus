@@ -1,69 +1,62 @@
 # Copyright 2020-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import copy
 import os
+import logging
 
+from collections import defaultdict, namedtuple
+from threading import Lock
 from kombu import Connection, Queue, binding as Binding
 from kombu.exceptions import NotBoundError
 from kombu.mixins import ConsumerMixin
 
-from .base import ConsumerProducerBase as Base, EventMessageBroker, MiddlewareError
+from .base import CommonBase as Base, MiddlewareError
+
+Subscription = namedtuple('Subscription', ['handler', 'binding'])
 
 
 class BusConsumer(ConsumerMixin, Base):
+    context = 'consumer'
+
     def __init__(
         self,
-        username='guest',
+        exchange_name=None,
+        exchange_type=None,
+        user='guest',
         password='guest',
         host='localhost',
         port=5672,
-        exchange_name=None,
-        exchange_type=None,
         middlewares=None,
-        **kwargs
     ):
+        url = self.make_url(user=user, password=password, host=host, port=port)
         super().__init__(
-            username,
-            password,
-            host,
-            port,
-            exchange_name,
-            exchange_type,
-            True,
-            middlewares,
+            url, exchange_name, exchange_type, use_thread=True, middlewares=middlewares
         )
+
+        service_name = '{}.{}'.format(self._filename, self._clsname)
+        self.connection = None
         self._is_running = False
-        self._broker = EventMessageBroker()
-        self._bindings = set([])
-
-        queue_name = '{module}.{name}-{id}'.format(
-            module=self._filename, name=self._clsname, id=self._generate_random_hex(3)
+        self._registrar = EventRegistrar(
+            self, name=service_name, durable=False, auto_delete=True
         )
-        self._queue = Queue(name=queue_name, durable=False, auto_delete=True)
-
-    @staticmethod
-    def _generate_random_hex(size):
-        return os.urandom(size).hex()
 
     @classmethod
-    def from_config(cls, config, middlewares=None, **options):
-        _config = dict(copy.deepcopy(config), **options)
-        if 'subscribe' in _config:
-            _config.update(
-                exchange_name=_config['subscribe']['exchange_name'],
-                exchange_type=_config['subscribe']['exchange_type'],
-            )
-
-        return cls(middlewares=middlewares, **_config)
+    def from_config(cls, config, middlewares=None):
+        config = config.copy()
+        if 'subscribe' in config:
+            config['exchange_name'] = config['subscribe']['exchange_name']
+            config['exchange_type'] = config['subscribe']['exchange_type']
+        exchange_name = config.pop('exchange_name')
+        exchange_type = config.pop('exchange_type')
+        return cls(exchange_name, exchange_type, middlewares=middlewares, **config)
 
     def get_consumers(self, Consumer, channel):
-        self._exchange(channel).declare()
-        self._queue(channel).declare()
+        self.exchange(channel).declare()
+        self._registrar.queue(channel).declare()
 
         return [
             Consumer(
-                queues=[self._queue],
+                queues=[self._registrar.queue],
                 callbacks=[self._on_message_received],
                 auto_declare=False,
             )
@@ -78,86 +71,156 @@ class BusConsumer(ConsumerMixin, Base):
         self._is_running = True
 
     def run(self, **consume_args):
-        try:
-            with Connection(self._url) as connection:
-                self.connection = connection
-                super().run(**consume_args)
-        except Exception:
-            self._logger.exception('Thread exited')
+        with Connection(self.url) as connection:
+            self.connection = connection
+            super().run(**consume_args)
 
     def is_running(self):
         return super().is_running() and self._is_running
 
     def _on_message_received(self, body, message):
         headers = message.headers
-        event = headers.get('name', None) or body.get('name')
+        event = headers.get('name', None) or body.get('name', None)
         payload = body
         try:
-            for middleware in self._middlewares:
-                headers, payload = middleware(event, headers, payload)
-        except Exception:
-            raise MiddlewareError(middleware)
+            headers, payload = self._manager.process(event, headers, payload)
+        except MiddlewareError:
+            raise
         else:
-            self._broker.dispatch(event, payload)
+            self._registrar.dispatch(event, payload)
         finally:
             message.ack()
 
     def register_event_handler(
-        self, event, handler, headers=None, headers_match_all=True, routing_key=None
+        self, event, handler, headers=None, routing_key=None, headers_match_all=True
     ):
-        if self._exchange.type == 'headers' and routing_key:
-            self._logger.warning(
-                'Exchange \'%s\' is using headers, routing_key will not be used.',
-                self._exchange.name,
-            )
+        self._registrar.subscribe(
+            event, handler, headers, headers_match_all, routing_key
+        )
 
-        if self._exchange.type == 'topic' and headers:
-            self._logger.warning(
-                'Exchange \'%s\' is using routing_key, headers will not be used.'
-            )
+    def unregister_event_handler(self, event, handler):
+        return self._registrar.unsubscribe(event, handler)
 
-        headers = headers or {}
-        headers.setdefault('name', event)
-        headers.setdefault('x-match', 'all' if headers_match_all else 'any')
-        B = Binding(self._exchange, routing_key, headers)
 
+class EventRegistrar(object):
+    def __init__(self, provider, name=None, **queue_kwargs):
+        if name:
+            name = '{name}-{id}'.format(name=name, id=os.urandom(3).hex())
+
+        self._provider = provider
+        self._subscriptions = defaultdict(list)
+        self._lock = Lock()
+        self._queue = Queue(name=name, exchange=None, **queue_kwargs)
+
+    @property
+    def log(self):
         try:
-            with self.establish_connection() as connection:
+            return self._provider.log
+        except AttributeError:
+            logging.getLogger(__name__)
+
+    @property
+    def queue(self):
+        return self._queue
+
+    @property
+    def exchange(self):
+        return self._provider.exchange
+
+    def _configure_headers(self, event, headers, routing_key, headers_match_all=True):
+        headers = dict(**headers)
+        headers.setdefault('x-event', event)
+        exchange = self.exchange
+
+        if exchange.type == 'headers':
+            headers.setdefault('x-match', 'all' if headers_match_all else 'any')
+            if routing_key:
+                self.log.warning(
+                    'Exchange \'%s\' is using headers, routing_key will not be used.',
+                    exchange.name,
+                )
+        elif exchange.type == 'topic' and headers:
+            self.log.warning(
+                'Exchange \'%s\' is using routing_key, headers will not be used.',
+                exchange.name,
+            )
+        return headers
+
+    def _create_binding(self, headers, routing_key):
+        B = Binding(self.exchange, routing_key=routing_key, arguments=headers)
+        self._queue.bindings.add(B)
+        try:
+            with self._provider.establish_connection() as connection:
                 with connection.channel() as channel:
                     self._queue.bind_to(
                         B.exchange, B.routing_key, B.arguments, channel=channel
                     )
-        except AttributeError:
+        except NotBoundError:
             pass
-        self._queue.bindings.add(B)
-        self._broker.subscribe(event, handler)
-        self._logger.info(
-            'Registered on event \'%s\' (handler: \'%s\')', event, handler.__name__
+        return B
+
+    def _remove_binding(self, binding):
+        self._queue.bindings.remove(binding)
+        try:
+            with self._provider.establish_connection() as connection:
+                with connection.channel() as channel:
+                    self._queue.unbind_from(
+                        binding.exchange,
+                        binding.routing_key,
+                        binding.arguments,
+                        channel=channel,
+                    )
+        except NotBoundError:
+            pass
+
+    def subscribe(
+        self, event, handler, headers=None, headers_match_all=True, routing_key=None
+    ):
+        headers = self._configure_headers(
+            event, headers, routing_key, headers_match_all
+        )
+        subscription = Subscription(handler, self._create_binding(headers, routing_key))
+
+        with self._lock:
+            self._subscriptions[event].append(subscription)
+        self.log.info(
+            'Registered handler \'%s\' to event \'%s\'', handler.__name__, event
         )
 
-    def unregister_event_handler(self, event, handler):
-        for B in self._queue.bindings:
-            if B.arguments.get('name') != event:
-                continue
+    def unsubscribe(self, event, handler):
+        with self._lock:
+            subscriptions = self._subscriptions[event].copy()
 
+        try:
+            for subscription in subscriptions:
+                if (
+                    subscription.handler == handler
+                    and subscription.binding.arguments.get('x-event', None) == event
+                ):
+                    with self._lock:
+                        self._subscriptions[event].remove(subscription)
+                    self._remove_binding(subscription.binding)
+                    self.log.info(
+                        'Unregistered handler \'%s\' from \'%s\'', handler, event
+                    )
+                    return True
+            return False
+        finally:
+            if not self._subscriptions[event]:
+                with self._lock:
+                    self._subscriptions.pop(event, None)
+
+    def dispatch(self, event, payload):
+        with self._lock:
+            subscribers = self._subscriptions[event].copy()
+
+        for (handler, _) in subscribers:
             try:
-                with self.establish_connection() as connection:
-                    with connection.channel() as channel:
-                        self._queue.unbind_from(
-                            B.exchange, B.routing_key, B.arguments, channel=channel
-                        )
-            except (AttributeError, NotBoundError):
-                self._logger.error(
-                    'Failed to unregister event \'%s\'', event, exc_info=1
+                handler(payload)
+            except Exception:
+                self.log.exception(
+                    'Handler \'%s\' dispatching failed for event \'%s\'',
+                    handler.__name__,
+                    event,
                 )
-                return False
-            self._queue.bindings.remove(B)
-            self._broker.unsubscribe(event, handler)
-            self._logger.info(
-                'Unregistered event \'%s\' (handler: \'%s\')', event, handler.__name__
-            )
-            return True
-        self._logger.error(
-            'Failed to unregister event \'%s\', handler not found.', event
-        )
-        return False
+            continue
