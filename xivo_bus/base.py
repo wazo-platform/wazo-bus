@@ -141,7 +141,7 @@ class MiddlewareError(Exception):
 
 
 class MiddlewareManager(object):
-    _func = dict(consumer='marshal', publisher='unmarshal')
+    _op = dict(publisher='marshal', consumer='unmarshal')
 
     def __init__(self, context=None, logger=None):
         self._middlewares = []
@@ -154,7 +154,7 @@ class MiddlewareManager(object):
 
     @context.setter
     def context(self, context):
-        if context not in self._func:
+        if context not in self._op:
             raise ValueError('Context must be either \'consumer\' or \'publisher\'')
         self._context = context
 
@@ -182,7 +182,7 @@ class MiddlewareManager(object):
         return False
 
     def _get_middleware_op(self, middleware):
-        return getattr(middleware, self._func[self.context], middleware)
+        return getattr(middleware, self._op[self.context], middleware)
 
     def process(self, event, headers, payload):
         for middleware in self._middlewares:

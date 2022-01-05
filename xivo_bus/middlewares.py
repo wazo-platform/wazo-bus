@@ -45,21 +45,23 @@ class Middleware(object):
         pass
 
 
-class WazoEvent(Middleware):
+class EventProcessor(Middleware):
     def __init__(self, service_uuid=None):
         self.service_uuid = service_uuid
 
     def marshal(self, event, headers, payload):
+        print('marshaling')
         headers = self._inject_metadata(event, headers)
         payload = dict(data=self._serialize_event(event, payload), **headers)
         return headers, payload
 
     def unmarshal(self, event, headers, payload):
+        print('unmarshaling')
         data = payload.pop('data')
         headers = headers or payload
         return headers, data
 
-    def _serialize_event(event, payload):
+    def _serialize_event(self, event, payload):
         payload = payload or {}
         try:
             return dict(event.marshal(), **payload)
