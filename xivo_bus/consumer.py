@@ -3,6 +3,7 @@
 
 import os
 import logging
+import six
 
 from collections import defaultdict, namedtuple
 from threading import Lock
@@ -11,8 +12,6 @@ from kombu.exceptions import NotBoundError
 from kombu.mixins import ConsumerMixin
 
 from .base import CommonBase as Base, MiddlewareError
-
-Subscription = namedtuple('Subscription', ['handler', 'binding'])
 
 
 class BusConsumer(ConsumerMixin, Base):
@@ -87,7 +86,7 @@ class BusConsumer(ConsumerMixin, Base):
         except MiddlewareError:
             raise
         else:
-            self._registrar.dispatch(event, payload)
+            self._registrar.dispatch(event, payload, headers)
         finally:
             message.ack()
 
@@ -103,6 +102,8 @@ class BusConsumer(ConsumerMixin, Base):
 
 
 class EventRegistrar(object):
+    Subscription = namedtuple('Subscription', ['handler', 'binding'])
+
     def __init__(self, provider, name=None, **queue_kwargs):
         if name:
             name = '{name}-{id}'.format(name=name, id=os.urandom(3).hex())
@@ -146,6 +147,33 @@ class EventRegistrar(object):
             )
         return headers
 
+    def _matches_binding(self, headers, binding):
+        def filter_unused(src):
+            return dict(filter(lambda e: not e[0].startswith('x-'), six.iteritems(src)))
+
+        def match_any(src, other):
+            for k, v in six.iteritems(src):
+                if k in other and other[k] == v:
+                    return True
+            return False
+
+        def match_all(src, other):
+            for k, v in six.iteritems(src):
+                if k not in other or (k in other and other[k] != v):
+                    return False
+            return True
+
+        if not self.exchange.type == 'headers':
+            return True
+
+        must_match = binding.arguments.get('x-match', None) == 'all'
+        headers = filter_unused(headers)
+        binding_headers = filter_unused(binding.arguments)
+
+        if must_match:
+            return match_all(binding_headers, headers)
+        return match_any(binding_headers, headers)
+
     def _create_binding(self, headers, routing_key):
         B = Binding(self.exchange, routing_key=routing_key, arguments=headers)
         self._queue.bindings.add(B)
@@ -179,7 +207,9 @@ class EventRegistrar(object):
         headers = self._configure_headers(
             event, headers, routing_key, headers_match_all
         )
-        subscription = Subscription(handler, self._create_binding(headers, routing_key))
+        subscription = self.Subscription(
+            handler, self._create_binding(headers, routing_key)
+        )
 
         with self._lock:
             self._subscriptions[event].append(subscription)
@@ -210,17 +240,18 @@ class EventRegistrar(object):
                 with self._lock:
                     self._subscriptions.pop(event, None)
 
-    def dispatch(self, event, payload):
+    def dispatch(self, event, payload, headers=None):
         with self._lock:
             subscribers = self._subscriptions[event].copy()
 
-        for (handler, _) in subscribers:
-            try:
-                handler(payload)
-            except Exception:
-                self.log.exception(
-                    'Handler \'%s\' dispatching failed for event \'%s\'',
-                    handler.__name__,
-                    event,
-                )
-            continue
+        for (handler, binding) in subscribers:
+            if self._matches_binding(headers, binding):
+                try:
+                    handler(payload)
+                except Exception:
+                    self.log.exception(
+                        'Handler \'%s\' dispatching failed for event \'%s\'',
+                        handler.__name__,
+                        event,
+                    )
+                continue

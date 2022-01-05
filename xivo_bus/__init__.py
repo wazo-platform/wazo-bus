@@ -12,4 +12,5 @@ from xivo_bus.middlewares import (  # noqa: F401
     EventPublisherMiddleware,
     EventConsumerMiddleware,
     EchoMiddleware,
+    EventProcessor,
 )
