@@ -38,9 +38,12 @@ class BusIntegrationTest(AssetLaunchingTestCase):
     @contextmanager
     def use_middleware(cls, bus_type, middleware, *args, **kwargs):
         try:
-            cls.bus.add_middlewares(bus_type, middleware, *args, **kwargs)
+            assert_that(
+                cls.bus.add_middleware(bus_type, middleware, *args, **kwargs),
+                is_(True),
+            )
             yield
         except AssertionError:
             raise
         finally:
-            cls.bus.remove_middleware(bus_type, middleware)
+            assert_that(cls.bus.remove_middleware(bus_type, middleware), is_(True))

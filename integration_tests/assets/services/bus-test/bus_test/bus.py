@@ -6,6 +6,7 @@ from threading import Lock
 from collections import defaultdict, namedtuple
 
 from xivo_bus import BusConsumer, BusPublisherFailFast, BusPublisherLongLived
+from xivo_bus.middlewares import Middleware
 
 
 class BusManager(object):
@@ -62,8 +63,13 @@ class MiddlewareManager(object):
         self._middlewares = {}
 
         for attr in dir(module):
-            if 'middleware' not in attr.lower():
+            if attr.startswith('__') and attr.endswith('__'):
                 continue
+
+            obj = getattr(module, attr)
+            if not isinstance(obj, Middleware) and not callable(obj):
+                continue
+
             self._middlewares[attr] = getattr(module, attr)
 
     @property
