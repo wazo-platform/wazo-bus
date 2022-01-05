@@ -72,7 +72,9 @@ def publish(event):
 
     must_deserialize_event = headers.pop('x-event-object', False)
     if must_deserialize_event:
+        print(event)
         event = deserialize_event_object(event, payload)
+        print(event)
         payload = None
 
     try:

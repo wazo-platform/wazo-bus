@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import requests
-from inspect import isfunction
+from inspect import ismethod
 
 
 class BusApiClient(object):
@@ -14,11 +14,11 @@ class BusApiClient(object):
 
     def _serialize_event(self, event):
         obj = {}
-        attrs = list(filter(lambda a: '__' not in a, dir(event)))
+        attrs = list(filter(lambda a: not a.startswith('__'), dir(event)))
 
         for attr in attrs:
             value = getattr(event, attr, None)
-            if not isfunction(value):
+            if not ismethod(value):
                 obj[attr] = value
         return obj
 
@@ -48,7 +48,7 @@ class BusApiClient(object):
         resp = requests.post(url, json=payload)
         return resp.status_code == 200
 
-    def publish_event_object(self, event, headers=None, routing_key=None):
+    def publish_event(self, event, headers=None, routing_key=None):
         url = self._make_url('bus', event.name, 'publish')
         headers = headers or {}
         payload = {
@@ -63,7 +63,7 @@ class BusApiClient(object):
         url = self._make_url('bus', event, 'messages')
         return requests.get(url).json()
 
-    def add_middlewares(self, bus_type, middleware, *args, **kwargs):
+    def add_middleware(self, bus_type, middleware, *args, **kwargs):
         url = self._make_url('bus', 'middlewares', middleware)
         payload = {'type': bus_type, 'args': args, 'kwargs': kwargs}
         resp = requests.put(url, json=payload)
