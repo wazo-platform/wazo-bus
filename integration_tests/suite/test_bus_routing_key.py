@@ -13,59 +13,51 @@ class TestRoutingKey(BusIntegrationTest):
         event = 'event_routing_key_bind'
         key = 'events.bus.bind_unbind_test'
 
-        with self.use_event(event, routing_key=key):
-            self.bus.publish(event, "first payload", routing_key=key)
+        with self.local_event(event, routing_key=key):
+            self.local_bus.publish(event, payload="first payload", routing_key=key)
 
-        self.bus.publish(event, "second payload", routing_key=key)
-        assert_that(self.bus.get_messages(event), has_item("first payload"))
+        self.local_bus.publish(event, payload="second payload", routing_key=key)
+        assert_that(self.local_messages(event), has_item("first payload"))
 
     def test_good_routing_key(self):
         event = 'event_good_routing_key'
         key = 'events.bus.good_key'
 
-        with self.use_event(event, routing_key=key):
-            self.bus.publish(event, "payload", routing_key=key)
-        assert_that(self.bus.get_messages(event), has_item("payload"))
+        with self.local_event(event, routing_key=key):
+            self.local_bus.publish(event, payload="payload", routing_key=key)
+        assert_that(self.local_messages(event), has_item("payload"))
 
     def test_wrong_routing_key(self):
         event = 'event_wrong_routing_key'
         key = 'events.bus.good_key'
         wrong_key = 'events.bus.wrong_key'
 
-        with self.use_event(event, routing_key=key):
-            self.bus.publish(event, "payload", routing_key=wrong_key)
-        assert_that(self.bus.get_messages(event), is_(empty()))
-
-    def test_no_publish_routing_key(self):
-        event = 'event_publish_null_routing_key'
-        key = 'events.bus.some_key'
-
-        with self.use_event(event, routing_key=key):
-            self.bus.publish(event, "payload", routing_key=None)
-        assert_that(self.bus.get_messages(event), is_(empty()))
+        with self.local_event(event, routing_key=key):
+            self.local_bus.publish(event, payload="payload", routing_key=wrong_key)
+        assert_that(self.local_messages(event), is_(empty()))
 
     def test_no_event_routing_key(self):
         event = 'event_no_key'
         key = 'events.bus.no_key'
 
-        with self.use_event(event, routing_key=None):
-            self.bus.publish(event, "payload", routing_key=key)
-        assert_that(self.bus.get_messages(event), is_(empty()))
+        with self.local_event(event, routing_key=None):
+            self.local_bus.publish(event, payload="payload", routing_key=key)
+        assert_that(self.local_messages(event), is_(empty()))
 
     def test_no_routing_key(self):
         event = 'event_no_routing_key'
         key = ''
 
-        with self.use_event(event, routing_key=key):
-            self.bus.publish(event, "payload", routing_key=key)
-        assert_that(self.bus.get_messages(event), has_item("payload"))
+        with self.local_event(event, routing_key=key):
+            self.local_bus.publish(event, payload="payload", routing_key=key)
+        assert_that(self.local_messages(event), has_item("payload"))
 
-    def test_headers_disabled_with_routing_key(self):
+    def test_headers_disabled_when_using_routing_key(self):
         event = 'headers_with_routing_key'
         key = 'events.bus.headers_test'
 
-        with self.use_event(event, headers={'required': True}, routing_key=key):
-            self.bus.publish(
-                event, "payload", headers={'required': False}, routing_key=key
+        with self.local_event(event, headers={'required': True}, routing_key=key):
+            self.local_bus.publish(
+                event, payload="payload", headers={'required': False}, routing_key=key
             )
-        assert_that(self.bus.get_messages(event), has_item("payload"))
+        assert_that(self.local_messages(event), has_item("payload"))

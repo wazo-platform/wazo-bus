@@ -3,17 +3,16 @@
 
 import os
 from flask import request, jsonify
+from xivo_bus.base import BusConnector
 
 from . import app, info, error
-from .bus import MessageBroker, MiddlewareManager, BusManager
+from .bus import MessageBroker, MiddlewareManager
 
 
-_bus = BusManager(
-    {
-        'host': 'rabbitmq',
-        'exchange_name': 'bus-integration-tests',
-        'exchange_type': os.getenv('EXCHANGE'),
-    }
+_bus = BusConnector(
+    host='rabbitmq',
+    exchange_name=os.getenv('EXCHANGE_NAME'),
+    exchange_type=os.getenv('EXCHANGE_TYPE'),
 )
 _broker = MessageBroker()
 _middlewares = MiddlewareManager()
@@ -44,25 +43,6 @@ def make_response(code, status=None, **kwargs):
     return jsonify({'result': code, 'status': status, **kwargs}), code
 
 
-def deserialize_event_object(event, payload):
-    class _Event(object):
-        def __init__(self, event, **kwargs):
-            self.name = event
-            self._kwargs = {}
-            for (key, value) in kwargs.items():
-                self._kwargs[key] = value
-                setattr(self, key, value)
-
-        @classmethod
-        def from_dict(cls, event, payload):
-            return cls(event, **payload)
-
-        def marshal(self):
-            return self._kwargs
-
-    return _Event.from_dict(event, payload)
-
-
 #####################
 # Routes definition #
 #####################
@@ -70,17 +50,8 @@ def deserialize_event_object(event, payload):
 def publish(event):
     headers, routing_key, payload = process_json(event, request.json)
 
-    must_deserialize_event = headers.pop('x-event-object', False)
-    if must_deserialize_event:
-        print(event)
-        event = deserialize_event_object(event, payload)
-        print(event)
-        payload = None
-
     try:
-        _bus.publisher.publish(
-            event, headers=headers, routing_key=routing_key, payload=payload
-        )
+        _bus.publish(event, headers=headers, routing_key=routing_key, payload=payload)
         info(
             'Published to \'%s\' (headers: %s, routing_key: %s)',
             event,
@@ -104,9 +75,7 @@ def publish(event):
 def subscribe(event):
     headers, routing_key, _ = process_json(event, request.json, use_match=True)
     handler = create_event_handler(event, headers, routing_key)
-    _bus.consumer.register_event_handler(
-        event, handler, headers=headers, headers_match_all=True, routing_key=routing_key
-    )
+    _bus.subscribe(event, handler, headers, routing_key)
     info('Subscribed to \'%s\' (headers: %s)', event, headers)
     return make_response(
         200,
@@ -123,7 +92,7 @@ def unsubscribe(event):
 
     handler = _broker.unbind_handler(event, headers, routing_key)
     if handler:
-        _bus.consumer.unregister_event_handler(event, handler)
+        _bus.unsubscribe(event, handler)
         info('Unsubscribed from \'%s\' (headers: %s)', event, headers)
         return make_response(200, 'Unregistered event handler', event=event)
     return make_response(400, 'Handler not found', event=event)
@@ -145,26 +114,18 @@ def modify_middleware(name):
     if not middleware:
         return make_response(404, 'Middleware \'{}\' could not be found'.format(name))
 
-    if not request.is_json:
-        return make_response(
-            400, 'Must provide a bus type (type=[consumer/publisher/publisher_thread])'
-        )
-    args = request.json.get('args', {})
-    kwargs = request.json.get('kwargs', {})
-
-    try:
-        bus = getattr(_bus, request.json.get('type', 'invalid'))
-    except AttributeError:
-        return make_response(400, 'Bus type is invalid')
+    json_ = request.json or {}
+    args = json_.get('args', {})
+    kwargs = json_.get('kwargs', {})
 
     if request.method == 'PUT':
         try:
-            bus.register_middleware(middleware(*args, **kwargs))
-        except (TypeError, ValueError) as exc:
+            _bus.register_middleware(middleware(*args, **kwargs))
+        except Exception as exc:
             return make_response(400, error=str(exc))
         return make_response(200, 'Registered middleware succesfully', middleware=name)
     elif request.method == 'DELETE':
-        if not bus.unregister_middleware(middleware):
+        if not _bus.unregister_middleware(middleware):
             return make_response(
                 404, 'Requested middleware not found on bus', middleware=name
             )
