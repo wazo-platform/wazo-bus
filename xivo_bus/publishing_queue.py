@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
-import six
 
 from six.moves import queue
 
@@ -25,26 +24,24 @@ class PublishingQueue(object):
 
         while not self._should_stop or self._flushing:
             try:
-                message, headers, kwargs = self._queue.get(timeout=0.1)
+                payload, headers, routing_key, kwargs = self._queue.get(timeout=0.1)
             except queue.Empty:
                 self._flushing = False
                 continue
 
             if not self._publish:
-                self._publish = self._publisher_factory()
-                if not six.callable(self._publish):
-                    self._publish = self._publish.publish
+                self._publish = self._publisher_factory
             try:
-                self._publish(message, headers=headers, **kwargs)
+                self._publish(payload, headers=headers, routing_key=routing_key, **kwargs)
             except Exception as e:
                 logger.exception('Error while publishing: %s', e)
 
         self._running = False
         self._should_stop = False
 
-    def publish(self, event, headers=None, **kwargs):
+    def publish(self, payload, headers=None, routing_key=None, **kwargs):
         headers = headers or {}
-        self._queue.put((event, headers, kwargs))
+        self._queue.put((payload, headers, routing_key, kwargs))
 
     def stop(self):
         if self._running:

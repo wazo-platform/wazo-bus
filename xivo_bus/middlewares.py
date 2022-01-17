@@ -7,11 +7,26 @@ from datetime import datetime
 from six import add_metaclass, raise_from
 
 
+class MiddlewareError(Exception):
+    def __init__(self, middleware):
+        self.message = 'Error during middleware \'{}\' execution'.format(
+            middleware
+        )
+
+
 @add_metaclass(ABCMeta)
 class Middleware(object):
     '''
     Abstract class used to define a bus serializer/deserializer
+
+    Must implement functions:
+        marshal(self, event, headers, payload) -> headers, payload
+            Hook to perform action on data being sent on the wire
+
+        unmarshal(self, event, headers, payload) -> headers, payload
+            Hook to perform action on data being received
     '''
+
     @abstractmethod
     def marshal(self, event, headers, payload):
         '''
@@ -26,7 +41,7 @@ class Middleware(object):
             headers (dict): Modified headers
             payload (dict): Modified payload
         '''
-        pass
+        return headers, payload
 
     @abstractmethod
     def unmarshal(self, event, headers, payload):
@@ -42,21 +57,22 @@ class Middleware(object):
             headers (dict): Modified headers
             payload (dict): Modified payload
         '''
-        pass
+        return headers, payload
 
 
-class EventProcessor(Middleware):
-    def __init__(self, service_uuid=None):
+class EventMarshaller(Middleware):
+    def __init__(self, service_uuid=None, copy_headers_in_payload=True):
         self.service_uuid = service_uuid
+        self.copy_headers = copy_headers_in_payload
 
     def marshal(self, event, headers, payload):
-        print('marshaling')
         headers = self._inject_metadata(event, headers)
-        payload = dict(data=self._serialize_event(event, payload), **headers)
+        payload = dict(data=self._serialize_event(event, payload))
+        if self.copy_headers:
+            payload.update(**headers)
         return headers, payload
 
     def unmarshal(self, event, headers, payload):
-        print('unmarshaling')
         data = payload.pop('data')
         headers = headers or payload
         return headers, data
@@ -66,9 +82,9 @@ class EventProcessor(Middleware):
         try:
             return dict(event.marshal(), **payload)
         except AttributeError as exc:
-            raise_from(ValueError(
-                'Event \'{}\' has an invalid format'.format(event)
-            ), exc)
+            raise_from(
+                ValueError('Event \'{}\' has an invalid format'.format(event)), exc
+            )
 
     def _inject_metadata(self, event, headers):
         headers = headers or {}
@@ -83,55 +99,23 @@ class EventProcessor(Middleware):
         return headers
 
 
-class EventPublisherMiddleware(object):
-    def __init__(self, service_uuid):
-        self.uuid = service_uuid
+class EventLogger(Middleware):
+    logger = logging.getLogger(__name__)
 
-    def __call__(self, event, headers, payload):
-        headers = self._inject_headers_metadata(event, headers)
-        event_data = self._prepare_event(event, payload)
-        payload = dict(data=event_data, **headers)
+    def marshal(self, event, headers, payload):
+        self.logger.info(
+            'Transmitting:\n\tEvent: %s\n\tHeaders: %s\n\tPayload: %s',
+            event,
+            headers,
+            payload,
+        )
         return headers, payload
 
-    def _prepare_event(self, event, payload):
-        payload = payload or {}
-        try:
-            return dict(event.marshal(), **payload)
-        except AttributeError as e:
-            raise ValueError(
-                'Event \'{event}\' has invalid format -> {msg}'.format(
-                    event=event, msg=e
-                )
-            )
-
-    def _inject_headers_metadata(self, event, headers):
-        headers.update(
-            name=event.name, origin_uuid=self.uuid, timestamp=datetime.now().isoformat()
-        )
-
-        if hasattr(event, 'required_acl'):
-            headers['required_acl'] = event.required_acl
-
-        return headers
-
-
-class EventConsumerMiddleware(object):
-    def __call__(self, event, headers, payload):
-        data = payload.pop('data', None)
-        headers = headers or payload
-        return headers, data
-
-
-class EchoMiddleware(object):
-    _logger = logging.getLogger('EchoMiddleware')
-
-    def __init__(self, title=''):
-        self.title = title
-
-    def __call__(self, event, headers, payload):
-        self._logger.info(
-            '{title}\nEvent: {event}\nHeaders: {headers}\nPayload: {payload}'.format(
-                title=self.title, event=event, headers=headers, payload=payload
-            )
+    def unmarshal(self, event, headers, payload):
+        self.logger.info(
+            'Receiving:\n\tEvent: %s\n\tHeaders: %s\n\tPayload: %s',
+            event,
+            headers,
+            payload,
         )
         return headers, payload
