@@ -5,18 +5,8 @@ from importlib import import_module
 from threading import Lock
 from collections import defaultdict, namedtuple
 
-from xivo_bus import BusConsumer, BusPublisherFailFast, BusPublisherLongLived
+# from xivo_bus import BusConsumer, BusPublisherFailFast, BusPublisherLongLived
 from xivo_bus.middlewares import Middleware
-
-
-class BusManager(object):
-    def __init__(self, config):
-        self.consumer = BusConsumer(**config)
-        self.publisher = BusPublisherFailFast(**config)
-        self.publisher_thread = BusPublisherLongLived(**config)
-
-    def get(self, name):
-        return getattr(self, name)
 
 
 class MessageBroker(object):
