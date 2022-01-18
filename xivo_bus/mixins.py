@@ -11,7 +11,6 @@ from contextlib import contextmanager
 from collections import namedtuple, defaultdict
 from kombu import Queue, Exchange, Connection, Producer, binding as Binding
 from kombu.mixins import ConsumerMixin as KombuConsumer
-from kombu.exceptions import NotBoundError
 
 from .publishing_queue import PublishingQueue
 from .middlewares import Middleware, MiddlewareError
@@ -97,7 +96,7 @@ class ThreadableMixin(object):
     def _register_thread(self, name, run, cleanup=None, **kwargs):
         if not callable(run):
             raise ValueError('Run must be a function')
-        name = 'Thread-{}:{}'.format(self._name, name)
+        name = '{}:{}'.format(self._name, name)
         func = self.__wrap(run)
         barrier = Semaphore(0)
         thread = tuple(
@@ -185,7 +184,7 @@ class ConsumerMixin(KombuConsumer):
 
     def __init__(self, subscribe=None, **kwargs):
         super(ConsumerMixin, self).__init__(**kwargs)
-        name = '{name}-{id}'.format(name=self._name, id=os.urandom(3).hex())
+        name = '{name}.{id}'.format(name=self._name, id=os.urandom(3).hex())
         if subscribe:
             exchange = Exchange(subscribe['exchange_name'], subscribe['exchange_type'])
 
@@ -199,7 +198,7 @@ class ConsumerMixin(KombuConsumer):
         self.__ctrl_channel = None
 
         if isinstance(self, ThreadableMixin):
-            self._register_thread('consume', self.__run)
+            self._register_thread('consumer', self.__run)
 
     def __configure_headers(self, event, headers, headers_match_all=True):
         headers = headers.copy() if headers else {}
@@ -239,18 +238,20 @@ class ConsumerMixin(KombuConsumer):
     def __create_binding(self, headers, routing_key):
         B = Binding(self.__exchange, routing_key=routing_key, arguments=headers)
         self.__queue.bindings.add(B)
-        try:
-            B.bind(self.__queue, nowait=True, channel=self.__ctrl_channel)
-        except (AttributeError, NotBoundError):
-            pass
+        if self.__ctrl_channel:
+            try:
+                B.bind(self.__queue, nowait=True, channel=self.__ctrl_channel)
+            except self.connection.connection_errors:
+                self.log.exception('Error while installing binding')
         return B
 
     def __remove_binding(self, binding):
         self.__queue.bindings.remove(binding)
-        try:
-            binding.unbind(self.__queue, nowait=True, channel=self.__ctrl_channel)
-        except (AttributeError, NotBoundError):
-            pass
+        if self.__ctrl_channel:
+            try:
+                binding.unbind(self.__queue, nowait=True, channel=self.__ctrl_channel)
+            except self.connection.connection_errors:
+                self.log.exception('Error while removing binding')
 
     def __dispatch(self, event, payload, headers=None):
         with self.__lock:
@@ -335,6 +336,7 @@ class ConsumerMixin(KombuConsumer):
             message.ack()
 
     def on_connection_error(self, exc, interval):
+        self.__ctrl_channel = None
         super().on_connection_error(exc, interval)
         if self.should_stop:
             self.connection.close()
@@ -376,11 +378,7 @@ class PublisherMixin(object):
             return event
         return None
 
-    def on_publish_error(self, exc, interval):
-        self.log.error('Error: %s', exc, exc_info=1)
-        self.log.info('Retry in %s seconds...', interval)
-
-    def publish(self, event, headers=None, routing_key=None, payload=None):
+    def _prepare_publish(self, event, headers=None, routing_key=None, payload=None):
         headers = headers or {}
         headers.setdefault('x-event', self.__get_event_name(event))
         routing_key = routing_key or getattr(event, 'routing_key', None)
@@ -388,13 +386,23 @@ class PublisherMixin(object):
             headers, payload = self.marshal(event, headers, payload)
         except MiddlewareError:
             raise
-        self.Producer(payload, headers=headers, routing_key=routing_key, retry=True)
+        return headers, payload, routing_key
+
+    def on_publish_error(self, exc, interval):
+        self.log.error('Error: %s', exc, exc_info=1)
+        self.log.info('Retry in %s seconds...', interval)
+
+    def publish(self, event, headers=None, routing_key=None, payload=None):
+        headers, payload, key = self._prepare_publish(
+            event, headers, routing_key, payload
+        )
+        self.Producer(payload, headers=headers, routing_key=key, retry=True)
 
 
 class QueuePublisherMixin(PublisherMixin):
     def __init__(self, **kwargs):
         super(QueuePublisherMixin, self).__init__(**kwargs)
-        self.__queue = PublishingQueue(self.Producer)
+        self.__queue = PublishingQueue(self.__factory)
         self._register_thread('publisher_longlived', self.__run, cleanup=self.__stop)
 
     def __run(self, **kwargs):
@@ -403,12 +411,11 @@ class QueuePublisherMixin(PublisherMixin):
     def __stop(self):
         self.__queue.flush_and_stop()
 
+    def __factory(self):
+        return self.Producer
+
     def publish_soon(self, event, headers=None, routing_key=None, payload=None):
-        headers = headers or {}
-        headers.setdefault('x-event', event)
-        routing_key = routing_key or getattr(event, 'routing_key', None)
-        try:
-            headers, payload = self.marshal(event, headers, payload)
-        except MiddlewareError:
-            raise
-        self.__queue.publish(payload, headers, routing_key)
+        headers, payload, key = self._prepare_publish(
+            event, headers, routing_key, payload
+        )
+        self.__queue.publish(payload, headers, key)

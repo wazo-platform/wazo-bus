@@ -30,10 +30,11 @@ class Base(MiddlewareMixin):
         exchange_name='',
         exchange_type='',
         middlewares=None,
+        name=None,
         **kwargs
     ):
-        self._name = type(self).__name__
-        self._logger = logging.getLogger(self._name)
+        self._name = name or type(self).__name__
+        self._logger = logging.getLogger(type(self).__name__)
         self._connection_params = ConnectionParams(username, password, host, port)
         self._exchange = Exchange(name=exchange_name, type=exchange_type)
         super(Base, self).__init__(middlewares=middlewares)

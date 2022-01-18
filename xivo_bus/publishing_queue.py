@@ -10,7 +10,6 @@ logger = logging.getLogger(__name__)
 
 
 class PublishingQueue(object):
-
     def __init__(self, publisher_factory):
         self._publish = None
         self._publisher_factory = publisher_factory
@@ -30,9 +29,13 @@ class PublishingQueue(object):
                 continue
 
             if not self._publish:
-                self._publish = self._publisher_factory
+                self._publish = self._publisher_factory()
+                if hasattr(self._publish, 'publish'):
+                    self._publish = self._publish.publish
             try:
-                self._publish(payload, headers=headers, routing_key=routing_key, **kwargs)
+                self._publish(
+                    payload, headers=headers, routing_key=routing_key, **kwargs
+                )
             except Exception as e:
                 logger.exception('Error while publishing: %s', e)
 
