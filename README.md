@@ -14,6 +14,13 @@ pip install tox
 tox --recreate -e py27,py3
 ```
 
+Running integration tests
+-------------------------
+
+```sh
+tox -e integration
+```
+
 
 Building xivo-bus
 -----------------
