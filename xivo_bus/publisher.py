@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2012-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2012-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -14,6 +14,7 @@ class BusPublisherFailFast(InitMixin, PublisherMixin, Base):
     publisher_args = {'max_retries': 2}
 
 
+# Deprecated, thread should be avoided to respect WPEP-0004
 class BusPublisherLongLived(InitMixin, ThreadableMixin, QueuePublisherMixin, Base):
     publisher_args = {'interval_start': 2, 'interval_step': 2, 'interval_max': 32}
 
