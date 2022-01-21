@@ -1,12 +1,27 @@
 # -*- coding: utf-8 -*-
-# Copyright 2013-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_bus.marshaler import CollectdMarshaler, Marshaler  # noqa
-from xivo_bus.publisher import Publisher, FailFastPublisher, LongLivedPublisher  # noqa
-from xivo_bus.publishing_queue import PublishingQueue  # noqa
+from xivo_bus.marshaler import CollectdMarshaler, Marshaler
+from xivo_bus.publisher import Publisher, FailFastPublisher, LongLivedPublisher
+from xivo_bus.publishing_queue import PublishingQueue
 
-from xivo_bus.base import BusConnector  # noqa
-from xivo_bus.consumer import BusConsumer  # noqa: F401
-from xivo_bus.publisher import BusPublisherFailFast, BusPublisherLongLived  # noqa: F401
-from xivo_bus.middlewares import EventMarshaller, EventLogger  # noqa: F401
+from xivo_bus.base import BusConnector
+from xivo_bus.consumer import BusConsumer
+from xivo_bus.publisher import BusPublisherFailFast, BusPublisherLongLived
+from xivo_bus.middlewares import EventMarshaller, EventLogger
+
+__all__ = [
+    'CollectdMarshaler',
+    'Marshaler',
+    'Publisher',
+    'FailFastPublisher',
+    'LongLivedPublisher',
+    'PublishingQueue',
+    'BusConnector',
+    'BusConsumer',
+    'BusPublisherFailFast',
+    'BusPublisherLongLived',
+    'EventMarshaller',
+    'EventLogger',
+]
