@@ -3,19 +3,24 @@
 
 import os
 from flask import request, jsonify
-from xivo_bus.base import BusConnector
+from xivo_bus.base import Base
+from xivo_bus.mixins import ThreadableMixin, QueuePublisherMixin, ConsumerMixin
 
 from . import app, info, error
-from .bus import MessageBroker, MiddlewareManager
+from .bus import MessageBroker
 
 
-_bus = BusConnector(
+class Bus(ThreadableMixin, ConsumerMixin, QueuePublisherMixin, Base):
+    pass
+
+
+_bus = Bus(
+    name='remote-bus',
     host='rabbitmq',
     exchange_name=os.getenv('EXCHANGE_NAME'),
     exchange_type=os.getenv('EXCHANGE_TYPE'),
 )
 _broker = MessageBroker()
-_middlewares = MiddlewareManager()
 
 
 def create_event_handler(event, headers=None, routing_key=None):
@@ -101,34 +106,3 @@ def unsubscribe(event):
 @app.route('/bus/<string:event>/messages', methods=['GET'])
 def get_messages(event):
     return jsonify(_broker.dequeue(event))
-
-
-@app.route('/bus/middlewares', methods=['GET'])
-def middleware():
-    return make_response(200, middlewares=_middlewares.all)
-
-
-@app.route('/bus/middlewares/<string:name>', methods=['PUT', 'DELETE'])
-def modify_middleware(name):
-    middleware = _middlewares.get(name)
-    if not middleware:
-        return make_response(404, 'Middleware \'{}\' could not be found'.format(name))
-
-    json_ = request.json or {}
-    args = json_.get('args', {})
-    kwargs = json_.get('kwargs', {})
-
-    if request.method == 'PUT':
-        try:
-            _bus.register_middleware(middleware(*args, **kwargs))
-        except Exception as exc:
-            return make_response(400, error=str(exc))
-        return make_response(200, 'Registered middleware succesfully', middleware=name)
-    elif request.method == 'DELETE':
-        if not _bus.unregister_middleware(middleware):
-            return make_response(
-                404, 'Requested middleware not found on bus', middleware=name
-            )
-        return make_response(
-            200, 'Unregistered middleware succesfully', middleware=name
-        )

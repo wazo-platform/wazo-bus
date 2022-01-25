@@ -1,2 +1,2 @@
-from .base import BusIntegrationTest  # noqa
-from .busclient import BusApiClient  # noqa
+from .base import BusIntegrationTest
+from .remote_bus import RemoteBusApiClient

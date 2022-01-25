@@ -4,7 +4,7 @@
 import requests
 
 
-class BusApiClient(object):
+class RemoteBusApiClient(object):
     def __init__(self, host='localhost', port=6444):
         self._base_url = 'http://{host}:{port}'.format(host=host, port=port)
 
@@ -33,23 +33,12 @@ class BusApiClient(object):
         resp = requests.post(url, json=payload)
         return resp.status_code == 200
 
-    def publish(self, event, message, headers=None, routing_key=None):
+    def publish(self, event, payload=None, headers=None, routing_key=None):
         url = self._make_url('bus', event, 'publish')
-        payload = {'headers': headers, 'routing_key': routing_key, 'payload': message}
+        payload = {'headers': headers, 'routing_key': routing_key, 'payload': payload}
         resp = requests.post(url, json=payload)
         return resp.status_code == 200
 
     def get_messages(self, event):
         url = self._make_url('bus', event, 'messages')
         return requests.get(url).json()
-
-    def register_middleware(self, middleware, *args, **kwargs):
-        url = self._make_url('bus', 'middlewares', middleware)
-        payload = {'args': args, 'kwargs': kwargs}
-        resp = requests.put(url, json=payload)
-        return resp.status_code == 200
-
-    def unregister_middleware(self, middleware):
-        url = self._make_url('bus', 'middlewares', middleware)
-        resp = requests.delete(url)
-        return resp.status_code == 200
