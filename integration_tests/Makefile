@@ -7,6 +7,6 @@ egg-info:
 	cd .. && python setup.py egg_info
 
 bus: egg-info
-	docker build --no-cache -t xivo-bus -f Dockerfile-bus --force-rm ..
+	docker build -t xivo-bus -f Dockerfile-bus --force-rm ..
 
 .PHONY: test-setup test egg-info bus
