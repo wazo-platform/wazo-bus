@@ -5,18 +5,35 @@
 import logging
 
 from .base import Base
-from .mixins import PublisherMixin, QueuePublisherMixin, InitMixin, ThreadableMixin
+from .mixins import QueuePublisherMixin, ThreadableMixin, WazoEventMixin
 
 logger = logging.getLogger(__name__)
 
 
-class BusPublisherFailFast(InitMixin, PublisherMixin, Base):
-    publisher_args = {'max_retries': 2}
-
-
-# Deprecated, thread should be avoided to respect WPEP-0004
-class BusPublisherLongLived(InitMixin, ThreadableMixin, QueuePublisherMixin, Base):
-    publisher_args = {'interval_start': 2, 'interval_step': 2, 'interval_max': 32}
+class BusPublisher(WazoEventMixin, QueuePublisherMixin, ThreadableMixin, Base):
+    def __init__(
+        self,
+        name=None,
+        service_uuid=None,
+        username='guest',
+        password='guest',
+        host='localhost',
+        port=5672,
+        exchange_name='',
+        exchange_type='',
+        **kwargs
+    ):
+        super(BusPublisher, self).__init__(
+            name=name,
+            service_uuid=service_uuid,
+            username=username,
+            password=password,
+            host=host,
+            port=port,
+            exchange_name=exchange_name,
+            exchange_type=exchange_type,
+            **kwargs
+        )
 
 
 # Deprecated, use BusPublisher instead
@@ -51,13 +68,13 @@ class Publisher(object):
         )
 
 
-# Deprecated, use BusPublisherFailFast instead
+# Deprecated, use BusPublisher instead
 class FailFastPublisher(Publisher):
     def __init__(self, producer, marshaler):
         super(FailFastPublisher, self).__init__(producer, marshaler, max_retries=2)
 
 
-# Deprecated, use BusPublisherLongLived instead
+# Deprecated, use BusPublisher instead
 class LongLivedPublisher(Publisher):
     def __init__(self, producer, marshaler):
         super(LongLivedPublisher, self).__init__(

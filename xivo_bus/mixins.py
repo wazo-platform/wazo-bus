@@ -1,74 +1,66 @@
-# Copyright 2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import os
-import sys
 
-from threading import Thread, Lock, Semaphore
-from inspect import isclass
-from six import raise_from, iteritems
-from contextlib import contextmanager
+from threading import Thread, Lock, Event
+from datetime import datetime
+from six import iteritems
+from six.moves.queue import Queue as FifoQueue, Empty
 from collections import namedtuple, defaultdict
 from kombu import Queue, Exchange, Connection, Producer, binding as Binding
 from kombu.mixins import ConsumerMixin as KombuConsumer
 
-from .publishing_queue import PublishingQueue
-from .middlewares import Middleware, MiddlewareError
 
-
-class InitMixin(object):
-    def __init__(
-        self,
-        username='guest',
-        password='guest',
-        host='localhost',
-        port=5672,
-        exchange_name=None,
-        exchange_type=None,
-        middlewares=None,
-        **kwargs
-    ):
-        super(InitMixin, self).__init__(
-            username=username,
-            password=password,
-            host=host,
-            port=port,
-            exchange_name=exchange_name,
-            exchange_type=exchange_type,
-            middlewares=middlewares,
-            **kwargs
-        )
+Subscription = namedtuple('Subscription', 'handler, binding')
+BusThread = namedtuple('BusThread', 'thread, on_stop, status, ready')
 
 
 class ThreadableMixin(object):
     def __init__(self, **kwargs):
         super(ThreadableMixin, self).__init__(**kwargs)
-        self.should_stop = False
+        self._stop_flag = Event()
+
+    @property
+    def is_stopping(self):
+        return self._stop_flag.is_set()
 
     @property
     def is_running(self):
         try:
-            return any({thread.is_alive() for thread, _, _ in self.__threads})
+            return any({bt.thread.is_alive() for bt in self.__threads})
         except AttributeError:
             return False
 
     @property
     def __threads(self):
         try:
-            return self.__t
+            return self.__internal_threads_list
         except AttributeError:
-            self.__t = list()
-            return self.__t
+            self.__internal_threads_list = list()
+            return self.__internal_threads_list
 
-    @property
-    @contextmanager
-    def threads(self):
-        if not self.is_running:
-            self.start()
-        try:
-            yield
-        finally:
-            self.stop()
+    def __enter__(self):
+        self.start()
+        return super(ThreadableMixin, self).__enter__()
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.stop()
+        super(ThreadableMixin, self).__exit__()
+
+    def _register_thread(self, name, run, on_stop=None, **kwargs):
+        if not callable(run):
+            raise ValueError('Run must be a function')
+        name = '{}:{}'.format(self._name, name)
+        func = self.__wrap(run)
+        barrier = Event()
+        bus_thread = BusThread(
+            Thread(target=func, name=name, args=(self, name, barrier), kwargs=kwargs),
+            on_stop,
+            None,
+            barrier,
+        )
+        self.__threads.append(bus_thread)
 
     def start(self):
         if self.is_running:
@@ -76,107 +68,36 @@ class ThreadableMixin(object):
                 '{} threads are already running'.format(len(self.__threads))
             )
 
-        for thread, _, _ in self.__threads:
-            thread.start()
+        for bus_thread in self.__threads:
+            bus_thread.thread.start()
 
-        for _, _, barrier in self.__threads:
-            barrier.acquire(blocking=True)
-        self.log.debug('All thread started succesfully...')
+        for bus_thread in self.__threads:
+            bus_thread.ready.wait(timeout=3.0)
+        self.log.debug('All threads started successfully...')
 
     def stop(self):
-        self.should_stop = True
-        for thread, cleanup, _ in self.__threads:
-            if thread.is_alive():
-                self.log.info('Stopping AMQP thread \'%s\'', thread.name)
-                if callable(cleanup):
-                    cleanup()
-                thread.join()
-        self.should_stop = False
-
-    def _register_thread(self, name, run, cleanup=None, **kwargs):
-        if not callable(run):
-            raise ValueError('Run must be a function')
-        name = '{}:{}'.format(self._name, name)
-        func = self.__wrap(run)
-        barrier = Semaphore(0)
-        thread = tuple(
-            [
-                Thread(
-                    target=func, name=name, args=(self, name, barrier), kwargs=kwargs
-                ),
-                cleanup,
-                barrier,
-            ]
-        )
-        self.__threads.append(thread)
+        self._stop_flag.set()
+        for bus_thread in self.__threads:
+            if bus_thread.thread.is_alive():
+                self.log.debug('Stopping AMQP thread \'%s\'', bus_thread.thread.name)
+                if callable(bus_thread.on_stop):
+                    bus_thread.on_stop()
+                bus_thread.thread.join()
 
     @staticmethod
     def __wrap(func):
         def wrapper(self, name, barrier, *args, **kwargs):
-            self.log.info('Started AMQP thread \'%s\'', name)
-            barrier.release()
-            while not self.should_stop:
+            self.log.debug('Started AMQP thread \'%s\'', name)
+            while not self.is_stopping:
                 try:
-                    func(**kwargs)
+                    func(barrier, **kwargs)
                 except Exception:
-                    restart = ', restarting...' if not self.should_stop else ''
+                    restart = ', restarting...' if not self.is_stopping else ''
                     self.log.exception(
-                        'Exception occured in thread \'%s\'%s', name, restart
+                        'Exception occurred in thread \'%s\'%s', name, restart
                     )
 
         return wrapper
-
-
-class MiddlewareMixin(object):
-    def __init__(self, middlewares=None, **kwargs):
-        middlewares = middlewares or []
-        super(MiddlewareMixin, self).__init__(**kwargs)
-
-        self.__middlewares = []
-        if middlewares:
-            self.register_middleware(*middlewares)
-
-    def __process(self, context, event, headers, payload):
-        for middleware in self.__middlewares:
-            op = getattr(middleware, context, middleware)
-            try:
-                headers, payload = op(event, headers, payload)
-            except Exception as exc:
-                raise_from(MiddlewareError(middleware), exc)
-        return headers, payload
-
-    def marshal(self, event, headers, payload):
-        return self.__process('marshal', event, headers, payload)
-
-    def unmarshal(self, event, headers, payload):
-        return self.__process('unmarshal', event, headers, payload)
-
-    def register_middleware(self, *middlewares):
-        for middleware in middlewares:
-            if isclass(middleware):
-                middleware = middleware()
-            if not callable(middleware) and not isinstance(middleware, Middleware):
-                raise TypeError(
-                    'Middleware registration failed: \'{}\' doesn\'t inherit from Middleware nor is a callable'.format(
-                        middleware
-                    )
-                )
-            self.__middlewares.append(middleware)
-            self.log.info('Registered middleware \'%s\'', middleware)
-
-    def unregister_middleware(self, middleware):
-        for element in self.__middlewares:
-            if element == middleware or (
-                isclass(middleware) and isinstance(element, middleware)
-            ):
-                self.__middlewares.remove(element)
-                self.log.info('Unregistered middleware \'%s\'', element)
-                return True
-        self.log.error('Middleware unregistration failed: \'%s\' not found', middleware)
-        return False
-
-
-Subscription = namedtuple('Subscription', 'handler binding')
 
 
 class ConsumerMixin(KombuConsumer):
@@ -189,24 +110,18 @@ class ConsumerMixin(KombuConsumer):
             exchange = Exchange(subscribe['exchange_name'], subscribe['exchange_type'])
 
         self.connection = Connection(self.url)
-        self.__exchange = exchange if subscribe else self._exchange
+        self.__channel = None
+        self.__exchange = exchange if subscribe else self._default_exchange
         self.__subscriptions = defaultdict(list)
         self.__queue = Queue(
             name=name, exchange=self.__exchange, exclusive=True, durable=False
         )
         self.__lock = Lock()
-        self.__ctrl_channel = None
 
-        if isinstance(self, ThreadableMixin):
-            self._register_thread('consumer', self.__run)
-
-    def __configure_headers(self, event, headers, headers_match_all=True):
-        headers = headers.copy() if headers else {}
-        headers.setdefault('x-event', event)
-
-        if self.__exchange.type == 'headers':
-            headers.setdefault('x-match', 'all' if headers_match_all else 'any')
-        return headers
+        try:
+            self._register_thread('consumer', self.__run, on_stop=self.__stop)
+        except AttributeError:
+            pass
 
     def __binding_matches(self, binding, headers):
         def discard_unused(src):
@@ -238,20 +153,21 @@ class ConsumerMixin(KombuConsumer):
     def __create_binding(self, headers, routing_key):
         B = Binding(self.__exchange, routing_key=routing_key, arguments=headers)
         self.__queue.bindings.add(B)
-        if self.__ctrl_channel:
+        if self.__channel:
             try:
-                B.bind(self.__queue, nowait=True, channel=self.__ctrl_channel)
-            except self.connection.connection_errors:
-                self.log.exception('Error while installing binding')
+                B.declare(self.__channel, nowait=True)
+                B.bind(self.__queue, nowait=True, channel=self.__channel)
+            except self.connection.connection_errors as e:
+                self.log.error('Error while creating binding: %s', e)
         return B
 
     def __remove_binding(self, binding):
         self.__queue.bindings.remove(binding)
-        if self.__ctrl_channel:
+        if self.__channel:
             try:
-                binding.unbind(self.__queue, nowait=True, channel=self.__ctrl_channel)
-            except self.connection.connection_errors:
-                self.log.exception('Error while removing binding')
+                binding.unbind(self.__queue, nowait=True, channel=self.__channel)
+            except self.connection.connection_errors as e:
+                self.log.exception('Error while removing binding: %s', e)
 
     def __dispatch(self, event, payload, headers=None):
         with self.__lock:
@@ -274,6 +190,14 @@ class ConsumerMixin(KombuConsumer):
             event = payload.get('name', None)
         return event
 
+    def __configure_headers(self, event, headers, headers_match_all=True):
+        headers = dict(headers or {})
+        headers.setdefault('name', event)
+
+        if self.__exchange.type == 'headers':
+            headers.setdefault('x-match', 'all' if headers_match_all else 'any')
+        return headers
+
     def subscribe(
         self, event, handler, headers=None, routing_key=None, headers_match_all=True
     ):
@@ -282,7 +206,7 @@ class ConsumerMixin(KombuConsumer):
         subscription = Subscription(handler, binding)
         with self.__lock:
             self.__subscriptions[event].append(subscription)
-        self.log.info(
+        self.log.debug(
             'Registered handler \'%s\' to event \'%s\'', handler.__name__, event
         )
 
@@ -291,12 +215,12 @@ class ConsumerMixin(KombuConsumer):
             subscriptions = self.__subscriptions[event].copy()
         try:
             for subscription in subscriptions:
-                x_event = subscription.binding.arguments.get('x-event')
+                x_event = subscription.binding.arguments.get('name')
                 if subscription.handler == handler and x_event == event:
                     with self.__lock:
                         self.__subscriptions[event].remove(subscription)
                     self.__remove_binding(subscription.binding)
-                    self.log.info(
+                    self.log.debug(
                         'Unregistered handler \'%s\' from \'%s\'',
                         handler.__name__,
                         event,
@@ -308,17 +232,14 @@ class ConsumerMixin(KombuConsumer):
                 with self.__lock:
                     self.__subscriptions.pop(event)
 
-    def create_connection(self):
-        connection = self.connection.clone()
-        self.__ctrl_channel = connection.channel()
-        return connection
-
     def get_consumers(self, Consumer, channel):
+        self.__exchange.bind(channel).declare()
+        self.__queue.bind(channel).declare()
         return [
             Consumer(
                 queues=[self.__queue],
                 callbacks=[self.on_message_received],
-                auto_declare=True,
+                auto_declare=False,
             )
         ]
 
@@ -328,22 +249,29 @@ class ConsumerMixin(KombuConsumer):
         event = self.__extract_event(headers, payload)
         try:
             headers, payload = self.unmarshal(event, headers, payload)
-        except MiddlewareError:
+        except Exception:
             raise
         else:
             self.__dispatch(event, payload, headers)
         finally:
             message.ack()
 
-    def on_connection_error(self, exc, interval):
-        self.__ctrl_channel = None
-        super().on_connection_error(exc, interval)
-        if self.should_stop:
-            self.connection.close()
-            sys.exit()
+    def on_consume_ready(self, connection, channel, consumers, **kwargs):
+        self.__channel = connection.channel()
+        try:
+            kwargs['ready_flag'].set()
+        except KeyError:
+            pass
 
-    def __run(self, **kwargs):
-        super().run(**self.consumer_args)
+    def on_connection_error(self, exc, interval):
+        self.__channel = None
+        super(ConsumerMixin, self).on_connection_error(exc, interval)
+
+    def __run(self, ready_flag, **kwargs):
+        super(ConsumerMixin, self).run(ready_flag=ready_flag, **self.consumer_args)
+
+    def __stop(self):
+        self.should_stop = True
 
 
 class PublisherMixin(object):
@@ -353,22 +281,15 @@ class PublisherMixin(object):
         super().__init__(**kwargs)
         if publish:
             exchange = Exchange(publish['exchange_name'], publish['exchange_type'])
-        self.__exchange = exchange if publish else self._exchange
+        self.__exchange = exchange if publish else self._default_exchange
         self.__connection = Connection(self.url)
+        self.__publish = self.Producer(self.__connection)
 
-    def __del__(self):
-        self.__connection.close()
-        super().__del__()
-
-    @property
-    def Producer(self):
-        channel = self.__connection.default_channel
+    def Producer(self, connection, **connection_args):
+        channel = connection.default_channel
         producer = Producer(channel, exchange=self.__exchange, auto_declare=True)
-        return self.__connection.ensure(
-            producer,
-            producer.publish,
-            errback=self.on_publish_error,
-            **self.publisher_args
+        return connection.ensure(
+            producer, producer.publish, errback=self.on_publish_error, **connection_args
         )
 
     def __get_event_name(self, event):
@@ -379,13 +300,11 @@ class PublisherMixin(object):
         return None
 
     def _prepare_publish(self, event, headers=None, routing_key=None, payload=None):
-        headers = headers or {}
-        headers.setdefault('x-event', self.__get_event_name(event))
+        headers = dict(headers or {})
+        headers.setdefault('name', self.__get_event_name(event))
         routing_key = routing_key or getattr(event, 'routing_key', None)
-        try:
-            headers, payload = self.marshal(event, headers, payload)
-        except MiddlewareError:
-            raise
+
+        headers, payload = self.marshal(event, headers, payload)
         return headers, payload, routing_key
 
     def on_publish_error(self, exc, interval):
@@ -393,29 +312,87 @@ class PublisherMixin(object):
         self.log.info('Retry in %s seconds...', interval)
 
     def publish(self, event, headers=None, routing_key=None, payload=None):
-        headers, payload, key = self._prepare_publish(
-            event, headers, routing_key, payload
-        )
-        self.Producer(payload, headers=headers, routing_key=key, retry=True)
+        headers = dict(headers or {})
+        headers.setdefault('name', self._get_event_name(event))
+        routing_key = routing_key or getattr(event, 'routing_key', None)
+
+        headers, payload = self.marshal(event, headers, payload)
+        self.__publish(payload, headers=headers, routing_key=routing_key)
 
 
 class QueuePublisherMixin(PublisherMixin):
     def __init__(self, **kwargs):
         super(QueuePublisherMixin, self).__init__(**kwargs)
-        self.__queue = PublishingQueue(self.__factory)
-        self._register_thread('publisher_longlived', self.__run, cleanup=self.__stop)
+        self.__flushing = False
+        self.__queue = FifoQueue()
+        try:
+            self._register_thread('publisher_queue', self.__run, on_stop=self.__stop)
+        except AttributeError:
+            pass
 
-    def __run(self, **kwargs):
-        self.__queue.run()
+    def __run(self, ready_flag, **kwargs):
+        publish = None
+        ready_flag.set()
+        with Connection(self.url) as connection:
+            while not self.is_stopping or self.__flushing:
+                if not publish:
+                    publish = self.Producer(connection)
+                try:
+                    payload, headers, routing_key = self.__queue.get(timeout=None)
+                except (Empty, TypeError):
+                    self.__flushing = False
+                    continue
+                try:
+                    publish(payload, headers=headers, routing_key=routing_key)
+                    self.__queue.task_done()
+                except Exception:
+                    self.log.exception('Error while publishing')
 
     def __stop(self):
-        self.__queue.flush_and_stop()
-
-    def __factory(self):
-        return self.Producer
+        self.__flushing = True
+        self.__queue.put(None)
 
     def publish_soon(self, event, headers=None, routing_key=None, payload=None):
-        headers, payload, key = self._prepare_publish(
-            event, headers, routing_key, payload
-        )
-        self.__queue.publish(payload, headers, key)
+        headers = dict(headers or {})
+        headers.setdefault('name', self._get_event_name(event))
+        routing_key = routing_key or getattr(event, 'routing_key', None)
+
+        headers, payload = self.marshal(event, headers, payload)
+        self.__queue.put((payload, headers, routing_key))
+
+
+class WazoEventMixin(object):
+    def __init__(self, service_uuid=None, **kwargs):
+        super(WazoEventMixin, self).__init__(**kwargs)
+        self.service_uuid = service_uuid
+
+    def __serialize_event(self, event):
+        try:
+            return event.marshal()
+        except AttributeError:
+            self.log.exception("Received invalid event '%s'", event)
+            raise ValueError('Not a valid Wazo Event')
+
+    def __generate_metadata(self, event):
+        metadata = {
+            'name': event.name,
+            'origin_uuid': self.service_uuid,
+            'timestamp': datetime.now().isoformat(),
+        }
+        if hasattr(event, 'required_acl'):
+            metadata['required_acl'] = event.required_acl
+
+        return metadata
+
+    def marshal(self, event, headers, payload):
+        headers = headers or {}
+        payload = {}
+
+        headers.update(self.__generate_metadata(event))
+        payload.update(headers, data=self.__serialize_event(event))
+        return headers, payload
+
+    def unmarshal(self, event, headers, payload):
+        event_data = payload.pop('data')
+        headers = headers or payload
+        return headers, event_data

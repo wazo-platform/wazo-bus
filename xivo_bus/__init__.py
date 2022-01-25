@@ -6,10 +6,8 @@ from xivo_bus.marshaler import CollectdMarshaler, Marshaler
 from xivo_bus.publisher import Publisher, FailFastPublisher, LongLivedPublisher
 from xivo_bus.publishing_queue import PublishingQueue
 
-from xivo_bus.base import BusConnector
 from xivo_bus.consumer import BusConsumer
-from xivo_bus.publisher import BusPublisherFailFast, BusPublisherLongLived
-from xivo_bus.middlewares import EventMarshaller, EventLogger
+from xivo_bus.publisher import BusPublisher
 
 __all__ = [
     'CollectdMarshaler',
@@ -18,10 +16,8 @@ __all__ = [
     'FailFastPublisher',
     'LongLivedPublisher',
     'PublishingQueue',
-    'BusConnector',
     'BusConsumer',
+    'BusPublisher',
     'BusPublisherFailFast',
     'BusPublisherLongLived',
-    'EventMarshaller',
-    'EventLogger',
 ]
