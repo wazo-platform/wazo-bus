@@ -46,7 +46,7 @@ class ThreadableMixin(object):
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.stop()
-        super(ThreadableMixin, self).__exit__()
+        super(ThreadableMixin, self).__exit__(exc_type, exc_value, traceback)
 
     def _register_thread(self, name, run, on_stop=None, **kwargs):
         if not callable(run):
