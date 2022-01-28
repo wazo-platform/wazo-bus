@@ -23,4 +23,4 @@ debug, info, warn, error = (
 app = Flask('bus-services')
 
 from bus_test import routes  # noqa
-routes._bus.start()
+routes.bus.start()

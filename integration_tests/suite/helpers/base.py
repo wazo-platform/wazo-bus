@@ -82,19 +82,16 @@ class BusIntegrationTest(AssetLaunchingTestCase):
     def remote_event(cls, event, headers=None, routing_key=None):
         try:
             assert_that(
-                cls.remote_bus.subscribe(
-                    event, headers=headers, routing_key=routing_key
-                ),
+                cls.remote_bus.subscribe(event, headers, routing_key=routing_key),
                 is_(True),
             )
             yield
-        except AssertionError:
+        except Exception:
             raise
         finally:
+            sleep(0.01)  # Allow consumers to finish consuming all messages
             assert_that(
-                cls.remote_bus.unsubscribe(
-                    event, headers=headers, routing_key=routing_key
-                ),
+                cls.remote_bus.unsubscribe(event, headers, routing_key=routing_key),
                 is_(True),
             )
 
@@ -102,18 +99,13 @@ class BusIntegrationTest(AssetLaunchingTestCase):
     @contextmanager
     def local_event(cls, event, headers=None, routing_key=None):
         handler = cls._local_messages.create_handler(event)
-        headers = headers or {}
-        headers.setdefault('name', event)
         try:
-            cls.local_bus.subscribe(
-                event, handler, headers=headers, routing_key=routing_key
-            )
-            sleep(0.01)  # Allow bindings to be installed on server
+            cls.local_bus.subscribe(event, handler, headers, routing_key)
             yield
         except Exception:
             raise
         finally:
-            sleep(0.01)  # Allow consumers to consume all messages
+            sleep(0.01)  # Allow consumers to finish consuming all messages
             assert_that(cls.local_bus.unsubscribe(event, handler), is_(True))
 
     @classmethod

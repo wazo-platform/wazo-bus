@@ -5,7 +5,7 @@ import requests
 
 
 class RemoteBusApiClient(object):
-    def __init__(self, host='localhost', port=6444):
+    def __init__(self, host='localhost', port=5000):
         self._base_url = 'http://{host}:{port}'.format(host=host, port=port)
 
     def _make_url(self, *part):
