@@ -10,6 +10,7 @@ from six.moves.queue import Queue as FifoQueue, Empty
 from collections import namedtuple, defaultdict
 from kombu import Queue, Exchange, Connection, Producer, binding as Binding
 from kombu.mixins import ConsumerMixin as KombuConsumer
+from amqp.exceptions import NotFound
 
 
 Subscription = namedtuple('Subscription', 'handler, binding')
@@ -109,12 +110,11 @@ class ConsumerMixin(KombuConsumer):
         if subscribe:
             exchange = Exchange(subscribe['exchange_name'], subscribe['exchange_type'])
 
-        self.connection = Connection(self.url)
-        self.__channel = None
+        self.__connection = Connection(self.url)
         self.__exchange = exchange if subscribe else self._default_exchange
         self.__subscriptions = defaultdict(list)
         self.__queue = Queue(
-            name=name, exchange=self.__exchange, exclusive=True, durable=False
+            name=name, exchange=self.__exchange, auto_delete=True, durable=False
         )
         self.__lock = Lock()
 
@@ -151,23 +151,28 @@ class ConsumerMixin(KombuConsumer):
         return match_any(binding_headers, headers)
 
     def __create_binding(self, headers, routing_key):
-        B = Binding(self.__exchange, routing_key=routing_key, arguments=headers)
+        B = Binding(self.__exchange, routing_key, headers, headers)
         self.__queue.bindings.add(B)
-        if self.__channel:
-            try:
-                B.declare(self.__channel, nowait=True)
-                B.bind(self.__queue, nowait=True, channel=self.__channel)
-            except self.connection.connection_errors as e:
-                self.log.error('Error while creating binding: %s', e)
+        try:
+            with self._channel_autoretry(self.__connection) as channel:
+                self.__queue.queue_declare(passive=True, channel=channel)
+                B.bind(self.__queue, nowait=False, channel=channel)
+        except self.__connection.connection_errors as e:
+            self.log.error('Connection error while creating binding: %s', e)
+        except NotFound:
+            pass
         return B
 
     def __remove_binding(self, binding):
         self.__queue.bindings.remove(binding)
-        if self.__channel:
-            try:
-                binding.unbind(self.__queue, nowait=True, channel=self.__channel)
-            except self.connection.connection_errors as e:
-                self.log.exception('Error while removing binding: %s', e)
+        try:
+            with self._channel_autoretry(self.__connection) as channel:
+                self.__queue.queue_declare(passive=True, channel=channel)
+                binding.unbind(self.__queue, nowait=False, channel=channel)
+        except self.__connection.connection_errors as e:
+            self.log.exception('Connection error while removing binding: %s', e)
+        except NotFound:
+            pass
 
     def __dispatch(self, event, payload, headers=None):
         with self.__lock:
@@ -190,18 +195,14 @@ class ConsumerMixin(KombuConsumer):
             event = payload.get('name', None)
         return event
 
-    def __configure_headers(self, event, headers, headers_match_all=True):
-        headers = dict(headers or {})
-        headers.setdefault('name', event)
-
-        if self.__exchange.type == 'headers':
-            headers.setdefault('x-match', 'all' if headers_match_all else 'any')
-        return headers
-
     def subscribe(
         self, event, handler, headers=None, routing_key=None, headers_match_all=True
     ):
-        headers = self.__configure_headers(event, headers, headers_match_all)
+        headers = headers or {}
+        if self.__exchange.type == 'headers':
+            headers.setdefault('x-match', 'all' if headers_match_all else 'any')
+        headers.setdefault('name', event)
+
         binding = self.__create_binding(headers, routing_key)
         subscription = Subscription(handler, binding)
         with self.__lock:
@@ -233,13 +234,11 @@ class ConsumerMixin(KombuConsumer):
                     self.__subscriptions.pop(event)
 
     def get_consumers(self, Consumer, channel):
-        self.__exchange.bind(channel).declare()
-        self.__queue.bind(channel).declare()
         return [
             Consumer(
                 queues=[self.__queue],
                 callbacks=[self.on_message_received],
-                auto_declare=False,
+                auto_declare=True,
             )
         ]
 
@@ -257,18 +256,16 @@ class ConsumerMixin(KombuConsumer):
             message.ack()
 
     def on_consume_ready(self, connection, channel, consumers, **kwargs):
-        self.__channel = connection.channel()
-        try:
+        if 'ready_flag' in kwargs:
             kwargs['ready_flag'].set()
-        except KeyError:
-            pass
 
     def on_connection_error(self, exc, interval):
-        self.__channel = None
         super(ConsumerMixin, self).on_connection_error(exc, interval)
 
     def __run(self, ready_flag, **kwargs):
-        super(ConsumerMixin, self).run(ready_flag=ready_flag, **self.consumer_args)
+        with Connection(self.url) as connection:
+            self.connection = connection
+            super(ConsumerMixin, self).run(ready_flag=ready_flag, **self.consumer_args)
 
     def __stop(self):
         self.should_stop = True
@@ -292,20 +289,13 @@ class PublisherMixin(object):
             producer, producer.publish, errback=self.on_publish_error, **connection_args
         )
 
-    def __get_event_name(self, event):
+    @staticmethod
+    def _get_event_name(event):
         if hasattr(event, 'name'):
             return event.name
-        if isinstance(event, str):
+        elif isinstance(event, str):
             return event
         return None
-
-    def _prepare_publish(self, event, headers=None, routing_key=None, payload=None):
-        headers = dict(headers or {})
-        headers.setdefault('name', self.__get_event_name(event))
-        routing_key = routing_key or getattr(event, 'routing_key', None)
-
-        headers, payload = self.marshal(event, headers, payload)
-        return headers, payload, routing_key
 
     def on_publish_error(self, exc, interval):
         self.log.error('Error: %s', exc, exc_info=1)
@@ -324,7 +314,7 @@ class QueuePublisherMixin(PublisherMixin):
     def __init__(self, **kwargs):
         super(QueuePublisherMixin, self).__init__(**kwargs)
         self.__flushing = False
-        self.__queue = FifoQueue()
+        self.__fifo = FifoQueue()
         try:
             self._register_thread('publisher_queue', self.__run, on_stop=self.__stop)
         except AttributeError:
@@ -338,19 +328,19 @@ class QueuePublisherMixin(PublisherMixin):
                 if not publish:
                     publish = self.Producer(connection)
                 try:
-                    payload, headers, routing_key = self.__queue.get(timeout=None)
+                    payload, headers, routing_key = self.__fifo.get()
                 except (Empty, TypeError):
                     self.__flushing = False
                     continue
                 try:
                     publish(payload, headers=headers, routing_key=routing_key)
-                    self.__queue.task_done()
+                    self.__fifo.task_done()
                 except Exception:
                     self.log.exception('Error while publishing')
 
     def __stop(self):
         self.__flushing = True
-        self.__queue.put(None)
+        self.__fifo.put(None)
 
     def publish_soon(self, event, headers=None, routing_key=None, payload=None):
         headers = dict(headers or {})
@@ -358,7 +348,7 @@ class QueuePublisherMixin(PublisherMixin):
         routing_key = routing_key or getattr(event, 'routing_key', None)
 
         headers, payload = self.marshal(event, headers, payload)
-        self.__queue.put((payload, headers, routing_key))
+        self.__fifo.put((payload, headers, routing_key))
 
 
 class WazoEventMixin(object):
