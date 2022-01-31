@@ -13,11 +13,13 @@ RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 COPY . /usr/src/xivo-bus
-COPY integration_tests/docker/entrypoint.sh /usr/bin/entrypoint.sh
-COPY integration_tests/docker/services/bus-test/. /usr/src/bus-test
 
 WORKDIR /usr/src
 RUN pip install -e xivo-bus
+
+COPY integration_tests/docker/entrypoint.sh /usr/bin/entrypoint.sh
+COPY integration_tests/docker/services/bus-test/. /usr/src/bus-test
+
 RUN pip install -e bus-test
 
-ENTRYPOINT ["bash", "-c", "/usr/bin/entrypoint.sh"]
+ENTRYPOINT ["/usr/bin/entrypoint.sh"]
