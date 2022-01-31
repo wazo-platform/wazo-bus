@@ -13,8 +13,8 @@ RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 COPY . /usr/src/xivo-bus
-COPY integration_tests/assets/bin/entrypoint.sh /usr/bin/entrypoint.sh
-COPY integration_tests/assets/services/bus-test/. /usr/src/bus-test
+COPY integration_tests/entrypoint.sh /usr/bin/entrypoint.sh
+COPY integration_tests/services/bus-test/. /usr/src/bus-test
 
 WORKDIR /usr/src
 RUN pip install -e xivo-bus
