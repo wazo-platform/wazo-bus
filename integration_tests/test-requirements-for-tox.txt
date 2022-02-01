@@ -2,4 +2,7 @@ https://github.com/wazo-platform/wazo-test-helpers/archive/master.zip
 pyhamcrest
 pytest
 requests
-kombu
+
+# From xivo-bus
+kombu==4.6.11
+six==1.12.0
