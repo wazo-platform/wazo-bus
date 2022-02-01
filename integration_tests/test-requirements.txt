@@ -1,5 +1,4 @@
-https://github.com/wazo-platform/wazo-test-helpers/archive/master.zip
-pyhamcrest
-pytest
-requests
-kombu
+# Backward compatibility to use without tox
+
+-r test-requirements-for-tox.txt
+-e ..
