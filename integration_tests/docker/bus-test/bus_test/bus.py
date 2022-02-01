@@ -5,7 +5,7 @@ from threading import Lock
 from collections import defaultdict, namedtuple
 
 
-class MessageBroker(object):
+class MessageBroker:
     Handler = namedtuple('Handler', 'handler, headers, routing_key')
 
     def __init__(self):

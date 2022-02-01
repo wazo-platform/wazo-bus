@@ -4,7 +4,7 @@
 from collections import defaultdict
 
 
-class MessageAccumulator(object):
+class MessageAccumulator:
     def __init__(self):
         self._buffer = defaultdict(list)
 
