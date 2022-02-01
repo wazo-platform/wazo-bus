@@ -1,4 +1,4 @@
-test-setup: egg-info bus
+test-setup: egg-info bus-test
 
 test:
 	pytest -x
