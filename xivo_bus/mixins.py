@@ -5,7 +5,6 @@ import os
 
 from threading import Thread, Lock, Event
 from datetime import datetime
-from six import iteritems
 from six.moves.queue import Queue as FifoQueue, Empty
 from collections import namedtuple, defaultdict
 from kombu import Queue, Exchange, Connection, Producer, binding as Binding
@@ -13,8 +12,8 @@ from kombu.mixins import ConsumerMixin as KombuConsumer
 from amqp.exceptions import NotFound
 
 
-Subscription = namedtuple('Subscription', 'handler, binding')
-BusThread = namedtuple('BusThread', 'thread, on_stop, status, ready')
+Subscription = namedtuple('Subscription', ['handler', 'binding'])
+BusThread = namedtuple('BusThread', ['thread', 'on_stop', 'ready_flag'])
 
 
 class ThreadableMixin(object):
@@ -29,7 +28,7 @@ class ThreadableMixin(object):
     @property
     def is_running(self):
         try:
-            return any({bt.thread.is_alive() for bt in self.__threads})
+            return all({bus_thread.thread.is_alive() for bus_thread in self.__threads})
         except AttributeError:
             return False
 
@@ -52,14 +51,16 @@ class ThreadableMixin(object):
     def _register_thread(self, name, run, on_stop=None, **kwargs):
         if not callable(run):
             raise ValueError('Run must be a function')
-        name = '{}:{}'.format(self._name, name)
-        func = self.__wrap(run)
-        barrier = Event()
+        ready_flag = Event()
         bus_thread = BusThread(
-            Thread(target=func, name=name, args=(self, name, barrier), kwargs=kwargs),
+            Thread(
+                target=self.__wrap_thread(run),
+                name='{}:{}'.format(self._name, name),
+                args=(self, name, ready_flag),
+                kwargs=kwargs,
+            ),
             on_stop,
-            None,
-            barrier,
+            ready_flag,
         )
         self.__threads.append(bus_thread)
 
@@ -73,7 +74,7 @@ class ThreadableMixin(object):
             bus_thread.thread.start()
 
         for bus_thread in self.__threads:
-            bus_thread.ready.wait(timeout=3.0)
+            bus_thread.ready_flag.wait(timeout=3.0)
         self.log.debug('All threads started successfully...')
 
     def stop(self):
@@ -86,12 +87,12 @@ class ThreadableMixin(object):
                 bus_thread.thread.join()
 
     @staticmethod
-    def __wrap(func):
-        def wrapper(self, name, barrier, *args, **kwargs):
+    def __wrap_thread(func):
+        def wrapper(self, name, ready_flag, **kwargs):
             self.log.debug('Started AMQP thread \'%s\'', name)
             while not self.is_stopping:
                 try:
-                    func(barrier, **kwargs)
+                    func(ready_flag, **kwargs)
                 except Exception:
                     restart = ', restarting...' if not self.is_stopping else ''
                     self.log.exception(
@@ -113,42 +114,13 @@ class ConsumerMixin(KombuConsumer):
         self.__connection = Connection(self.url)
         self.__exchange = exchange if subscribe else self._default_exchange
         self.__subscriptions = defaultdict(list)
-        self.__queue = Queue(
-            name=name, exchange=self.__exchange, auto_delete=True, durable=False
-        )
+        self.__queue = Queue(name=name, auto_delete=True, durable=False)
         self.__lock = Lock()
 
         try:
             self._register_thread('consumer', self.__run, on_stop=self.__stop)
         except AttributeError:
             pass
-
-    def __binding_matches(self, binding, headers):
-        def discard_unused(src):
-            return {k: v for (k, v) in iteritems(src) if not k.startswith('x-')}
-
-        def match_any(src, other):
-            for k, v in iteritems(src):
-                if k in other and other[k] == v:
-                    return True
-            return False
-
-        def match_all(src, other):
-            for k, v in iteritems(src):
-                if k not in other or other[k] != v:
-                    return False
-            return True
-
-        if not self.__exchange.type == 'headers':
-            return True
-
-        must_match_all = binding.arguments.get('x-match', '') == 'all'
-        headers = discard_unused(headers)
-        binding_headers = discard_unused(binding.arguments)
-
-        if must_match_all:
-            return match_all(binding_headers, headers)
-        return match_any(binding_headers, headers)
 
     def __create_binding(self, headers, routing_key):
         B = Binding(self.__exchange, routing_key, headers, headers)
@@ -174,93 +146,96 @@ class ConsumerMixin(KombuConsumer):
         except NotFound:
             pass
 
-    def __dispatch(self, event, payload, headers=None):
+    def __dispatch(self, event_name, payload, headers=None):
         with self.__lock:
-            subscriptions = self.__subscriptions[event].copy()
-        for (handler, binding) in subscriptions:
-            if self.__binding_matches(binding, headers):
-                try:
-                    handler(payload)
-                except Exception:
-                    self.log.exception(
-                        'Handler \'%s\' for event \'%s\' failed',
-                        handler.__name__,
-                        event,
-                    )
-                continue
+            subscriptions = self.__subscriptions[event_name].copy()
+        for (handler, _) in subscriptions:
+            try:
+                handler(payload)
+            except Exception:
+                self.log.exception(
+                    'Handler \'%s\' for event \'%s\' failed',
+                    handler.__name__,
+                    event_name,
+                )
+            continue
 
-    def __extract_event(self, headers, payload):
-        event = headers.get('name', None) or headers.get('x-event', None)
+    def __get_event_name_from_message(self, headers, payload):
+        event = headers.get('name', None)
         if not event and isinstance(payload, dict):
             event = payload.get('name', None)
         return event
 
     def subscribe(
-        self, event, handler, headers=None, routing_key=None, headers_match_all=True
+        self,
+        event_name,
+        handler,
+        headers=None,
+        routing_key=None,
+        headers_match_all=True,
     ):
         headers = headers or {}
+        headers.update(name=event_name)
         if self.__exchange.type == 'headers':
             headers.setdefault('x-match', 'all' if headers_match_all else 'any')
-        headers.setdefault('name', event)
 
         binding = self.__create_binding(headers, routing_key)
         subscription = Subscription(handler, binding)
         with self.__lock:
-            self.__subscriptions[event].append(subscription)
+            self.__subscriptions[event_name].append(subscription)
         self.log.debug(
-            'Registered handler \'%s\' to event \'%s\'', handler.__name__, event
+            'Registered handler \'%s\' to event \'%s\'', handler.__name__, event_name
         )
 
-    def unsubscribe(self, event, handler):
+    def unsubscribe(self, event_name, handler):
         with self.__lock:
-            subscriptions = self.__subscriptions[event].copy()
+            subscriptions = self.__subscriptions[event_name].copy()
         try:
             for subscription in subscriptions:
-                x_event = subscription.binding.arguments.get('name')
-                if subscription.handler == handler and x_event == event:
+                if subscription.handler == handler:
                     with self.__lock:
-                        self.__subscriptions[event].remove(subscription)
+                        self.__subscriptions[event_name].remove(subscription)
                     self.__remove_binding(subscription.binding)
                     self.log.debug(
                         'Unregistered handler \'%s\' from \'%s\'',
                         handler.__name__,
-                        event,
+                        event_name,
                     )
                     return True
             return False
         finally:
-            if not self.__subscriptions[event]:
+            if not self.__subscriptions[event_name]:
                 with self.__lock:
-                    self.__subscriptions.pop(event)
+                    self.__subscriptions.pop(event_name)
 
     def get_consumers(self, Consumer, channel):
+        self.__exchange.bind(channel).declare()
         return [
             Consumer(
                 queues=[self.__queue],
-                callbacks=[self.on_message_received],
+                callbacks=[self.__on_message_received],
                 auto_declare=True,
             )
         ]
 
-    def on_message_received(self, body, message):
+    def __on_message_received(self, body, message):
         headers = message.headers
         payload = body
-        event = self.__extract_event(headers, payload)
+        event_name = self.__get_event_name_from_message(headers, payload)
         try:
-            headers, payload = self.unmarshal(event, headers, payload)
+            if event_name not in self.__subscriptions:
+                return
+            headers, payload = self._unmarshal(event_name, headers, payload)
         except Exception:
             raise
         else:
-            self.__dispatch(event, payload, headers)
+            self.__dispatch(event_name, payload, headers)
         finally:
             message.ack()
 
     def on_consume_ready(self, connection, channel, consumers, **kwargs):
         if 'ready_flag' in kwargs:
             kwargs['ready_flag'].set()
-
-    def on_connection_error(self, exc, interval):
-        super(ConsumerMixin, self).on_connection_error(exc, interval)
 
     def __run(self, ready_flag, **kwargs):
         with Connection(self.url) as connection:
@@ -289,24 +264,14 @@ class PublisherMixin(object):
             producer, producer.publish, errback=self.on_publish_error, **connection_args
         )
 
-    @staticmethod
-    def _get_event_name(event):
-        if hasattr(event, 'name'):
-            return event.name
-        elif isinstance(event, str):
-            return event
-        return None
-
     def on_publish_error(self, exc, interval):
         self.log.error('Error: %s', exc, exc_info=1)
         self.log.info('Retry in %s seconds...', interval)
 
     def publish(self, event, headers=None, routing_key=None, payload=None):
-        headers = dict(headers or {})
-        headers.setdefault('name', self._get_event_name(event))
-        routing_key = routing_key or getattr(event, 'routing_key', None)
-
-        headers, payload = self.marshal(event, headers, payload)
+        headers, payload, routing_key = self._marshal(
+            event, headers, payload, routing_key=routing_key
+        )
         self.__publish(payload, headers=headers, routing_key=routing_key)
 
 
@@ -343,11 +308,9 @@ class QueuePublisherMixin(PublisherMixin):
         self.__fifo.put(None)
 
     def publish_soon(self, event, headers=None, routing_key=None, payload=None):
-        headers = dict(headers or {})
-        headers.setdefault('name', self._get_event_name(event))
-        routing_key = routing_key or getattr(event, 'routing_key', None)
-
-        headers, payload = self.marshal(event, headers, payload)
+        headers, payload, routing_key = self._marshal(
+            event, headers, payload, routing_key
+        )
         self.__fifo.put((payload, headers, routing_key))
 
 
@@ -374,15 +337,17 @@ class WazoEventMixin(object):
 
         return metadata
 
-    def marshal(self, event, headers, payload):
+    def _marshal(self, event, headers, payload, routing_key=None):
         headers = headers or {}
-        payload = {}
+        payload = payload or {}
+        routing_key = routing_key or getattr(event, 'routing_key', None)
 
+        data = dict(payload, **self.__serialize_event(event))
         headers.update(self.__generate_metadata(event))
-        payload.update(headers, data=self.__serialize_event(event))
-        return headers, payload
+        payload = dict(headers, data=data)
+        return headers, payload, routing_key
 
-    def unmarshal(self, event, headers, payload):
+    def _unmarshal(self, event_name, headers, payload):
         event_data = payload.pop('data')
         headers = headers or payload
         return headers, event_data

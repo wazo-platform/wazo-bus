@@ -41,10 +41,10 @@ class Base(object):
     def is_running(self):
         return False
 
-    def marshal(self, event, headers, payload):
-        return headers, payload
+    def _marshal(self, event, headers, payload, routing_key=None):
+        return headers, payload, routing_key
 
-    def unmarshal(self, event, headers, payload):
+    def _unmarshal(self, event_name, headers, payload):
         return headers, payload
 
     def __enter__(self):
