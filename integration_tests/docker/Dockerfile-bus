@@ -10,16 +10,13 @@ RUN apt-get -yq install netcat
 COPY requirements.txt /usr/src/xivo-bus/requirements.txt
 WORKDIR /usr/src/xivo-bus
 RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+RUN pip install flask -r requirements.txt
 
+COPY integration_tests/docker/entrypoint.sh /usr/bin/entrypoint.sh
+COPY integration_tests/docker/remote-bus-pilot.py /usr/src/remote-bus-pilot.py
 COPY . /usr/src/xivo-bus
 
 WORKDIR /usr/src
 RUN pip install -e xivo-bus
-
-COPY integration_tests/docker/entrypoint.sh /usr/bin/entrypoint.sh
-COPY integration_tests/docker/bus-test/. /usr/src/bus-test
-
-RUN pip install -e bus-test
 
 ENTRYPOINT ["/usr/bin/entrypoint.sh"]

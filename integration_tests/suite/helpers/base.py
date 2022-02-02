@@ -5,37 +5,27 @@ import os
 from time import sleep
 from contextlib import contextmanager
 from hamcrest import assert_that, is_
+from uuid import uuid4
 
 from wazo_test_helpers.asset_launching_test_case import (
     AssetLaunchingTestCase,
     NoSuchService,
 )
-from xivo_bus.base import Base
-from xivo_bus.mixins import (
-    ThreadableMixin,
-    ConsumerMixin,
-    QueuePublisherMixin,
-    WazoEventMixin,
-)
+from xivo_bus.consumer import BusConsumer
+from xivo_bus.publisher import BusPublisher
+
 from .remote_bus import RemoteBusApiClient
 from .accumulator import MessageAccumulator
 
 
-class Bus(ThreadableMixin, ConsumerMixin, QueuePublisherMixin, Base):
-    pass
-
-
-class WazoBus(WazoEventMixin, Bus):
+class Bus(BusConsumer, BusPublisher):
     pass
 
 
 class BusIntegrationTest(AssetLaunchingTestCase):
     assets_root = os.path.join(os.path.dirname(__file__), '..', '..', 'assets')
     service = 'bus'
-    _local_messages = MessageAccumulator()
-
     EXCHANGE_NAME = 'bus-integration-tests'
-    TEST_WAZO_EVENTS = False
 
     @classmethod
     def setUpClass(cls):
@@ -49,6 +39,7 @@ class BusIntegrationTest(AssetLaunchingTestCase):
 
     @classmethod
     def reset_clients(cls):
+        cls._local_messages = MessageAccumulator()
         cls.local_bus = cls.make_local_bus()
         cls.remote_bus = cls.make_remote_bus()
         cls.local_bus.start()
@@ -59,10 +50,9 @@ class BusIntegrationTest(AssetLaunchingTestCase):
             port = cls.service_port(5672, 'rabbitmq')
         except NoSuchService:
             return
-        bus_cls = WazoBus if cls.TEST_WAZO_EVENTS else Bus
-        return bus_cls(
+        return Bus(
             name='local-bus',
-            service_uuid='00000000-0000-0000-0000-000000000001',
+            service_uuid=str(uuid4()),
             host='127.0.0.1',
             port=port,
             exchange_name=cls.EXCHANGE_NAME,
