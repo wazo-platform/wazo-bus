@@ -21,3 +21,6 @@ class MessageAccumulator:
     def pop(self, event):
         event = event if event else '__none__'
         return self._buffer.pop(event, [])
+
+    def count(self, event):
+        return len(self._buffer[event])

@@ -42,3 +42,7 @@ class RemoteBusApiClient:
     def get_messages(self, event):
         url = self._make_url('bus', event, 'messages')
         return requests.get(url).json()
+
+    def get_messages_count(self, event):
+        url = self._make_url('bus', event, 'messages', 'count')
+        return requests.get(url).json()

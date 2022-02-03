@@ -40,6 +40,10 @@ class MessageBroker:
         with self.lock:
             return self._messages.pop(event, [])
 
+    def count(self, event):
+        with self.lock:
+            return len(self._messages[event])
+
     def bind_handler(self, event, handler, headers=None, routing_key=None):
         handler = self.Handler(handler, self._filter_headers(headers), routing_key)
         with self.lock:
@@ -152,6 +156,11 @@ def unsubscribe(event):
 @app.route('/bus/<string:event>/messages', methods=['GET'])
 def get_messages(event):
     return jsonify(broker.dequeue(event))
+
+
+@app.route('/bus/<string:event>/messages/count', methods=['GET'])
+def get_messages_count(event):
+    return jsonify(broker.count(event))
 
 
 if __name__ == '__main__':

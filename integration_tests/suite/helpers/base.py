@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import os
-from time import sleep
 from contextlib import contextmanager
 from hamcrest import assert_that, is_
 from uuid import uuid4
@@ -11,6 +10,7 @@ from wazo_test_helpers.asset_launching_test_case import (
     AssetLaunchingTestCase,
     NoSuchService,
 )
+from wazo_test_helpers import until
 from xivo_bus.consumer import BusConsumer
 from xivo_bus.publisher import BusPublisher
 
@@ -79,7 +79,6 @@ class BusIntegrationTest(AssetLaunchingTestCase):
         except Exception:
             raise
         finally:
-            sleep(0.01)  # Allow consumers to finish consuming all messages
             assert_that(
                 cls.remote_bus.unsubscribe(event, headers, routing_key=routing_key),
                 is_(True),
@@ -95,13 +94,26 @@ class BusIntegrationTest(AssetLaunchingTestCase):
         except Exception:
             raise
         finally:
-            sleep(0.01)  # Allow consumers to finish consuming all messages
             assert_that(cls.local_bus.unsubscribe(event, handler), is_(True))
 
     @classmethod
-    def local_messages(cls, event):
-        return cls._local_messages.pop(event)
+    def local_messages(cls, event_name, expected=None, timeout=3.0):
+        def test():
+            return cls._local_messages.count(event_name) == expected
+
+        try:
+            until.true(test, timeout=timeout, interval=0.1)
+        except until.NoMoreTries:
+            pass
+        return cls._local_messages.pop(event_name)
 
     @classmethod
-    def remote_messages(cls, event):
-        return cls.remote_bus.get_messages(event)
+    def remote_messages(cls, event_name, expected=None, timeout=3.0):
+        def test():
+            return cls.remote_bus.get_messages_count == expected
+
+        try:
+            until.true(test, timeout=timeout, interval=0.1)
+        except until.NoMoreTries:
+            pass
+        return cls.remote_bus.get_messages(event_name)

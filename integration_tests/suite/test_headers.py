@@ -8,9 +8,9 @@ from hamcrest import (
     has_entries,
     has_key,
     has_items,
+    has_item,
     empty,
     is_,
-    contains_exactly,
     has_length,
 )
 from .helpers.base import BusIntegrationTest
@@ -27,12 +27,13 @@ class TestHeaders(BusIntegrationTest):
 
         with self.local_event(event_name):
             self.local_bus.publish(event1)
-        self.local_bus.publish(event2)
+            assert_that(
+                self.local_messages(event_name, 1),
+                has_item(has_entry('value', 'first payload')),
+            )
 
-        assert_that(
-            self.local_messages(event_name),
-            contains_exactly(has_entry('value', 'first payload')),
-        )
+        self.local_bus.publish(event2)
+        assert_that(self.local_messages(event_name, 1), is_(empty()))
 
     def test_routing_key_disabled_with_headers_exchange(self):
         event_name = 'routing_key_event'
@@ -43,12 +44,13 @@ class TestHeaders(BusIntegrationTest):
             self.local_bus.publish(event1, routing_key='events.good_key.1')
             self.local_bus.publish(event2, routing_key='events.wrong_key.1')
 
-        assert_that(
-            self.local_messages(event_name),
-            has_items(
-                has_entry('value', 'first value'), has_entry('value', 'second value')
-            ),
-        )
+            assert_that(
+                self.local_messages(event_name, 2),
+                has_items(
+                    has_entry('value', 'first value'),
+                    has_entry('value', 'second value'),
+                ),
+            )
 
     def test_extra_headers_required(self):
         event = MockEvent('bound_headers')
@@ -58,10 +60,10 @@ class TestHeaders(BusIntegrationTest):
             self.local_bus.publish(event, headers=headers, payload={'value': 'first'})
             self.local_bus.publish(event, headers=None, payload={'value': 'second'})
 
-        assert_that(
-            self.local_messages(event.name),
-            contains_exactly((has_entry('value', 'first'))),
-        )
+            assert_that(
+                self.local_messages(event.name, 1),
+                has_item((has_entry('value', 'first'))),
+            )
 
     def test_publish_wrong_expected_headers_value(self):
         event = MockEvent('wrong_headers_value')
@@ -72,7 +74,7 @@ class TestHeaders(BusIntegrationTest):
                 event, payload={'value': 'something'}, headers={'required': False}
             )
 
-        assert_that(self.local_messages(event.name), is_(empty()))
+            assert_that(self.local_messages(event.name), is_(empty()))
 
     def test_publish_ignore_extra_headers(self):
         event = MockEvent('extra_ignored_headers', some='payload')
@@ -82,11 +84,10 @@ class TestHeaders(BusIntegrationTest):
             self.local_bus.publish(
                 event, headers={'required': True, 'other': 1, 'ignored': 'headers'}
             )
-
-        assert_that(
-            self.local_messages(event.name),
-            contains_exactly((has_entry('some', 'payload'))),
-        )
+            assert_that(
+                self.local_messages(event.name, 1),
+                has_item(has_entry('some', 'payload')),
+            )
 
     def test_multiple_events(self):
         event1 = MockEvent('event_1', value=1)
@@ -101,15 +102,18 @@ class TestHeaders(BusIntegrationTest):
                     self.local_bus.publish(event2, headers=headers[1])
                     self.local_bus.publish(event3, headers=headers[2])
 
-        assert_that(
-            self.local_messages(event1.name), contains_exactly(has_entry('value', 1))
-        )
-        assert_that(
-            self.local_messages(event2.name), contains_exactly(has_entry('value', 2))
-        )
-        assert_that(
-            self.local_messages(event3.name), contains_exactly(has_entry('value', 3))
-        )
+                    assert_that(
+                        self.local_messages(event1.name, 1),
+                        has_item(has_entry('value', 1)),
+                    )
+                    assert_that(
+                        self.local_messages(event2.name, 1),
+                        has_item(has_entry('value', 2)),
+                    )
+                    assert_that(
+                        self.local_messages(event3.name, 1),
+                        has_item(has_entry('value', 3)),
+                    )
 
     def test_same_event_multiple_headers(self):
         event = MockEvent('test_event', payload='test')
@@ -117,6 +121,8 @@ class TestHeaders(BusIntegrationTest):
         headers2 = {'test': 2}
         headers3 = {'test': 3}
         headers4 = {'test': 4}
+        messages = []
+        NB_OF_HANDLER_EXECUTIONS = 9  # handlers are per event name (not headers)
 
         with self.local_event(event.name, headers=headers1):
             with self.local_event(event.name, headers=headers2):
@@ -125,22 +131,11 @@ class TestHeaders(BusIntegrationTest):
                     self.local_bus.publish(event, headers=headers2)
                     self.local_bus.publish(event, headers=headers3)
                     self.local_bus.publish(event, headers=headers4)
+                    messages = self.local_messages(event.name, NB_OF_HANDLER_EXECUTIONS)
 
-        messages = self.local_messages(event.name)
-        assert_that(messages, has_length(9))
+        assert_that(messages, has_length(NB_OF_HANDLER_EXECUTIONS))
         for message in messages:
             assert_that(message, has_entry('payload', 'test'))
-
-    def test_no_default_binding(self):
-        event_name = 'test_default_binding'
-
-        with self.remote_event(event_name):
-            self.remote_bus.publish(event_name, payload={'some': 'data'})
-
-        assert_that(
-            self.remote_messages(event_name),
-            contains_exactly(has_entry('some', 'data')),
-        )
 
     def test_publish_queue(self):
         event_name = 'test_queue_publisher'
@@ -151,15 +146,13 @@ class TestHeaders(BusIntegrationTest):
             self.local_bus.publish(event_1)
             self.local_bus.publish_soon(event_2)
 
-        messages = self.local_messages(event_name)
-        assert_that(messages, has_length(2))
-        assert_that(
-            messages,
-            has_items(
-                has_entry('value', 'first payload'),
-                has_entry('value', 'second payload'),
-            ),
-        )
+            assert_that(
+                self.local_messages(event_name, 2),
+                has_items(
+                    has_entry('value', 'first payload'),
+                    has_entry('value', 'second payload'),
+                ),
+            )
 
     def test_event_marshaller(self):
         event = MockEvent('marshaller', id=1234, value='something')
@@ -167,15 +160,15 @@ class TestHeaders(BusIntegrationTest):
         with self.remote_event(event.name):
             self.local_bus.publish(event)
 
-        assert_that(
-            self.remote_messages(event.name),
-            has_items(
-                has_entry('data', has_entries(id=1234, value='something')),
-                has_entry('name', 'marshaller'),
-                has_entry('origin_uuid', self.local_bus.service_uuid),
-                has_key('timestamp'),
-            ),
-        )
+            assert_that(
+                self.remote_messages(event.name, 1),
+                has_items(
+                    has_entry('data', has_entries(id=1234, value='something')),
+                    has_entry('name', 'marshaller'),
+                    has_entry('origin_uuid', self.local_bus.service_uuid),
+                    has_key('timestamp'),
+                ),
+            )
 
     def test_event_unmarshaller(self):
         event_name = 'unmarshaller'
@@ -189,7 +182,7 @@ class TestHeaders(BusIntegrationTest):
         with self.local_event(event_name):
             self.remote_bus.publish(event_name, payload=payload)
 
-        assert_that(
-            self.local_messages(event_name),
-            has_items(has_entries(id=4567, value='something')),
-        )
+            assert_that(
+                self.local_messages(event_name, 1),
+                has_items(has_entries(id=4567, value='something')),
+            )

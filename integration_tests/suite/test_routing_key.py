@@ -27,11 +27,13 @@ class TestRoutingKey(BusIntegrationTest):
 
         with self.local_event(event.name, routing_key=event.routing_key):
             self.local_bus.publish(event)
-        self.local_bus.publish(event)
+            assert_that(
+                self.local_messages(event.name, 1),
+                has_item(has_entry('data', 'payload')),
+            )
 
-        assert_that(
-            self.local_messages(event.name), has_item(has_entry('data', 'payload'))
-        )
+        self.local_bus.publish(event)
+        assert_that(self.local_messages(event.name, 1), is_(empty()))
 
     def test_good_routing_key(self):
         event = MockEvent('good_routing_key', data='payload')
@@ -39,9 +41,10 @@ class TestRoutingKey(BusIntegrationTest):
         with self.local_event(event.name, routing_key='events.bus.good.#'):
             self.local_bus.publish(event, routing_key='events.bus.good.1.ok')
 
-        assert_that(
-            self.local_messages(event.name), has_item(has_entry('data', 'payload'))
-        )
+            assert_that(
+                self.local_messages(event.name, 1),
+                has_item(has_entry('data', 'payload')),
+            )
 
     def test_wrong_routing_key(self):
         event = MockEvent('wrong_routing_key', data='something')
@@ -49,7 +52,7 @@ class TestRoutingKey(BusIntegrationTest):
         with self.local_event(event.name, routing_key='events.bus.good.#'):
             self.local_bus.publish(event, routing_key='events.bus.wrong')
 
-        assert_that(self.local_messages(event.name), is_(empty()))
+            assert_that(self.local_messages(event.name), is_(empty()))
 
     def test_no_event_routing_key(self):
         event = MockEvent('no_key', data='something')
@@ -57,7 +60,7 @@ class TestRoutingKey(BusIntegrationTest):
         with self.local_event(event.name, routing_key=None):
             self.local_bus.publish(event, routing_key='events.bus.somewhere')
 
-        assert_that(self.local_messages(event.name), is_(empty()))
+            assert_that(self.local_messages(event.name), is_(empty()))
 
     def test_no_routing_key(self):
         event = MockEvent('no_publish_key', data='payload')
@@ -65,7 +68,7 @@ class TestRoutingKey(BusIntegrationTest):
         with self.local_event(event.name, routing_key='events.bus.good.#'):
             self.local_bus.publish(event, routing_key=None)
 
-        assert_that(self.local_messages(event.name), is_(empty()))
+            assert_that(self.local_messages(event.name), is_(empty()))
 
     def test_headers_disabled_when_using_routing_key(self):
         event = MockEvent('headers_test', data='payload')
@@ -77,9 +80,10 @@ class TestRoutingKey(BusIntegrationTest):
                 event, headers={'required': False}, routing_key='events.1'
             )
 
-        assert_that(
-            self.local_messages(event.name), has_item(has_entry('data', 'payload'))
-        )
+            assert_that(
+                self.local_messages(event.name, 1),
+                has_item(has_entry('data', 'payload')),
+            )
 
     def test_message_marshalling(self):
         event = MockEvent(
@@ -89,15 +93,15 @@ class TestRoutingKey(BusIntegrationTest):
         with self.remote_event(event.name, routing_key='some.key.#'):
             self.local_bus.publish(event)
 
-        assert_that(
-            self.remote_messages(event.name),
-            has_items(
-                has_entry('data', has_entries(id=1234, value='something')),
-                has_entry('name', 'marshaller'),
-                has_entry('origin_uuid', self.local_bus.service_uuid),
-                has_key('timestamp'),
-            ),
-        )
+            assert_that(
+                self.remote_messages(event.name, 1),
+                has_items(
+                    has_entry('data', has_entries(id=1234, value='something')),
+                    has_entry('name', 'marshaller'),
+                    has_entry('origin_uuid', self.local_bus.service_uuid),
+                    has_key('timestamp'),
+                ),
+            )
 
     def test_message_unmarshalling(self):
         event_name = 'unmarshaller'
@@ -113,7 +117,7 @@ class TestRoutingKey(BusIntegrationTest):
                 event_name, payload=payload, routing_key='other.key.1'
             )
 
-        assert_that(
-            self.local_messages(event_name),
-            has_items(has_entries(id=4567, value='something')),
-        )
+            assert_that(
+                self.local_messages(event_name, 1),
+                has_items(has_entries(id=4567, value='something')),
+            )
