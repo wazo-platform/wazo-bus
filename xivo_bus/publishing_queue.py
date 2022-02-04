@@ -10,9 +10,8 @@ logger = logging.getLogger(__name__)
 
 
 class PublishingQueue(object):
-
     def __init__(self, publisher_factory):
-        self._publisher = None
+        self._publish = None
         self._publisher_factory = publisher_factory
         self._queue = queue.Queue()
         self._running = False
@@ -24,24 +23,28 @@ class PublishingQueue(object):
 
         while not self._should_stop or self._flushing:
             try:
-                message, headers = self._queue.get(timeout=0.1)
+                payload, headers, routing_key, kwargs = self._queue.get(timeout=0.1)
             except queue.Empty:
                 self._flushing = False
                 continue
 
+            if not self._publish:
+                self._publish = self._publisher_factory()
+                if hasattr(self._publish, 'publish'):
+                    self._publish = self._publish.publish
             try:
-                if not self._publisher:
-                    self._publisher = self._publisher_factory()
-                self._publisher.publish(message, headers=headers)
+                self._publish(
+                    payload, headers=headers, routing_key=routing_key, **kwargs
+                )
             except Exception as e:
                 logger.exception('Error while publishing: %s', e)
 
         self._running = False
         self._should_stop = False
 
-    def publish(self, event, headers=None):
+    def publish(self, payload, headers=None, routing_key=None, **kwargs):
         headers = headers or {}
-        self._queue.put((event, headers))
+        self._queue.put((payload, headers, routing_key, kwargs))
 
     def stop(self):
         if self._running:

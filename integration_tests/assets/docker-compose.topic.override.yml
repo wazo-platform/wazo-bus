@@ -1,0 +1,5 @@
+version: '3'
+services:
+  bus:
+    environment:
+      - EXCHANGE_TYPE=topic

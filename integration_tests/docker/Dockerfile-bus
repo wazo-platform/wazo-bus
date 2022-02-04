@@ -1,0 +1,22 @@
+FROM python:3.7-slim-buster
+LABEL maintainer="Wazo Maintainers <dev@wazo.community>"
+
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+RUN apt-get -q update
+RUN apt-get -yq install netcat
+
+COPY requirements.txt /usr/src/xivo-bus/requirements.txt
+WORKDIR /usr/src/xivo-bus
+RUN pip install --upgrade pip
+RUN pip install flask -r requirements.txt
+
+COPY integration_tests/docker/entrypoint.sh /usr/bin/entrypoint.sh
+COPY integration_tests/docker/remote-bus-pilot.py /usr/src/remote-bus-pilot.py
+COPY . /usr/src/xivo-bus
+
+WORKDIR /usr/src
+RUN pip install -e xivo-bus
+
+ENTRYPOINT ["/usr/bin/entrypoint.sh"]

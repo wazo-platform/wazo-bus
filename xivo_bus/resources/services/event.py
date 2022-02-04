@@ -41,6 +41,9 @@ class ServiceRegisteredEvent(object):
     def __ne__(self, other):
         return not self.__eq__(other)
 
+    def __repr__(self):
+        return self.name
+
 
 class ServiceDeregisteredEvent(object):
 
@@ -65,3 +68,6 @@ class ServiceDeregisteredEvent(object):
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    def __repr__(self):
+        return self.name

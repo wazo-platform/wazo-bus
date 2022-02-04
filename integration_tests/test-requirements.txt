@@ -1,0 +1,4 @@
+# Backward compatibility to use without tox
+
+-r test-requirements-for-tox.txt
+-e ..
