@@ -9,7 +9,6 @@ class BusConsumer(WazoEventMixin, ThreadableMixin, ConsumerMixin, Base):
     def __init__(
         self,
         name=None,
-        service_uuid=None,
         username='guest',
         password='guest',
         host='localhost',
@@ -21,7 +20,6 @@ class BusConsumer(WazoEventMixin, ThreadableMixin, ConsumerMixin, Base):
     ):
         super(BusConsumer, self).__init__(
             name=name,
-            service_uuid=service_uuid,
             username=username,
             password=password,
             host=host,

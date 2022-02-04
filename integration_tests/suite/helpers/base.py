@@ -12,13 +12,13 @@ from wazo_test_helpers.asset_launching_test_case import (
 )
 from wazo_test_helpers import until
 from xivo_bus.consumer import BusConsumer
-from xivo_bus.publisher import BusPublisher
+from xivo_bus.publisher import BusPublisherWithQueue
 
 from .remote_bus import RemoteBusApiClient
 from .accumulator import MessageAccumulator
 
 
-class Bus(BusConsumer, BusPublisher):
+class Bus(BusConsumer, BusPublisherWithQueue):
     pass
 
 

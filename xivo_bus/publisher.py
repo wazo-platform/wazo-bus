@@ -5,12 +5,12 @@
 import logging
 
 from .base import Base
-from .mixins import QueuePublisherMixin, ThreadableMixin, WazoEventMixin
+from .mixins import QueuePublisherMixin, PublisherMixin, ThreadableMixin, WazoEventMixin
 
 logger = logging.getLogger(__name__)
 
 
-class BusPublisher(WazoEventMixin, QueuePublisherMixin, ThreadableMixin, Base):
+class BusPublisher(WazoEventMixin, PublisherMixin, Base):
     def __init__(
         self,
         name=None,
@@ -24,6 +24,33 @@ class BusPublisher(WazoEventMixin, QueuePublisherMixin, ThreadableMixin, Base):
         **kwargs
     ):
         super(BusPublisher, self).__init__(
+            name=name,
+            service_uuid=service_uuid,
+            username=username,
+            password=password,
+            host=host,
+            port=port,
+            exchange_name=exchange_name,
+            exchange_type=exchange_type,
+            **kwargs
+        )
+
+
+# Deprecated, thread should be avoided to respect WPEP-0004
+class BusPublisherWithQueue(WazoEventMixin, ThreadableMixin, QueuePublisherMixin, Base):
+    def __init__(
+        self,
+        name=None,
+        service_uuid=None,
+        username='guest',
+        password='guest',
+        host='localhost',
+        port=5672,
+        exchange_name='',
+        exchange_type='',
+        **kwargs
+    ):
+        super(BusPublisherWithQueue, self).__init__(
             name=name,
             service_uuid=service_uuid,
             username=username,
