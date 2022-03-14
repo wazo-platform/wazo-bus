@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from ..common.event import BaseEvent
@@ -117,6 +117,20 @@ class SessionDeletedEvent(BaseEvent):
             'user_uuid': user_uuid,
         }
         super(SessionDeletedEvent, self).__init__()
+
+
+class UserSessionsUpdatedEvent(BaseEvent):
+
+    name = 'auth_user_sessions_updated'
+    routing_key_fmt = 'auth.users.{user_uuid}.sessions.updated'
+
+    def __init__(self, user_uuid, tenant_uuid, sessions):
+        self._body = {
+            'user_uuid': user_uuid,
+            'tenant_uuid': tenant_uuid,
+            'sessions': sessions,
+        }
+        super(UserSessionsUpdatedEvent, self).__init__()
 
 
 class SessionExpireSoonEvent(BaseEvent):
