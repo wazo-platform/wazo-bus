@@ -39,7 +39,7 @@ class Base(object):
 
     @property
     def is_running(self):
-        return False
+        return True
 
     def _marshal(self, event, headers, payload, routing_key=None):
         return headers, payload, routing_key

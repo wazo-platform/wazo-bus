@@ -19,18 +19,16 @@ BusThread = namedtuple('BusThread', ['thread', 'on_stop', 'ready_flag'])
 class ThreadableMixin(object):
     def __init__(self, **kwargs):
         super(ThreadableMixin, self).__init__(**kwargs)
-        self._stop_flag = Event()
+        self.__stop_flag = Event()
 
     @property
     def is_stopping(self):
-        return self._stop_flag.is_set()
+        return self.__stop_flag.is_set()
 
     @property
     def is_running(self):
-        try:
-            return all({bus_thread.thread.is_alive() for bus_thread in self.__threads})
-        except AttributeError:
-            return False
+        status = all({bus_thread.thread.is_alive() for bus_thread in self.__threads})
+        return super(ThreadableMixin, self).is_running and status
 
     @property
     def __threads(self):
@@ -78,7 +76,7 @@ class ThreadableMixin(object):
         self.log.debug('All threads started successfully...')
 
     def stop(self):
-        self._stop_flag.set()
+        self.__stop_flag.set()
         for bus_thread in self.__threads:
             if bus_thread.thread.is_alive():
                 self.log.debug('Stopping AMQP thread \'%s\'', bus_thread.thread.name)
@@ -116,6 +114,7 @@ class ConsumerMixin(KombuConsumer):
         self.__subscriptions = defaultdict(list)
         self.__queue = Queue(name=name, auto_delete=True, durable=False)
         self.__lock = Lock()
+        self.create_connection()
 
         try:
             self._register_thread('consumer', self.__run, on_stop=self.__stop)
@@ -233,17 +232,41 @@ class ConsumerMixin(KombuConsumer):
         finally:
             message.ack()
 
+    def on_connection_error(self, exc, interval):
+        self.log.error(
+            'Broker connection error: %s, trying to reconnect in %s seconds...',
+            exc,
+            interval,
+        )
+        if self.should_stop:
+            raise SystemExit
+
+    def create_connection(self):
+        self.connection = self.__connection.clone()
+        return self.connection
+
+    @property
+    def is_running(self):
+        try:
+            is_running = self.connection.connected
+        except AttributeError:
+            is_running = False
+        return super(ConsumerMixin, self).is_running and is_running
+
+    @property
+    def should_stop(self):
+        return getattr(self, 'is_stopping', True)
+
     def on_consume_ready(self, connection, channel, consumers, **kwargs):
         if 'ready_flag' in kwargs:
-            kwargs['ready_flag'].set()
+            ready_flag = kwargs.pop('ready_flag')
+            ready_flag.set()
 
     def __run(self, ready_flag, **kwargs):
-        with Connection(self.url) as connection:
-            self.connection = connection
-            super(ConsumerMixin, self).run(ready_flag=ready_flag, **self.consumer_args)
+        super(ConsumerMixin, self).run(ready_flag=ready_flag, **self.consumer_args)
 
     def __stop(self):
-        self.should_stop = True
+        self.__connection.release()
 
 
 class PublisherMixin(object):
