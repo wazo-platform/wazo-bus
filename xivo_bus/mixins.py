@@ -171,11 +171,18 @@ class ConsumerMixin(KombuConsumer):
                 )
             continue
 
-    def __get_event_name_from_message(self, headers, payload):
-        event = headers.get('name', None)
-        if not event and isinstance(payload, dict):
-            event = payload.get('name', None)
-        return event
+    def __extract_event_from_message(self, message):
+        event_name = None
+        headers = message.headers
+        payload = message.payload
+
+        if 'name' in headers:
+            event_name = headers['name']
+        elif isinstance(payload, dict) and 'name' in payload:
+            event_name = payload['name']
+        else:
+            raise ValueError('Received invalid messsage; no event name could be found.')
+        return event_name, headers, payload
 
     def subscribe(
         self,
@@ -230,12 +237,10 @@ class ConsumerMixin(KombuConsumer):
         ]
 
     def __on_message_received(self, body, message):
-        headers = message.headers
-        payload = body
-        event_name = self.__get_event_name_from_message(headers, payload)
+        event_name, headers, payload = self.__extract_event_from_message(message)
+        if event_name not in self.__subscriptions:
+            return
         try:
-            if event_name not in self.__subscriptions:
-                return
             headers, payload = self._unmarshal(event_name, headers, payload)
         except Exception:
             raise
