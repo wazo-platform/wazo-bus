@@ -128,7 +128,12 @@ class UserSessionsUpdatedEvent(BaseEvent):
         self._body = {
             'user_uuid': user_uuid,
             'tenant_uuid': tenant_uuid,
-            'sessions': sessions,
+            'sessions': [
+                {
+                    'uuid': session['uuid'],
+                    'mobile': session['mobile']
+                } for session in sessions
+            ],
         }
         super(UserSessionsUpdatedEvent, self).__init__()
 
