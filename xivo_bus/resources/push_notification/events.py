@@ -12,3 +12,13 @@ class PushNotificationEvent(BaseEvent):
         self._body = push_notification
         super(PushNotificationEvent, self).__init__()
         self.required_acl = 'events.calls.{uuid}'.format(uuid=user_uuid)
+
+
+class CancelPushNotificationEvent(BaseEvent):
+    name = 'call_cancel_push_notification'
+    routing_key_fmt = 'calls.call.cancel_push_notification'
+
+    def __init__(self, cancel_push_notification, user_uuid):
+        self._body = cancel_push_notification
+        super(CancelPushNotificationEvent, self).__init__()
+        self.required_acl = 'events.calls.{uuid}'.format(uuid=user_uuid)
