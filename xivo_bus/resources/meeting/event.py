@@ -145,3 +145,37 @@ class UserCreateMeetingAuthorizationEvent(_BaseMeetingAuthorizationEvent):
                     user_uuid=user_uuid,
                 )
             )
+
+
+class UserEditMeetingAuthorizationEvent(_BaseMeetingAuthorizationEvent):
+    name = 'meeting_user_guest_authorization_updated'
+    routing_key_fmt = 'config.users.{user_uuid}.meeting_guest_authorizations.updated'
+
+    def __init__(self, meeting_authorization, user_uuid=None):
+        body = dict(meeting_authorization)
+        body['user_uuid'] = user_uuid
+        super(UserEditMeetingAuthorizationEvent, self).__init__(body)
+        if user_uuid:
+            self.routing_key = self.routing_key_fmt.format(user_uuid=user_uuid)
+            self.required_acl = (
+                'events.users.{user_uuid}.meeting_guest_authorizations.updated'.format(
+                    user_uuid=user_uuid,
+                )
+            )
+
+
+class UserDeleteMeetingAuthorizationEvent(_BaseMeetingAuthorizationEvent):
+    name = 'meeting_user_guest_authorization_deleted'
+    routing_key_fmt = 'config.users.{user_uuid}.meeting_guest_authorizations.deleted'
+
+    def __init__(self, meeting_authorization, user_uuid=None):
+        body = dict(meeting_authorization)
+        body['user_uuid'] = user_uuid
+        super(UserDeleteMeetingAuthorizationEvent, self).__init__(body)
+        if user_uuid:
+            self.routing_key = self.routing_key_fmt.format(user_uuid=user_uuid)
+            self.required_acl = (
+                'events.users.{user_uuid}.meeting_guest_authorizations.deleted'.format(
+                    user_uuid=user_uuid,
+                )
+            )
