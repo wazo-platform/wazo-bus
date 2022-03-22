@@ -1,4 +1,4 @@
-# Copyright 2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
@@ -105,5 +105,43 @@ class UserParticipantLeftMeetingEvent(_BaseParticipantMeetingEvent):
             self.required_acl = (
                 'events.users.{user_uuid}.meetings.participants.left'.format(
                     user_uuid=user_uuid
+                )
+            )
+
+
+class _BaseMeetingAuthorizationEvent(BaseEvent):
+    def __init__(self, meeting_authorization):
+        self._body = meeting_authorization
+        super(_BaseMeetingAuthorizationEvent, self).__init__()
+
+
+class CreateMeetingAuthorizationEvent(_BaseMeetingAuthorizationEvent):
+    name = 'meeting_guest_authorization_created'
+    routing_key_fmt = 'config.meeting_guest_authorizations.created'
+
+
+class EditMeetingAuthorizationEvent(_BaseMeetingAuthorizationEvent):
+    name = 'meeting_guest_authorization_updated'
+    routing_key_fmt = 'config.meeting_guest_authorizations.updated'
+
+
+class DeleteMeetingAuthorizationEvent(_BaseMeetingAuthorizationEvent):
+    name = 'meeting_guest_authorization_deleted'
+    routing_key_fmt = 'config.meeting_guest_authorizations.deleted'
+
+
+class UserCreateMeetingAuthorizationEvent(_BaseMeetingAuthorizationEvent):
+    name = 'meeting_user_guest_authorization_created'
+    routing_key_fmt = 'config.users.{user_uuid}.meeting_guest_authorizations.created'
+
+    def __init__(self, meeting_authorization, user_uuid=None):
+        body = dict(meeting_authorization)
+        body['user_uuid'] = user_uuid
+        super(UserCreateMeetingAuthorizationEvent, self).__init__(body)
+        if user_uuid:
+            self.routing_key = self.routing_key_fmt.format(user_uuid=user_uuid)
+            self.required_acl = (
+                'events.users.{user_uuid}.meeting_guest_authorizations.created'.format(
+                    user_uuid=user_uuid,
                 )
             )
