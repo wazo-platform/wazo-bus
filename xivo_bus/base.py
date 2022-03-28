@@ -3,7 +3,6 @@
 
 import logging
 
-from contextlib import contextmanager
 from collections import namedtuple
 from kombu import Exchange
 from kombu.utils.url import as_url
@@ -52,15 +51,3 @@ class Base(object):
 
     def __exit__(self, exc_type, exc_value, traceback):
         pass
-
-    @contextmanager
-    def _channel_autoretry(self, connection, retries=3):
-        for count in range(retries):
-            connection.ensure_connection(max_retries=1, reraise_as_library_errors=False)
-            try:
-                yield connection.default_channel
-            except connection.connection_errors:
-                self.log.error('Connection error, reconnecting (%d/%d)...', count + 1, retries)
-                continue
-            else:
-                break

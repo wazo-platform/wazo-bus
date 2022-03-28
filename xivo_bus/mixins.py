@@ -3,6 +3,7 @@
 
 import os
 
+from contextlib import contextmanager
 from threading import Thread, Lock, Event
 from datetime import datetime
 from six.moves.queue import Queue as FifoQueue, Empty
@@ -121,29 +122,40 @@ class ConsumerMixin(KombuConsumer):
         except AttributeError:
             pass
 
+    @property
+    @contextmanager
+    def __binding_channel(self):
+        if not self.__connection.connected:
+            self.__connection.connect()
+        yield self.__connection.default_channel
+
     def __create_binding(self, headers, routing_key):
         B = Binding(self.__exchange, routing_key, headers, headers)
         self.__queue.bindings.add(B)
-        try:
-            with self._channel_autoretry(self.__connection) as channel:
-                self.__queue.queue_declare(passive=True, channel=channel)
-                B.bind(self.__queue, nowait=False, channel=channel)
-        except self.__connection.connection_errors as e:
-            self.log.error('Connection error while creating binding: %s', e)
-        except NotFound:
-            pass
+        if self.is_running:
+            try:
+                with self.__binding_channel as channel:
+                    self.__queue.queue_declare(passive=True, channel=channel)
+                    B.bind(self.__queue, channel=channel)
+            except self.__connection.connection_errors as e:
+                self.log.error('Connection error while creating binding: %s', e)
+            except NotFound:
+                self.log.error(
+                    'Queue %s doesn\'t exist on the server', self.__queue.name
+                )
         return B
 
     def __remove_binding(self, binding):
         self.__queue.bindings.remove(binding)
-        try:
-            with self._channel_autoretry(self.__connection) as channel:
-                self.__queue.queue_declare(passive=True, channel=channel)
-                binding.unbind(self.__queue, nowait=False, channel=channel)
-        except self.__connection.connection_errors as e:
-            self.log.exception('Connection error while removing binding: %s', e)
-        except NotFound:
-            pass
+        if self.is_running:
+            try:
+                with self.__binding_channel as channel:
+                    self.__queue.queue_declare(passive=True, channel=channel)
+                    binding.unbind(self.__queue, channel=channel)
+            except self.__connection.connection_errors:
+                self.log.exception('Connection error while removing binding: %s')
+            except NotFound:
+                pass
 
     def __dispatch(self, event_name, payload, headers=None):
         with self.__lock:
