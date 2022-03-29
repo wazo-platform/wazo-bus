@@ -18,6 +18,8 @@ services:
 
   bus:
     image: xivo-bus-test
+    volumes:
+      - ../..:/usr/src/xivo-bus
     ports:
       - "5000"
     environment:

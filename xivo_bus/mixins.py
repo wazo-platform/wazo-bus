@@ -3,12 +3,14 @@
 
 import os
 
+from contextlib import contextmanager
 from threading import Thread, Lock, Event
 from datetime import datetime
 from six.moves.queue import Queue as FifoQueue, Empty
 from collections import namedtuple, defaultdict
 from kombu import Queue, Exchange, Connection, Producer, binding as Binding
 from kombu.mixins import ConsumerMixin as KombuConsumer
+from kombu.exceptions import OperationalError
 from amqp.exceptions import NotFound
 
 
@@ -19,18 +21,16 @@ BusThread = namedtuple('BusThread', ['thread', 'on_stop', 'ready_flag'])
 class ThreadableMixin(object):
     def __init__(self, **kwargs):
         super(ThreadableMixin, self).__init__(**kwargs)
-        self._stop_flag = Event()
+        self.__stop_flag = Event()
 
     @property
     def is_stopping(self):
-        return self._stop_flag.is_set()
+        return self.__stop_flag.is_set()
 
     @property
     def is_running(self):
-        try:
-            return all({bus_thread.thread.is_alive() for bus_thread in self.__threads})
-        except AttributeError:
-            return False
+        status = all({bus_thread.thread.is_alive() for bus_thread in self.__threads})
+        return super(ThreadableMixin, self).is_running and status
 
     @property
     def __threads(self):
@@ -78,7 +78,7 @@ class ThreadableMixin(object):
         self.log.debug('All threads started successfully...')
 
     def stop(self):
-        self._stop_flag.set()
+        self.__stop_flag.set()
         for bus_thread in self.__threads:
             if bus_thread.thread.is_alive():
                 self.log.debug('Stopping AMQP thread \'%s\'', bus_thread.thread.name)
@@ -116,35 +116,47 @@ class ConsumerMixin(KombuConsumer):
         self.__subscriptions = defaultdict(list)
         self.__queue = Queue(name=name, auto_delete=True, durable=False)
         self.__lock = Lock()
+        self.create_connection()
 
         try:
             self._register_thread('consumer', self.__run, on_stop=self.__stop)
         except AttributeError:
             pass
 
+    @property
+    @contextmanager
+    def __binding_channel(self):
+        if not self.__connection.connected:
+            self.__connection.connect()
+        yield self.__connection.default_channel
+
     def __create_binding(self, headers, routing_key):
-        B = Binding(self.__exchange, routing_key, headers, headers)
-        self.__queue.bindings.add(B)
-        try:
-            with self._channel_autoretry(self.__connection) as channel:
-                self.__queue.queue_declare(passive=True, channel=channel)
-                B.bind(self.__queue, nowait=False, channel=channel)
-        except self.__connection.connection_errors as e:
-            self.log.error('Connection error while creating binding: %s', e)
-        except NotFound:
-            pass
-        return B
+        binding = Binding(self.__exchange, routing_key, headers, headers)
+        self.__queue.bindings.add(binding)
+        if self.is_running:
+            try:
+                with self.__binding_channel as channel:
+                    self.__queue.queue_declare(passive=True, channel=channel)
+                    binding.bind(self.__queue, channel=channel)
+            except self.__connection.connection_errors as e:
+                self.log.error('Connection error while creating binding: %s', e)
+            except NotFound:
+                self.log.error(
+                    'Queue %s doesn\'t exist on the server', self.__queue.name
+                )
+        return binding
 
     def __remove_binding(self, binding):
         self.__queue.bindings.remove(binding)
-        try:
-            with self._channel_autoretry(self.__connection) as channel:
-                self.__queue.queue_declare(passive=True, channel=channel)
-                binding.unbind(self.__queue, nowait=False, channel=channel)
-        except self.__connection.connection_errors as e:
-            self.log.exception('Connection error while removing binding: %s', e)
-        except NotFound:
-            pass
+        if self.is_running:
+            try:
+                with self.__binding_channel as channel:
+                    self.__queue.queue_declare(passive=True, channel=channel)
+                    binding.unbind(self.__queue, channel=channel)
+            except self.__connection.connection_errors:
+                self.log.exception('Connection error while removing binding: %s')
+            except NotFound:
+                pass
 
     def __dispatch(self, event_name, payload, headers=None):
         with self.__lock:
@@ -160,11 +172,18 @@ class ConsumerMixin(KombuConsumer):
                 )
             continue
 
-    def __get_event_name_from_message(self, headers, payload):
-        event = headers.get('name', None)
-        if not event and isinstance(payload, dict):
-            event = payload.get('name', None)
-        return event
+    def __extract_event_from_message(self, message):
+        event_name = None
+        headers = message.headers
+        payload = message.payload
+
+        if 'name' in headers:
+            event_name = headers['name']
+        elif isinstance(payload, dict) and 'name' in payload:
+            event_name = payload['name']
+        else:
+            raise ValueError('Received invalid messsage; no event name could be found.')
+        return event_name, headers, payload
 
     def subscribe(
         self,
@@ -219,12 +238,10 @@ class ConsumerMixin(KombuConsumer):
         ]
 
     def __on_message_received(self, body, message):
-        headers = message.headers
-        payload = body
-        event_name = self.__get_event_name_from_message(headers, payload)
+        event_name, headers, payload = self.__extract_event_from_message(message)
+        if event_name not in self.__subscriptions:
+            return
         try:
-            if event_name not in self.__subscriptions:
-                return
             headers, payload = self._unmarshal(event_name, headers, payload)
         except Exception:
             raise
@@ -233,49 +250,84 @@ class ConsumerMixin(KombuConsumer):
         finally:
             message.ack()
 
+    def on_connection_error(self, exc, interval):
+        self.log.error(
+            'Broker connection error: %s, trying to reconnect in %s seconds...',
+            exc,
+            interval,
+        )
+        if self.should_stop:
+            # Workaround to force kill the threaded consumer when a stop has been issued
+            # instead of looping forever to reestablish the connection
+            raise SystemExit
+
+    def create_connection(self):
+        self.connection = self.__connection.clone()
+        return self.connection
+
+    @property
+    def is_running(self):
+        try:
+            is_running = self.connection.connected
+        except AttributeError:
+            is_running = False
+        return super(ConsumerMixin, self).is_running and is_running
+
+    @property
+    def should_stop(self):
+        return getattr(self, 'is_stopping', True)
+
     def on_consume_ready(self, connection, channel, consumers, **kwargs):
         if 'ready_flag' in kwargs:
-            kwargs['ready_flag'].set()
+            ready_flag = kwargs.pop('ready_flag')
+            ready_flag.set()
 
     def __run(self, ready_flag, **kwargs):
-        with Connection(self.url) as connection:
-            self.connection = connection
-            super(ConsumerMixin, self).run(ready_flag=ready_flag, **self.consumer_args)
+        super(ConsumerMixin, self).run(ready_flag=ready_flag, **self.consumer_args)
 
     def __stop(self):
-        self.should_stop = True
+        self.__connection.release()
 
 
 class PublisherMixin(object):
-    publisher_args = {}
+    publisher_args = {
+        'max_retries': 2,
+    }
 
     def __init__(self, publish=None, **kwargs):
         super().__init__(**kwargs)
         if publish:
             exchange = Exchange(publish['exchange_name'], publish['exchange_type'])
         self.__exchange = exchange if publish else self._default_exchange
-        self.__connection = Connection(self.url)
-        self.__publish = self.Producer(self.__connection)
+        self.__connection = Connection(self.url, transport_options=self.publisher_args)
 
+    @contextmanager
     def Producer(self, connection, **connection_args):
-        channel = connection.default_channel
-        producer = Producer(channel, exchange=self.__exchange, auto_declare=True)
-        return connection.ensure(
+        producer = Producer(connection, exchange=self.__exchange, auto_declare=True)
+        yield connection.ensure(
             producer, producer.publish, errback=self.on_publish_error, **connection_args
         )
 
     def on_publish_error(self, exc, interval):
-        self.log.error('Error: %s', exc, exc_info=1)
+        self.log.error('Publish error: %s', exc, exc_info=1)
         self.log.info('Retry in %s seconds...', interval)
 
     def publish(self, event, headers=None, routing_key=None, payload=None):
         headers, payload, routing_key = self._marshal(
             event, headers, payload, routing_key=routing_key
         )
-        self.__publish(payload, headers=headers, routing_key=routing_key)
+        with self.Producer(self.__connection, **self.publisher_args) as publish:
+            publish(payload, headers=headers, routing_key=routing_key)
+        self.log.debug('Published \'%s\' (headers: %s)', event.name, headers)
 
 
 class QueuePublisherMixin(PublisherMixin):
+    queue_publisher_args = {
+        'interval_start': 2,
+        'interval_step': 2,
+        'interval_max': 32,
+    }
+
     def __init__(self, **kwargs):
         super(QueuePublisherMixin, self).__init__(**kwargs)
         self.__flushing = False
@@ -286,22 +338,23 @@ class QueuePublisherMixin(PublisherMixin):
             pass
 
     def __run(self, ready_flag, **kwargs):
-        publish = None
         ready_flag.set()
-        with Connection(self.url) as connection:
+        publisher_args = self.queue_publisher_args
+
+        with Connection(self.url, transport_options=publisher_args) as connection:
             while not self.is_stopping or self.__flushing:
-                if not publish:
-                    publish = self.Producer(connection)
                 try:
                     payload, headers, routing_key = self.__fifo.get()
                 except (Empty, TypeError):
                     self.__flushing = False
                     continue
                 try:
-                    publish(payload, headers=headers, routing_key=routing_key)
+                    with self.Producer(connection, **publisher_args) as publish:
+                        publish(payload, headers=headers, routing_key=routing_key)
+                except OperationalError as exc:
+                    self.log.error('Publishing queue error: %s', exc, exc_info=1)
+                else:
                     self.__fifo.task_done()
-                except Exception:
-                    self.log.exception('Error while publishing')
 
     def __stop(self):
         self.__flushing = True

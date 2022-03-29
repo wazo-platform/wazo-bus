@@ -101,6 +101,11 @@ def make_response(code, status=None, **kwargs):
 #####################
 # Routes definition #
 #####################
+@app.route('/bus/status', methods=['GET'])
+def status():
+    return make_response(200, None, running=bus.is_running)
+
+
 @app.route('/bus/<string:event>/publish', methods=['POST'])
 def publish(event):
     headers, routing_key, payload = process_json(event, request.json)

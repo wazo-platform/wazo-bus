@@ -15,6 +15,7 @@ from xivo_bus.consumer import BusConsumer
 from xivo_bus.publisher import BusPublisherWithQueue
 
 from .remote_bus import RemoteBusApiClient
+from .wait_strategies import wait_for_rabbitmq
 from .accumulator import MessageAccumulator
 
 
@@ -42,15 +43,32 @@ class BusIntegrationTest(AssetLaunchingTestCase):
         cls._local_messages = MessageAccumulator()
         cls.local_bus = cls.make_local_bus()
         cls.remote_bus = cls.make_remote_bus()
-        cls.local_bus.start()
+
+    @classmethod
+    def stop_rabbitmq(cls):
+        cls.stop_service('rabbitmq')
+
+    @classmethod
+    def start_rabbitmq(cls):
+        cls.start_service('rabbitmq')
+        port = cls.service_port(5672, 'rabbitmq')
+        # Note: only needed on integration tests because ports are dynamic
+        url = f'amqp://guest:guest@127.0.0.1:{port}//'
+        cls.local_bus._PublisherMixin__connection.switch(url)
+        cls.local_bus._ConsumerMixin__connection.switch(url)
+        cls.local_bus.connection.switch(url)
+        wait_for_rabbitmq(cls)
 
     @classmethod
     def make_local_bus(cls):
+        if hasattr(cls, 'local_bus'):
+            cls.local_bus.stop()
+
         try:
             port = cls.service_port(5672, 'rabbitmq')
         except NoSuchService:
             return
-        return Bus(
+        bus = Bus(
             name='local-bus',
             service_uuid=str(uuid4()),
             host='127.0.0.1',
@@ -58,6 +76,8 @@ class BusIntegrationTest(AssetLaunchingTestCase):
             exchange_name=cls.EXCHANGE_NAME,
             exchange_type=cls.asset,
         )
+        bus.start()
+        return bus
 
     @classmethod
     def make_remote_bus(cls):
