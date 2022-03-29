@@ -10,6 +10,7 @@ from six.moves.queue import Queue as FifoQueue, Empty
 from collections import namedtuple, defaultdict
 from kombu import Queue, Exchange, Connection, Producer, binding as Binding
 from kombu.mixins import ConsumerMixin as KombuConsumer
+from kombu.exceptions import OperationalError
 from amqp.exceptions import NotFound
 
 
@@ -287,35 +288,44 @@ class ConsumerMixin(KombuConsumer):
 
 
 class PublisherMixin(object):
-    publisher_args = {}
+    publisher_args = {
+        'max_retries': 2,
+    }
 
     def __init__(self, publish=None, **kwargs):
         super().__init__(**kwargs)
         if publish:
             exchange = Exchange(publish['exchange_name'], publish['exchange_type'])
         self.__exchange = exchange if publish else self._default_exchange
-        self.__connection = Connection(self.url)
-        self.__publish = self.Producer(self.__connection)
+        self.__connection = Connection(self.url, transport_options=self.publisher_args)
 
+    @contextmanager
     def Producer(self, connection, **connection_args):
-        channel = connection.default_channel
-        producer = Producer(channel, exchange=self.__exchange, auto_declare=True)
-        return connection.ensure(
+        producer = Producer(connection, exchange=self.__exchange, auto_declare=True)
+        yield connection.ensure(
             producer, producer.publish, errback=self.on_publish_error, **connection_args
         )
 
     def on_publish_error(self, exc, interval):
-        self.log.error('Error: %s', exc, exc_info=1)
+        self.log.error('Publish error: %s', exc, exc_info=1)
         self.log.info('Retry in %s seconds...', interval)
 
     def publish(self, event, headers=None, routing_key=None, payload=None):
         headers, payload, routing_key = self._marshal(
             event, headers, payload, routing_key=routing_key
         )
-        self.__publish(payload, headers=headers, routing_key=routing_key)
+        with self.Producer(self.__connection, **self.publisher_args) as publish:
+            publish(payload, headers=headers, routing_key=routing_key)
+        self.log.debug('Published \'%s\' (headers: %s)', event.name, headers)
 
 
 class QueuePublisherMixin(PublisherMixin):
+    queue_publisher_args = {
+        'interval_start': 2,
+        'interval_step': 2,
+        'interval_max': 32,
+    }
+
     def __init__(self, **kwargs):
         super(QueuePublisherMixin, self).__init__(**kwargs)
         self.__flushing = False
@@ -326,22 +336,24 @@ class QueuePublisherMixin(PublisherMixin):
             pass
 
     def __run(self, ready_flag, **kwargs):
-        publish = None
         ready_flag.set()
-        with Connection(self.url) as connection:
+        publisher_args = self.queue_publisher_args
+
+        with Connection(self.url, transport_options=publisher_args) as connection:
             while not self.is_stopping or self.__flushing:
-                if not publish:
-                    publish = self.Producer(connection)
                 try:
                     payload, headers, routing_key = self.__fifo.get()
                 except (Empty, TypeError):
                     self.__flushing = False
                     continue
                 try:
-                    publish(payload, headers=headers, routing_key=routing_key)
+                    with self.Producer(connection, **publisher_args) as publish:
+                        publish(payload, headers=headers, routing_key=routing_key)
+                except OperationalError as exc:
+                    self.log.error('Publishing queue error: %s', exc, exc_info=1)
+                else:
                     self.__fifo.task_done()
-                except Exception:
-                    self.log.exception('Error while publishing')
+            connection.release()
 
     def __stop(self):
         self.__flushing = True
