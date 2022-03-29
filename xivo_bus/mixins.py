@@ -131,20 +131,20 @@ class ConsumerMixin(KombuConsumer):
         yield self.__connection.default_channel
 
     def __create_binding(self, headers, routing_key):
-        B = Binding(self.__exchange, routing_key, headers, headers)
-        self.__queue.bindings.add(B)
+        binding = Binding(self.__exchange, routing_key, headers, headers)
+        self.__queue.bindings.add(binding)
         if self.is_running:
             try:
                 with self.__binding_channel as channel:
                     self.__queue.queue_declare(passive=True, channel=channel)
-                    B.bind(self.__queue, channel=channel)
+                    binding.bind(self.__queue, channel=channel)
             except self.__connection.connection_errors as e:
                 self.log.error('Connection error while creating binding: %s', e)
             except NotFound:
                 self.log.error(
                     'Queue %s doesn\'t exist on the server', self.__queue.name
                 )
-        return B
+        return binding
 
     def __remove_binding(self, binding):
         self.__queue.bindings.remove(binding)
@@ -257,6 +257,8 @@ class ConsumerMixin(KombuConsumer):
             interval,
         )
         if self.should_stop:
+            # Workaround to force kill the threaded consumer when a stop has been issued
+            # instead of looping forever to reestablish the connection
             raise SystemExit
 
     def create_connection(self):
@@ -353,7 +355,6 @@ class QueuePublisherMixin(PublisherMixin):
                     self.log.error('Publishing queue error: %s', exc, exc_info=1)
                 else:
                     self.__fifo.task_done()
-            connection.release()
 
     def __stop(self):
         self.__flushing = True
