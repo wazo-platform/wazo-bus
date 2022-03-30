@@ -300,6 +300,7 @@ class PublisherMixin(object):
             exchange = Exchange(publish['exchange_name'], publish['exchange_type'])
         self.__exchange = exchange if publish else self._default_exchange
         self.__connection = Connection(self.url, transport_options=self.publisher_args)
+        self.__lock = Lock()
 
     @contextmanager
     def Producer(self, connection, **connection_args):
@@ -316,8 +317,9 @@ class PublisherMixin(object):
         headers, payload, routing_key = self._marshal(
             event, headers, payload, routing_key=routing_key
         )
-        with self.Producer(self.__connection, **self.publisher_args) as publish:
-            publish(payload, headers=headers, routing_key=routing_key)
+        with self.__lock:
+            with self.Producer(self.__connection, **self.publisher_args) as publish:
+                publish(payload, headers=headers, routing_key=routing_key)
         self.log.debug('Published \'%s\' (headers: %s)', event.name, headers)
 
 
