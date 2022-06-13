@@ -193,7 +193,7 @@ class ConsumerMixin(KombuConsumer):
         routing_key=None,
         headers_match_all=True,
     ):
-        headers = headers or {}
+        headers = dict(headers or {})
         headers.update(name=event_name)
         if self.__exchange.type == 'headers':
             headers.setdefault('x-match', 'all' if headers_match_all else 'any')
