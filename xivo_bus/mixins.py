@@ -193,7 +193,7 @@ class ConsumerMixin(KombuConsumer):
         routing_key=None,
         headers_match_all=True,
     ):
-        headers = headers or {}
+        headers = dict(headers or {})
         headers.update(name=event_name)
         if self.__exchange.type == 'headers':
             headers.setdefault('x-match', 'all' if headers_match_all else 'any')
@@ -203,7 +203,9 @@ class ConsumerMixin(KombuConsumer):
         with self.__lock:
             self.__subscriptions[event_name].append(subscription)
         self.log.debug(
-            'Registered handler \'%s\' to event \'%s\'', handler.__name__, event_name
+            'Registered handler \'%s\' to event \'%s\'',
+            getattr(handler, '__name__', handler),
+            event_name,
         )
 
     def unsubscribe(self, event_name, handler):
@@ -217,7 +219,7 @@ class ConsumerMixin(KombuConsumer):
                     self.__remove_binding(subscription.binding)
                     self.log.debug(
                         'Unregistered handler \'%s\' from \'%s\'',
-                        handler.__name__,
+                        getattr(handler, '__name__', handler),
                         event_name,
                     )
                     return True
