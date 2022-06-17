@@ -7,6 +7,7 @@ from contextlib import contextmanager
 from threading import Thread, Lock, Event
 from datetime import datetime
 from six.moves.queue import Queue as FifoQueue, Empty
+from six import iteritems
 from collections import namedtuple, defaultdict
 from kombu import Queue, Exchange, Connection, Producer, binding as Binding
 from kombu.mixins import ConsumerMixin as KombuConsumer
@@ -158,10 +159,26 @@ class ConsumerMixin(KombuConsumer):
             except NotFound:
                 pass
 
+    def __check_headers_match(self, headers, binding):
+        # only perform check if exchange type is headers
+        if self.__exchange.type != 'headers':
+            return True
+        compare = all if binding.arguments.get('x-match', 'all') == 'all' else any
+        headers = {k: v for k, v in iteritems(headers) if not k.startswith('x-')}
+        arguments = {
+            k: v for k, v in iteritems(binding.arguments) if not k.startswith('x-')
+        }
+
+        return compare(
+            [k in headers and headers[k] == v for k, v in iteritems(arguments)]
+        )
+
     def __dispatch(self, event_name, payload, headers=None):
         with self.__lock:
             subscriptions = self.__subscriptions[event_name].copy()
-        for (handler, _) in subscriptions:
+        for (handler, binding) in subscriptions:
+            if not self.__check_headers_match(headers, binding):
+                continue
             try:
                 handler(payload)
             except Exception:
