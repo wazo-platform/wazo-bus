@@ -122,7 +122,7 @@ class TestHeaders(BusIntegrationTest):
         headers3 = {'test': 3}
         headers4 = {'test': 4}
         messages = []
-        NB_OF_HANDLER_EXECUTIONS = 9  # handlers are per event name (not headers)
+        HANDLER_EXECUTIONS_COUNT = 3  # handlers are per event name (not headers)
 
         with self.local_event(event.name, headers=headers1):
             with self.local_event(event.name, headers=headers2):
@@ -131,9 +131,9 @@ class TestHeaders(BusIntegrationTest):
                     self.local_bus.publish(event, headers=headers2)
                     self.local_bus.publish(event, headers=headers3)
                     self.local_bus.publish(event, headers=headers4)
-                    messages = self.local_messages(event.name, NB_OF_HANDLER_EXECUTIONS)
+                    messages = self.local_messages(event.name, HANDLER_EXECUTIONS_COUNT)
 
-        assert_that(messages, has_length(NB_OF_HANDLER_EXECUTIONS))
+        assert_that(messages, has_length(HANDLER_EXECUTIONS_COUNT))
         for message in messages:
             assert_that(message, has_entry('payload', 'test'))
 
