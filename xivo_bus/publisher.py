@@ -65,7 +65,9 @@ class BusPublisherWithQueue(WazoEventMixin, ThreadableMixin, QueuePublisherMixin
 
 # Deprecated, use BusPublisher instead
 class Publisher(object):
+
     def __init__(self, producer, marshaler, **connection_args):
+        self._producer = producer
         self._marshaler = marshaler
         self._publish = self._new_publish(producer, connection_args)
 
@@ -93,6 +95,9 @@ class Publisher(object):
             routing_key=event.routing_key,
             headers=all_headers,
         )
+
+    def is_connected(self):
+        return self._producer.connection.connected
 
 
 # Deprecated, use BusPublisher instead
