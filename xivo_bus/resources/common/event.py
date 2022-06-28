@@ -1,12 +1,33 @@
 # -*- coding: utf-8 -*-
-# Copyright 2013-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
+from .abstract import AbstractEvent
 
 
+class ServiceEvent(AbstractEvent):
+    pass
+
+
+class TenantEvent(AbstractEvent):
+    def __init__(self, content, tenant_uuid):
+        super(TenantEvent, self).__init__(content=content)
+        if tenant_uuid is None:
+            raise ValueError('tenant_uuid must have a value')
+        self.tenant_uuid = str(tenant_uuid)
+
+
+class UserEvent(TenantEvent):
+    def __init__(self, content, tenant_uuid, user_uuid):
+        super(UserEvent, self).__init__(content, tenant_uuid)
+        if user_uuid is None:
+            raise ValueError('user_uuid must have a value')
+        self.user_uuid = str(user_uuid)
+
+
+# Deprecated and should not be used for new events
 class BaseEvent(object):
-
     def __init__(self):
         self.routing_key = self.routing_key_fmt.format(**self._body)
         self.required_acl = 'events.{}'.format(self.routing_key)
@@ -33,7 +54,6 @@ class BaseEvent(object):
 
 # Deprecated and should not be used for new events
 class ResourceConfigEvent(object):
-
     def __init__(self, resource_id):
         self.id = int(resource_id)
 
@@ -53,7 +73,6 @@ class ResourceConfigEvent(object):
 
 # Deprecated and should not be used for new events
 class ArbitraryEvent(object):
-
     def __init__(self, name, body, required_acl=None):
         self.name = name
         self._body = dict(body)
