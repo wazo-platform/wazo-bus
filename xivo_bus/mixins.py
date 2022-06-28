@@ -376,32 +376,47 @@ class WazoEventMixin(object):
         super(WazoEventMixin, self).__init__(**kwargs)
         self.service_uuid = service_uuid
 
-    def __serialize_event(self, event):
+    def __generate_payload(self, event, headers, initial_data):
+        payload = {}
+        data = initial_data.copy() if initial_data else {}
         try:
-            return event.marshal()
+            data.update(event.marshal())
         except AttributeError:
             self.log.exception("Received invalid event '%s'", event)
             raise ValueError('Not a valid Wazo Event')
+        else:
+            payload.update(headers, data=data)
+            return payload
 
-    def __generate_metadata(self, event):
-        metadata = {
-            'name': event.name,
-            'origin_uuid': self.service_uuid,
-            'timestamp': datetime.now().isoformat(),
-        }
+    def __generate_headers(self, event, extra_headers):
+        headers = {}
+        headers.update(extra_headers or {})
+
+        try:
+            headers.update(event.headers)
+        except AttributeError:
+            pass
+
+        if hasattr(event, 'required_access'):
+            headers['required_access'] = event.required_access
+
+        # TODO: remove deprecated `required_acl`
         if hasattr(event, 'required_acl'):
-            metadata['required_acl'] = event.required_acl
+            headers['required_acl'] = event.required_acl
 
-        return metadata
+        headers.update(
+            name=event.name,
+            origin_uuid=self.service_uuid,
+            timestamp=datetime.now().isoformat(),
+        )
+
+        return headers
 
     def _marshal(self, event, headers, payload, routing_key=None):
-        headers = headers or {}
-        payload = payload or {}
         routing_key = routing_key or getattr(event, 'routing_key', None)
+        headers = self.__generate_headers(event, headers)
+        payload = self.__generate_payload(event, headers, payload)
 
-        data = dict(payload, **self.__serialize_event(event))
-        headers.update(self.__generate_metadata(event))
-        payload = dict(headers, data=data)
         return headers, payload, routing_key
 
     def _unmarshal(self, event_name, headers, payload):
