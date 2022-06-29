@@ -25,6 +25,13 @@ class UserEvent(TenantEvent):
             raise ValueError('user_uuid must have a value')
         self.user_uuid = str(user_uuid)
 
+    @property
+    def headers(self):
+        headers = super(UserEvent, self).headers
+        uuid = headers.pop('user_uuid')
+        headers['user_uuid:{}'.format(uuid)] = True
+        return headers
+
 
 # Deprecated and should not be used for new events
 class BaseEvent(object):
