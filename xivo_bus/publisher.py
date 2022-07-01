@@ -5,30 +5,25 @@
 import logging
 
 from .base import Base
-from .mixins import (
-    QueuePublisherMixin,
-    PublisherMixin,
-    ThreadableMixin,
-    WazoEventMixin)
+from .mixins import QueuePublisherMixin, PublisherMixin, ThreadableMixin, WazoEventMixin
 
 logger = logging.getLogger(__name__)
 
 
 class BusPublisher(WazoEventMixin, PublisherMixin, Base):
-
     def __init__(
-            self,
-            name=None,
-            service_uuid=None,
-            username='guest',
-            password='guest',
-            host='localhost',
-            port=5672,
-            exchange_name='',
-            exchange_type='',
-            **kwargs
+        self,
+        name=None,
+        service_uuid=None,
+        username='guest',
+        password='guest',
+        host='localhost',
+        port=5672,
+        exchange_name='',
+        exchange_type='',
+        **kwargs
     ):
-        super().__init__(
+        super(BusPublisher, self).__init__(
             name=name,
             service_uuid=service_uuid,
             username=username,
@@ -42,25 +37,20 @@ class BusPublisher(WazoEventMixin, PublisherMixin, Base):
 
 
 # Deprecated, thread should be avoided to respect WPEP-0004
-class BusPublisherWithQueue(
-    WazoEventMixin,
-    ThreadableMixin,
-    QueuePublisherMixin,
-    Base):
-
+class BusPublisherWithQueue(WazoEventMixin, ThreadableMixin, QueuePublisherMixin, Base):
     def __init__(
-            self,
-            name=None,
-            service_uuid=None,
-            username='guest',
-            password='guest',
-            host='localhost',
-            port=5672,
-            exchange_name='',
-            exchange_type='',
-            **kwargs
+        self,
+        name=None,
+        service_uuid=None,
+        username='guest',
+        password='guest',
+        host='localhost',
+        port=5672,
+        exchange_name='',
+        exchange_type='',
+        **kwargs
     ):
-        super().__init__(
+        super(BusPublisherWithQueue, self).__init__(
             name=name,
             service_uuid=service_uuid,
             username=username,
@@ -112,19 +102,13 @@ class Publisher(object):
 
 # Deprecated, use BusPublisher instead
 class FailFastPublisher(Publisher):
-
     def __init__(self, producer, marshaler):
-        super().__init__(producer, marshaler, max_retries=2)
+        super(FailFastPublisher, self).__init__(producer, marshaler, max_retries=2)
 
 
 # Deprecated, use BusPublisher instead
 class LongLivedPublisher(Publisher):
-
     def __init__(self, producer, marshaler):
-        super().__init__(
-            producer,
-            marshaler,
-            interval_start=2,
-            interval_step=2,
-            interval_max=32
+        super(LongLivedPublisher, self).__init__(
+            producer, marshaler, interval_start=2, interval_step=2, interval_max=32
         )
