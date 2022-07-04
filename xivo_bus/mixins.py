@@ -117,6 +117,7 @@ class ConsumerMixin(KombuConsumer):
         self.__queue = Queue(name=name, auto_delete=True, durable=False)
         self.__lock = Lock()
         self.create_connection()
+        self.log.debug('setting consumption exchange as \'%s\'', self.__exchange)
 
         try:
             self._register_thread('consumer', self.__run, on_stop=self.__stop)
@@ -303,6 +304,7 @@ class PublisherMixin(object):
         self.__exchange = exchange if publish else self._default_exchange
         self.__connection = Connection(self.url, transport_options=self.publisher_args)
         self.__lock = Lock()
+        self.log.debug('setting publishing exchange as \'%s\'', self.__exchange)
 
     @contextmanager
     def Producer(self, connection, **connection_args):
