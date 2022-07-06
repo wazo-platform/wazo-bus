@@ -49,3 +49,7 @@ class TestPublisher(unittest.TestCase):
         self.marshaler.marshal_message.assert_called_once_with(event)
         self.publish.assert_called_once_with(
             sentinel.data, routing_key='foobar', headers=expected_headers, content_type='bazglop')
+
+    def test_publisher_is_connected(self):
+        self.producer.connection.connected = True
+        assert self.publisher.is_connected()
