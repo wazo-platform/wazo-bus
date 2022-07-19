@@ -1,42 +1,49 @@
-# Copyright 2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
-from xivo_bus.resources.common.event import BaseEvent
+from xivo_bus.resources.common.event import UserEvent
 
 
-class AdhocConferenceUserEvent(BaseEvent):
-    def __init__(self, conference_id, user_uuid):
-        self._body = {'conference_id': conference_id}
-        self.routing_key_fmt = self.routing_key_fmt.format(user_uuid=user_uuid)
-        super(AdhocConferenceUserEvent, self).__init__()
-
-
-class AdhocConferenceCreatedUserEvent(AdhocConferenceUserEvent):
+class AdhocConferenceCreatedEvent(UserEvent):
     name = 'conference_adhoc_created'
     routing_key_fmt = 'conferences.users.{user_uuid}.adhoc.created'
 
+    def __init__(self, conference_id, tenant_uuid, user_uuid):
+        content = {'conference_id': conference_id}
+        super(AdhocConferenceCreatedEvent, self).__init__(
+            content, tenant_uuid, user_uuid
+        )
 
-class AdhocConferenceDeletedUserEvent(AdhocConferenceUserEvent):
+
+class AdhocConferenceDeletedEvent(UserEvent):
     name = 'conference_adhoc_deleted'
     routing_key_fmt = 'conferences.users.{user_uuid}.adhoc.deleted'
 
-
-class AdhocConferenceParticipantUserEvent(BaseEvent):
-    def __init__(self, conference_id, user_uuid, participant_call):
-        self._body = {
-            'conference_id': conference_id,
-            'call_id': participant_call['call_id'],
-        }
-        self.routing_key_fmt = self.routing_key_fmt.format(user_uuid=user_uuid)
-        super(AdhocConferenceParticipantUserEvent, self).__init__()
+    def __init__(self, conference_id, tenant_uuid, user_uuid):
+        content = {'conference_id': conference_id}
+        super(AdhocConferenceDeletedEvent, self).__init__(
+            content, tenant_uuid, user_uuid
+        )
 
 
-class AdhocConferenceParticipantJoinedUserEvent(AdhocConferenceParticipantUserEvent):
+class AdhocConferenceParticipantJoinedEvent(UserEvent):
     name = 'conference_adhoc_participant_joined'
     routing_key_fmt = 'conferences.users.{user_uuid}.adhoc.participants.joined'
 
+    def __init__(self, conference_id, call_id, tenant_uuid, user_uuid):
+        content = {'conference_id': conference_id, 'call_id': call_id}
+        super(AdhocConferenceParticipantJoinedEvent, self).__init__(
+            content, tenant_uuid, user_uuid
+        )
 
-class AdhocConferenceParticipantLeftUserEvent(AdhocConferenceParticipantUserEvent):
+
+class AdhocConferenceParticipantLeftEvent(UserEvent):
     name = 'conference_adhoc_participant_left'
     routing_key_fmt = 'conferences.users.{user_uuid}.adhoc.participants.left'
+
+    def __init__(self, conference_id, call_id, tenant_uuid, user_uuid):
+        content = {'conference_id': conference_id, 'call_id': call_id}
+        super(AdhocConferenceParticipantLeftEvent, self).__init__(
+            content, tenant_uuid, user_uuid
+        )
