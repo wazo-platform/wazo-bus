@@ -75,7 +75,7 @@ def generate_event_payload(cls):
     except AttributeError:
         return {}
 
-    return yml['payload']
+    return {'data': yml['payload']}
 
 
 def generate_event_spec(cls):
