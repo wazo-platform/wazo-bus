@@ -1,29 +1,30 @@
 # -*- coding: utf-8 -*-
-# Copyright 2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
-
-from xivo_bus.resources.common.event import BaseEvent
-
-
-class _BaseExternalAppEvent(BaseEvent):
-
-    def __init__(self, app):
-        self._body = app
-        super(_BaseExternalAppEvent, self).__init__()
+from xivo_bus.resources.common.event import TenantEvent
 
 
-class EditExternalAppEvent(_BaseExternalAppEvent):
-    name = 'external_app_edited'
-    routing_key_fmt = 'config.external_apps.edited'
-
-
-class CreateExternalAppEvent(_BaseExternalAppEvent):
+class ExternalAppCreatedEvent(TenantEvent):
     name = 'external_app_created'
     routing_key_fmt = 'config.external_apps.created'
 
+    def __init__(self, app, tenant_uuid):
+        super(ExternalAppCreatedEvent, self).__init__(app, tenant_uuid)
 
-class DeleteExternalAppEvent(_BaseExternalAppEvent):
+
+class ExternalAppDeletedEvent(TenantEvent):
     name = 'external_app_deleted'
     routing_key_fmt = 'config.external_apps.deleted'
+
+    def __init__(self, app, tenant_uuid):
+        super(ExternalAppDeletedEvent, self).__init__(app, tenant_uuid)
+
+
+class ExternalAppEditedEvent(TenantEvent):
+    name = 'external_app_edited'
+    routing_key_fmt = 'config.external_apps.edited'
+
+    def __init__(self, app, tenant_uuid):
+        super(ExternalAppEditedEvent, self).__init__(app, tenant_uuid)
