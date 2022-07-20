@@ -1,29 +1,30 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
-
-from ..common.event import BaseEvent
-
-
-class _BaseCustomEndpointEvent(BaseEvent):
-
-    def __init__(self, endpoint_iax):
-        self._body = endpoint_iax
-        super(_BaseCustomEndpointEvent, self).__init__()
+from xivo_bus.resources.common.event import TenantEvent
 
 
-class EditCustomEndpointEvent(_BaseCustomEndpointEvent):
-    name = 'custom_endpoint_updated'
-    routing_key_fmt = 'config.custom_endpoint.updated'
-
-
-class CreateCustomEndpointEvent(_BaseCustomEndpointEvent):
+class CustomEndpointCreatedEvent(TenantEvent):
     name = 'custom_endpoint_created'
     routing_key_fmt = 'config.custom_endpoint.created'
 
+    def __init__(self, endpoint_iax, tenant_uuid):
+        super(CustomEndpointCreatedEvent, self).__init__(endpoint_iax, tenant_uuid)
 
-class DeleteCustomEndpointEvent(_BaseCustomEndpointEvent):
+
+class CustomEndpointDeletedEvent(TenantEvent):
     name = 'custom_endpoint_deleted'
     routing_key_fmt = 'config.custom_endpoint.deleted'
+
+    def __init__(self, endpoint_iax, tenant_uuid):
+        super(CustomEndpointDeletedEvent, self).__init__(endpoint_iax, tenant_uuid)
+
+
+class CustomEndpointEditedEvent(TenantEvent):
+    name = 'custom_endpoint_edited'
+    routing_key_fmt = 'config.custom_endpoint.edited'
+
+    def __init__(self, endpoint_iax, tenant_uuid):
+        super(CustomEndpointCreatedEvent, self).__init__(endpoint_iax, tenant_uuid)
