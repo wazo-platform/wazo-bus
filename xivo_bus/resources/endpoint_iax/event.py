@@ -1,29 +1,30 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
-
-from ..common.event import BaseEvent
-
-
-class _BaseIAXEndpointEvent(BaseEvent):
-
-    def __init__(self, endpoint_iax):
-        self._body = endpoint_iax
-        super(_BaseIAXEndpointEvent, self).__init__()
+from xivo_bus.resources.common.event import TenantEvent
 
 
-class EditIAXEndpointEvent(_BaseIAXEndpointEvent):
-    name = 'iax_endpoint_updated'
-    routing_key_fmt = 'config.iax_endpoint.updated'
-
-
-class CreateIAXEndpointEvent(_BaseIAXEndpointEvent):
+class IAXEndpointCreatedEvent(TenantEvent):
     name = 'iax_endpoint_created'
     routing_key_fmt = 'config.iax_endpoint.created'
 
+    def __init__(self, endpoint_iax, tenant_uuid):
+        super(IAXEndpointCreatedEvent, self).__init__(endpoint_iax, tenant_uuid)
 
-class DeleteIAXEndpointEvent(_BaseIAXEndpointEvent):
+
+class IAXEndpointDeletedEvent(TenantEvent):
     name = 'iax_endpoint_deleted'
     routing_key_fmt = 'config.iax_endpoint.deleted'
+
+    def __init__(self, endpoint_iax, tenant_uuid):
+        super(IAXEndpointDeletedEvent, self).__init__(endpoint_iax, tenant_uuid)
+
+
+class IAXEndpointEditedEvent(TenantEvent):
+    name = 'iax_endpoint_edited'
+    routing_key_fmt = 'config.iax_endpoint.edited'
+
+    def __init__(self, endpoint_iax, tenant_uuid):
+        super(IAXEndpointEditedEvent, self).__init__(endpoint_iax, tenant_uuid)
