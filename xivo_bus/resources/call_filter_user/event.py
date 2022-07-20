@@ -1,42 +1,30 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
+from xivo_bus.resources.common.event import TenantEvent
 
 
-class CallFilterUserConfigEvent(object):
+class CallFilterRecipientUsersAssociatedEvent(TenantEvent):
+    name = 'call_filter_recipient_users_associated'
+    routing_key_fmt = 'config.callfilters.recipients.users.updated'
 
-    def __init__(self, call_filter_id, user_uuids):
-        self.call_filter_id = call_filter_id
-        self.user_uuids = user_uuids
-
-    def marshal(self):
-        return {
-            'call_filter_id': self.call_filter_id,
-            'user_uuids': self.user_uuids,
+    def __init__(self, call_filter_id, users, tenant_uuid):
+        content = {
+            'call_filter_id': call_filter_id,
+            'user_uuids': users,
         }
-
-    @classmethod
-    def unmarshal(cls, msg):
-        return cls(
-            msg['call_filter_id'],
-            msg['user_uuids']
-        )
-
-    def __eq__(self, other):
-        return (self.call_filter_id == other.call_filter_id
-                and self.user_uuids == other.user_uuids)
-
-    def __ne__(self, other):
-        return not self == other
+        super(CallFilterRecipientUsersAssociatedEvent, self).__init__(content, tenant_uuid)
 
 
-class CallFilterRecipientUsersAssociatedEvent(CallFilterUserConfigEvent):
-    name = 'users_associated'
-    routing_key = 'config.callfilters.recipients.users.updated'
+class CallFilterSurrogateUsersAssociatedEvent(TenantEvent):
+    name = 'call_filter_surrogate_users_associated'
+    routing_key_fmt = 'config.callfilters.surrogates.users.updated'
 
-
-class CallFilterSurrogateUsersAssociatedEvent(CallFilterUserConfigEvent):
-    name = 'users_associated'
-    routing_key = 'config.callfilters.surrogates.users.updated'
+    def __init__(self, call_filter_id, users, tenant_uuid):
+        content = {
+            'call_filter_id': call_filter_id,
+            'user_uuids': users,
+        }
+        super(CallFilterSurrogateUsersAssociatedEvent, self).__init__(content, tenant_uuid)
