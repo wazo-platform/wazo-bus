@@ -1,29 +1,30 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
-
-from ..common.event import BaseEvent
-
-
-class _BaseApplicationEvent(BaseEvent):
-
-    def __init__(self, application):
-        self._body = application
-        super(_BaseApplicationEvent, self).__init__()
+from xivo_bus.resources.common.event import TenantEvent
 
 
-class EditApplicationEvent(_BaseApplicationEvent):
-    name = 'application_edited'
-    routing_key_fmt = 'config.applications.edited'
-
-
-class CreateApplicationEvent(_BaseApplicationEvent):
+class ApplicationCreatedEvent(TenantEvent):
     name = 'application_created'
     routing_key_fmt = 'config.applications.created'
 
+    def __init__(self, application, tenant_uuid):
+        super(ApplicationCreatedEvent, self).__init__(application, tenant_uuid)
 
-class DeleteApplicationEvent(_BaseApplicationEvent):
+
+class ApplicationDeletedEvent(TenantEvent):
     name = 'application_deleted'
     routing_key_fmt = 'config.applications.deleted'
+
+    def __init__(self, application, tenant_uuid):
+        super(ApplicationDeletedEvent, self).__init__(application, tenant_uuid)
+
+
+class ApplicationEditedEvent(TenantEvent):
+    name = 'application_edited'
+    routing_key_fmt = 'config.applications.edited'
+
+    def __init__(self, application, tenant_uuid):
+        super(ApplicationEditedEvent, self).__init__(application, tenant_uuid)
