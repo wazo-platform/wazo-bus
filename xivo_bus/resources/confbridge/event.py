@@ -1,30 +1,22 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
+from xivo_bus.resources.common.event import ServiceEvent
 
 
-class _ConfBridgeConfigurationEvent(object):
-    def marshal(self):
-        return {}
-
-    @classmethod
-    def unmarshal(cls, msg):
-        return cls()
-
-    def __eq__(self, other):
-        return self.name == other.name
-
-    def __ne__(self, other):
-        return not self == other
-
-
-class EditConfBridgeWazoDefaultBridgeEvent(_ConfBridgeConfigurationEvent):
+class ConfBridgeWazoDefaultBridgeEditedEvent(ServiceEvent):
     name = 'confbridge_wazo_default_bridge_edited'
-    routing_key = 'config.confbridge_wazo_default_bridge.edited'
+    routing_key_fmt = 'config.confbridge_wazo_default_bridge.edited'
+
+    def __init__(self):
+        super(ConfBridgeWazoDefaultBridgeEditedEvent, self).__init__()
 
 
-class EditConfBridgeWazoDefaultUserEvent(_ConfBridgeConfigurationEvent):
+class ConfBridgeWazoDefaultUserEditedEvent(ServiceEvent):
     name = 'confbridge_wazo_default_user_edited'
-    routing_key = 'config.confbridge_wazo_default_user.edited'
+    routing_key_fmt = 'config.confbridge_wazo_default_user.edited'
+
+    def __init__(self):
+        super(ConfBridgeWazoDefaultUserEditedEvent, self).__init__()
