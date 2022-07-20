@@ -1,44 +1,54 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
-
-from ..common.event import BaseEvent
-
-
-class _BaseSipEndpointEvent(BaseEvent):
-
-    def __init__(self, endpoint_sip):
-        self._body = endpoint_sip
-        super(_BaseSipEndpointEvent, self).__init__()
+from xivo_bus.resources.common.event import TenantEvent
 
 
-class EditSipEndpointEvent(_BaseSipEndpointEvent):
-    name = 'sip_endpoint_updated'
-    routing_key_fmt = 'config.sip_endpoint.updated'
-
-
-class CreateSipEndpointEvent(_BaseSipEndpointEvent):
+class SIPEndpointCreatedEvent(TenantEvent):
     name = 'sip_endpoint_created'
     routing_key_fmt = 'config.sip_endpoint.created'
 
+    def __init__(self, endpoint_sip, tenant_uuid):
+        super(SIPEndpointCreatedEvent, self).__init__(endpoint_sip, tenant_uuid)
 
-class DeleteSipEndpointEvent(_BaseSipEndpointEvent):
+
+class SIPEndpointDeletedEvent(TenantEvent):
     name = 'sip_endpoint_deleted'
     routing_key_fmt = 'config.sip_endpoint.deleted'
 
-
-class EditSipEndpointTemplateEvent(_BaseSipEndpointEvent):
-    name = 'sip_endpoint_template_updated'
-    routing_key_fmt = 'config.sip_endpoint_template.updated'
+    def __init__(self, endpoint_sip, tenant_uuid):
+        super(SIPEndpointDeletedEvent, self).__init__(endpoint_sip, tenant_uuid)
 
 
-class CreateSipEndpointTemplateEvent(_BaseSipEndpointEvent):
+class SIPEndpointEditedEvent(TenantEvent):
+    name = 'sip_endpoint_edited'
+    routing_key_fmt = 'config.sip_endpoint.edited'
+
+    def __init__(self, endpoint_sip, tenant_uuid):
+        super(SIPEndpointEditedEvent, self).__init__(endpoint_sip, tenant_uuid)
+
+
+class SIPEndpointTemplateCreatedEvent(TenantEvent):
     name = 'sip_endpoint_template_created'
     routing_key_fmt = 'config.sip_endpoint_template.created'
 
+    def __init__(self, endpoint_sip, tenant_uuid):
+        super(SIPEndpointTemplateCreatedEvent, self).__init__(endpoint_sip, tenant_uuid)
 
-class DeleteSipEndpointTemplateEvent(_BaseSipEndpointEvent):
+
+class SIPEndpointTemplateDeletedEvent(TenantEvent):
     name = 'sip_endpoint_template_deleted'
     routing_key_fmt = 'config.sip_endpoint_template.deleted'
+
+    def __init__(self, endpoint_sip, tenant_uuid):
+        super(SIPEndpointTemplateDeletedEvent, self).__init__(endpoint_sip, tenant_uuid)
+
+
+class SIPEndpointTemplateEditedEvent(TenantEvent):
+    name = 'sip_endpoint_template_edited'
+    routing_key_fmt = 'config.sip_endpoint_template.edited'
+
+    def __init__(self, endpoint_sip, tenant_uuid):
+        super(SIPEndpointTemplateEditedEvent, self).__init__(endpoint_sip, tenant_uuid)
