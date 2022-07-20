@@ -1,83 +1,56 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
+from xivo_bus.resources.common.event import TenantEvent
 
 
-class CallPickupUserConfigEvent(object):
+class CallPickupInterceptorUsersAssociatedEventt(TenantEvent):
+    name = 'call_pickup_interceptor_users_associated'
+    routing_key_fmt = 'config.callpickups.interceptors.users.updated'
 
-    def __init__(self, call_pickup_id, user_uuids):
-        self.call_pickup_id = call_pickup_id
-        self.user_uuids = user_uuids
-
-    def marshal(self):
-        return {
-            'call_pickup_id': self.call_pickup_id,
-            'user_uuids': self.user_uuids,
+    def __init__(self, call_pickup_id, users, tenant_uuid):
+        content = {
+            'call_pickup_id': call_pickup_id,
+            'user_uuids': users,
         }
-
-    @classmethod
-    def unmarshal(cls, msg):
-        return cls(
-            msg['call_pickup_id'],
-            msg['user_uuids']
+        super(CallPickupInterceptorUsersAssociatedEventt, self).__init__(
+            content, tenant_uuid
         )
 
-    def __eq__(self, other):
-        return (
-            self.call_pickup_id == other.call_pickup_id
-            and self.user_uuids == other.user_uuids,
-        )
 
-    def __ne__(self, other):
-        return not self == other
+class CallPickupTargetUsersAssociatedEvent(TenantEvent):
+    name = 'call_pickup_target_users_associated'
+    routing_key_fmt = 'config.callpickups.targets.users.updated'
 
-
-class CallPickupInterceptorUsersAssociatedEvent(CallPickupUserConfigEvent):
-    name = 'users_associated'
-    routing_key = 'config.callpickups.interceptors.users.updated'
-
-
-class CallPickupTargetUsersAssociatedEvent(CallPickupUserConfigEvent):
-    name = 'users_associated'
-    routing_key = 'config.callpickups.targets.users.updated'
-
-
-class CallPickupGroupConfigEvent(object):
-
-    def __init__(self, call_pickup_id, group_ids):
-        self.call_pickup_id = call_pickup_id
-        self.group_ids = group_ids
-
-    def marshal(self):
-        return {
-            'call_pickup_id': self.call_pickup_id,
-            'group_ids': self.group_ids,
+    def __init__(self, call_pickup_id, users, tenant_uuid):
+        content = {
+            'call_pickup_id': call_pickup_id,
+            'user_uuids': users,
         }
-
-    @classmethod
-    def unmarshal(cls, msg):
-        return cls(
-            msg['call_pickup_id'],
-            msg['group_ids']
-        )
-
-    def __eq__(self, other):
-        return (
-            self.call_pickup_id == other.call_pickup_id
-            and self.group_ids == other.group_ids,
-        )
-
-    def __ne__(self, other):
-        return not self == other
+        super(CallPickupTargetUsersAssociatedEvent, self).__init__(content, tenant_uuid)
 
 
-class CallPickupInterceptorGroupsAssociatedEvent(CallPickupGroupConfigEvent):
-    name = 'groups_associated'
-    routing_key = 'config.callpickups.interceptors.groups.updated'
+class CallPickupInterceptorGroupsAssociatedEvent(TenantEvent):
+    name = 'call_pickup_interceptor_groups_associated'
+    routing_key_fmt = 'config.callpickups.interceptors.users.updated'
+
+    def __init__(self, call_pickup_id, group_ids, tenant_uuid):
+        content = {
+            'call_pickup_id': call_pickup_id,
+            'group_ids': group_ids,
+        }
+        super(CallPickupInterceptorGroupsAssociatedEvent, self).__init__(content, tenant_uuid)
 
 
-class CallPickupTargetGroupsAssociatedEvent(CallPickupGroupConfigEvent):
-    name = 'groups_associated'
-    routing_key = 'config.callpickups.targets.groups.updated'
+class CallPickupTargetGroupsAssociatedEvent(TenantEvent):
+    name = 'call_pickup_target_groups_associated'
+    routing_key_fmt = 'config.callpickups.targets.groups.updated'
+
+    def __init__(self, call_pickup_id, group_ids, tenant_uuid):
+        content = {
+            'call_pickup_id': call_pickup_id,
+            'group_ids': group_ids,
+        }
+        super(CallPickupTargetGroupsAssociatedEvent, self).__init__(content, tenant_uuid)
