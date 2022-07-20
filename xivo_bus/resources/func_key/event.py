@@ -1,29 +1,36 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2014-2016 Avencall
+# Copyright 2014-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
-
-from xivo_bus.resources.common.event import ResourceConfigEvent
-
-
-class FuncKeyTemplateEvent(ResourceConfigEvent):
-    routing_key = 'config.funckey.template.{}'
+from xivo_bus.resources.common.event import TenantEvent, ResourceConfigEvent
 
 
-class CreateFuncKeyTemplateEvent(ResourceConfigEvent):
+class FuncKeyTemplateCreatedEvent(TenantEvent):
     name = 'func_key_template_created'
-    routing_key = FuncKeyTemplateEvent.routing_key.format('created')
+    routing_key_fmt = 'config.funckey.template.created'
+
+    def __init__(self, template_id, tenant_uuid):
+        content = {'id': template_id}
+        super(FuncKeyTemplateCreatedEvent, self).__init__(content, tenant_uuid)
 
 
-class DeleteFuncKeyTemplateEvent(ResourceConfigEvent):
+class FuncKeyTemplateDeletedEvent(TenantEvent):
     name = 'func_key_template_deleted'
-    routing_key = FuncKeyTemplateEvent.routing_key.format('deleted')
+    routing_key_fmt = 'config.funckey.template.deleted'
+
+    def __init__(self, template_id, tenant_uuid):
+        content = {'id': template_id}
+        super(FuncKeyTemplateDeletedEvent, self).__init__(content, tenant_uuid)
 
 
-class EditFuncKeyTemplateEvent(ResourceConfigEvent):
+class FuncKeyTemplateEditedEvent(TenantEvent):
     name = 'func_key_template_edited'
-    routing_key = FuncKeyTemplateEvent.routing_key.format('edited')
+    routing_key_fmt = 'config.funckey.template.edited'
+
+    def __init__(self, template_id, tenant_uuid):
+        content = {'id': template_id}
+        super(FuncKeyTemplateEditedEvent, self).__init__(content, tenant_uuid)
 
 
 class UserFuncKeyEvent(ResourceConfigEvent):
