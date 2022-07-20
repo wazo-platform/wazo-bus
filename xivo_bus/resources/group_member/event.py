@@ -1,24 +1,32 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
-
-from ..common.event import BaseEvent
-
-
-class _GroupMemberConfigEvent(BaseEvent):
-
-    def __init__(self, **body):
-        self._body = body
-        super(_GroupMemberConfigEvent, self).__init__()
+from xivo_bus.resources.common.event import TenantEvent
 
 
-class GroupMemberUsersAssociatedEvent(_GroupMemberConfigEvent):
-    name = 'users_associated'
+class GroupMemberUsersAssociatedEvent(TenantEvent):
+    name = 'group_member_users_associated'
     routing_key_fmt = 'config.groups.members.users.updated'
 
+    def __init__(self, group_id, group_uuid, users, tenant_uuid):
+        content = {
+            'group_id': group_id,
+            'group_uuid': str(group_uuid),
+            'user_uuids': users,
+        }
+        super(GroupMemberUsersAssociatedEvent, self).__init__(content, tenant_uuid)
 
-class GroupMemberExtensionsAssociatedEvent(_GroupMemberConfigEvent):
-    name = 'extensions_associated'
+
+class GroupMemberExtensionsAssociatedEvent(TenantEvent):
+    name = 'group_member_extensions_associated'
     routing_key_fmt = 'config.groups.members.extensions.updated'
+
+    def __init__(self, group_id, group_uuid, extensions, tenant_uuid):
+        content = {
+            'group_id': group_id,
+            'group_uuid': str(group_uuid),
+            'extensions': extensions,
+        }
+        super(GroupMemberExtensionsAssociatedEvent, self).__init__(content, tenant_uuid)
