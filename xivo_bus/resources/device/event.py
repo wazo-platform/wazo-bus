@@ -1,29 +1,33 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2013-2014 Avencall
+# Copyright 2013-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
-
-from xivo_bus.resources.common.event import ResourceConfigEvent
-
-
-class DeviceConfigEvent(ResourceConfigEvent):
-    routing_key = 'config.device.{}'
-
-    def __init__(self, device_id):
-        self.id = device_id
+from xivo_bus.resources.common.event import TenantEvent
 
 
-class EditDeviceEvent(DeviceConfigEvent):
-    name = 'device_edited'
-    routing_key = DeviceConfigEvent.routing_key.format('edited')
-
-
-class CreateDeviceEvent(DeviceConfigEvent):
+class DeviceCreatedEvent(TenantEvent):
     name = 'device_created'
-    routing_key = DeviceConfigEvent.routing_key.format('created')
+    routing_key_fmt = 'config.device.created'
+
+    def __init__(self, device_id, tenant_uuid):
+        content = {'id': device_id}
+        super(DeviceCreatedEvent, self).__init__(content, tenant_uuid)
 
 
-class DeleteDeviceEvent(DeviceConfigEvent):
+class DeviceDeletedEvent(TenantEvent):
     name = 'device_deleted'
-    routing_key = DeviceConfigEvent.routing_key.format('deleted')
+    routing_key_fmt = 'config.device.deleted'
+
+    def __init__(self, device_id, tenant_uuid):
+        content = {'id': device_id}
+        super(DeviceCreatedEvent, self).__init__(content, tenant_uuid)
+
+
+class DeviceEditedEvent(TenantEvent):
+    name = 'device_edited'
+    routing_key_fmt = 'config.device.edited'
+
+    def __init__(self, device_id, tenant_uuid):
+        content = {'id': device_id}
+        super(DeviceCreatedEvent, self).__init__(content, tenant_uuid)
