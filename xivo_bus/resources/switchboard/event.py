@@ -3,10 +3,58 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
-
-from ..common.event import BaseEvent
+from xivo_bus.resources.common.event import TenantEvent, BaseEvent
 from xivo.permission import escape as escape_acl
 from xivo_bus.resources.common.routing_key import escape as escape_key
+
+
+class SwitchboardEvent(TenantEvent):
+    def __init__(self, content, switchboard_uuid, tenant_uuid):
+        super(TenantEvent, self).__init__(content, tenant_uuid)
+        if switchboard_uuid is None:
+            raise ValueError('switchboard_uuid must have a value')
+        self.switchboard_uuid = str(switchboard_uuid)
+
+
+class SwitchboardCreatedEvent(SwitchboardEvent):
+    name = 'switchboard_created'
+    routing_key_fmt = 'config.switchboards.{uuid}.created'
+
+    def __init__(self, switchboard, tenant_uuid):
+        uuid = switchboard['uuid']
+        self.required_acl = 'switchboards.{uuid}.created'.format(uuid=uuid)
+        super(SwitchboardCreatedEvent, self).__init__(switchboard, uuid, tenant_uuid)
+
+
+class SwitchboardDeletedEvent(SwitchboardEvent):
+    name = 'switchboard_deleted'
+    routing_key_fmt = 'config.switchboards.{uuid}.deleted'
+
+    def __init__(self, switchboard, tenant_uuid):
+        uuid = switchboard['uuid']
+        self.required_acl = 'switchboards.{uuid}.deleted'.format(uuid=uuid)
+        super(SwitchboardDeletedEvent, self).__init__(switchboard, uuid, tenant_uuid)
+
+
+class SwitchboardEditedEvent(SwitchboardEvent):
+    name = 'switchboard_edited'
+    routing_key_fmt = 'config.switchboards.{uuid}.edited'
+
+    def __init__(self, switchboard, tenant_uuid):
+        uuid = switchboard['uuid']
+        self.required_acl = 'switchboards.{uuid}.edited'.format(uuid=uuid)
+        super(SwitchboardEditedEvent, self).__init__(switchboard, uuid, tenant_uuid)
+
+
+class SwitchboardFallbackEditedEvent(SwitchboardEvent):
+    name = 'switchboard_fallback_edited'
+    routing_key_fmt = 'config.switchboards.fallbacks.edited'
+    required_acl = 'switchboards.fallbacks.edited'
+
+    def __init__(self, fallback, switchboard_uuid, tenant_uuid):
+        super(SwitchboardFallbackEditedEvent, self).__init__(
+            fallback, switchboard_uuid, tenant_uuid
+        )
 
 
 class _BaseSwitchboardEvent(BaseEvent):
