@@ -1,41 +1,34 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
+from xivo_bus.resources.common.event import UserEvent
 
 
-class UserScheduleConfigEvent(object):
-
-    def __init__(self, user_uuid, schedule_id):
-        self.user_uuid = user_uuid
-        self.schedule_id = schedule_id
-
-    def marshal(self):
-        return {
-            'user_uuid': self.user_uuid,
-            'schedule_id': self.schedule_id,
-        }
-
-    @classmethod
-    def unmarshal(cls, msg):
-        return cls(
-            msg['user_uuid'],
-            msg['schedule_id'])
-
-    def __eq__(self, other):
-        return (self.user_uuid == other.user_uuid
-                and self.schedule_id == other.schedule_id)
-
-    def __ne__(self, other):
-        return not self == other
-
-
-class UserScheduleAssociatedEvent(UserScheduleConfigEvent):
+class UserScheduleAssociatedEvent(UserEvent):
     name = 'user_schedule_associated'
-    routing_key = 'config.users.schedules.updated'
+    routing_key_fmt = 'config.users.schedules.updated'
+
+    def __init__(self, schedule_id, tenant_uuid, user_uuid):
+        content = {
+            'user_uuid': str(user_uuid),
+            'schedule_id': schedule_id,
+        }
+        super(UserScheduleAssociatedEvent, self).__init__(
+            content, tenant_uuid, user_uuid
+        )
 
 
-class UserScheduleDissociatedEvent(UserScheduleConfigEvent):
+class UserScheduleDissociatedEvent(UserEvent):
     name = 'user_schedule_dissociated'
-    routing_key = 'config.users.schedules.deleted'
+    routing_key_fmt = 'config.users.schedules.deleted'
+
+    def __init__(self, schedule_id, tenant_uuid, user_uuid):
+        content = {
+            'user_uuid': str(user_uuid),
+            'schedule_id': schedule_id,
+        }
+        super(UserScheduleDissociatedEvent, self).__init__(
+            content, tenant_uuid, user_uuid
+        )
