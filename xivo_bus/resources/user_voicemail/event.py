@@ -1,29 +1,34 @@
 # -*- coding: utf-8 -*-
-# Copyright 2013-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
+from xivo_bus.resources.common.event import UserEvent
 
-from ..common.event import BaseEvent
+
+class UserVoicemailAssociatedEvent(UserEvent):
+    name = 'user_voicemail_associated'
+    routing_key_fmt = 'config.users.{user_uuid}.voicemails.updated'
+
+    def __init__(self, voicemail_id, tenant_uuid, user_uuid):
+        content = {
+            'user_uuid': str(user_uuid),
+            'voicemail_id': int(voicemail_id),
+        }
+        super(UserVoicemailAssociatedEvent, self).__init__(
+            content, tenant_uuid, user_uuid
+        )
 
 
-class _BaseUserVoicemailEvent(BaseEvent):
+class UserVoicemailDissociatedEvent(UserEvent):
+    name = 'user_voicemail_dissociated'
+    routing_key_fmt = 'config.users.{user_uuid}.voicemails.deleted'
 
-    def __init__(self, user_uuid, voicemail_id):
-        self._body = {
+    def __init__(self, voicemail_id, tenant_uuid, user_uuid):
+        content = {
             'user_uuid': user_uuid,
             'voicemail_id': int(voicemail_id),
         }
-        super(_BaseUserVoicemailEvent, self).__init__()
-
-
-class UserVoicemailAssociatedEvent(_BaseUserVoicemailEvent):
-
-    name = 'voicemail_associated'
-    routing_key_fmt = 'config.users.{user_uuid}.voicemails.updated'
-
-
-class UserVoicemailDissociatedEvent(_BaseUserVoicemailEvent):
-
-    name = 'voicemail_dissociated'
-    routing_key_fmt = 'config.users.{user_uuid}.voicemails.deleted'
+        super(UserVoicemailDissociatedEvent, self).__init__(
+            content, tenant_uuid, user_uuid
+        )
