@@ -1,23 +1,14 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
+from xivo_bus.resources.common.event import ServiceEvent
 
 
-class EditVoicemailZoneMessagesEvent(object):
+class VoicemailZoneMessagesEditedEvent(ServiceEvent):
     name = 'voicemail_zonemessages_edited'
-    routing_key = 'config.voicemail_zonemessages.edited'
+    routing_key_fmt = 'config.voicemail_zonemessages.edited'
 
-    def marshal(self):
-        return {}
-
-    @classmethod
-    def unmarshal(cls, msg):
-        return cls()
-
-    def __eq__(self, other):
-        return self.name == other.name
-
-    def __ne__(self, other):
-        return not self == other
+    def __init__(self):
+        super(VoicemailZoneMessagesEditedEvent, self).__init__()
