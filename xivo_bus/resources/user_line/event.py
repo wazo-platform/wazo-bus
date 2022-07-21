@@ -1,31 +1,38 @@
 # -*- coding: utf-8 -*-
-# Copyright 2013-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
+from xivo_bus.resources.common.event import UserEvent
 
-from ..common.event import BaseEvent
 
+class UserLineAssociatedEvent(UserEvent):
+    name = 'user_line_associated'
+    routing_key_fmt = 'config.users.{user_uuid}.lines.{line[id]}.updated'
 
-class _BaseUserLineEvent(BaseEvent):
-
-    def __init__(self, user, line, main_user, main_line):
-        self._body = {
+    def __init__(self, user, line, main_user, main_line, tenant_uuid):
+        content = {
             'line': line,
             'main_line': main_line,
             'main_user': main_user,
             'user': user,
         }
-        super(_BaseUserLineEvent, self).__init__()
+        super(UserLineAssociatedEvent, self).__init__(
+            content, tenant_uuid, user['uuid']
+        )
 
 
-class UserLineAssociatedEvent(_BaseUserLineEvent):
-
-    name = 'user_line_associated'
-    routing_key_fmt = 'config.users.{user[uuid]}.lines.{line[id]}.updated'
-
-
-class UserLineDissociatedEvent(_BaseUserLineEvent):
-
+class UserLineDissociatedEvent(UserEvent):
     name = 'user_line_dissociated'
-    routing_key_fmt = 'config.users.{user[uuid]}.lines.{line[id]}.deleted'
+    routing_key_fmt = 'config.users.{user_uuid}.lines.{line[id]}.deleted'
+
+    def __init__(self, user, line, main_user, main_line, tenant_uuid):
+        content = {
+            'line': line,
+            'main_line': main_line,
+            'main_user': main_user,
+            'user': user,
+        }
+        super(UserLineDissociatedEvent, self).__init__(
+            content, tenant_uuid, user['uuid']
+        )
