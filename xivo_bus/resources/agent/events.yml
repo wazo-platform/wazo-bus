@@ -1,0 +1,45 @@
+asyncapi: 2.0.0
+info:
+  title: Wazo-agentd Service
+  version: '1.0.0'
+  description: |
+    Manages agents in wazo system
+
+servers:
+  production:
+    url: amqp://guest:guest@localhost:5672/
+    protocol: amqp
+    protocolVersion: 0.9.1
+
+channels:
+  agent_edited:
+    subscribe:
+      summary: An agent has been edited
+      message:
+        $ref: '#/components/messages/agentId'
+
+components:
+  messages:
+    agentId:
+      payload:
+        type: object
+        properties:
+          id:
+            type: integer
+            description: Agent's unique ID
+            minimum: 1
+      headers:
+        type: object
+        properties:
+          name:
+            $ref: '#/components/schemas/name'
+          tenant_uuid:
+            $ref: '#/components/schemas/tenant_uuid'
+
+  schemas:
+    name:
+      type: string
+      const: {$channel}
+    tenant_uuid:
+      type: string
+      description: Agent's associated tenant UUID
