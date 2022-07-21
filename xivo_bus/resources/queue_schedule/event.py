@@ -1,41 +1,30 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
+from xivo_bus.resources.common.event import TenantEvent
 
 
-class QueueScheduleConfigEvent(object):
-
-    def __init__(self, queue_id, schedule_id):
-        self.queue_id = queue_id
-        self.schedule_id = schedule_id
-
-    def marshal(self):
-        return {
-            'queue_id': self.queue_id,
-            'schedule_id': self.schedule_id,
-        }
-
-    @classmethod
-    def unmarshal(cls, msg):
-        return cls(
-            msg['queue_id'],
-            msg['schedule_id'])
-
-    def __eq__(self, other):
-        return (self.queue_id == other.queue_id
-                and self.schedule_id == other.schedule_id)
-
-    def __ne__(self, other):
-        return not self == other
-
-
-class QueueScheduleAssociatedEvent(QueueScheduleConfigEvent):
+class QueueScheduleAssociatedEvent(TenantEvent):
     name = 'queue_schedule_associated'
-    routing_key = 'config.queues.schedules.updated'
+    routing_key_fmt = 'config.queues.schedules.updated'
+
+    def __init__(self, queue_id, schedule_id, tenant_uuid):
+        content = {
+            'queue_id': queue_id,
+            'schedule_id': schedule_id,
+        }
+        super(QueueScheduleAssociatedEvent, self).__init__(content, tenant_uuid)
 
 
-class QueueScheduleDissociatedEvent(QueueScheduleConfigEvent):
+class QueueScheduleDissociatedEvent(TenantEvent):
     name = 'queue_schedule_dissociated'
-    routing_key = 'config.queues.schedules.deleted'
+    routing_key_fmt = 'config.queues.schedules.deleted'
+
+    def __init__(self, queue_id, schedule_id, tenant_uuid):
+        content = {
+            'queue_id': queue_id,
+            'schedule_id': schedule_id,
+        }
+        super(QueueScheduleDissociatedEvent, self).__init__(content, tenant_uuid)
