@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 from xivo_bus.resources.common.event import TenantEvent
 
 
-class CallFilterRecipientAssociatedEvent(TenantEvent):
+class CallFilterRecipientUsersAssociatedEvent(TenantEvent):
     name = 'call_filter_recipient_users_associated'
     routing_key_fmt = 'config.callfilters.recipients.users.updated'
 
@@ -15,7 +15,7 @@ class CallFilterRecipientAssociatedEvent(TenantEvent):
             'call_filter_id': call_filter_id,
             'user_uuids': users,
         }
-        super(CallFilterRecipientAssociatedEvent, self).__init__(content, tenant_uuid)
+        super(CallFilterRecipientUsersAssociatedEvent, self).__init__(content, tenant_uuid)
 
 
 class CallFilterSurrogateUsersAssociatedEvent(TenantEvent):
