@@ -1,44 +1,24 @@
 # -*- coding: utf-8 -*-
-# Copyright 2013-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
+from xivo_bus.resources.common.event import TenantEvent
 
 
-class LineExtensionConfigEvent(object):
-    routing_key = 'config.line_extension_association.{}'
-
-    def __init__(self,
-                 line_id,
-                 extension_id):
-        self.line_id = int(line_id)
-        self.extension_id = int(extension_id)
-
-    def marshal(self):
-        return {
-            'line_id': self.line_id,
-            'extension_id': self.extension_id,
-        }
-
-    @classmethod
-    def unmarshal(cls, msg):
-        return cls(
-            msg['line_id'],
-            msg['extension_id'])
-
-    def __eq__(self, other):
-        return (self.line_id == other.line_id
-                and self.extension_id == other.extension_id)
-
-    def __ne__(self, other):
-        return not self == other
-
-
-class LineExtensionAssociatedEvent(LineExtensionConfigEvent):
+class LineExtensionAssociatedEvent(TenantEvent):
     name = 'line_extension_associated'
-    routing_key = LineExtensionConfigEvent.routing_key.format('created')
+    routing_key_fmt = 'config.line_extension_associated.updated'
+
+    def __init__(self, line_id, extension_id, tenant_uuid):
+        content = {'line_id': line_id, 'extension_id': extension_id}
+        super(LineExtensionAssociatedEvent, self).__init__(content, tenant_uuid)
 
 
-class LineExtensionDissociatedEvent(LineExtensionConfigEvent):
+class LineExtensionDissociatedEvent(TenantEvent):
     name = 'line_extension_dissociated'
-    routing_key = LineExtensionConfigEvent.routing_key.format('deleted')
+    routing_key_fmt = 'config.line_extension_associated.deleted'
+
+    def __init__(self, line_id, extension_id, tenant_uuid):
+        content = {'line_id': line_id, 'extension_id': extension_id}
+        super(LineExtensionDissociatedEvent, self).__init__(content, tenant_uuid)
