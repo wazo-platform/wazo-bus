@@ -1,41 +1,30 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
+from xivo_bus.resources.common.event import TenantEvent
 
 
-class OutcallScheduleConfigEvent(object):
-
-    def __init__(self, outcall_id, schedule_id):
-        self.outcall_id = outcall_id
-        self.schedule_id = schedule_id
-
-    def marshal(self):
-        return {
-            'outcall_id': self.outcall_id,
-            'schedule_id': self.schedule_id,
-        }
-
-    @classmethod
-    def unmarshal(cls, msg):
-        return cls(
-            msg['outcall_id'],
-            msg['schedule_id'])
-
-    def __eq__(self, other):
-        return (self.outcall_id == other.outcall_id
-                and self.schedule_id == other.schedule_id)
-
-    def __ne__(self, other):
-        return not self == other
-
-
-class OutcallScheduleAssociatedEvent(OutcallScheduleConfigEvent):
+class OutcallScheduleAssociatedEvent(TenantEvent):
     name = 'outcall_schedule_associated'
-    routing_key = 'config.outcalls.schedules.updated'
+    routing_key_fmt = 'config.outcalls.schedules.updated'
+
+    def __init__(self, outcall_id, schedule_id, tenant_uuid):
+        content = {
+            'outcall_id': outcall_id,
+            'schedule_id': schedule_id,
+        }
+        super(OutcallScheduleAssociatedEvent, self).__init__(content, tenant_uuid)
 
 
-class OutcallScheduleDissociatedEvent(OutcallScheduleConfigEvent):
+class OutcallScheduleDissociatedEvent(TenantEvent):
     name = 'outcall_schedule_dissociated'
-    routing_key = 'config.outcalls.schedules.deleted'
+    routing_key_fmt = 'config.outcalls.schedules.deleted'
+
+    def __init__(self, outcall_id, schedule_id, tenant_uuid):
+        content = {
+            'outcall_id': outcall_id,
+            'schedule_id': schedule_id,
+        }
+        super(OutcallScheduleDissociatedEvent, self).__init__(content, tenant_uuid)
