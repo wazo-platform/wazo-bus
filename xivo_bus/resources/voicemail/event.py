@@ -1,15 +1,36 @@
 # -*- coding: utf-8 -*-
-# Copyright 2013-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
+from xivo_bus.resources.common.event import TenantEvent
 
-from xivo_bus.resources.common.event import ResourceConfigEvent
+
+class VoicemailCreatedEvent(TenantEvent):
+    name = 'voicemail_created'
+    routing_key_fmt = 'config.voicemail.created'
+
+    def __init__(self, voicemail_id, tenant_uuid):
+        content = {'id': int(voicemail_id)}
+        super(VoicemailCreatedEvent, self).__init__(content, tenant_uuid)
 
 
-class EditVoicemailEvent(ResourceConfigEvent):
+class VoicemailDeletedEvent(TenantEvent):
+    name = 'voicemail_deleted'
+    routing_key_fmt = 'config.voicemail.deleted'
+
+    def __init__(self, voicemail_id, tenant_uuid):
+        content = {'id': int(voicemail_id)}
+        super(VoicemailDeletedEvent, self).__init__(content, tenant_uuid)
+
+
+class VoicemailEditedEvent(TenantEvent):
     name = 'voicemail_edited'
-    routing_key = 'config.voicemail.edited'
+    routing_key_fmt = 'config.voicemail.edited'
+
+    def __init__(self, voicemail_id, tenant_uuid):
+        content = {'id': int(voicemail_id)}
+        super(VoicemailEditedEvent, self).__init__(content, tenant_uuid)
 
 
 class EditUserVoicemailEvent(object):
@@ -39,16 +60,6 @@ class EditUserVoicemailEvent(object):
 
     def __ne__(self, other):
         return not self == other
-
-
-class CreateVoicemailEvent(ResourceConfigEvent):
-    name = 'voicemail_created'
-    routing_key = 'config.voicemail.created'
-
-
-class DeleteVoicemailEvent(ResourceConfigEvent):
-    name = 'voicemail_deleted'
-    routing_key = 'config.voicemail.deleted'
 
 
 class _UserVoicemailMessageEvent(object):
