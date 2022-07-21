@@ -1,73 +1,72 @@
 # -*- coding: utf-8 -*-
-# Copyright 2019-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
-
-from ..common.event import BaseEvent
-
-
-class _BaseLineEndpointSIPEvent(BaseEvent):
-
-    def __init__(self, line, sip):
-        self._body = {
-            'line': line,
-            'endpoint_sip': sip,
-        }
-        super(_BaseLineEndpointSIPEvent, self).__init__()
+from xivo_bus.resources.common.event import TenantEvent
 
 
-class LineEndpointSIPAssociatedEvent(_BaseLineEndpointSIPEvent):
-
+class LineEndpointSIPAssociatedEvent(TenantEvent):
     name = 'line_endpoint_sip_associated'
-    routing_key_fmt = 'config.lines.{line[id]}.endpoints.sip.{endpoint_sip[uuid]}.updated'
+    routing_key_fmt = (
+        'config.lines.{line[id]}.endpoints.sip.{endpoint_sip[uuid]}.updated'
+    )
+
+    def __init__(self, line, sip, tenant_uuid):
+        content = {'line': line, 'endpoint_sip': sip}
+        super(LineEndpointSIPAssociatedEvent, self).__init__(content, tenant_uuid)
 
 
-class LineEndpointSIPDissociatedEvent(_BaseLineEndpointSIPEvent):
-
+class LineEndpointSIPDissociatedEvent(TenantEvent):
     name = 'line_endpoint_sip_dissociated'
-    routing_key_fmt = 'config.lines.{line[id]}.endpoints.sip.{endpoint_sip[uuid]}.deleted'
+    routing_key_fmt = (
+        'config.lines.{line[id]}.endpoints.sip.{endpoint_sip[uuid]}.deleted'
+    )
+
+    def __init__(self, line, sip, tenant_uuid):
+        content = {'line': line, 'endpoint_sip': sip}
+        super(LineEndpointSIPDissociatedEvent, self).__init__(content, tenant_uuid)
 
 
-class _BaseLineEndpointSCCPEvent(BaseEvent):
-
-    def __init__(self, line, sccp):
-        self._body = {
-            'line': line,
-            'endpoint_sccp': sccp,
-        }
-        super(_BaseLineEndpointSCCPEvent, self).__init__()
-
-
-class LineEndpointSCCPAssociatedEvent(_BaseLineEndpointSCCPEvent):
-
+class LineEndpointSCCPAssociatedEvent(TenantEvent):
     name = 'line_endpoint_sccp_associated'
-    routing_key_fmt = 'config.lines.{line[id]}.endpoints.sccp.{endpoint_sccp[id]}.updated'
+    routing_key_fmt = (
+        'config.lines.{line[id]}.endpoints.sccp.{endpoint_sccp[uuid]}.updated'
+    )
+
+    def __init__(self, line, sccp, tenant_uuid):
+        content = {'line': line, 'endpoint_sccp': sccp}
+        super(LineEndpointSIPAssociatedEvent, self).__init__(content, tenant_uuid)
 
 
-class LineEndpointSCCPDissociatedEvent(_BaseLineEndpointSCCPEvent):
-
+class LineEndpointSCCPDissociatedEvent(TenantEvent):
     name = 'line_endpoint_sccp_dissociated'
-    routing_key_fmt = 'config.lines.{line[id]}.endpoints.sccp.{endpoint_sccp[id]}.deleted'
+    routing_key_fmt = (
+        'config.lines.{line[id]}.endpoints.sccp.{endpoint_sccp[uuid]}.deleted'
+    )
+
+    def __init__(self, line, sccp, tenant_uuid):
+        content = {'line': line, 'endpoint_sccp': sccp}
+        super(LineEndpointSIPDissociatedEvent, self).__init__(content, tenant_uuid)
 
 
-class _BaseLineEndpointCustomEvent(BaseEvent):
-
-    def __init__(self, line, custom):
-        self._body = {
-            'line': line,
-            'endpoint_custom': custom,
-        }
-        super(_BaseLineEndpointCustomEvent, self).__init__()
-
-
-class LineEndpointCustomAssociatedEvent(_BaseLineEndpointCustomEvent):
-
+class LineEndpointCustomAssociatedEvent(TenantEvent):
     name = 'line_endpoint_custom_associated'
-    routing_key_fmt = 'config.lines.{line[id]}.endpoints.custom.{endpoint_custom[id]}.updated'
+    routing_key_fmt = (
+        'config.lines.{line[id]}.endpoints.sccp.{endpoint_custom[uuid]}.updated'
+    )
+
+    def __init__(self, line, custom, tenant_uuid):
+        content = {'line': line, 'endpoint_custom': custom}
+        super(LineEndpointCustomAssociatedEvent, self).__init__(content, tenant_uuid)
 
 
-class LineEndpointCustomDissociatedEvent(_BaseLineEndpointCustomEvent):
-
+class LineEndpointCustomDissociatedEvent(TenantEvent):
     name = 'line_endpoint_custom_dissociated'
-    routing_key_fmt = 'config.lines.{line[id]}.endpoints.custom.{endpoint_custom[id]}.deleted'
+    routing_key_fmt = (
+        'config.lines.{line[id]}.endpoints.custom.{endpoint_custom[uuid]}.deleted'
+    )
+
+    def __init__(self, line, custom, tenant_uuid):
+        content = {'line': line, 'endpoint_custom': custom}
+        super(LineEndpointCustomDissociatedEvent, self).__init__(content, tenant_uuid)
