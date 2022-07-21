@@ -1,73 +1,78 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
-
-from ..common.event import BaseEvent
-
-
-class _BaseTrunkEndpointSIPEvent(BaseEvent):
-
-    def __init__(self, trunk, sip):
-        self._body = {
-            'trunk': trunk,
-            'endpoint_sip': sip,
-        }
-        super(_BaseTrunkEndpointSIPEvent, self).__init__()
+from xivo_bus.resources.common.event import TenantEvent
 
 
-class TrunkEndpointSIPAssociatedEvent(_BaseTrunkEndpointSIPEvent):
-
+class TrunkEndpointSIPAssociatedEvent(TenantEvent):
     name = 'trunk_endpoint_sip_associated'
     routing_key_fmt = 'config.trunks.{trunk[id]}.endpoints.sip.{endpoint_sip[uuid]}.updated'
 
+    def __init__(self, trunk, sip, tenant_uuid):
+        content = {
+            'trunk': trunk,
+            'endpoint_sip': sip,
+        }
+        super(TrunkEndpointSIPAssociatedEvent, self).__init__(content, tenant_uuid)
 
-class TrunkEndpointSIPDissociatedEvent(_BaseTrunkEndpointSIPEvent):
 
+class TrunkEndpointSIPDissociatedEvent(TenantEvent):
     name = 'trunk_endpoint_sip_dissociated'
     routing_key_fmt = 'config.trunks.{trunk[id]}.endpoints.sip.{endpoint_sip[uuid]}.deleted'
 
-
-class _BaseTrunkEndpointIAXEvent(BaseEvent):
-
-    def __init__(self, trunk, iax):
-        self._body = {
+    def __init__(self, trunk, sip, tenant_uuid):
+        content = {
             'trunk': trunk,
-            'endpoint_iax': iax,
+            'endpoint_sip': sip,
         }
-        super(_BaseTrunkEndpointIAXEvent, self).__init__()
+        super(TrunkEndpointSIPDissociatedEvent, self).__init__(content, tenant_uuid)
 
 
-class TrunkEndpointIAXAssociatedEvent(_BaseTrunkEndpointIAXEvent):
-
+class TrunkEndpointIAXAssociatedEvent(TenantEvent):
     name = 'trunk_endpoint_iax_associated'
     routing_key_fmt = 'config.trunks.{trunk[id]}.endpoints.iax.{endpoint_iax[id]}.updated'
 
+    def __init__(self, trunk, iax, tenant_uuid):
+        content = {
+            'trunk': trunk,
+            'endpoint_iax': iax,
+        }
+        super(TrunkEndpointIAXAssociatedEvent, self).__init__(content, tenant_uuid)
 
-class TrunkEndpointIAXDissociatedEvent(_BaseTrunkEndpointIAXEvent):
 
+class TrunkEndpointIAXDissociatedEvent(TenantEvent):
     name = 'trunk_endpoint_iax_dissociated'
     routing_key_fmt = 'config.trunks.{trunk[id]}.endpoints.iax.{endpoint_iax[id]}.deleted'
 
-
-class _BaseTrunkEndpointCustomEvent(BaseEvent):
-
-    def __init__(self, trunk, custom):
-        self._body = {
+    def __init__(self, trunk, iax, tenant_uuid):
+        content = {
             'trunk': trunk,
-            'endpoint_custom': custom,
+            'endpoint_iax': iax,
         }
-        super(_BaseTrunkEndpointCustomEvent, self).__init__()
+        super(TrunkEndpointIAXDissociatedEvent, self).__init__(content, tenant_uuid)
 
 
-class TrunkEndpointCustomAssociatedEvent(_BaseTrunkEndpointCustomEvent):
-
+class TrunkEndpointCustomAssociatedEvent(TenantEvent):
     name = 'trunk_endpoint_custom_associated'
     routing_key_fmt = 'config.trunks.{trunk[id]}.endpoints.custom.{endpoint_custom[id]}.updated'
 
+    def __init__(self, trunk, custom, tenant_uuid):
+        content = {
+            'trunk': trunk,
+            'endpoint_custom': custom,
+        }
+        super(TrunkEndpointCustomAssociatedEvent, self).__init__(content, tenant_uuid)
 
-class TrunkEndpointCustomDissociatedEvent(_BaseTrunkEndpointCustomEvent):
 
+class TrunkEndpointCustomDissociatedEvent(TenantEvent):
     name = 'trunk_endpoint_custom_dissociated'
     routing_key_fmt = 'config.trunks.{trunk[id]}.endpoints.custom.{endpoint_custom[id]}.deleted'
+
+    def __init__(self, trunk, custom, tenant_uuid):
+        content = {
+            'trunk': trunk,
+            'endpoint_custom': custom,
+        }
+        super(TrunkEndpointCustomDissociatedEvent, self).__init__(content, tenant_uuid)
