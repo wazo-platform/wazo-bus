@@ -37,12 +37,12 @@ class MeetingDeletedEvent(_MeetingTenantEvent):
         super(MeetingDeletedEvent, self).__init__(meeting, meeting['uuid'], tenant_uuid)
 
 
-class MeetingUpdatedEvent(_MeetingTenantEvent):
+class MeetingEditedEvent(_MeetingTenantEvent):
     name = 'meeting_updated'
     routing_key_fmt = 'config.meetings.updated'
 
     def __init__(self, meeting, tenant_uuid):
-        super(MeetingUpdatedEvent, self).__init__(meeting, meeting['uuid'], tenant_uuid)
+        super(MeetingEditedEvent, self).__init__(meeting, meeting['uuid'], tenant_uuid)
 
 
 class MeetingProgressEvent(_MeetingTenantEvent):
@@ -131,12 +131,6 @@ class UserParticipantLeftMeetingEvent(_BaseParticipantMeetingEvent):
             )
 
 
-class _BaseMeetingAuthorizationEvent(BaseEvent):
-    def __init__(self, meeting_authorization):
-        self._body = meeting_authorization
-        super(_BaseMeetingAuthorizationEvent, self).__init__()
-
-
 class MeetingAuthorizationCreatedEvent(_MeetingTenantEvent):
     name = 'meeting_guest_authorization_created'
     routing_key_fmt = 'config.meeting_guest_authorizations.created'
@@ -157,12 +151,12 @@ class MeetingAuthorizationDeletedEvent(_MeetingTenantEvent):
         )
 
 
-class MeetingAuthorizationUpdatedEvent(_MeetingTenantEvent):
+class MeetingAuthorizationEditedEvent(_MeetingTenantEvent):
     name = 'meeting_guest_authorization_updated'
     routing_key_fmt = 'config.meeting_guest_authorizations.updated'
 
     def __init__(self, meeting_authorization, meeting_uuid, tenant_uuid):
-        super(MeetingAuthorizationUpdatedEvent, self).__init__(
+        super(MeetingAuthorizationEditedEvent, self).__init__(
             meeting_authorization, meeting_uuid, tenant_uuid
         )
 
