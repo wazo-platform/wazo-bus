@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
-from xivo_bus.resources.common.event import TenantEvent
+from xivo_bus.resources.common.event import TenantEvent, UserEvent
 
 
 class QueueMemberAgentAssociatedEvent(TenantEvent):
@@ -31,25 +31,29 @@ class QueueMemberAgentDissociatedEvent(TenantEvent):
         super(QueueMemberAgentDissociatedEvent, self).__init__(content, tenant_uuid)
 
 
-class QueueMemberUserAssociatedEvent(TenantEvent):
+class QueueMemberUserAssociatedEvent(UserEvent):
     name = 'queue_member_user_associated'
     routing_key_fmt = 'config.queues.users.updated'
 
-    def __init__(self, queue_id, users, tenant_uuid):
+    def __init__(self, queue_id, tenant_uuid, user_uuid):
         content = {
             'queue_id': queue_id,
-            'user_uuids': users,
+            'user_uuid': str(user_uuid),
         }
-        super(QueueMemberUserAssociatedEvent, self).__init__(content, tenant_uuid)
+        super(QueueMemberUserAssociatedEvent, self).__init__(
+            content, tenant_uuid, user_uuid
+        )
 
 
-class QueueMemberUserDissociatedEvent(TenantEvent):
+class QueueMemberUserDissociatedEvent(UserEvent):
     name = 'queue_member_user_dissociated'
     routing_key_fmt = 'config.queues.users.deleted'
 
-    def __init__(self, queue_id, users, tenant_uuid):
+    def __init__(self, queue_id, tenant_uuid, user_uuid):
         content = {
             'queue_id': queue_id,
-            'user_uuids': users,
+            'user_uuid': str(user_uuid),
         }
-        super(QueueMemberUserDissociatedEvent, self).__init__(content, tenant_uuid)
+        super(QueueMemberUserDissociatedEvent, self).__init__(
+            content, tenant_uuid, user_uuid
+        )
