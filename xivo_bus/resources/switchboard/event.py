@@ -16,6 +16,26 @@ class _SwitchboardEvent(TenantEvent):
         self.switchboard_uuid = str(switchboard_uuid)
 
 
+class _SwitchboardUsersEvent(_SwitchboardEvent):
+    def __init__(self, content, switchboard_uuid, tenant_uuid, user_uuids):
+        super(_SwitchboardUsersEvent, self).__init__(
+            content, switchboard_uuid, tenant_uuid
+        )
+        if not isinstance(user_uuids, list):
+            raise TypeError('user_uuids must be a list of user uuids')
+        if not user_uuids:
+            raise ValueError('user_uuids must contain user uuids')
+        self.user_uuids = user_uuids
+
+    @property
+    def headers(self):
+        headers = super(_SwitchboardUsersEvent, self).headers
+        user_uuids = headers.pop('user_uuids')
+        for uuid in user_uuids:
+            headers['user_uuid:{}'.format(uuid)] = True
+        return headers
+
+
 class SwitchboardCreatedEvent(_SwitchboardEvent):
     name = 'switchboard_created'
     routing_key_fmt = 'config.switchboards.{switchboard_uuid}.created'
@@ -57,6 +77,21 @@ class SwitchboardFallbackEditedEvent(_SwitchboardEvent):
     def __init__(self, fallback, switchboard_uuid, tenant_uuid):
         super(SwitchboardFallbackEditedEvent, self).__init__(
             fallback, switchboard_uuid, tenant_uuid
+        )
+
+
+class SwitchboardMemberUserAssociatedEvent(_SwitchboardUsersEvent):
+    name = 'switchboard_member_user_associated'
+    routing_key_fmt = 'config.switchboards.{switchboard_uuid}.members.users.updated'
+    required_acl_fmt = 'switchboards.{switchboard_uuid}.members.users.updated'
+
+    def __init__(self, switchboard_uuid, tenant_uuid, user_uuids):
+        content = {
+            'switchboard_uuid': str(switchboard_uuid),
+            'users': [{'uuid': str(uuid)} for uuid in user_uuids],
+        }
+        super(SwitchboardMemberUserAssociatedEvent, self).__init__(
+            content, switchboard_uuid, tenant_uuid, user_uuids
         )
 
 
