@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 from xivo_bus.resources.common.event import TenantEvent
 
 
-class CallPickupInterceptorUsersAssociatedEventt(TenantEvent):
+class CallPickupInterceptorUsersAssociatedEvent(TenantEvent):
     name = 'call_pickup_interceptor_users_associated'
     routing_key_fmt = 'config.callpickups.interceptors.users.updated'
 
@@ -15,7 +15,7 @@ class CallPickupInterceptorUsersAssociatedEventt(TenantEvent):
             'call_pickup_id': call_pickup_id,
             'user_uuids': users,
         }
-        super(CallPickupInterceptorUsersAssociatedEventt, self).__init__(
+        super(CallPickupInterceptorUsersAssociatedEvent, self).__init__(
             content, tenant_uuid
         )
 
