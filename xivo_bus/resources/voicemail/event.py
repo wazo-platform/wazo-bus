@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
-from xivo_bus.resources.common.event import TenantEvent
+from xivo_bus.resources.common.event import TenantEvent, UserEvent
 
 
 class VoicemailCreatedEvent(TenantEvent):
@@ -33,37 +33,19 @@ class VoicemailEditedEvent(TenantEvent):
         super(VoicemailEditedEvent, self).__init__(content, tenant_uuid)
 
 
-class EditUserVoicemailEvent(object):
+class UserVoicemailEditedEvent(UserEvent):
     name = 'user_voicemail_edited'
+    routing_key_fmt = 'config.users.{}.voicemails.edited'
 
-    def __init__(self, user_uuid, voicemail_id):
-        self.user_uuid = user_uuid
-        self.voicemail_id = int(voicemail_id)
-        self.routing_key = 'config.users.{}.voicemails.edited'.format(self.user_uuid)
-        self.required_acl = 'events.{}'.format(self.routing_key)
-
-    def marshal(self):
-        return {
-            'user_uuid': self.user_uuid,
-            'voicemail_id': self.voicemail_id,
+    def __init__(self, voicemail_id, tenant_uuid, user_uuid):
+        content = {
+            'user_uuid': str(user_uuid),
+            'voicemail_id': voicemail_id,
         }
-
-    @classmethod
-    def unmarshal(cls, msg):
-        return cls(
-            msg['user_uuid'],
-            msg['voicemail_id'])
-
-    def __eq__(self, other):
-        return (self.user_uuid == other.user_uuid
-                and self.voicemail_id == other.voicemail_id)
-
-    def __ne__(self, other):
-        return not self == other
+        super(UserVoicemailEditedEvent, self).__init__(content, tenant_uuid, user_uuid)
 
 
 class _UserVoicemailMessageEvent(object):
-
     def __init__(self, user_uuid, voicemail_id, message_id, message):
         self.user_uuid = user_uuid
         self.voicemail_id = voicemail_id
@@ -82,10 +64,8 @@ class _UserVoicemailMessageEvent(object):
     @classmethod
     def unmarshal(cls, msg):
         return cls(
-            msg['user_uuid'],
-            msg['voicemail_id'],
-            msg['message_id'],
-            msg['message'])
+            msg['user_uuid'], msg['voicemail_id'], msg['message_id'], msg['message']
+        )
 
 
 class CreateUserVoicemailMessageEvent(_UserVoicemailMessageEvent):
