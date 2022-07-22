@@ -34,5 +34,9 @@ class GroupFallbackEditedEvent(TenantEvent):
     name = 'group_fallback_edited'
     routing_key_fmt = 'config.groups.fallbacks.edited'
 
-    def __init__(self, group, tenant_uuid):
-        super(GroupFallbackEditedEvent, self).__init__(group, tenant_uuid)
+    def __init__(self, group_id, group_uuid, tenant_uuid):
+        content = {
+            'id': group_id,
+            'uuid': str(group_uuid),
+        }
+        super(GroupFallbackEditedEvent, self).__init__(content, tenant_uuid)
