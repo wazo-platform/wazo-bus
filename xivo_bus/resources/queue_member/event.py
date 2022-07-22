@@ -23,11 +23,10 @@ class QueueMemberAgentDissociatedEvent(TenantEvent):
     name = 'queue_member_agent_dissociated'
     routing_key_fmt = 'config.queues.agents.deleted'
 
-    def __init__(self, queue_id, agent_id, penalty, tenant_uuid):
+    def __init__(self, queue_id, agent_id, tenant_uuid):
         content = {
             'queue_id': queue_id,
             'agent_id': agent_id,
-            'penalty': penalty,
         }
         super(QueueMemberAgentDissociatedEvent, self).__init__(content, tenant_uuid)
 
