@@ -18,33 +18,35 @@ class _SwitchboardEvent(TenantEvent):
 
 class SwitchboardCreatedEvent(_SwitchboardEvent):
     name = 'switchboard_created'
-    routing_key_fmt = 'config.switchboards.{uuid}.created'
-    required_acl_fmt = 'switchboards.{uuid}.created'
+    routing_key_fmt = 'config.switchboards.{switchboard_uuid}.created'
+    required_acl_fmt = 'switchboards.{switchboard_uuid}.created'
 
-    def __init__(self, switchboard, tenant_uuid):
-        uuid = switchboard['uuid']
-        super(SwitchboardCreatedEvent, self).__init__(switchboard, uuid, tenant_uuid)
+    def __init__(self, switchboard, switchboard_uuid, tenant_uuid):
+        super(SwitchboardCreatedEvent, self).__init__(
+            switchboard, switchboard_uuid, tenant_uuid
+        )
 
 
 class SwitchboardDeletedEvent(_SwitchboardEvent):
     name = 'switchboard_deleted'
-    routing_key_fmt = 'config.switchboards.{uuid}.deleted'
-    required_acl_fmt = 'switchboards.{uuid}.deleted'
+    routing_key_fmt = 'config.switchboards.{switchboard_uuid}.deleted'
+    required_acl_fmt = 'switchboards.{switchboard_uuid}.deleted'
 
-    def __init__(self, switchboard, tenant_uuid):
-        uuid = switchboard['uuid']
-        self.required_acl = 'switchboards.{uuid}.deleted'.format(uuid=uuid)
-        super(SwitchboardDeletedEvent, self).__init__(switchboard, uuid, tenant_uuid)
+    def __init__(self, switchboard, switchboard_uuid, tenant_uuid):
+        super(SwitchboardDeletedEvent, self).__init__(
+            switchboard, switchboard_uuid, tenant_uuid
+        )
 
 
 class SwitchboardEditedEvent(_SwitchboardEvent):
     name = 'switchboard_edited'
-    routing_key_fmt = 'config.switchboards.{uuid}.edited'
-    required_acl_fmt = 'switchboards.{uuid}.edited'
+    routing_key_fmt = 'config.switchboards.{switchboard_uuid}.edited'
+    required_acl_fmt = 'switchboards.{switchboard_uuid}.edited'
 
-    def __init__(self, switchboard, tenant_uuid):
-        uuid = switchboard['uuid']
-        super(SwitchboardEditedEvent, self).__init__(switchboard, uuid, tenant_uuid)
+    def __init__(self, switchboard, switchboard_uuid, tenant_uuid):
+        super(SwitchboardEditedEvent, self).__init__(
+            switchboard, switchboard_uuid, tenant_uuid
+        )
 
 
 class SwitchboardFallbackEditedEvent(_SwitchboardEvent):
