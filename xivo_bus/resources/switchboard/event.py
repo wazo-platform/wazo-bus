@@ -67,12 +67,6 @@ class _BaseSwitchboardEvent(BaseEvent):
         self.required_acl = self.required_acl_fmt.format(**body)
 
 
-class EditSwitchboardFallbackEvent(_BaseSwitchboardEvent):
-    name = 'switchboard_fallback_edited'
-    routing_key_fmt = 'config.switchboards.fallbacks.edited'
-    required_acl_fmt = 'switchboards.fallbacks.edited'
-
-
 class SwitchboardQueuedCallsUpdatedEvent(_BaseSwitchboardEvent):
     name = 'switchboard_queued_calls_updated'
     routing_key_fmt = 'switchboards.{switchboard_uuid}.calls.queued.updated'
