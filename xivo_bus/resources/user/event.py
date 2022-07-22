@@ -38,7 +38,7 @@ class UserFallbackEditedEvent(_BaseUserEvent):
     routing_key_fmt = 'config.users.fallbacks.edited'
 
 
-class UserServicesEditedEvent(UserEvent):
+class UserServiceEditedEvent(UserEvent):
     routing_key_fmt = 'config.users.{user_uuid}.services.{service_name}.updated'
 
     def __init__(self, user_id, service_name, service_enabled, tenant_uuid, user_uuid):
@@ -51,7 +51,7 @@ class UserServicesEditedEvent(UserEvent):
             'tenant_uuid': str(tenant_uuid),
             'enabled': service_enabled,
         }
-        super(UserServicesEditedEvent, self).__init__(content, tenant_uuid, user_uuid)
+        super(UserServiceEditedEvent, self).__init__(content, tenant_uuid, user_uuid)
         self.service_name = service_name
 
 
