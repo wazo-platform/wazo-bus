@@ -164,13 +164,9 @@ class MeetingAuthorizationEditedEvent(_MeetingTenantEvent):
 class MeetingUserAuthorizationCreatedEvent(_MeetingUserEvent):
     name = 'meeting_user_guest_authorization_created'
     routing_key_fmt = 'config.users.{user_uuid}.meeting_guest_authorizations.created'
+    required_acl_fmt = 'events.users.{user_uuid}.meeting_guest_authorizations.created'
 
     def __init__(self, meeting_authorization, meeting_uuid, tenant_uuid, user_uuid):
-        self.required_acl = (
-            'events.users.{user_uuid}.meeting_guest_authorizations.created'.format(
-                user_uuid=user_uuid
-            )
-        )
         content = dict(meeting_authorization)
         content['user_uuid'] = user_uuid
         super(MeetingUserAuthorizationCreatedEvent, self).__init__(
@@ -181,13 +177,9 @@ class MeetingUserAuthorizationCreatedEvent(_MeetingUserEvent):
 class MeetingUserAuthorizationDeletedEvent(_MeetingUserEvent):
     name = 'meeting_user_guest_authorization_deleted'
     routing_key_fmt = 'config.users.{user_uuid}.meeting_guest_authorizations.deleted'
+    required_acl_fmt = 'events.users.{user_uuid}.meeting_guest_authorizations.deleted'
 
     def __init__(self, meeting_authorization, meeting_uuid, tenant_uuid, user_uuid):
-        self.required_acl = (
-            'events.users.{user_uuid}.meeting_guest_authorizations.deleted'.format(
-                user_uuid=user_uuid
-            )
-        )
         content = dict(meeting_authorization)
         content['user_uuid'] = user_uuid
         super(MeetingUserAuthorizationDeletedEvent, self).__init__(
@@ -198,13 +190,9 @@ class MeetingUserAuthorizationDeletedEvent(_MeetingUserEvent):
 class MeetingUserAuthorizationEditedEvent(_MeetingUserEvent):
     name = 'meeting_user_guest_authorization_updated'
     routing_key_fmt = 'config.users.{user_uuid}.meeting_guest_authorizations.updated'
+    required_acl_fmt = 'events.users.{user_uuid}.meeting_guest_authorizations.updated'
 
     def __init__(self, meeting_authorization, meeting_uuid, tenant_uuid, user_uuid):
-        self.required_acl = (
-            'events.users.{user_uuid}.meeting_guest_authorizations.updated'.format(
-                user_uuid=user_uuid
-            )
-        )
         content = dict(meeting_authorization)
         content['user_uuid'] = user_uuid
         super(MeetingUserAuthorizationEditedEvent, self).__init__(
