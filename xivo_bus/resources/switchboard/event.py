@@ -8,27 +8,28 @@ from xivo.permission import escape as escape_acl
 from xivo_bus.resources.common.routing_key import escape as escape_key
 
 
-class SwitchboardEvent(TenantEvent):
+class _SwitchboardEvent(TenantEvent):
     def __init__(self, content, switchboard_uuid, tenant_uuid):
-        super(TenantEvent, self).__init__(content, tenant_uuid)
+        super(_SwitchboardEvent, self).__init__(content, tenant_uuid)
         if switchboard_uuid is None:
             raise ValueError('switchboard_uuid must have a value')
         self.switchboard_uuid = str(switchboard_uuid)
 
 
-class SwitchboardCreatedEvent(SwitchboardEvent):
+class SwitchboardCreatedEvent(_SwitchboardEvent):
     name = 'switchboard_created'
     routing_key_fmt = 'config.switchboards.{uuid}.created'
+    required_acl_fmt = 'switchboards.{uuid}.created'
 
     def __init__(self, switchboard, tenant_uuid):
         uuid = switchboard['uuid']
-        self.required_acl = 'switchboards.{uuid}.created'.format(uuid=uuid)
         super(SwitchboardCreatedEvent, self).__init__(switchboard, uuid, tenant_uuid)
 
 
-class SwitchboardDeletedEvent(SwitchboardEvent):
+class SwitchboardDeletedEvent(_SwitchboardEvent):
     name = 'switchboard_deleted'
     routing_key_fmt = 'config.switchboards.{uuid}.deleted'
+    required_acl_fmt = 'switchboards.{uuid}.deleted'
 
     def __init__(self, switchboard, tenant_uuid):
         uuid = switchboard['uuid']
@@ -36,20 +37,20 @@ class SwitchboardDeletedEvent(SwitchboardEvent):
         super(SwitchboardDeletedEvent, self).__init__(switchboard, uuid, tenant_uuid)
 
 
-class SwitchboardEditedEvent(SwitchboardEvent):
+class SwitchboardEditedEvent(_SwitchboardEvent):
     name = 'switchboard_edited'
     routing_key_fmt = 'config.switchboards.{uuid}.edited'
+    required_acl_fmt = 'switchboards.{uuid}.edited'
 
     def __init__(self, switchboard, tenant_uuid):
         uuid = switchboard['uuid']
-        self.required_acl = 'switchboards.{uuid}.edited'.format(uuid=uuid)
         super(SwitchboardEditedEvent, self).__init__(switchboard, uuid, tenant_uuid)
 
 
-class SwitchboardFallbackEditedEvent(SwitchboardEvent):
+class SwitchboardFallbackEditedEvent(_SwitchboardEvent):
     name = 'switchboard_fallback_edited'
     routing_key_fmt = 'config.switchboards.fallbacks.edited'
-    required_acl = 'switchboards.fallbacks.edited'
+    required_acl_fmt = 'switchboards.fallbacks.edited'
 
     def __init__(self, fallback, switchboard_uuid, tenant_uuid):
         super(SwitchboardFallbackEditedEvent, self).__init__(
