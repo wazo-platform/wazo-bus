@@ -57,7 +57,7 @@ class MeetingProgressEvent(_MeetingTenantEvent):
         )
 
 
-class MeetingUserProgress(_MeetingUserEvent):
+class MeetingUserProgressEvent(_MeetingUserEvent):
     name = 'meeting_user_progress'
     routing_key_fmt = 'config.users.{user_uuid}.meetings.progress'
 
@@ -65,7 +65,7 @@ class MeetingUserProgress(_MeetingUserEvent):
         content = dict(meeting)
         content['status'] = status
         content['user_uuid'] = user_uuid
-        super(MeetingUserProgress, self).__init__(
+        super(MeetingUserProgressEvent, self).__init__(
             content, meeting['uuid'], tenant_uuid, user_uuid
         )
 
