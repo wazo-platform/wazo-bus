@@ -31,7 +31,7 @@ class LineEndpointSIPDissociatedEvent(TenantEvent):
 class LineEndpointSCCPAssociatedEvent(TenantEvent):
     name = 'line_endpoint_sccp_associated'
     routing_key_fmt = (
-        'config.lines.{line[id]}.endpoints.sccp.{endpoint_sccp[uuid]}.updated'
+        'config.lines.{line[id]}.endpoints.sccp.{endpoint_sccp[id]}.updated'
     )
 
     def __init__(self, line, sccp, tenant_uuid):
@@ -42,7 +42,7 @@ class LineEndpointSCCPAssociatedEvent(TenantEvent):
 class LineEndpointSCCPDissociatedEvent(TenantEvent):
     name = 'line_endpoint_sccp_dissociated'
     routing_key_fmt = (
-        'config.lines.{line[id]}.endpoints.sccp.{endpoint_sccp[uuid]}.deleted'
+        'config.lines.{line[id]}.endpoints.sccp.{endpoint_sccp[id]}.deleted'
     )
 
     def __init__(self, line, sccp, tenant_uuid):
@@ -53,7 +53,7 @@ class LineEndpointSCCPDissociatedEvent(TenantEvent):
 class LineEndpointCustomAssociatedEvent(TenantEvent):
     name = 'line_endpoint_custom_associated'
     routing_key_fmt = (
-        'config.lines.{line[id]}.endpoints.sccp.{endpoint_custom[uuid]}.updated'
+        'config.lines.{line[id]}.endpoints.sccp.{endpoint_custom[id]}.updated'
     )
 
     def __init__(self, line, custom, tenant_uuid):
@@ -64,7 +64,7 @@ class LineEndpointCustomAssociatedEvent(TenantEvent):
 class LineEndpointCustomDissociatedEvent(TenantEvent):
     name = 'line_endpoint_custom_dissociated'
     routing_key_fmt = (
-        'config.lines.{line[id]}.endpoints.custom.{endpoint_custom[uuid]}.deleted'
+        'config.lines.{line[id]}.endpoints.custom.{endpoint_custom[id]}.deleted'
     )
 
     def __init__(self, line, custom, tenant_uuid):
