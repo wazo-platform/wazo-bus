@@ -27,4 +27,4 @@ class CustomEndpointEditedEvent(TenantEvent):
     routing_key_fmt = 'config.custom_endpoint.edited'
 
     def __init__(self, endpoint_iax, tenant_uuid):
-        super(CustomEndpointCreatedEvent, self).__init__(endpoint_iax, tenant_uuid)
+        super(CustomEndpointEditedEvent, self).__init__(endpoint_iax, tenant_uuid)
