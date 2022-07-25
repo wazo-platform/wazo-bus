@@ -17,7 +17,7 @@ class LineApplicationAssociatedEvent(TenantEvent):
 
 class LineApplicationDissociatedEvent(TenantEvent):
     name = 'line_application_dissociated'
-    routing_key_fmt = 'config.lines.{line[id]}.applications.{application[uuid]}.updated'
+    routing_key_fmt = 'config.lines.{line[id]}.applications.{application[uuid]}.deleted'
 
     def __init__(self, line, application, tenant_uuid):
         content = {'line': line, 'application': application}
