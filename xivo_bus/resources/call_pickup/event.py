@@ -21,7 +21,7 @@ class CallPickupDeletedEvent(TenantEvent):
 
     def __init__(self, call_pickup_id, tenant_uuid):
         content = {'id': call_pickup_id}
-        super(CallPickupCreatedEvent, self).__init__(content, tenant_uuid)
+        super(CallPickupDeletedEvent, self).__init__(content, tenant_uuid)
 
 
 class CallPickupEditedEvent(TenantEvent):
@@ -30,4 +30,4 @@ class CallPickupEditedEvent(TenantEvent):
 
     def __init__(self, call_pickup_id, tenant_uuid):
         content = {'id': call_pickup_id}
-        super(CallPickupCreatedEvent, self).__init__(content, tenant_uuid)
+        super(CallPickupEditedEvent, self).__init__(content, tenant_uuid)
