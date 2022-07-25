@@ -12,7 +12,7 @@ class ConferenceCreatedEvent(TenantEvent):
 
     def __init__(self, conference_id, tenant_uuid):
         content = {'id': conference_id}
-        super(ConferenceEditedEvent, self).__init__(content, tenant_uuid)
+        super(ConferenceCreatedEvent, self).__init__(content, tenant_uuid)
 
 
 class ConferenceDeletedEvent(TenantEvent):
@@ -21,7 +21,7 @@ class ConferenceDeletedEvent(TenantEvent):
 
     def __init__(self, conference_id, tenant_uuid):
         content = {'id': conference_id}
-        super(ConferenceEditedEvent, self).__init__(content, tenant_uuid)
+        super(ConferenceDeletedEvent, self).__init__(content, tenant_uuid)
 
 
 class ConferenceEditedEvent(TenantEvent):
