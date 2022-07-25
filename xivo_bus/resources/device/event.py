@@ -21,7 +21,7 @@ class DeviceDeletedEvent(TenantEvent):
 
     def __init__(self, device_id, tenant_uuid):
         content = {'id': device_id}
-        super(DeviceCreatedEvent, self).__init__(content, tenant_uuid)
+        super(DeviceDeletedEvent, self).__init__(content, tenant_uuid)
 
 
 class DeviceEditedEvent(TenantEvent):
@@ -30,4 +30,4 @@ class DeviceEditedEvent(TenantEvent):
 
     def __init__(self, device_id, tenant_uuid):
         content = {'id': device_id}
-        super(DeviceCreatedEvent, self).__init__(content, tenant_uuid)
+        super(DeviceEditedEvent, self).__init__(content, tenant_uuid)
