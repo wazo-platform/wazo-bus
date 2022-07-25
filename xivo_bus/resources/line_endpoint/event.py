@@ -36,7 +36,7 @@ class LineEndpointSCCPAssociatedEvent(TenantEvent):
 
     def __init__(self, line, sccp, tenant_uuid):
         content = {'line': line, 'endpoint_sccp': sccp}
-        super(LineEndpointSIPAssociatedEvent, self).__init__(content, tenant_uuid)
+        super(LineEndpointSCCPAssociatedEvent, self).__init__(content, tenant_uuid)
 
 
 class LineEndpointSCCPDissociatedEvent(TenantEvent):
@@ -47,7 +47,7 @@ class LineEndpointSCCPDissociatedEvent(TenantEvent):
 
     def __init__(self, line, sccp, tenant_uuid):
         content = {'line': line, 'endpoint_sccp': sccp}
-        super(LineEndpointSIPDissociatedEvent, self).__init__(content, tenant_uuid)
+        super(LineEndpointSCCPDissociatedEvent, self).__init__(content, tenant_uuid)
 
 
 class LineEndpointCustomAssociatedEvent(TenantEvent):
