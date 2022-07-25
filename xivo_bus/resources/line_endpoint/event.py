@@ -53,7 +53,7 @@ class LineEndpointSCCPDissociatedEvent(TenantEvent):
 class LineEndpointCustomAssociatedEvent(TenantEvent):
     name = 'line_endpoint_custom_associated'
     routing_key_fmt = (
-        'config.lines.{line[id]}.endpoints.sccp.{endpoint_custom[id]}.updated'
+        'config.lines.{line[id]}.endpoints.custom.{endpoint_custom[id]}.updated'
     )
 
     def __init__(self, line, custom, tenant_uuid):
