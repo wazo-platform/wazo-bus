@@ -35,7 +35,7 @@ class VoicemailEditedEvent(TenantEvent):
 
 class UserVoicemailEditedEvent(UserEvent):
     name = 'user_voicemail_edited'
-    routing_key_fmt = 'config.users.{}.voicemails.edited'
+    routing_key_fmt = 'config.users.{user_uuid}.voicemails.edited'
 
     def __init__(self, voicemail_id, tenant_uuid, user_uuid):
         content = {
