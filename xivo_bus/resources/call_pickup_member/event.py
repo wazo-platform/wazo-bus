@@ -34,7 +34,7 @@ class CallPickupTargetUsersAssociatedEvent(TenantEvent):
 
 class CallPickupInterceptorGroupsAssociatedEvent(TenantEvent):
     name = 'call_pickup_interceptor_groups_associated'
-    routing_key_fmt = 'config.callpickups.interceptors.users.updated'
+    routing_key_fmt = 'config.callpickups.interceptors.groups.updated'
 
     def __init__(self, call_pickup_id, group_ids, tenant_uuid):
         content = {
