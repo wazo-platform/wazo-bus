@@ -23,8 +23,6 @@ class _SwitchboardUsersEvent(_SwitchboardEvent):
         )
         if not isinstance(user_uuids, list):
             raise TypeError('user_uuids must be a list of user uuids')
-        if not user_uuids:
-            raise ValueError('user_uuids must contain user uuids')
         self.user_uuids = user_uuids
 
     @property
