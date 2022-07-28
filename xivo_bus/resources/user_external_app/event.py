@@ -15,7 +15,7 @@ class UserExternalAppCreatedEvent(TenantEvent):
 
 
 class UserExternalAppDeletedEvent(TenantEvent):
-    name = 'user_external_app_created'
+    name = 'user_external_app_deleted'
     routing_key_fmt = 'config.user_external_apps.deleted'
 
     def __init__(self, app, tenant_uuid):
