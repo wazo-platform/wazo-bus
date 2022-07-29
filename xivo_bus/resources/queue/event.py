@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
-from xivo_bus.resources.common.event import TenantEvent
+from xivo_bus.resources.common.event import TenantEvent, ResourceConfigEvent
 
 
 class QueueCreatedEvent(TenantEvent):
@@ -40,3 +40,15 @@ class QueueFallbackEditedEvent(TenantEvent):
     def __init__(self, queue_id, tenant_uuid):
         content = {'id': int(queue_id)}
         super(QueueFallbackEditedEvent, self).__init__(content, tenant_uuid)
+
+
+# FIXME: Remove after wazo-agentd migration
+class EditQueueEvent(ResourceConfigEvent):
+    name = 'queue_edited'
+    routing_key = 'config.queue.edited'
+
+
+# FIXME: Remove after wazo-agentd migration
+class DeleteQueueEvent(ResourceConfigEvent):
+    name = 'queue_deleted'
+    routing_key = 'config.queue.deleted'
