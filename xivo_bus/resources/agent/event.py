@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
-from xivo_bus.resources.common.event import TenantEvent, BaseEvent
+from xivo_bus.resources.common.event import TenantEvent, BaseEvent, ResourceConfigEvent
 
 
 class AgentCreatedEvent(TenantEvent):
@@ -61,3 +61,15 @@ class UnpauseAgentEvent(BaseEvent):
             paused_reason=reason,
             queue=queue,
         )
+
+
+# To be removed, needed for migration
+class EditAgentEvent(ResourceConfigEvent):
+    name = 'agent_edited'
+    routing_key = 'config.agent.edited'
+
+
+# To be removed, needed for migration
+class DeleteAgentEvent(ResourceConfigEvent):
+    name = 'agent_deleted'
+    routing_key = 'config.agent.deleted'
