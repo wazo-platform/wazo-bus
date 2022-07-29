@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
-from xivo_bus.resources.common.event import TenantEvent, BaseEvent, ResourceConfigEvent
+from xivo_bus.resources.common.event import TenantEvent
 
 
 class AgentCreatedEvent(TenantEvent):
@@ -33,43 +33,33 @@ class AgentEditedEvent(TenantEvent):
         super(AgentEditedEvent, self).__init__(content, tenant_uuid)
 
 
-class PauseAgentEvent(BaseEvent):
+class AgentPausedEvent(TenantEvent):
     name = 'agent_paused'
-    routing_key = 'status.agent.pause'
-    required_acl = 'events.statuses.agents'
+    routing_key_fmt = 'status.agent.pause'
+    required_acl_fmt = 'events.statuses.agents'
 
-    def __init__(self, agent_id, agent_number, queue, reason=''):
-        self._body = dict(
-            agent_id=agent_id,
-            agent_number=agent_number,
-            paused=True,
-            paused_reason=reason,
-            queue=queue,
-        )
+    def __init__(self, agent_id, agent_number, queue, reason, tenant_uuid):
+        content = {
+            'agent_id': agent_id,
+            'agent_number': agent_number,
+            'paused': True,
+            'paused_reason': reason or '',
+            'queue': queue,
+        }
+        super(AgentPausedEvent, self).__init__(content, tenant_uuid)
 
 
-class UnpauseAgentEvent(BaseEvent):
+class AgentUnpausedEvent(TenantEvent):
     name = 'agent_unpaused'
-    routing_key = 'status.agent.unpause'
-    required_acl = 'events.statuses.agents'
+    routing_key_fmt = 'status.agent.unpause'
+    required_acl_fmt = 'events.statuses.agents'
 
-    def __init__(self, agent_id, agent_number, queue, reason=''):
-        self._body = dict(
-            agent_id=agent_id,
-            agent_number=agent_number,
-            paused=False,
-            paused_reason=reason,
-            queue=queue,
-        )
-
-
-# To be removed, needed for migration
-class EditAgentEvent(ResourceConfigEvent):
-    name = 'agent_edited'
-    routing_key = 'config.agent.edited'
-
-
-# To be removed, needed for migration
-class DeleteAgentEvent(ResourceConfigEvent):
-    name = 'agent_deleted'
-    routing_key = 'config.agent.deleted'
+    def __init__(self, agent_id, agent_number, queue, reason, tenant_uuid):
+        content = {
+            'agent_id': agent_id,
+            'agent_number': agent_number,
+            'paused': False,
+            'paused_reason': reason or '',
+            'queue': queue,
+        }
+        super(AgentUnpausedEvent, self).__init__(content, tenant_uuid)
