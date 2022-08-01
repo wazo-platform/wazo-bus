@@ -49,9 +49,11 @@ class UserFallbackEditedEvent(UserEvent):
 
 
 class UserServiceEditedEvent(UserEvent):
+    name = 'users_services_{service_name}_updated'
     routing_key_fmt = 'config.users.{user_uuid}.services.{service_name}.updated'
 
     def __init__(self, user_id, service_name, service_enabled, tenant_uuid, user_uuid):
+        self.name = type(self).name.format(service_name=service_name)
         content = {
             'user_id': int(user_id),
             'user_uuid': str(user_uuid),
@@ -61,14 +63,9 @@ class UserServiceEditedEvent(UserEvent):
         super(UserServiceEditedEvent, self).__init__(content, tenant_uuid, user_uuid)
         self.service_name = service_name
 
-    @property
-    def name(self):
-        return 'users_services_{service_name}_updated'.format(
-            service_name=self.service_name
-        )
-
 
 class UserForwardEditedEvent(UserEvent):
+    name = 'users_forwards_{forward_name}_updated'
     routing_key_fmt = 'config.users.{user_uuid}.forwards.{forward_name}.updated'
 
     def __init__(
@@ -80,6 +77,7 @@ class UserForwardEditedEvent(UserEvent):
         tenant_uuid,
         user_uuid,
     ):
+        self.name = type(self).name.format(forward_name=forward_name)
         content = {
             'id': int(user_id),
             'user_uuid': str(user_uuid),
@@ -89,9 +87,3 @@ class UserForwardEditedEvent(UserEvent):
         }
         super(UserForwardEditedEvent, self).__init__(content, tenant_uuid, user_uuid)
         self.forward_name = forward_name
-
-    @property
-    def name(self):
-        return 'users_forwards_{forward_name}_updated'.format(
-            forward_name=self.forward_name
-        )
