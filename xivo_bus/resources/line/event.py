@@ -34,5 +34,20 @@ class LineStatusUpdatedEvent(TenantEvent):
     name = 'line_status_updated'
     routing_key_fmt = 'lines.{id}.status.updated'
 
-    def __init__(self, status, tenant_uuid):
-        super(LineStatusUpdatedEvent, self).__init__(status, tenant_uuid)
+    def __init__(
+        self,
+        line_id,
+        technology,
+        endpoint_name,
+        endpoint_registered,
+        endpoint_current_call_count,
+        tenant_uuid,
+    ):
+        content = {
+            'id': line_id,
+            'technology': technology,
+            'name': endpoint_name,
+            'registered': endpoint_registered,
+            'current_call_count': endpoint_current_call_count,
+        }
+        super(LineStatusUpdatedEvent, self).__init__(content, tenant_uuid)

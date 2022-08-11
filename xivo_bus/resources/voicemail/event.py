@@ -45,42 +45,52 @@ class UserVoicemailEditedEvent(UserEvent):
         super(UserVoicemailEditedEvent, self).__init__(content, tenant_uuid, user_uuid)
 
 
-class _UserVoicemailMessageEvent(object):
-    def __init__(self, user_uuid, voicemail_id, message_id, message):
-        self.user_uuid = user_uuid
-        self.voicemail_id = voicemail_id
-        self.message_id = message_id
-        self.message = message
-        self.required_acl = 'events.users.{}.voicemails'.format(self.user_uuid)
+class UserVoicemailMessageCreatedEvent(UserEvent):
+    name = 'user_voicemail_message_created'
+    routing_key_fmt = 'voicemails.messages.created'
+    required_acl_fmt = 'events.users.{user_uuid}.voicemails'
 
-    def marshal(self):
-        return {
-            'user_uuid': self.user_uuid,
-            'voicemail_id': self.voicemail_id,
-            'message_id': self.message_id,
-            'message': self.message,
+    def __init__(self, message_id, voicemail_id, message, tenant_uuid, user_uuid):
+        content = {
+            'user_uuid': str(user_uuid),
+            'voicemail_id': voicemail_id,
+            'message_id': message_id,
+            'message': message,
         }
-
-    @classmethod
-    def unmarshal(cls, msg):
-        return cls(
-            msg['user_uuid'], msg['voicemail_id'], msg['message_id'], msg['message']
+        super(UserVoicemailMessageCreatedEvent, self).__init__(
+            content, tenant_uuid, user_uuid
         )
 
 
-class CreateUserVoicemailMessageEvent(_UserVoicemailMessageEvent):
-
-    name = 'user_voicemail_message_created'
-    routing_key = 'voicemails.messages.created'
-
-
-class UpdateUserVoicemailMessageEvent(_UserVoicemailMessageEvent):
-
+class UserVoicemailMessageUpdatedEvent(UserEvent):
     name = 'user_voicemail_message_updated'
-    routing_key = 'voicemails.messages.updated'
+    routing_key_fmt = 'voicemails.messages.updated'
+    required_acl_fmt = 'events.users.{user_uuid}.voicemails'
+
+    def __init__(self, message_id, voicemail_id, message, tenant_uuid, user_uuid):
+        content = {
+            'user_uuid': str(user_uuid),
+            'voicemail_id': voicemail_id,
+            'message_id': message_id,
+            'message': message,
+        }
+        super(UserVoicemailMessageUpdatedEvent, self).__init__(
+            content, tenant_uuid, user_uuid
+        )
 
 
-class DeleteUserVoicemailMessageEvent(_UserVoicemailMessageEvent):
-
+class UserVoicemailMessageDeletedEvent(UserEvent):
     name = 'user_voicemail_message_deleted'
-    routing_key = 'voicemails.messages.deleted'
+    routing_key_fmt = 'voicemails.messages.deleted'
+    required_acl_fmt = 'events.users.{user_uuid}.voicemails'
+
+    def __init__(self, message_id, voicemail_id, message, tenant_uuid, user_uuid):
+        content = {
+            'user_uuid': str(user_uuid),
+            'voicemail_id': voicemail_id,
+            'message_id': message_id,
+            'message': message,
+        }
+        super(UserVoicemailMessageDeletedEvent, self).__init__(
+            content, tenant_uuid, user_uuid
+        )

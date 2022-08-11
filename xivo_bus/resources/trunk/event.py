@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
-from xivo_bus.resources.common.event import TenantEvent, BaseEvent
+from xivo_bus.resources.common.event import TenantEvent
 
 
 class TrunkCreatedEvent(TenantEvent):
@@ -33,11 +33,24 @@ class TrunkEditedEvent(TenantEvent):
         super(TrunkEditedEvent, self).__init__(content, tenant_uuid)
 
 
-class TrunkStatusUpdatedEvent(BaseEvent):
-
+class TrunkStatusUpdatedEvent(TenantEvent):
     name = 'trunk_status_updated'
     routing_key_fmt = 'trunks.{id}.status.updated'
 
-    def __init__(self, status):
-        self._body = status
-        super(TrunkStatusUpdatedEvent, self).__init__()
+    def __init__(
+        self,
+        trunk_id,
+        technology,
+        endpoint_name,
+        endpoint_registered,
+        endpoint_current_call_count,
+        tenant_uuid,
+    ):
+        content = {
+            'id': trunk_id,
+            'technology': technology,
+            'name': endpoint_name,
+            'registered': endpoint_registered,
+            'current_call_count': endpoint_current_call_count,
+        }
+        super(TrunkStatusUpdatedEvent, self).__init__(content, tenant_uuid)
