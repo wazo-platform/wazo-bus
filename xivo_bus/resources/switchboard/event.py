@@ -3,8 +3,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
-from xivo_bus.resources.common.event import TenantEvent, MultiUserEvent, BaseEvent
+
 from xivo.permission import escape as escape_acl
+from xivo_bus.resources.common.event import TenantEvent, MultiUserEvent
 from xivo_bus.resources.common.routing_key import escape as escape_key
 
 
@@ -71,63 +72,85 @@ class SwitchboardMemberUserAssociatedEvent(_SwitchboardMixin, MultiUserEvent):
             'users': [{'uuid': str(uuid)} for uuid in user_uuids],
         }
         super(SwitchboardMemberUserAssociatedEvent, self).__init__(
-            content, switchboard_uuid, tenant_uuid, user_uuids
+            content, user_uuids, switchboard_uuid, tenant_uuid
         )
 
 
-class _BaseSwitchboardEvent(BaseEvent):
-    def __init__(self, body):
-        self._body = body
-        super(_BaseSwitchboardEvent, self).__init__()
-        self.required_acl = self.required_acl_fmt.format(**body)
-
-
-class SwitchboardQueuedCallsUpdatedEvent(_BaseSwitchboardEvent):
+class SwitchboardQueuedCallsUpdatedEvent(_SwitchboardMixin, TenantEvent):
     name = 'switchboard_queued_calls_updated'
     routing_key_fmt = 'switchboards.{switchboard_uuid}.calls.queued.updated'
-    required_acl_fmt = 'events.switchboards.{switchboard_uuid}.calls.queued.updated'
+
+    def __init__(self, items, switchboard_uuid, tenant_uuid):
+        content = {
+            'switchboard_uuid': str(switchboard_uuid),
+            'items': items,
+        }
+        super(SwitchboardQueuedCallsUpdatedEvent, self).__init__(
+            content, switchboard_uuid, tenant_uuid
+        )
 
 
-class SwitchboardQueuedCallAnsweredEvent(_BaseSwitchboardEvent):
+class SwitchboardQueuedCallAnsweredEvent(_SwitchboardMixin, TenantEvent):
     name = 'switchboard_queued_call_answered'
-    routing_key_fmt = 'switchboards.{uuid}.calls.queued.{call_id}.answer.updated'
+    routing_key_fmt = (
+        'switchboards.{{switchboard_uuid}}.calls.queued.{queued_call_id}.answer.updated'
+    )
     required_acl_fmt = (
-        'events.switchboards.{uuid}.calls.queued.{call_id}.answer.updated'
+        'events.switchboards.{{switchboard_uuid}}.calls.queued.{queued_call_id}.answer.updated'
     )
 
-    def __init__(self, body):
-        uuid = body['switchboard_uuid']
-        call_id = body['queued_call_id']
-        self._body = body
-
-        self.routing_key = self.routing_key_fmt.format(
-            uuid=uuid, call_id=escape_key(call_id)
+    def __init__(self, operator_call_id, queued_call_id, switchboard_uuid, tenant_uuid):
+        content = {
+            'switchboard_uuid': str(switchboard_uuid),
+            'operator_call_id': operator_call_id,
+            'queued_call_id': queued_call_id,
+        }
+        self.routing_key_fmt = self.routing_key_fmt.format(
+            queued_call_id=escape_key(queued_call_id)
         )
-        self.required_acl = self.required_acl_fmt.format(
-            uuid=uuid, call_id=escape_acl(call_id)
+        self.required_acl_fmt = self.required_acl_fmt.format(
+            queued_call_id=escape_acl(queued_call_id)
+        )
+        super(SwitchboardQueuedCallAnsweredEvent, self).__init__(
+            content, switchboard_uuid, tenant_uuid
         )
 
 
-class SwitchboardHeldCallsUpdatedEvent(_BaseSwitchboardEvent):
+class SwitchboardHeldCallsUpdatedEvent(_SwitchboardMixin, TenantEvent):
     name = 'switchboard_held_calls_updated'
     routing_key_fmt = 'switchboards.{switchboard_uuid}.calls.held.updated'
-    required_acl_fmt = 'events.switchboards.{switchboard_uuid}.calls.held.updated'
 
-
-class SwitchboardHeldCallAnsweredEvent(_BaseSwitchboardEvent):
-    name = 'switchboard_held_call_answered'
-    routing_key_fmt = 'switchboards.{uuid}.calls.held.{call_id}.answer.updated'
-    required_acl_fmt = 'events.switchboards.{uuid}.calls.held.{call_id}.answer.updated'
-
-    def __init__(self, body):
-        uuid = body['switchboard_uuid']
-        call_id = body['held_call_id']
-        self._body = body
-
-        self.routing_key = self.routing_key_fmt.format(
-            uuid=uuid,
-            call_id=escape_key(call_id),
+    def __init__(self, items, switchboard_uuid, tenant_uuid):
+        content = {
+            'switchboard_uuid': str(switchboard_uuid),
+            'items': items,
+        }
+        super(SwitchboardHeldCallsUpdatedEvent, self).__init__(
+            content, switchboard_uuid, tenant_uuid
         )
-        self.required_acl = self.required_acl_fmt.format(
-            uuid=uuid, call_id=escape_acl(call_id)
+
+
+class SwitchboardHeldCallAnsweredEvent(_SwitchboardMixin, TenantEvent):
+    name = 'switchboard_held_call_answered'
+    routing_key_fmt = (
+        'switchboards.{{switchboard_uuid}}.calls.held.{held_call_id}.answer.updated'
+    )
+    required_acl_fmt = (
+        'events.switchboards.{{switchboard_uuid}}.calls.held.{held_call_id}.answer.updated'
+    )
+
+    def __init__(self, operator_call_id, held_call_id, switchboard_uuid, tenant_uuid):
+        content = {
+            'switchboard_uuid': str(switchboard_uuid),
+            'operator_call_id': operator_call_id,
+            'held_call_id': held_call_id,
+        }
+        self.routing_key_fmt = self.routing_key_fmt.format(
+            held_call_id=escape_key(held_call_id)
+        )
+        self.required_acl_fmt = self.required_acl_fmt.format(
+            held_call_id=escape_acl(held_call_id)
+        )
+        super(SwitchboardHeldCallAnsweredEvent, self).__init__(
+            content, switchboard_uuid, tenant_uuid
         )

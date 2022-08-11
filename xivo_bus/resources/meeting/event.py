@@ -2,26 +2,18 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
-from xivo_bus.resources.common.event import TenantEvent, UserEvent, BaseEvent
+from xivo_bus.resources.common.event import TenantEvent, UserEvent
 
 
-class _MeetingTenantEvent(TenantEvent):
-    def __init__(self, content, meeting_uuid, tenant_uuid):
-        super(_MeetingTenantEvent, self).__init__(content, tenant_uuid)
+class _MeetingMixin(object):
+    def __init__(self, content, meeting_uuid, *args):
+        super(_MeetingMixin, self).__init__(content, *args)
         if meeting_uuid is None:
             raise ValueError('meeting_uuid must have a value')
         self.meeting_uuid = str(meeting_uuid)
 
 
-class _MeetingUserEvent(UserEvent):
-    def __init__(self, content, meeting_uuid, tenant_uuid, user_uuid):
-        super(_MeetingUserEvent, self).__init__(content, tenant_uuid, user_uuid)
-        if meeting_uuid is None:
-            raise ValueError('meeting_uuid must have a value')
-        self.meeting_uuid = str(meeting_uuid)
-
-
-class MeetingCreatedEvent(_MeetingTenantEvent):
+class MeetingCreatedEvent(_MeetingMixin, TenantEvent):
     name = 'meeting_created'
     routing_key_fmt = 'config.meetings.created'
 
@@ -29,7 +21,7 @@ class MeetingCreatedEvent(_MeetingTenantEvent):
         super(MeetingCreatedEvent, self).__init__(meeting, meeting['uuid'], tenant_uuid)
 
 
-class MeetingDeletedEvent(_MeetingTenantEvent):
+class MeetingDeletedEvent(_MeetingMixin, TenantEvent):
     name = 'meeting_deleted'
     routing_key_fmt = 'config.meetings.deleted'
 
@@ -37,7 +29,7 @@ class MeetingDeletedEvent(_MeetingTenantEvent):
         super(MeetingDeletedEvent, self).__init__(meeting, meeting['uuid'], tenant_uuid)
 
 
-class MeetingEditedEvent(_MeetingTenantEvent):
+class MeetingEditedEvent(_MeetingMixin, TenantEvent):
     name = 'meeting_updated'
     routing_key_fmt = 'config.meetings.updated'
 
@@ -45,7 +37,7 @@ class MeetingEditedEvent(_MeetingTenantEvent):
         super(MeetingEditedEvent, self).__init__(meeting, meeting['uuid'], tenant_uuid)
 
 
-class MeetingProgressEvent(_MeetingTenantEvent):
+class MeetingProgressEvent(_MeetingMixin, TenantEvent):
     name = 'meeting_progress'
     routing_key_fmt = 'config.meetings.progress'
 
@@ -57,7 +49,7 @@ class MeetingProgressEvent(_MeetingTenantEvent):
         )
 
 
-class MeetingUserProgressEvent(_MeetingUserEvent):
+class MeetingUserProgressEvent(_MeetingMixin, UserEvent):
     name = 'meeting_user_progress'
     routing_key_fmt = 'config.users.{user_uuid}.meetings.progress'
 
@@ -70,68 +62,51 @@ class MeetingUserProgressEvent(_MeetingUserEvent):
         )
 
 
-class _BaseParticipantMeetingEvent(BaseEvent):
-    def __init__(self, meeting_uuid, participant_dict):
-        self._body = {'meeting_uuid': meeting_uuid}
-        self._body.update(participant_dict)
-        super(_BaseParticipantMeetingEvent, self).__init__()
-
-
-class ParticipantJoinedMeetingEvent(_BaseParticipantMeetingEvent):
+class MeetingParticipantJoinedEvent(_MeetingMixin, TenantEvent):
     name = 'meeting_participant_joined'
     routing_key_fmt = 'meetings.{meeting_uuid}.participants.joined'
 
-    def __init__(self, meeting_uuid, participant_dict):
-        super(ParticipantJoinedMeetingEvent, self).__init__(
-            meeting_uuid, participant_dict
+    def __init__(self, participant_data, meeting_uuid, tenant_uuid):
+        content = dict(participant_data, meeting_uuid=meeting_uuid)
+        super(MeetingParticipantJoinedEvent, self).__init__(
+            content, meeting_uuid, tenant_uuid
         )
 
 
-class ParticipantLeftMeetingEvent(_BaseParticipantMeetingEvent):
+class MeetingParticipantLeftEvent(_MeetingMixin, TenantEvent):
     name = 'meeting_participant_left'
     routing_key_fmt = 'meetings.{meeting_uuid}.participants.left'
 
-    def __init__(self, meeting_uuid, participant_dict):
-        super(ParticipantLeftMeetingEvent, self).__init__(
-            meeting_uuid, participant_dict
+    def __init__(self, participant_data, meeting_uuid, tenant_uuid):
+        content = dict(participant_data, meeting_uuid=meeting_uuid)
+        super(MeetingParticipantLeftEvent, self).__init__(
+            content, meeting_uuid, tenant_uuid
         )
 
 
-class UserParticipantJoinedMeetingEvent(_BaseParticipantMeetingEvent):
+class MeetingUserParticipantJoinedEvent(_MeetingMixin, UserEvent):
     name = 'meeting_user_participant_joined'
     routing_key_fmt = 'meetings.users.{user_uuid}.participants.joined'
 
-    def __init__(self, meeting_uuid, participant_dict, user_uuid=None):
-        super(UserParticipantJoinedMeetingEvent, self).__init__(
-            meeting_uuid, participant_dict
+    def __init__(self, participant_data, meeting_uuid, tenant_uuid, user_uuid):
+        content = dict(participant_data, meeting_uuid=meeting_uuid)
+        super(MeetingUserParticipantJoinedEvent, self).__init__(
+            content, meeting_uuid, tenant_uuid, user_uuid
         )
-        if user_uuid:
-            self.routing_key = self.routing_key_fmt.format(user_uuid=user_uuid)
-            self.required_acl = (
-                'events.users.{user_uuid}.meetings.participants.joined'.format(
-                    user_uuid=user_uuid
-                )
-            )
 
 
-class UserParticipantLeftMeetingEvent(_BaseParticipantMeetingEvent):
+class MeetingUserParticipantLeftEvent(_MeetingMixin, UserEvent):
     name = 'meeting_user_participant_left'
     routing_key_fmt = 'meetings.users.{user_uuid}.participants.left'
 
-    def __init__(self, meeting_uuid, participant_dict, user_uuid=None):
-        super(UserParticipantLeftMeetingEvent, self).__init__(
-            meeting_uuid, participant_dict
+    def __init__(self, participant_data, meeting_uuid, tenant_uuid, user_uuid):
+        content = dict(participant_data, meeting_uuid=meeting_uuid)
+        super(MeetingUserParticipantLeftEvent, self).__init__(
+            content, meeting_uuid, tenant_uuid, user_uuid
         )
-        if user_uuid:
-            self.routing_key = self.routing_key_fmt.format(user_uuid=user_uuid)
-            self.required_acl = (
-                'events.users.{user_uuid}.meetings.participants.left'.format(
-                    user_uuid=user_uuid
-                )
-            )
 
 
-class MeetingAuthorizationCreatedEvent(_MeetingTenantEvent):
+class MeetingAuthorizationCreatedEvent(_MeetingMixin, TenantEvent):
     name = 'meeting_guest_authorization_created'
     routing_key_fmt = 'config.meeting_guest_authorizations.created'
 
@@ -141,7 +116,7 @@ class MeetingAuthorizationCreatedEvent(_MeetingTenantEvent):
         )
 
 
-class MeetingAuthorizationDeletedEvent(_MeetingTenantEvent):
+class MeetingAuthorizationDeletedEvent(_MeetingMixin, TenantEvent):
     name = 'meeting_guest_authorization_deleted'
     routing_key_fmt = 'config.meeting_guest_authorizations.deleted'
 
@@ -151,7 +126,7 @@ class MeetingAuthorizationDeletedEvent(_MeetingTenantEvent):
         )
 
 
-class MeetingAuthorizationEditedEvent(_MeetingTenantEvent):
+class MeetingAuthorizationEditedEvent(_MeetingMixin, TenantEvent):
     name = 'meeting_guest_authorization_updated'
     routing_key_fmt = 'config.meeting_guest_authorizations.updated'
 
@@ -161,40 +136,37 @@ class MeetingAuthorizationEditedEvent(_MeetingTenantEvent):
         )
 
 
-class MeetingUserAuthorizationCreatedEvent(_MeetingUserEvent):
+class MeetingUserAuthorizationCreatedEvent(_MeetingMixin, UserEvent):
     name = 'meeting_user_guest_authorization_created'
     routing_key_fmt = 'config.users.{user_uuid}.meeting_guest_authorizations.created'
     required_acl_fmt = 'events.users.{user_uuid}.meeting_guest_authorizations.created'
 
     def __init__(self, meeting_authorization, meeting_uuid, tenant_uuid, user_uuid):
-        content = dict(meeting_authorization)
-        content['user_uuid'] = user_uuid
+        content = dict(meeting_authorization, user_uuid=user_uuid)
         super(MeetingUserAuthorizationCreatedEvent, self).__init__(
             content, meeting_uuid, tenant_uuid, user_uuid
         )
 
 
-class MeetingUserAuthorizationDeletedEvent(_MeetingUserEvent):
+class MeetingUserAuthorizationDeletedEvent(_MeetingMixin, UserEvent):
     name = 'meeting_user_guest_authorization_deleted'
     routing_key_fmt = 'config.users.{user_uuid}.meeting_guest_authorizations.deleted'
     required_acl_fmt = 'events.users.{user_uuid}.meeting_guest_authorizations.deleted'
 
     def __init__(self, meeting_authorization, meeting_uuid, tenant_uuid, user_uuid):
-        content = dict(meeting_authorization)
-        content['user_uuid'] = user_uuid
+        content = dict(meeting_authorization, user_uuid=user_uuid)
         super(MeetingUserAuthorizationDeletedEvent, self).__init__(
             content, meeting_uuid, tenant_uuid, user_uuid
         )
 
 
-class MeetingUserAuthorizationEditedEvent(_MeetingUserEvent):
+class MeetingUserAuthorizationEditedEvent(_MeetingMixin, UserEvent):
     name = 'meeting_user_guest_authorization_updated'
     routing_key_fmt = 'config.users.{user_uuid}.meeting_guest_authorizations.updated'
     required_acl_fmt = 'events.users.{user_uuid}.meeting_guest_authorizations.updated'
 
     def __init__(self, meeting_authorization, meeting_uuid, tenant_uuid, user_uuid):
-        content = dict(meeting_authorization)
-        content['user_uuid'] = user_uuid
+        content = dict(meeting_authorization, user_uuid=user_uuid)
         super(MeetingUserAuthorizationEditedEvent, self).__init__(
             content, meeting_uuid, tenant_uuid, user_uuid
         )
