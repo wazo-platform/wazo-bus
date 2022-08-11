@@ -21,15 +21,14 @@ class TenantEvent(AbstractEvent):
 class UserEvent(TenantEvent):
     def __init__(self, content, tenant_uuid, user_uuid):
         super(UserEvent, self).__init__(content, tenant_uuid)
-        if user_uuid is None:
-            raise ValueError('user_uuid must have a value')
-        self.user_uuid = str(user_uuid)
+        self.user_uuid = str(user_uuid) if user_uuid else None
 
     @property
     def headers(self):
         headers = super(UserEvent, self).headers
         uuid = headers.pop('user_uuid')
-        headers['user_uuid:{}'.format(uuid)] = True
+        if uuid:
+            headers['user_uuid:{}'.format(uuid)] = True
         return headers
 
 
