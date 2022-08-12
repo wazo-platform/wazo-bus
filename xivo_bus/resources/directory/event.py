@@ -1,36 +1,33 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-
-class _BaseFavoriteEvent(object):
-
-    def __init__(self, xivo_uuid, user_uuid, source, source_entry_id):
-        self.routing_key = self._routing_key_fmt.format(user_uuid)
-        self.required_acl = self._required_acl_fmt.format(user_uuid)
-        self._xivo_uuid = xivo_uuid
-        self._user_uuid = user_uuid
-        self._source = source
-        self._source_entry_id = source_entry_id
-
-    def marshal(self):
-        return {
-            'xivo_uuid': self._xivo_uuid,
-            'user_uuid': self._user_uuid,
-            'source': self._source,
-            'source_entry_id': self._source_entry_id,
-        }
+from xivo_bus.resources.common.event import UserEvent
 
 
-class FavoriteAddedEvent(_BaseFavoriteEvent):
-
+class FavoriteAddedEvent(UserEvent):
     name = 'favorite_added'
-    _routing_key_fmt = 'directory.{}.favorite.created'
-    _required_acl_fmt = 'events.directory.{}.favorite.created'
+    routing_key_fmt = 'directory.{user_uuid}.favorite.created'
+
+    def __init__(self, source_name, entry_id, wazo_uuid, tenant_uuid, user_uuid):
+        content = {
+            'xivo_uuid': str(wazo_uuid),
+            'user_uuid': str(user_uuid),
+            'source': source_name,
+            'source_entry_id': entry_id,
+        }
+        super(FavoriteAddedEvent, self).__init__(content, tenant_uuid, user_uuid)
 
 
-class FavoriteDeletedEvent(_BaseFavoriteEvent):
-
+class FavoriteDeletedEvent(UserEvent):
     name = 'favorite_deleted'
-    _routing_key_fmt = 'directory.{}.favorite.deleted'
-    _required_acl_fmt = 'events.directory.{}.favorite.deleted'
+    routing_key_fmt = 'directory.{user_uuid}.favorite.deleted'
+
+    def __init__(self, source_name, entry_id, wazo_uuid, tenant_uuid, user_uuid):
+        content = {
+            'xivo_uuid': str(wazo_uuid),
+            'user_uuid': str(user_uuid),
+            'source': source_name,
+            'source_entry_id': entry_id,
+        }
+        super(FavoriteDeletedEvent, self).__init__(content, tenant_uuid, user_uuid)
