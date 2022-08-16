@@ -32,6 +32,23 @@ class UserEvent(TenantEvent):
         return headers
 
 
+class MultiUserEvent(TenantEvent):
+    __slots__ = ('user_uuids',)
+
+    def __init__(self, content, tenant_uuid, user_uuids):
+        super(MultiUserEvent, self).__init__(content, tenant_uuid)
+        if not isinstance(user_uuids, list):
+            raise ValueError('user_uuids must be a list of uuids')
+        self.user_uuids = [str(user_uuid) for user_uuid in user_uuids]
+
+    @property
+    def headers(self):
+        headers = super(MultiUserEvent, self).headers
+        for user_uuid in self.user_uuids:
+            headers['user_uuid:{}'.format(user_uuid)] = True
+        return headers
+
+
 # Deprecated and should not be used for new events
 class BaseEvent(object):
     def __init__(self):
