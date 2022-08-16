@@ -3,38 +3,20 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
-from xivo_bus.resources.common.event import TenantEvent, BaseEvent
+from xivo_bus.resources.common.event import TenantEvent, MultiUserEvent, BaseEvent
 from xivo.permission import escape as escape_acl
 from xivo_bus.resources.common.routing_key import escape as escape_key
 
 
-class _SwitchboardEvent(TenantEvent):
-    def __init__(self, content, switchboard_uuid, tenant_uuid):
-        super(_SwitchboardEvent, self).__init__(content, tenant_uuid)
+class _SwitchboardMixin(object):
+    def __init__(self, content, switchboard_uuid, *args):
+        super(_SwitchboardMixin, self).__init__(content, *args)
         if switchboard_uuid is None:
             raise ValueError('switchboard_uuid must have a value')
         self.switchboard_uuid = str(switchboard_uuid)
 
 
-class _SwitchboardUsersEvent(_SwitchboardEvent):
-    def __init__(self, content, switchboard_uuid, tenant_uuid, user_uuids):
-        super(_SwitchboardUsersEvent, self).__init__(
-            content, switchboard_uuid, tenant_uuid
-        )
-        if not isinstance(user_uuids, list):
-            raise TypeError('user_uuids must be a list of user uuids')
-        self.user_uuids = user_uuids
-
-    @property
-    def headers(self):
-        headers = super(_SwitchboardUsersEvent, self).headers
-        user_uuids = headers.pop('user_uuids')
-        for uuid in user_uuids:
-            headers['user_uuid:{}'.format(uuid)] = True
-        return headers
-
-
-class SwitchboardCreatedEvent(_SwitchboardEvent):
+class SwitchboardCreatedEvent(_SwitchboardMixin, TenantEvent):
     name = 'switchboard_created'
     routing_key_fmt = 'config.switchboards.{switchboard_uuid}.created'
     required_acl_fmt = 'switchboards.{switchboard_uuid}.created'
@@ -45,7 +27,7 @@ class SwitchboardCreatedEvent(_SwitchboardEvent):
         )
 
 
-class SwitchboardDeletedEvent(_SwitchboardEvent):
+class SwitchboardDeletedEvent(_SwitchboardMixin, TenantEvent):
     name = 'switchboard_deleted'
     routing_key_fmt = 'config.switchboards.{switchboard_uuid}.deleted'
     required_acl_fmt = 'switchboards.{switchboard_uuid}.deleted'
@@ -56,7 +38,7 @@ class SwitchboardDeletedEvent(_SwitchboardEvent):
         )
 
 
-class SwitchboardEditedEvent(_SwitchboardEvent):
+class SwitchboardEditedEvent(_SwitchboardMixin, TenantEvent):
     name = 'switchboard_edited'
     routing_key_fmt = 'config.switchboards.{switchboard_uuid}.edited'
     required_acl_fmt = 'switchboards.{switchboard_uuid}.edited'
@@ -67,7 +49,7 @@ class SwitchboardEditedEvent(_SwitchboardEvent):
         )
 
 
-class SwitchboardFallbackEditedEvent(_SwitchboardEvent):
+class SwitchboardFallbackEditedEvent(_SwitchboardMixin, TenantEvent):
     name = 'switchboard_fallback_edited'
     routing_key_fmt = 'config.switchboards.fallbacks.edited'
     required_acl_fmt = 'switchboards.fallbacks.edited'
@@ -78,7 +60,7 @@ class SwitchboardFallbackEditedEvent(_SwitchboardEvent):
         )
 
 
-class SwitchboardMemberUserAssociatedEvent(_SwitchboardUsersEvent):
+class SwitchboardMemberUserAssociatedEvent(_SwitchboardMixin, MultiUserEvent):
     name = 'switchboard_member_user_associated'
     routing_key_fmt = 'config.switchboards.{switchboard_uuid}.members.users.updated'
     required_acl_fmt = 'switchboards.{switchboard_uuid}.members.users.updated'
