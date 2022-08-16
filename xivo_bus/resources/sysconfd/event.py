@@ -1,18 +1,31 @@
-# Copyright 2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from ..common.event import BaseEvent
+from xivo_bus.resources.common.event import ServiceEvent
 
 
-class RequestHandlersProgressEvent(BaseEvent):
-
+class RequestHandlersProgressEvent(ServiceEvent):
     name = 'request_handlers_progress'
     routing_key_fmt = 'sysconfd.request_handlers.{uuid}.{status}'
 
-    def __init__(self, request, status):
-        self._body = {
-            'uuid': request.uuid,
+    def __init__(self, request_uuid, request_context, status):
+        content = {
+            'uuid': str(request_uuid),
             'status': status,
-            'context': request.context,
+            'context': request_context,
         }
-        super(RequestHandlersProgressEvent, self).__init__()
+        super(RequestHandlersProgressEvent, self).__init__(content)
+
+
+class AsteriskReloadProgressEvent(ServiceEvent):
+    name = 'asterisk_reload_progress'
+    routing_key_fmt = 'sysconfd.asterisk.reload.{uuid}.{status}'
+
+    def __init__(self, uuid, status, command, request_uuids):
+        content = {
+            'uuid': str(uuid),
+            'status': status,
+            'command': command,
+            'request_uuids': request_uuids,
+        }
+        super(AsteriskReloadProgressEvent, self).__init__(content)
