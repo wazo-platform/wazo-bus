@@ -94,6 +94,7 @@ class TestTenantEvent(TestCase):
             equal_to(
                 {
                     'name': 'some_tenant_event',
+                    'user_uuid:*': True,
                     'tenant_uuid': str(TENANT_UUID),
                 }
             ),

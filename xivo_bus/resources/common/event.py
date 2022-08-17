@@ -16,11 +16,13 @@ class TenantEvent(AbstractEvent):
         if tenant_uuid is None:
             raise ValueError('tenant_uuid must have a value')
         self.tenant_uuid = str(tenant_uuid)
+        setattr(self, 'user_uuid:*', True)
 
 
 class UserEvent(TenantEvent):
     def __init__(self, content, tenant_uuid, user_uuid):
         super(UserEvent, self).__init__(content, tenant_uuid)
+        delattr(self, 'user_uuid:*')
         self.user_uuid = str(user_uuid) if user_uuid else None
 
     @property
@@ -37,6 +39,7 @@ class MultiUserEvent(TenantEvent):
 
     def __init__(self, content, tenant_uuid, user_uuids):
         super(MultiUserEvent, self).__init__(content, tenant_uuid)
+        delattr(self, 'user_uuid:*')
         if not isinstance(user_uuids, list):
             raise ValueError('user_uuids must be a list of uuids')
         self.user_uuids = [str(user_uuid) for user_uuid in user_uuids]
