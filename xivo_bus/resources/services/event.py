@@ -1,73 +1,35 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from xivo_bus.resources.common.event import ServiceEvent
 
-class ServiceRegisteredEvent(object):
 
-    name = 'service_registered_event'
+class ServiceRegisteredEvent(ServiceEvent):
+    name = 'service_registered'
     routing_key_fmt = 'service.registered.{service_name}'
 
-    def __init__(self, service_name, service_id, advertise_address, advertise_port, tags):
-        self.routing_key = self.routing_key_fmt.format(service_name=service_name)
-        self.service_name = service_name
-        self.service_id = service_id
-        self.advertise_address = advertise_address
-        self.advertise_port = advertise_port
-        self.tags = tags
-
-    def marshal(self):
-        return {'service_name': self.service_name,
-                'service_id': self.service_id,
-                'address': self.advertise_address,
-                'port': self.advertise_port,
-                'tags': self.tags}
-
-    @classmethod
-    def unmarshal(cls, body):
-        return cls(body['service_name'],
-                   body['service_id'],
-                   body['address'],
-                   body['port'],
-                   body['tags'])
-
-    def __eq__(self, other):
-        return (self.service_name == other.service_name
-                and self.service_id == other.service_id
-                and self.advertise_address == other.advertise_address
-                and self.advertise_port == other.advertise_port
-                and sorted(self.tags) == sorted(other.tags))
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-    def __repr__(self):
-        return self.name
+    def __init__(
+        self, service_name, service_id, advertise_address, advertise_port, tags
+    ):
+        content = {
+            'service_name': service_name,
+            'service_id': service_id,
+            'address': advertise_address,
+            'port': advertise_port,
+            'targs': tags,
+        }
+        super(ServiceRegisteredEvent, self).__init__(content)
 
 
-class ServiceDeregisteredEvent(object):
-
-    name = 'service_deregistered_event'
-    routing_key_fmt = 'service.deregistered.{service_name}'
+class ServiceDeregisteredEvent(ServiceEvent):
+    name = 'service_deregistered'
+    routing_key_fmt = 'service.registered.{service_name}'
 
     def __init__(self, service_name, service_id, tags):
-        self.routing_key = self.routing_key_fmt.format(service_name=service_name)
-        self._service_name = service_name
-        self._service_id = service_id
-        self._tags = tags
-
-    def marshal(self):
-        return {'service_name': self._service_name,
-                'service_id': self._service_id,
-                'tags': self._tags}
-
-    def __eq__(self, other):
-        return (self._service_name == other._service_name
-                and self._service_id == other._service_id
-                and sorted(self._tags) == sorted(other._tags))
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-    def __repr__(self):
-        return self.name
+        content = {
+            'service_name': service_name,
+            'service_id': service_id,
+            'tags': tags,
+        }
+        super(ServiceDeregisteredEvent, self).__init__(content)
