@@ -298,7 +298,7 @@ class PublisherMixin(object):
     }
 
     def __init__(self, publish=None, **kwargs):
-        super().__init__(**kwargs)
+        super(PublisherMixin, self).__init__(**kwargs)
         if publish:
             exchange = Exchange(publish['exchange_name'], publish['exchange_type'])
         self.__exchange = exchange if publish else self._default_exchange
