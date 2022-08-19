@@ -276,6 +276,10 @@ class ConsumerMixin(KombuConsumer):
             is_running = False
         return super(ConsumerMixin, self).is_running and is_running
 
+    def _connected(self, status):
+        status['consuming'] = self.connection.connected
+        super(ConsumerMixin, self)._connected(status)
+
     @property
     def should_stop(self):
         return getattr(self, 'is_stopping', True)
@@ -305,6 +309,10 @@ class PublisherMixin(object):
         self.__connection = Connection(self.url, transport_options=self.publisher_args)
         self.__lock = Lock()
         self.log.debug('setting publishing exchange as \'%s\'', self.__exchange)
+
+    def _connected(self, status):
+        status['publishing'] = self.__connection.connected
+        super(PublisherMixin, self)._connected(status)
 
     @contextmanager
     def Producer(self, connection, **connection_args):
@@ -336,18 +344,24 @@ class QueuePublisherMixin(PublisherMixin):
 
     def __init__(self, **kwargs):
         super(QueuePublisherMixin, self).__init__(**kwargs)
+        retry_policy = self.queue_publisher_args
         self.__flushing = False
         self.__fifo = FifoQueue()
+        self.__connection = Connection(self.url, transport_options=retry_policy)
         try:
             self._register_thread('publisher_queue', self.__run, on_stop=self.__stop)
         except AttributeError:
             pass
 
+    def _connected(self, status):
+        status['publishing_queue'] = self.__connection and self.__connection.connected
+        super(QueuePublisherMixin, self)._connected(status)
+
     def __run(self, ready_flag, **kwargs):
         ready_flag.set()
-        publisher_args = self.queue_publisher_args
+        retry_policy = self.queue_publisher_args
 
-        with Connection(self.url, transport_options=publisher_args) as connection:
+        with self.__connection:
             while not self.is_stopping or self.__flushing:
                 try:
                     payload, headers, routing_key = self.__fifo.get()
@@ -355,7 +369,7 @@ class QueuePublisherMixin(PublisherMixin):
                     self.__flushing = False
                     continue
                 try:
-                    with self.Producer(connection, **publisher_args) as publish:
+                    with self.Producer(self.__connection, **retry_policy) as publish:
                         publish(payload, headers=headers, routing_key=routing_key)
                 except OperationalError as exc:
                     self.log.error('Publishing queue error: %s', exc, exc_info=1)
