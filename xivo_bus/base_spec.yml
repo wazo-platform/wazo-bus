@@ -1,0 +1,35 @@
+asyncapi: 2.0.0
+info:
+  title: WAZO Events API
+  version: 0.0.1
+servers:
+  production:
+    url: amqp://guest:guest@localhost:5672//
+    protocol: amqp
+    protocolVersion: 0.9.1
+channels: {}
+components:
+  messages: {}
+  schemas:
+    origin_uuid:
+      type: string
+      format: uuid
+      description: Unique identifier of the publishing WAZO server
+    timestamp:
+      type: string
+      format: date-time
+      description: Date and time this event was published
+    tenant_uuid:
+      type: string
+      format: uuid
+      description: Resource's associated tenant's unique identifier
+    user_uuid:{uuid}:
+      type: boolean
+      description: Targeted user's unique identifier.  The format user_uuid:{uuid} allows
+        multiple users to be the recipient of this event
+      parameters:
+        uuid:
+          description: Concerned user's unique identifier
+          schema:
+            type: string
+            format: uuid
