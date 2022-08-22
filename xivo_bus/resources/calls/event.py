@@ -90,7 +90,7 @@ class MissedCallEvent(UserEvent):
 
 
 class CallRelocateInitiatedEvent(UserEvent):
-    name = 'call_relocate_initiated'
+    name = 'relocate_initiated'
     routing_key_fmt = 'calls.relocate.created'
     required_acl_fmt = 'events.relocates.{user_uuid}'
 
@@ -101,7 +101,7 @@ class CallRelocateInitiatedEvent(UserEvent):
 
 
 class CallRelocateAnsweredEvent(UserEvent):
-    name = 'call_relocate_answered'
+    name = 'relocate_answered'
     routing_key_fmt = 'calls.relocate.edited'
     required_acl_fmt = 'events.relocates.{user_uuid}'
 
@@ -112,7 +112,7 @@ class CallRelocateAnsweredEvent(UserEvent):
 
 
 class CallRelocateCompletedEvent(UserEvent):
-    name = 'call_relocate_completed'
+    name = 'relocate_completed'
     routing_key_fmt = 'calls.relocate.edited'
     required_acl_fmt = 'events.relocates.{user_uuid}'
 
@@ -123,7 +123,7 @@ class CallRelocateCompletedEvent(UserEvent):
 
 
 class CallRelocateEndedEvent(UserEvent):
-    name = 'call_relocate_ended'
+    name = 'relocate_ended'
     routing_key_fmt = 'calls.relocate.deleted'
     required_acl_fmt = 'events.relocates.{user_uuid}'
 
@@ -134,7 +134,7 @@ class CallRelocateEndedEvent(UserEvent):
 
 
 class CallTransferCreatedEvent(UserEvent):
-    name = 'call_transfer_created'
+    name = 'transfer_created'
     routing_key_fmt = 'calls.transfer.created'
     required_acl_fmt = 'events.transfers.{user_uuid}'
 
@@ -145,7 +145,7 @@ class CallTransferCreatedEvent(UserEvent):
 
 
 class CallTransferUpdatedEvent(UserEvent):
-    name = 'call_transfer_updated'
+    name = 'transfer_updated'
     routing_key_fmt = 'calls.transfer.created'
     required_acl_fmt = 'events.transfers.{user_uuid}'
 
@@ -156,7 +156,7 @@ class CallTransferUpdatedEvent(UserEvent):
 
 
 class CallTransferAnsweredEvent(UserEvent):
-    name = 'call_transfer_answered'
+    name = 'transfer_answered'
     routing_key_fmt = 'calls.transfer.edited'
     required_acl_fmt = 'events.transfers.{user_uuid}'
 
@@ -167,7 +167,7 @@ class CallTransferAnsweredEvent(UserEvent):
 
 
 class CallTransferCancelledEvent(UserEvent):
-    name = 'call_transfer_cancelled'
+    name = 'transfer_cancelled'
     routing_key_fmt = 'calls.transfer.edited'
     required_acl_fmt = 'events.transfers.{user_uuid}'
 
@@ -178,7 +178,7 @@ class CallTransferCancelledEvent(UserEvent):
 
 
 class CallTransferCompletedEvent(UserEvent):
-    name = 'call_transfer_completed'
+    name = 'transfer_completed'
     routing_key_fmt = 'calls.transfer.edited'
     required_acl_fmt = 'events.transfers.{user_uuid}'
 
@@ -189,7 +189,7 @@ class CallTransferCompletedEvent(UserEvent):
 
 
 class CallTransferAbandonedEvent(UserEvent):
-    name = 'call_transfer_abandoned'
+    name = 'transfer_abandoned'
     routing_key_fmt = 'calls.transfer.edited'
     required_acl_fmt = 'events.transfers.{user_uuid}'
 
@@ -200,7 +200,7 @@ class CallTransferAbandonedEvent(UserEvent):
 
 
 class CallTransferEndedEvent(UserEvent):
-    name = 'call_transfer_ended'
+    name = 'transfer_ended'
     routing_key_fmt = 'calls.transfer.deleted'
     required_acl_fmt = 'events.transfers.{user_uuid}'
 
