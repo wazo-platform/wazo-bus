@@ -29,8 +29,7 @@ class ThreadableMixin(object):
 
     @property
     def is_running(self):
-        status = all({bus_thread.thread.is_alive() for bus_thread in self.__threads})
-        return super(ThreadableMixin, self).is_running and status
+        return all({bus_thread.thread.is_alive() for bus_thread in self.__threads})
 
     @property
     def __threads(self):
@@ -270,10 +269,9 @@ class ConsumerMixin(KombuConsumer):
     @property
     def is_running(self):
         try:
-            is_running = self.connection.connected
+            return self.connection.connected
         except AttributeError:
-            is_running = False
-        return super(ConsumerMixin, self).is_running and is_running
+            return False
 
     @property
     def should_stop(self):
