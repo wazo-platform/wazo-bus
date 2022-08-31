@@ -29,3 +29,10 @@ class BusConsumer(WazoEventMixin, ThreadableMixin, ConsumerMixin, Base):
             subscribe=subscribe,
             **kwargs
         )
+
+    def is_running(self):
+        return (
+            super(ThreadableMixin, self).is_running()
+            and super(ConsumerMixin, self).is_running()
+            and super(Base, self).is_running()
+        )
