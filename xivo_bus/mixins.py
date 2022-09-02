@@ -19,6 +19,22 @@ Subscription = namedtuple('Subscription', ['handler', 'binding'])
 
 
 class ThreadableMixin(object):
+    '''
+    Mixin to provide methods for easy thread creation/management
+
+    Public attributes:
+        * `is_running`:
+            Returns True if threads are alive and running
+
+    Public methods:
+        * `start`:
+            Starts execution of registered thread
+        * `stop`:
+            Kill all running threads
+        * `_register_thread`:
+            Allows another mixin to register a thread for execution
+    '''
+
     def __init__(self, **kwargs):
         super(ThreadableMixin, self).__init__(**kwargs)
         self.__stop_flag = Event()
@@ -104,6 +120,18 @@ class ThreadableMixin(object):
 
 
 class ConsumerMixin(KombuConsumer):
+    '''
+    Mixin to provide RabbitMQ message consuming capabilities
+
+    Public methods:
+        * `consumer_connected`:
+            Returns whether the consumer is connected to RabbitMQ or not
+        * `subscribe`:
+            Install a handler for the specified event
+        * `unsubscribe`:
+            Uninstall a handler for the specified event
+    '''
+
     consumer_args = {}
 
     def __init__(self, subscribe=None, **kwargs):
@@ -291,6 +319,16 @@ class ConsumerMixin(KombuConsumer):
 
 
 class PublisherMixin(object):
+    '''
+    Mixin providing RabbitMQ message publishing capabilities
+
+    Methods:
+        * `publisher_connected`:
+            Returns whether publisher is connected to RabbitMQ or not
+        * `publish`:
+            publish an event immediately to the bus
+    '''
+
     publisher_args = {
         'max_retries': 2,
     }
@@ -329,6 +367,23 @@ class PublisherMixin(object):
 
 
 class QueuePublisherMixin(PublisherMixin):
+    '''
+    Mixin to provide publishing capabilities, including ability to publish
+    through a thread
+
+    **Note: Exclusive with PublisherMixin**
+
+    Public methods:
+        * `publisher_connected`:
+            Returns publisher's connection state to rabbitmq
+        * `queue_publisher_connected`:
+            Returns threaded publisher's connection state to rabbitmq
+        * `publish`:
+            Publish an event immediately to the bus without queueing
+        * `publish_soon`:
+            Queue an event to be processed by the publishing thread
+    '''
+
     queue_publisher_args = {
         'interval_start': 2,
         'interval_step': 2,
@@ -383,6 +438,17 @@ class QueuePublisherMixin(PublisherMixin):
 
 
 class WazoEventMixin(object):
+    '''
+    Mixin to handle message formatting for wazo events
+
+    Overrides:
+        * `_marshal`:
+            Serializes the message to be sent to RabbitMQ
+
+        * `_unmarshal`:
+            Deserializes the message received from RabbitMQ
+    '''
+
     def __init__(self, service_uuid=None, **kwargs):
         super(WazoEventMixin, self).__init__(**kwargs)
         self.service_uuid = service_uuid

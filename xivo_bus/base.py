@@ -12,6 +12,8 @@ ConnectionParams = namedtuple('ConnectionParams', 'user, password, host, port')
 
 
 class Base(object):
+    '''Base class for publishers/consumers (to be extended by mixins)'''
+
     def __init__(
         self,
         name=None,
