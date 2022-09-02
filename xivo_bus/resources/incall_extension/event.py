@@ -1,41 +1,30 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
+from xivo_bus.resources.common.event import TenantEvent
 
 
-class IncallExtensionConfigEvent(object):
-
-    def __init__(self, incall_id, extension_id):
-        self.incall_id = incall_id
-        self.extension_id = extension_id
-
-    def marshal(self):
-        return {
-            'incall_id': self.incall_id,
-            'extension_id': self.extension_id,
-        }
-
-    @classmethod
-    def unmarshal(cls, msg):
-        return cls(
-            msg['incall_id'],
-            msg['extension_id'])
-
-    def __eq__(self, other):
-        return (self.incall_id == other.incall_id
-                and self.extension_id == other.extension_id)
-
-    def __ne__(self, other):
-        return not self == other
-
-
-class IncallExtensionAssociatedEvent(IncallExtensionConfigEvent):
+class IncallExtensionAssociatedEvent(TenantEvent):
     name = 'incall_extension_associated'
-    routing_key = 'config.incalls.extensions.updated'
+    routing_key_fmt = 'config.incalls.extensions.updated'
+
+    def __init__(self, incall_id, extension_id, tenant_uuid):
+        content = {
+            'incall_id': incall_id,
+            'extension_id': extension_id,
+        }
+        super(IncallExtensionAssociatedEvent, self).__init__(content, tenant_uuid)
 
 
-class IncallExtensionDissociatedEvent(IncallExtensionConfigEvent):
+class IncallExtensionDissociatedEvent(TenantEvent):
     name = 'incall_extension_dissociated'
-    routing_key = 'config.incalls.extensions.deleted'
+    routing_key_fmt = 'config.incalls.extensions.deleted'
+
+    def __init__(self, incall_id, extension_id, tenant_uuid):
+        content = {
+            'incall_id': incall_id,
+            'extension_id': extension_id,
+        }
+        super(IncallExtensionDissociatedEvent, self).__init__(content, tenant_uuid)

@@ -1,22 +1,33 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
-
-from xivo_bus.resources.common.event import ResourceConfigEvent
-
-
-class EditCallPickupEvent(ResourceConfigEvent):
-    name = 'call_pickup_edited'
-    routing_key = 'config.callpickup.edited'
+from xivo_bus.resources.common.event import TenantEvent
 
 
-class CreateCallPickupEvent(ResourceConfigEvent):
+class CallPickupCreatedEvent(TenantEvent):
     name = 'call_pickup_created'
-    routing_key = 'config.callpickup.created'
+    routing_key_fmt = 'config.callpickup.created'
+
+    def __init__(self, call_pickup_id, tenant_uuid):
+        content = {'id': call_pickup_id}
+        super(CallPickupCreatedEvent, self).__init__(content, tenant_uuid)
 
 
-class DeleteCallPickupEvent(ResourceConfigEvent):
+class CallPickupDeletedEvent(TenantEvent):
     name = 'call_pickup_deleted'
-    routing_key = 'config.callpickup.deleted'
+    routing_key_fmt = 'config.callpickup.deleted'
+
+    def __init__(self, call_pickup_id, tenant_uuid):
+        content = {'id': call_pickup_id}
+        super(CallPickupDeletedEvent, self).__init__(content, tenant_uuid)
+
+
+class CallPickupEditedEvent(TenantEvent):
+    name = 'call_pickup_edited'
+    routing_key_fmt = 'config.callpickup.edited'
+
+    def __init__(self, call_pickup_id, tenant_uuid):
+        content = {'id': call_pickup_id}
+        super(CallPickupEditedEvent, self).__init__(content, tenant_uuid)

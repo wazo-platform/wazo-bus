@@ -14,7 +14,7 @@ class TestStatus(BusIntegrationTest):
 
     def check_is_running(self):
         remote_status = self.remote_bus.get_status()
-        return self.local_bus.is_running and remote_status['running']
+        return self.local_bus.consumer_connected() and remote_status['running']
 
     def test_status_when_all_ok(self):
         until.true(self.check_is_running, tries=3)

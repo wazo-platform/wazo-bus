@@ -1,17 +1,14 @@
 # -*- coding: utf-8 -*-
-# Copyright 2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
+from xivo_bus.resources.common.event import ServiceEvent
 
-from ..common.event import BaseEvent
 
-
-class HEPGeneralUpdatedEvent(BaseEvent):
-
-    name = 'hep_general_updated'
-    routing_key_fmt = 'config.hep_general.updated'
+class HEPGeneralEditedEvent(ServiceEvent):
+    name = 'hep_general_edited'
+    routing_key_fmt = 'config.hep_general.edited'
 
     def __init__(self):
-        self._body = {}
-        super(HEPGeneralUpdatedEvent, self).__init__()
+        super(HEPGeneralEditedEvent, self).__init__()

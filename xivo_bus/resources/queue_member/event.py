@@ -1,94 +1,59 @@
 # -*- coding: utf-8 -*-
-# Copyright 2013-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
+from xivo_bus.resources.common.event import TenantEvent, UserEvent
 
 
-class QueueMemberAgentAssociatedEvent(object):
-    name = 'agent_queue_associated'
-    routing_key = 'config.agent_queue_association.created'
+class QueueMemberAgentAssociatedEvent(TenantEvent):
+    name = 'queue_member_agent_associated'
+    routing_key_fmt = 'config.queues.agents.updated'
 
-    def __init__(self, queue_id, agent_id, penalty):
-        self.queue_id = queue_id
-        self.agent_id = agent_id
-        self.penalty = penalty
-
-    def marshal(self):
-        return {
-            'queue_id': self.queue_id,
-            'agent_id': self.agent_id,
-            'penalty': self.penalty
+    def __init__(self, queue_id, agent_id, penalty, tenant_uuid):
+        content = {
+            'queue_id': queue_id,
+            'agent_id': agent_id,
+            'penalty': penalty,
         }
-
-    @classmethod
-    def unmarshal(cls, msg):
-        return cls(msg['queue_id'], msg['agent_id'], msg['penalty'])
-
-    def __eq__(self, other):
-        return (self.queue_id == other.queue_id
-                and self.agent_id == other.agent_id
-                and self.penalty == other.penalty)
-
-    def __ne__(self, other):
-        return not self == other
+        super(QueueMemberAgentAssociatedEvent, self).__init__(content, tenant_uuid)
 
 
-class QueueMemberAgentDissociatedEvent(object):
-    name = "agent_removed_from_queue"
-    routing_key = 'config.agent_queue_association.deleted'
+class QueueMemberAgentDissociatedEvent(TenantEvent):
+    name = 'queue_member_agent_dissociated'
+    routing_key_fmt = 'config.queues.agents.deleted'
 
-    def __init__(self, queue_id, agent_id):
-        self.queue_id = queue_id
-        self.agent_id = agent_id
-
-    def marshal(self):
-        return {
-            'queue_id': self.queue_id,
-            'agent_id': self.agent_id,
+    def __init__(self, queue_id, agent_id, tenant_uuid):
+        content = {
+            'queue_id': queue_id,
+            'agent_id': agent_id,
         }
-
-    @classmethod
-    def unmarshal(cls, msg):
-        return cls(msg['queue_id'], msg['agent_id'])
-
-    def __eq__(self, other):
-        return (self.queue_id == other.queue_id
-                and self.agent_id == other.agent_id)
-
-    def __ne__(self, other):
-        return not self == other
+        super(QueueMemberAgentDissociatedEvent, self).__init__(content, tenant_uuid)
 
 
-class QueueMemberUserConfigEvent(object):
+class QueueMemberUserAssociatedEvent(UserEvent):
+    name = 'queue_member_user_associated'
+    routing_key_fmt = 'config.queues.users.updated'
 
-    def __init__(self, queue_id, user_uuid):
-        self.queue_id = queue_id
-        self.user_uuid = user_uuid
-
-    def marshal(self):
-        return {
-            'queue_id': self.queue_id,
-            'user_uuid': self.user_uuid,
+    def __init__(self, queue_id, tenant_uuid, user_uuid):
+        content = {
+            'queue_id': queue_id,
+            'user_uuid': str(user_uuid),
         }
-
-    @classmethod
-    def unmarshal(cls, msg):
-        return cls(msg['queue_id'], msg['user_uuid'])
-
-    def __eq__(self, other):
-        return (self.queue_id == other.queue_id
-                and self.user_uuid == other.user_uuid)
-
-    def __ne__(self, other):
-        return not self == other
+        super(QueueMemberUserAssociatedEvent, self).__init__(
+            content, tenant_uuid, user_uuid
+        )
 
 
-class QueueMemberUserAssociatedEvent(QueueMemberUserConfigEvent):
-    name = 'user_queue_associated'
-    routing_key = 'config.user_queue_association.created'
+class QueueMemberUserDissociatedEvent(UserEvent):
+    name = 'queue_member_user_dissociated'
+    routing_key_fmt = 'config.queues.users.deleted'
 
-
-class QueueMemberUserDissociatedEvent(QueueMemberUserConfigEvent):
-    name = "user_removed_from_queue"
-    routing_key = 'config.user_queue_association.deleted'
+    def __init__(self, queue_id, tenant_uuid, user_uuid):
+        content = {
+            'queue_id': queue_id,
+            'user_uuid': str(user_uuid),
+        }
+        super(QueueMemberUserDissociatedEvent, self).__init__(
+            content, tenant_uuid, user_uuid
+        )

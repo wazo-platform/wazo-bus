@@ -1,42 +1,45 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2013-2014 Avencall
+# Copyright 2013-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
-
-from xivo_bus.resources.common.event import ResourceConfigEvent
-
-
-class ExtensionConfigEvent(ResourceConfigEvent):
-    routing_key = 'config.extension.{}'
-
-    def __init__(self, extension_id, exten, context):
-        self.id = int(extension_id)
-        self.exten = exten
-        self.context = context
-
-    def marshal(self):
-        return {
-            'id': self.id,
-            'exten': self.exten,
-            'context': self.context
-        }
-
-    @classmethod
-    def unmarshal(cls, msg):
-        return cls(msg['id'], msg['exten'], msg['context'])
+from xivo_bus.resources.common.event import TenantEvent
 
 
-class EditExtensionEvent(ExtensionConfigEvent):
-    name = 'extension_edited'
-    routing_key = ExtensionConfigEvent.routing_key.format('edited')
-
-
-class CreateExtensionEvent(ExtensionConfigEvent):
+class ExtensionCreatedEvent(TenantEvent):
     name = 'extension_created'
-    routing_key = ExtensionConfigEvent.routing_key.format('created')
+    routing_key_fmt = 'config.extensions.created'
+
+    def __init__(self, extension_id, exten, context, tenant_uuid):
+        content = {
+            'id': int(extension_id),
+            'exten': exten,
+            'context': context,
+        }
+        super(ExtensionCreatedEvent, self).__init__(content, tenant_uuid)
 
 
-class DeleteExtensionEvent(ExtensionConfigEvent):
+class ExtensionDeletedEvent(TenantEvent):
     name = 'extension_deleted'
-    routing_key = ExtensionConfigEvent.routing_key.format('deleted')
+    routing_key_fmt = 'config.extensions.deleted'
+
+    def __init__(self, extension_id, exten, context, tenant_uuid):
+        content = {
+            'id': int(extension_id),
+            'exten': exten,
+            'context': context,
+        }
+        super(ExtensionDeletedEvent, self).__init__(content, tenant_uuid)
+
+
+class ExtensionEditedEvent(TenantEvent):
+    name = 'extension_edited'
+    routing_key_fmt = 'config.extensions.edited'
+
+    def __init__(self, extension_id, exten, context, tenant_uuid):
+        content = {
+            'id': int(extension_id),
+            'exten': exten,
+            'context': context,
+        }
+        super(ExtensionEditedEvent, self).__init__(content, tenant_uuid)

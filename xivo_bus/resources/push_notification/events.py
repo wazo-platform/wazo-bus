@@ -1,24 +1,26 @@
 # Copyright 2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from xivo_bus.resources.common.event import BaseEvent
+from xivo_bus.resources.common.event import UserEvent
 
 
-class PushNotificationEvent(BaseEvent):
+class CallPushNotificationEvent(UserEvent):
     name = 'call_push_notification'
     routing_key_fmt = 'calls.call.push_notification'
+    required_acl_fmt = 'events.calls.{user_uuid}'
 
-    def __init__(self, push_notification, user_uuid):
-        self._body = push_notification
-        super(PushNotificationEvent, self).__init__()
-        self.required_acl = 'events.calls.{uuid}'.format(uuid=user_uuid)
+    def __init__(self, push_schema, tenant_uuid, user_uuid):
+        super(CallPushNotificationEvent, self).__init__(
+            push_schema, tenant_uuid, user_uuid
+        )
 
 
-class CancelPushNotificationEvent(BaseEvent):
+class CallCancelPushNotificationEvent(UserEvent):
     name = 'call_cancel_push_notification'
     routing_key_fmt = 'calls.call.cancel_push_notification'
+    required_acl_fmt = 'events.calls.{user_uuid}'
 
-    def __init__(self, cancel_push_notification, user_uuid):
-        self._body = cancel_push_notification
-        super(CancelPushNotificationEvent, self).__init__()
-        self.required_acl = 'events.calls.{uuid}'.format(uuid=user_uuid)
+    def __init__(self, push_schema, tenant_uuid, user_uuid):
+        super(CallCancelPushNotificationEvent, self).__init__(
+            push_schema, tenant_uuid, user_uuid
+        )

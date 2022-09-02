@@ -1,27 +1,29 @@
-# Copyright 2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
-
-from ..common.event import BaseEvent
-
-
-class _BaseIngressHTTPEvent(BaseEvent):
-    def __init__(self, ingress_http):
-        self._body = ingress_http
-        super(_BaseIngressHTTPEvent, self).__init__()
+from xivo_bus.resources.common.event import TenantEvent
 
 
-class CreateIngressHTTPEvent(_BaseIngressHTTPEvent):
+class IngressHTTPCreatedEvent(TenantEvent):
     name = 'ingress_http_created'
     routing_key_fmt = 'config.ingresses.http.created'
 
-
-class EditIngressHTTPEvent(_BaseIngressHTTPEvent):
-    name = 'ingress_http_updated'
-    routing_key_fmt = 'config.ingresses.http.updated'
+    def __init__(self, ingress_http, tenant_uuid):
+        super(IngressHTTPCreatedEvent, self).__init__(ingress_http, tenant_uuid)
 
 
-class DeleteIngressHTTPEvent(_BaseIngressHTTPEvent):
+class IngressHTTPDeletedEvent(TenantEvent):
     name = 'ingress_http_deleted'
     routing_key_fmt = 'config.ingresses.http.deleted'
+
+    def __init__(self, ingress_http, tenant_uuid):
+        super(IngressHTTPDeletedEvent, self).__init__(ingress_http, tenant_uuid)
+
+
+class IngressHTTPEditedEvent(TenantEvent):
+    name = 'ingress_http_edited'
+    routing_key_fmt = 'config.ingresses.http.edited'
+
+    def __init__(self, ingress_http, tenant_uuid):
+        super(IngressHTTPEditedEvent, self).__init__(ingress_http, tenant_uuid)

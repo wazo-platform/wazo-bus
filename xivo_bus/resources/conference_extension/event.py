@@ -1,41 +1,30 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
+from xivo_bus.resources.common.event import TenantEvent
 
 
-class ConferenceExtensionConfigEvent(object):
-
-    def __init__(self, conference_id, extension_id):
-        self.conference_id = conference_id
-        self.extension_id = extension_id
-
-    def marshal(self):
-        return {
-            'conference_id': self.conference_id,
-            'extension_id': self.extension_id,
-        }
-
-    @classmethod
-    def unmarshal(cls, msg):
-        return cls(
-            msg['conference_id'],
-            msg['extension_id'])
-
-    def __eq__(self, other):
-        return (self.conference_id == other.conference_id
-                and self.extension_id == other.extension_id)
-
-    def __ne__(self, other):
-        return not self == other
-
-
-class ConferenceExtensionAssociatedEvent(ConferenceExtensionConfigEvent):
+class ConferenceExtensionAssociatedEvent(TenantEvent):
     name = 'conference_extension_associated'
-    routing_key = 'config.conferences.extensions.updated'
+    routing_key_fmt = 'config.conferences.extensions.updated'
+
+    def __init__(self, conference_id, extension_id, tenant_uuid):
+        content = {
+            'conference_id': conference_id,
+            'extension_id': extension_id,
+        }
+        super(ConferenceExtensionAssociatedEvent, self).__init__(content, tenant_uuid)
 
 
-class ConferenceExtensionDissociatedEvent(ConferenceExtensionConfigEvent):
+class ConferenceExtensionDissociatedEvent(TenantEvent):
     name = 'conference_extension_dissociated'
-    routing_key = 'config.conferences.extensions.deleted'
+    routing_key_fmt = 'config.conferences.extensions.deleted'
+
+    def __init__(self, conference_id, extension_id, tenant_uuid):
+        content = {
+            'conference_id': conference_id,
+            'extension_id': extension_id,
+        }
+        super(ConferenceExtensionDissociatedEvent, self).__init__(content, tenant_uuid)

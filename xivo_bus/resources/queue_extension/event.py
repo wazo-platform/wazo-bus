@@ -1,41 +1,30 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
+from xivo_bus.resources.common.event import TenantEvent
 
 
-class QueueExtensionConfigEvent(object):
-
-    def __init__(self, queue_id, extension_id):
-        self.queue_id = queue_id
-        self.extension_id = extension_id
-
-    def marshal(self):
-        return {
-            'queue_id': self.queue_id,
-            'extension_id': self.extension_id,
-        }
-
-    @classmethod
-    def unmarshal(cls, msg):
-        return cls(
-            msg['queue_id'],
-            msg['extension_id'])
-
-    def __eq__(self, other):
-        return (self.queue_id == other.queue_id
-                and self.extension_id == other.extension_id)
-
-    def __ne__(self, other):
-        return not self == other
-
-
-class QueueExtensionAssociatedEvent(QueueExtensionConfigEvent):
+class QueueExtensionAssociatedEvent(TenantEvent):
     name = 'queue_extension_associated'
-    routing_key = 'config.queues.extensions.updated'
+    routing_key_fmt = 'config.queues.extensions.updated'
+
+    def __init__(self, queue_id, extension_id, tenant_uuid):
+        content = {
+            'queue_id': queue_id,
+            'extension_id': extension_id,
+        }
+        super(QueueExtensionAssociatedEvent, self).__init__(content, tenant_uuid)
 
 
-class QueueExtensionDissociatedEvent(QueueExtensionConfigEvent):
+class QueueExtensionDissociatedEvent(TenantEvent):
     name = 'queue_extension_dissociated'
-    routing_key = 'config.queues.extensions.deleted'
+    routing_key_fmt = 'config.queues.extensions.deleted'
+
+    def __init__(self, queue_id, extension_id, tenant_uuid):
+        content = {
+            'queue_id': queue_id,
+            'extension_id': extension_id,
+        }
+        super(QueueExtensionDissociatedEvent, self).__init__(content, tenant_uuid)

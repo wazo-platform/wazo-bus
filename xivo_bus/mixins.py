@@ -3,22 +3,38 @@
 
 import os
 
-from contextlib import contextmanager
-from threading import Thread, Lock, Event
-from datetime import datetime
-from six.moves.queue import Queue as FifoQueue, Empty
-from collections import namedtuple, defaultdict
-from kombu import Queue, Exchange, Connection, Producer, binding as Binding
-from kombu.mixins import ConsumerMixin as KombuConsumer
-from kombu.exceptions import OperationalError
 from amqp.exceptions import NotFound
+from contextlib import contextmanager
+from collections import defaultdict, namedtuple
+from datetime import datetime
+from kombu import binding as Binding, Connection, Exchange, Producer, Queue
+from kombu.exceptions import OperationalError
+from kombu.mixins import ConsumerMixin as KombuConsumer
+from six.moves.queue import Empty, Queue as FifoQueue
+from threading import Event, Lock, Thread
 
 
-Subscription = namedtuple('Subscription', ['handler', 'binding'])
 BusThread = namedtuple('BusThread', ['thread', 'on_stop', 'ready_flag'])
+Subscription = namedtuple('Subscription', ['handler', 'binding'])
 
 
 class ThreadableMixin(object):
+    '''
+    Mixin to provide methods for easy thread creation/management
+
+    Public attributes:
+        * `is_running`:
+            Returns True if threads are alive and running
+
+    Public methods:
+        * `start`:
+            Starts execution of registered thread
+        * `stop`:
+            Kill all running threads
+        * `_register_thread`:
+            Allows another mixin to register a thread for execution
+    '''
+
     def __init__(self, **kwargs):
         super(ThreadableMixin, self).__init__(**kwargs)
         self.__stop_flag = Event()
@@ -63,6 +79,7 @@ class ThreadableMixin(object):
             ready_flag,
         )
         self.__threads.append(bus_thread)
+        return bus_thread.thread
 
     def start(self):
         if self.is_running:
@@ -103,6 +120,18 @@ class ThreadableMixin(object):
 
 
 class ConsumerMixin(KombuConsumer):
+    '''
+    Mixin to provide RabbitMQ message consuming capabilities
+
+    Public methods:
+        * `consumer_connected`:
+            Returns whether the consumer is connected to RabbitMQ or not
+        * `subscribe`:
+            Install a handler for the specified event
+        * `unsubscribe`:
+            Uninstall a handler for the specified event
+    '''
+
     consumer_args = {}
 
     def __init__(self, subscribe=None, **kwargs):
@@ -116,12 +145,18 @@ class ConsumerMixin(KombuConsumer):
         self.__subscriptions = defaultdict(list)
         self.__queue = Queue(name=name, auto_delete=True, durable=False)
         self.__lock = Lock()
-        self.create_connection()
+        self.__thread = None
+        if hasattr(self, '_register_thread'):
+            self.__thread = self._register_thread(
+                'consumer', self.__thread_run, self.__thread_stop
+            )
 
-        try:
-            self._register_thread('consumer', self.__run, on_stop=self.__stop)
-        except AttributeError:
-            pass
+        self.create_connection()
+        self.log.debug('setting consuming exchange as \'%s\'', self.__exchange)
+
+    def consumer_connected(self):
+        is_running = self.__thread.is_alive() if self.__thread is not None else True
+        return bool(is_running and self.connection.connected)
 
     @property
     @contextmanager
@@ -268,14 +303,6 @@ class ConsumerMixin(KombuConsumer):
         return self.connection
 
     @property
-    def is_running(self):
-        try:
-            is_running = self.connection.connected
-        except AttributeError:
-            is_running = False
-        return super(ConsumerMixin, self).is_running and is_running
-
-    @property
     def should_stop(self):
         return getattr(self, 'is_stopping', True)
 
@@ -284,25 +311,39 @@ class ConsumerMixin(KombuConsumer):
             ready_flag = kwargs.pop('ready_flag')
             ready_flag.set()
 
-    def __run(self, ready_flag, **kwargs):
+    def __thread_run(self, ready_flag, **kwargs):
         super(ConsumerMixin, self).run(ready_flag=ready_flag, **self.consumer_args)
 
-    def __stop(self):
+    def __thread_stop(self):
         self.__connection.release()
 
 
 class PublisherMixin(object):
+    '''
+    Mixin providing RabbitMQ message publishing capabilities
+
+    Methods:
+        * `publisher_connected`:
+            Returns whether publisher is connected to RabbitMQ or not
+        * `publish`:
+            publish an event immediately to the bus
+    '''
+
     publisher_args = {
         'max_retries': 2,
     }
 
     def __init__(self, publish=None, **kwargs):
-        super().__init__(**kwargs)
+        super(PublisherMixin, self).__init__(**kwargs)
         if publish:
             exchange = Exchange(publish['exchange_name'], publish['exchange_type'])
         self.__exchange = exchange if publish else self._default_exchange
         self.__connection = Connection(self.url, transport_options=self.publisher_args)
         self.__lock = Lock()
+        self.log.debug('setting publishing exchange as \'%s\'', self.__exchange)
+
+    def publisher_connected(self):
+        return self.__connection.connected
 
     @contextmanager
     def Producer(self, connection, **connection_args):
@@ -326,6 +367,23 @@ class PublisherMixin(object):
 
 
 class QueuePublisherMixin(PublisherMixin):
+    '''
+    Mixin to provide publishing capabilities, including ability to publish
+    through a thread
+
+    **Note: Exclusive with PublisherMixin**
+
+    Public methods:
+        * `publisher_connected`:
+            Returns publisher's connection state to rabbitmq
+        * `queue_publisher_connected`:
+            Returns threaded publisher's connection state to rabbitmq
+        * `publish`:
+            Publish an event immediately to the bus without queueing
+        * `publish_soon`:
+            Queue an event to be processed by the publishing thread
+    '''
+
     queue_publisher_args = {
         'interval_start': 2,
         'interval_step': 2,
@@ -333,19 +391,27 @@ class QueuePublisherMixin(PublisherMixin):
     }
 
     def __init__(self, **kwargs):
+        retry_policy = self.queue_publisher_args
         super(QueuePublisherMixin, self).__init__(**kwargs)
         self.__flushing = False
         self.__fifo = FifoQueue()
-        try:
-            self._register_thread('publisher_queue', self.__run, on_stop=self.__stop)
-        except AttributeError:
-            pass
+        self.__connection = Connection(self.url, transport_options=retry_policy)
+        self.__thread = None
 
-    def __run(self, ready_flag, **kwargs):
+        if hasattr(self, '_register_thread'):
+            self.__thread = self._register_thread(
+                'publisher_queue', self.__thread_run, self.__thread_stop
+            )
+
+    def queue_publisher_connected(self):
+        is_running = self.__thread.is_alive() if self.__thread is not None else True
+        return bool(self.__connection.connected and is_running)
+
+    def __thread_run(self, ready_flag, **kwargs):
         ready_flag.set()
-        publisher_args = self.queue_publisher_args
+        retry_policy = self.queue_publisher_args
 
-        with Connection(self.url, transport_options=publisher_args) as connection:
+        with self.__connection:
             while not self.is_stopping or self.__flushing:
                 try:
                     payload, headers, routing_key = self.__fifo.get()
@@ -353,14 +419,14 @@ class QueuePublisherMixin(PublisherMixin):
                     self.__flushing = False
                     continue
                 try:
-                    with self.Producer(connection, **publisher_args) as publish:
+                    with self.Producer(self.__connection, **retry_policy) as publish:
                         publish(payload, headers=headers, routing_key=routing_key)
                 except OperationalError as exc:
                     self.log.error('Publishing queue error: %s', exc, exc_info=1)
                 else:
                     self.__fifo.task_done()
 
-    def __stop(self):
+    def __thread_stop(self):
         self.__flushing = True
         self.__fifo.put(None)
 
@@ -372,36 +438,62 @@ class QueuePublisherMixin(PublisherMixin):
 
 
 class WazoEventMixin(object):
+    '''
+    Mixin to handle message formatting for wazo events
+
+    Overrides:
+        * `_marshal`:
+            Serializes the message to be sent to RabbitMQ
+
+        * `_unmarshal`:
+            Deserializes the message received from RabbitMQ
+    '''
+
     def __init__(self, service_uuid=None, **kwargs):
         super(WazoEventMixin, self).__init__(**kwargs)
         self.service_uuid = service_uuid
 
-    def __serialize_event(self, event):
+    def __generate_payload(self, event, headers, initial_data):
+        payload = {}
+        data = initial_data.copy() if initial_data else {}
         try:
-            return event.marshal()
+            data.update(event.marshal())
         except AttributeError:
             self.log.exception("Received invalid event '%s'", event)
             raise ValueError('Not a valid Wazo Event')
+        else:
+            payload.update(headers, data=data)
+            return payload
 
-    def __generate_metadata(self, event):
-        metadata = {
-            'name': event.name,
-            'origin_uuid': self.service_uuid,
-            'timestamp': datetime.now().isoformat(),
-        }
+    def __generate_headers(self, event, extra_headers):
+        headers = {}
+        headers.update(extra_headers or {})
+
+        try:
+            headers.update(event.headers)
+        except AttributeError:
+            pass
+
+        if hasattr(event, 'required_access'):
+            headers['required_access'] = event.required_access
+
+        # TODO: remove deprecated `required_acl`
         if hasattr(event, 'required_acl'):
-            metadata['required_acl'] = event.required_acl
+            headers['required_acl'] = event.required_acl
 
-        return metadata
+        headers.update(
+            name=event.name,
+            origin_uuid=self.service_uuid,
+            timestamp=datetime.now().isoformat(),
+        )
+
+        return headers
 
     def _marshal(self, event, headers, payload, routing_key=None):
-        headers = headers or {}
-        payload = payload or {}
         routing_key = routing_key or getattr(event, 'routing_key', None)
+        headers = self.__generate_headers(event, headers)
+        payload = self.__generate_payload(event, headers, payload)
 
-        data = dict(payload, **self.__serialize_event(event))
-        headers.update(self.__generate_metadata(event))
-        payload = dict(headers, data=data)
         return headers, payload, routing_key
 
     def _unmarshal(self, event_name, headers, payload):

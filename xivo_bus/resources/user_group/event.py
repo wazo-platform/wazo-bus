@@ -1,36 +1,18 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
+from xivo_bus.resources.common.event import UserEvent
 
 
-class UserGroupConfigEvent(object):
+class UserGroupsAssociatedEvent(UserEvent):
+    name = 'user_groups_associated'
+    routing_key_fmt = 'config.users.groups.updated'
 
-    def __init__(self, user_uuid, group_ids):
-        self.user_uuid = user_uuid
-        self.group_ids = group_ids
-
-    def marshal(self):
-        return {
-            'user_uuid': self.user_uuid,
-            'group_ids': self.group_ids,
+    def __init__(self, group_ids, tenant_uuid, user_uuid):
+        content = {
+            'user_uuid': str(user_uuid),
+            'group_ids': group_ids,
         }
-
-    @classmethod
-    def unmarshal(cls, msg):
-        return cls(
-            msg['user_uuid'],
-            msg['group_ids'])
-
-    def __eq__(self, other):
-        return (self.user_uuid == other.user_uuid
-                and self.group_ids == other.group_ids)
-
-    def __ne__(self, other):
-        return not self == other
-
-
-class UserGroupsAssociatedEvent(UserGroupConfigEvent):
-    name = 'groups_associated'
-    routing_key = 'config.users.groups.updated'
+        super(UserGroupsAssociatedEvent, self).__init__(content, tenant_uuid, user_uuid)

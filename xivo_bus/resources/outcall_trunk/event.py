@@ -1,38 +1,18 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
+from xivo_bus.resources.common.event import TenantEvent
 
-from xivo_bus.resources.common.event import ResourceConfigEvent
 
+class OutcallTrunksAssociatedEvent(TenantEvent):
+    name = 'outcall_trunks_associated'
+    routing_key_fmt = 'config.outcalls.trunks.updated'
 
-class OutcallTrunkConfigEvent(ResourceConfigEvent):
-
-    def __init__(self, outcall_id, trunk_ids):
-        self.outcall_id = outcall_id
-        self.trunk_ids = trunk_ids
-
-    def marshal(self):
-        return {
-            'outcall_id': self.outcall_id,
-            'trunk_ids': self.trunk_ids,
+    def __init__(self, outcall_id, trunk_ids, tenant_uuid):
+        content = {
+            'outcall_id': outcall_id,
+            'trunk_ids': trunk_ids,
         }
-
-    @classmethod
-    def unmarshal(cls, msg):
-        return cls(
-            msg['outcall_id'],
-            msg['trunk_ids'])
-
-    def __eq__(self, other):
-        return (self.outcall_id == other.outcall_id
-                and self.trunk_ids == other.trunk_ids)
-
-    def __ne__(self, other):
-        return not (self == other)
-
-
-class OutcallTrunksAssociatedEvent(OutcallTrunkConfigEvent):
-    name = 'trunks_associated'
-    routing_key = 'config.outcalls.trunks.updated'
+        super(OutcallTrunksAssociatedEvent, self).__init__(content, tenant_uuid)
