@@ -66,7 +66,7 @@ class AgentUnpausedEvent(MultiUserEvent):
 
 
 class AgentStatusUpdatedEvent(MultiUserEvent):
-    name = 'agent_status_updated'
+    name = 'agent_status_update'
     routing_key_fmt = 'status.agent'
     required_acl_fmt = 'events.statuses.agents'
 
