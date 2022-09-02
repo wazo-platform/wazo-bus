@@ -17,7 +17,7 @@ class ServiceRegisteredEvent(ServiceEvent):
             'service_id': service_id,
             'address': advertise_address,
             'port': advertise_port,
-            'targs': tags,
+            'tags': tags,
         }
         super(ServiceRegisteredEvent, self).__init__(content)
 
