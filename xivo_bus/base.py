@@ -40,15 +40,6 @@ class Base(object):
     def is_running(self):
         return True
 
-    @property
-    def is_connected(self):
-        status = {}
-        self._connected(status)
-        return status
-
-    def _connected(self, status):
-        pass
-
     def _marshal(self, event, headers, payload, routing_key=None):
         return headers, payload, routing_key
 

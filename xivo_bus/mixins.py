@@ -3,19 +3,19 @@
 
 import os
 
-from contextlib import contextmanager
-from threading import Thread, Lock, Event
-from datetime import datetime
-from six.moves.queue import Queue as FifoQueue, Empty
-from collections import namedtuple, defaultdict
-from kombu import Queue, Exchange, Connection, Producer, binding as Binding
-from kombu.mixins import ConsumerMixin as KombuConsumer
-from kombu.exceptions import OperationalError
 from amqp.exceptions import NotFound
+from contextlib import contextmanager
+from collections import defaultdict, namedtuple
+from datetime import datetime
+from kombu import binding as Binding, Connection, Exchange, Producer, Queue
+from kombu.exceptions import OperationalError
+from kombu.mixins import ConsumerMixin as KombuConsumer
+from six.moves.queue import Empty, Queue as FifoQueue
+from threading import Event, Lock, Thread
 
 
-Subscription = namedtuple('Subscription', ['handler', 'binding'])
 BusThread = namedtuple('BusThread', ['thread', 'on_stop', 'ready_flag'])
+Subscription = namedtuple('Subscription', ['handler', 'binding'])
 
 
 class ThreadableMixin(object):
@@ -63,6 +63,7 @@ class ThreadableMixin(object):
             ready_flag,
         )
         self.__threads.append(bus_thread)
+        return bus_thread.thread
 
     def start(self):
         if self.is_running:
@@ -116,13 +117,18 @@ class ConsumerMixin(KombuConsumer):
         self.__subscriptions = defaultdict(list)
         self.__queue = Queue(name=name, auto_delete=True, durable=False)
         self.__lock = Lock()
-        self.create_connection()
-        self.log.debug('setting consumption exchange as \'%s\'', self.__exchange)
+        self.__thread = None
+        if hasattr(self, '_register_thread'):
+            self.__thread = self._register_thread(
+                'consumer', self.__thread_run, self.__thread_stop
+            )
 
-        try:
-            self._register_thread('consumer', self.__run, on_stop=self.__stop)
-        except AttributeError:
-            pass
+        self.create_connection()
+        self.log.debug('setting consuming exchange as \'%s\'', self.__exchange)
+
+    def consumer_connected(self):
+        is_running = self.__thread.is_alive() if self.__thread is not None else True
+        return bool(is_running and self.connection.connected)
 
     @property
     @contextmanager
@@ -269,18 +275,6 @@ class ConsumerMixin(KombuConsumer):
         return self.connection
 
     @property
-    def is_running(self):
-        try:
-            is_running = self.connection.connected
-        except AttributeError:
-            is_running = False
-        return super(ConsumerMixin, self).is_running and is_running
-
-    def _connected(self, status):
-        status['consuming'] = self.connection.connected
-        super(ConsumerMixin, self)._connected(status)
-
-    @property
     def should_stop(self):
         return getattr(self, 'is_stopping', True)
 
@@ -289,10 +283,10 @@ class ConsumerMixin(KombuConsumer):
             ready_flag = kwargs.pop('ready_flag')
             ready_flag.set()
 
-    def __run(self, ready_flag, **kwargs):
+    def __thread_run(self, ready_flag, **kwargs):
         super(ConsumerMixin, self).run(ready_flag=ready_flag, **self.consumer_args)
 
-    def __stop(self):
+    def __thread_stop(self):
         self.__connection.release()
 
 
@@ -310,9 +304,8 @@ class PublisherMixin(object):
         self.__lock = Lock()
         self.log.debug('setting publishing exchange as \'%s\'', self.__exchange)
 
-    def _connected(self, status):
-        status['publishing'] = self.__connection.connected
-        super(PublisherMixin, self)._connected(status)
+    def publisher_connected(self):
+        return self.__connection.connected
 
     @contextmanager
     def Producer(self, connection, **connection_args):
@@ -343,21 +336,23 @@ class QueuePublisherMixin(PublisherMixin):
     }
 
     def __init__(self, **kwargs):
-        super(QueuePublisherMixin, self).__init__(**kwargs)
         retry_policy = self.queue_publisher_args
+        super(QueuePublisherMixin, self).__init__(**kwargs)
         self.__flushing = False
         self.__fifo = FifoQueue()
         self.__connection = Connection(self.url, transport_options=retry_policy)
-        try:
-            self._register_thread('publisher_queue', self.__run, on_stop=self.__stop)
-        except AttributeError:
-            pass
+        self.__thread = None
 
-    def _connected(self, status):
-        status['publishing_queue'] = self.__connection and self.__connection.connected
-        super(QueuePublisherMixin, self)._connected(status)
+        if hasattr(self, '_register_thread'):
+            self.__thread = self._register_thread(
+                'publisher_queue', self.__thread_run, self.__thread_stop
+            )
 
-    def __run(self, ready_flag, **kwargs):
+    def queue_publisher_connected(self):
+        is_running = self.__thread.is_alive() if self.__thread is not None else True
+        return bool(self.__connection.connected and is_running)
+
+    def __thread_run(self, ready_flag, **kwargs):
         ready_flag.set()
         retry_policy = self.queue_publisher_args
 
@@ -376,7 +371,7 @@ class QueuePublisherMixin(PublisherMixin):
                 else:
                     self.__fifo.task_done()
 
-    def __stop(self):
+    def __thread_stop(self):
         self.__flushing = True
         self.__fifo.put(None)
 

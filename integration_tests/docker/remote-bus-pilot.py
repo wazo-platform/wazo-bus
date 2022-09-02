@@ -103,7 +103,7 @@ def make_response(code, status=None, **kwargs):
 #####################
 @app.route('/bus/status', methods=['GET'])
 def status():
-    return make_response(200, None, running=bus.is_running)
+    return make_response(200, None, running=bus.consumer_connected())
 
 
 @app.route('/bus/<string:event>/publish', methods=['POST'])
