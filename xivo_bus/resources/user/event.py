@@ -79,7 +79,7 @@ class UserForwardEditedEvent(UserEvent):
     ):
         self.name = type(self).name.format(forward_name=forward_name)
         content = {
-            'id': int(user_id),
+            'user_id': int(user_id),
             'user_uuid': str(user_uuid),
             'tenant_uuid': str(tenant_uuid),
             'enabled': forward_enabled,
