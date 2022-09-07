@@ -7,10 +7,27 @@ from .abstract import AbstractEvent
 
 
 class ServiceEvent(AbstractEvent):
+    '''
+    ### Service-level event base class
+
+    These events are intended for internal use by services and will never
+    make it through the websocket.
+    '''
+
     pass
 
 
 class TenantEvent(AbstractEvent):
+    '''
+    ### Tenant-level event base class
+
+    These events are intended for *all* users of the specified tenant.  They will be
+    dispatched to all it's connected users by setting `user_uuid:*` in the headers.
+
+    #### Required property:
+        - tenant_uuid
+    '''
+
     def __init__(self, content, tenant_uuid):
         super(TenantEvent, self).__init__(content=content)
         if tenant_uuid is None:
@@ -20,6 +37,18 @@ class TenantEvent(AbstractEvent):
 
 
 class UserEvent(TenantEvent):
+    '''
+    ### User-level event base class
+
+    These events are intended for a single user from a specific tenant.  They will be
+    dispatched through the websocket to the user by setting `user_uuid:{uuid}`
+    in the headers.
+
+    #### Required properties:
+        - tenant_uuid
+        - user_uuid
+    '''
+
     def __init__(self, content, tenant_uuid, user_uuid):
         super(UserEvent, self).__init__(content, tenant_uuid)
         delattr(self, 'user_uuid:*')
@@ -35,6 +64,18 @@ class UserEvent(TenantEvent):
 
 
 class MultiUserEvent(TenantEvent):
+    '''
+    ### User-level event base class (targetting multiple users)
+
+    These events are intended for multiple users from a specific tenant.
+    They will be dispatched through the websocket by setting `user_uuid:{uuid} = True`
+    in the headers for all intended users.
+
+    #### Required properties:
+        - tenant_uuid
+        - list of user_uuids
+    '''
+
     __slots__ = ('user_uuids',)
 
     def __init__(self, content, tenant_uuid, user_uuids):
