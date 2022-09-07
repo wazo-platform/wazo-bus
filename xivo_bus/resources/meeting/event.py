@@ -87,6 +87,7 @@ class MeetingParticipantLeftEvent(_MeetingMixin, TenantEvent):
 class MeetingUserParticipantJoinedEvent(_MeetingMixin, UserEvent):
     name = 'meeting_user_participant_joined'
     routing_key_fmt = 'meetings.users.{user_uuid}.participants.joined'
+    required_acl_fmt = 'events.users.{user_uuid}.meetings.participants.joined'
 
     def __init__(self, participant_data, meeting_uuid, tenant_uuid, user_uuid):
         content = dict(participant_data, meeting_uuid=meeting_uuid)
@@ -98,6 +99,7 @@ class MeetingUserParticipantJoinedEvent(_MeetingMixin, UserEvent):
 class MeetingUserParticipantLeftEvent(_MeetingMixin, UserEvent):
     name = 'meeting_user_participant_left'
     routing_key_fmt = 'meetings.users.{user_uuid}.participants.left'
+    required_acl_fmt = 'events.users.{user_uuid}.meetings.participants.left'
 
     def __init__(self, participant_data, meeting_uuid, tenant_uuid, user_uuid):
         content = dict(participant_data, meeting_uuid=meeting_uuid)
