@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class CallFilterRecipientUsersAssociatedEvent(TenantEvent):
+    service = 'confd'
     name = 'call_filter_recipient_users_associated'
     routing_key_fmt = 'config.callfilters.recipients.users.updated'
 
@@ -19,6 +20,7 @@ class CallFilterRecipientUsersAssociatedEvent(TenantEvent):
 
 
 class CallFilterSurrogateUsersAssociatedEvent(TenantEvent):
+    service = 'confd'
     name = 'call_filter_surrogate_users_associated'
     routing_key_fmt = 'config.callfilters.surrogates.users.updated'
 

@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import ServiceEvent
 
 
 class HAEditedEvent(ServiceEvent):
+    service = 'confd'
     name = 'ha_edited'
     routing_key_fmt = 'config.ha.edited'
 

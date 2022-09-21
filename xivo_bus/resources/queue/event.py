@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class QueueCreatedEvent(TenantEvent):
+    service = 'confd'
     name = 'queue_created'
     routing_key_fmt = 'config.queues.created'
 
@@ -16,6 +17,7 @@ class QueueCreatedEvent(TenantEvent):
 
 
 class QueueDeletedEvent(TenantEvent):
+    service = 'confd'
     name = 'queue_deleted'
     routing_key_fmt = 'config.queues.deleted'
 
@@ -25,6 +27,7 @@ class QueueDeletedEvent(TenantEvent):
 
 
 class QueueEditedEvent(TenantEvent):
+    service = 'confd'
     name = 'queue_edited'
     routing_key_fmt = 'config.queues.edited'
 
@@ -34,6 +37,7 @@ class QueueEditedEvent(TenantEvent):
 
 
 class QueueFallbackEditedEvent(TenantEvent):
+    service = 'confd'
     name = 'queue_fallback_edited'
     routing_key_fmt = 'config.queues.fallbacks.edited'
 

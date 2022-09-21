@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import ServiceEvent
 
 
 class PJSIPGlobalUpdatedEvent(ServiceEvent):
+    service = 'confd'
     name = 'pjsip_global_updated'
     routing_key_fmt = 'config.pjsip_global.updated'
 
@@ -15,6 +16,7 @@ class PJSIPGlobalUpdatedEvent(ServiceEvent):
 
 
 class PJSIPSystemUpdatedEvent(ServiceEvent):
+    service = 'confd'
     name = 'pjsip_system_updated'
     routing_key_fmt = 'config.pjsip_system.updated'
 
@@ -23,6 +25,7 @@ class PJSIPSystemUpdatedEvent(ServiceEvent):
 
 
 class SIPTransportCreatedEvent(ServiceEvent):
+    service = 'confd'
     name = 'sip_transport_created'
     routing_key_fmt = 'config.sip.transports.created'
 
@@ -31,6 +34,7 @@ class SIPTransportCreatedEvent(ServiceEvent):
 
 
 class SIPTransportDeletedEvent(ServiceEvent):
+    service = 'confd'
     name = 'sip_transport_deleted'
     routing_key_fmt = 'config.sip.transports.deleted'
 
@@ -39,6 +43,7 @@ class SIPTransportDeletedEvent(ServiceEvent):
 
 
 class SIPTransportEditedEvent(ServiceEvent):
+    service = 'confd'
     name = 'sip_transport_edited'
     routing_key_fmt = 'config.sip.transports.edited'
 

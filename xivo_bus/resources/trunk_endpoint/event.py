@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class TrunkEndpointSIPAssociatedEvent(TenantEvent):
+    service = 'confd'
     name = 'trunk_endpoint_sip_associated'
     routing_key_fmt = 'config.trunks.{trunk[id]}.endpoints.sip.{endpoint_sip[uuid]}.updated'
 
@@ -19,6 +20,7 @@ class TrunkEndpointSIPAssociatedEvent(TenantEvent):
 
 
 class TrunkEndpointSIPDissociatedEvent(TenantEvent):
+    service = 'confd'
     name = 'trunk_endpoint_sip_dissociated'
     routing_key_fmt = 'config.trunks.{trunk[id]}.endpoints.sip.{endpoint_sip[uuid]}.deleted'
 
@@ -31,6 +33,7 @@ class TrunkEndpointSIPDissociatedEvent(TenantEvent):
 
 
 class TrunkEndpointIAXAssociatedEvent(TenantEvent):
+    service = 'confd'
     name = 'trunk_endpoint_iax_associated'
     routing_key_fmt = 'config.trunks.{trunk[id]}.endpoints.iax.{endpoint_iax[id]}.updated'
 
@@ -43,6 +46,7 @@ class TrunkEndpointIAXAssociatedEvent(TenantEvent):
 
 
 class TrunkEndpointIAXDissociatedEvent(TenantEvent):
+    service = 'confd'
     name = 'trunk_endpoint_iax_dissociated'
     routing_key_fmt = 'config.trunks.{trunk[id]}.endpoints.iax.{endpoint_iax[id]}.deleted'
 
@@ -55,6 +59,7 @@ class TrunkEndpointIAXDissociatedEvent(TenantEvent):
 
 
 class TrunkEndpointCustomAssociatedEvent(TenantEvent):
+    service = 'confd'
     name = 'trunk_endpoint_custom_associated'
     routing_key_fmt = 'config.trunks.{trunk[id]}.endpoints.custom.{endpoint_custom[id]}.updated'
 
@@ -67,6 +72,7 @@ class TrunkEndpointCustomAssociatedEvent(TenantEvent):
 
 
 class TrunkEndpointCustomDissociatedEvent(TenantEvent):
+    service = 'confd'
     name = 'trunk_endpoint_custom_dissociated'
     routing_key_fmt = 'config.trunks.{trunk[id]}.endpoints.custom.{endpoint_custom[id]}.deleted'
 

@@ -6,6 +6,7 @@ from xivo_bus.resources.common.event import TenantEvent, UserEvent
 
 
 class CallLogCreatedEvent(TenantEvent):
+    service = 'call_logd'
     name = 'call_log_created'
     routing_key_fmt = 'call_log.created'
 
@@ -14,6 +15,7 @@ class CallLogCreatedEvent(TenantEvent):
 
 
 class CallLogUserCreatedEvent(UserEvent):
+    service = 'call_logd'
     name = 'call_log_user_created'
     routing_key_fmt = 'call_log.user.{user_uuid}.created'
 

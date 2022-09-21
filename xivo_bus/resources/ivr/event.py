@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class IVRCreatedEvent(TenantEvent):
+    service = 'confd'
     name = 'ivr_created'
     routing_key_fmt = 'config.ivr.created'
 
@@ -16,6 +17,7 @@ class IVRCreatedEvent(TenantEvent):
 
 
 class IVRDeletedEvent(TenantEvent):
+    service = 'confd'
     name = 'ivr_deleted'
     routing_key_fmt = 'config.ivr.deleted'
 
@@ -25,6 +27,7 @@ class IVRDeletedEvent(TenantEvent):
 
 
 class IVREditedEvent(TenantEvent):
+    service = 'confd'
     name = 'ivr_edited'
     routing_key_fmt = 'config.ivr.edited'
 

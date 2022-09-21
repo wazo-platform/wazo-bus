@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import ServiceEvent
 
 
 class ConfBridgeWazoDefaultBridgeEditedEvent(ServiceEvent):
+    service = 'confd'
     name = 'confbridge_wazo_default_bridge_edited'
     routing_key_fmt = 'config.confbridge_wazo_default_bridge.edited'
 
@@ -15,6 +16,7 @@ class ConfBridgeWazoDefaultBridgeEditedEvent(ServiceEvent):
 
 
 class ConfBridgeWazoDefaultUserEditedEvent(ServiceEvent):
+    service = 'confd'
     name = 'confbridge_wazo_default_user_edited'
     routing_key_fmt = 'config.confbridge_wazo_default_user.edited'
 

@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class SkillCreatedEvent(TenantEvent):
+    service = 'confd'
     name = 'skill_created'
     routing_key_fmt = 'config.agents.skills.created'
 
@@ -16,6 +17,7 @@ class SkillCreatedEvent(TenantEvent):
 
 
 class SkillDeletedEvent(TenantEvent):
+    service = 'confd'
     name = 'skill_deleted'
     routing_key_fmt = 'config.agents.skills.deleted'
 
@@ -25,6 +27,7 @@ class SkillDeletedEvent(TenantEvent):
 
 
 class SkillEditedEvent(TenantEvent):
+    service = 'confd'
     name = 'skill_edited'
     routing_key_fmt = 'config.agents.skills.edited'
 

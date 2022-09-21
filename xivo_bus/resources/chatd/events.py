@@ -6,6 +6,7 @@ from xivo_bus.resources.common.event import UserEvent
 
 
 class PresenceUpdatedEvent(UserEvent):
+    service = 'chatd'
     name = 'chatd_presence_updated'
     routing_key_fmt = 'chatd.users.{user_uuid}.presences.updated'
 
@@ -16,6 +17,7 @@ class PresenceUpdatedEvent(UserEvent):
 
 
 class UserRoomCreatedEvent(UserEvent):
+    service = 'chatd'
     name = 'chatd_user_room_created'
     routing_key_fmt = 'chatd.users.{user_uuid}.rooms.created'
 
@@ -26,6 +28,7 @@ class UserRoomCreatedEvent(UserEvent):
 
 
 class UserRoomMessageCreatedEvent(UserEvent):
+    service = 'chatd'
     name = 'chatd_user_room_message_created'
     routing_key_fmt = 'chatd.users.{user_uuid}.rooms.{room_uuid}.messages.created'
 

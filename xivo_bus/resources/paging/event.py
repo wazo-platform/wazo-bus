@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class PagingCreatedEvent(TenantEvent):
+    service = 'confd'
     name = 'paging_created'
     routing_key_fmt = 'config.pagings.created'
 
@@ -16,6 +17,7 @@ class PagingCreatedEvent(TenantEvent):
 
 
 class PagingDeletedEvent(TenantEvent):
+    service = 'confd'
     name = 'paging_deleted'
     routing_key_fmt = 'config.pagings.deleted'
 
@@ -25,6 +27,7 @@ class PagingDeletedEvent(TenantEvent):
 
 
 class PagingEditedEvent(TenantEvent):
+    service = 'confd'
     name = 'paging_edited'
     routing_key_fmt = 'config.pagings.edited'
 

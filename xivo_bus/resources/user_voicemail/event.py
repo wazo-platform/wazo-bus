@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import UserEvent
 
 
 class UserVoicemailAssociatedEvent(UserEvent):
+    service = 'confd'
     name = 'user_voicemail_associated'
     routing_key_fmt = 'config.users.{user_uuid}.voicemails.updated'
 
@@ -21,6 +22,7 @@ class UserVoicemailAssociatedEvent(UserEvent):
 
 
 class UserVoicemailDissociatedEvent(UserEvent):
+    service = 'confd'
     name = 'user_voicemail_dissociated'
     routing_key_fmt = 'config.users.{user_uuid}.voicemails.deleted'
 

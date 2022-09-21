@@ -6,6 +6,7 @@ from xivo_bus.resources.common.event import ServiceEvent
 
 
 class WizardCreatedEvent(ServiceEvent):
+    service = 'confd'
     name = 'wizard_created'
     routing_key_fmt = 'config.wizard.created'
 

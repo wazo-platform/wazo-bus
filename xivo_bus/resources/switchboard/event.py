@@ -18,6 +18,7 @@ class _SwitchboardMixin(object):
 
 
 class SwitchboardCreatedEvent(_SwitchboardMixin, TenantEvent):
+    service = 'confd'
     name = 'switchboard_created'
     routing_key_fmt = 'config.switchboards.{switchboard_uuid}.created'
     required_acl_fmt = 'switchboards.{switchboard_uuid}.created'
@@ -29,6 +30,7 @@ class SwitchboardCreatedEvent(_SwitchboardMixin, TenantEvent):
 
 
 class SwitchboardDeletedEvent(_SwitchboardMixin, TenantEvent):
+    service = 'confd'
     name = 'switchboard_deleted'
     routing_key_fmt = 'config.switchboards.{switchboard_uuid}.deleted'
     required_acl_fmt = 'switchboards.{switchboard_uuid}.deleted'
@@ -40,6 +42,7 @@ class SwitchboardDeletedEvent(_SwitchboardMixin, TenantEvent):
 
 
 class SwitchboardEditedEvent(_SwitchboardMixin, TenantEvent):
+    service = 'confd'
     name = 'switchboard_edited'
     routing_key_fmt = 'config.switchboards.{switchboard_uuid}.edited'
     required_acl_fmt = 'switchboards.{switchboard_uuid}.edited'
@@ -51,6 +54,7 @@ class SwitchboardEditedEvent(_SwitchboardMixin, TenantEvent):
 
 
 class SwitchboardFallbackEditedEvent(_SwitchboardMixin, TenantEvent):
+    service = 'confd'
     name = 'switchboard_fallback_edited'
     routing_key_fmt = 'config.switchboards.fallbacks.edited'
     required_acl_fmt = 'switchboards.fallbacks.edited'
@@ -62,6 +66,7 @@ class SwitchboardFallbackEditedEvent(_SwitchboardMixin, TenantEvent):
 
 
 class SwitchboardMemberUserAssociatedEvent(_SwitchboardMixin, MultiUserEvent):
+    service = 'confd'
     name = 'switchboard_member_user_associated'
     routing_key_fmt = 'config.switchboards.{switchboard_uuid}.members.users.updated'
     required_acl_fmt = 'switchboards.{switchboard_uuid}.members.users.updated'
@@ -77,6 +82,7 @@ class SwitchboardMemberUserAssociatedEvent(_SwitchboardMixin, MultiUserEvent):
 
 
 class SwitchboardQueuedCallsUpdatedEvent(_SwitchboardMixin, TenantEvent):
+    service = 'calld'
     name = 'switchboard_queued_calls_updated'
     routing_key_fmt = 'switchboards.{switchboard_uuid}.calls.queued.updated'
 
@@ -91,6 +97,7 @@ class SwitchboardQueuedCallsUpdatedEvent(_SwitchboardMixin, TenantEvent):
 
 
 class SwitchboardQueuedCallAnsweredEvent(_SwitchboardMixin, TenantEvent):
+    service = 'calld'
     name = 'switchboard_queued_call_answered'
     routing_key_fmt = (
         'switchboards.{{switchboard_uuid}}.calls.queued.{queued_call_id}.answer.updated'
@@ -117,6 +124,7 @@ class SwitchboardQueuedCallAnsweredEvent(_SwitchboardMixin, TenantEvent):
 
 
 class SwitchboardHeldCallsUpdatedEvent(_SwitchboardMixin, TenantEvent):
+    service = 'calld'
     name = 'switchboard_held_calls_updated'
     routing_key_fmt = 'switchboards.{switchboard_uuid}.calls.held.updated'
 
@@ -131,6 +139,7 @@ class SwitchboardHeldCallsUpdatedEvent(_SwitchboardMixin, TenantEvent):
 
 
 class SwitchboardHeldCallAnsweredEvent(_SwitchboardMixin, TenantEvent):
+    service = 'calld'
     name = 'switchboard_held_call_answered'
     routing_key_fmt = (
         'switchboards.{{switchboard_uuid}}.calls.held.{held_call_id}.answer.updated'

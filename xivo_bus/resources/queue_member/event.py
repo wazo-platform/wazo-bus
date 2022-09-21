@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent, UserEvent
 
 
 class QueueMemberAgentAssociatedEvent(TenantEvent):
+    service = 'confd'
     name = 'queue_member_agent_associated'
     routing_key_fmt = 'config.queues.agents.updated'
 
@@ -20,6 +21,7 @@ class QueueMemberAgentAssociatedEvent(TenantEvent):
 
 
 class QueueMemberAgentDissociatedEvent(TenantEvent):
+    service = 'confd'
     name = 'queue_member_agent_dissociated'
     routing_key_fmt = 'config.queues.agents.deleted'
 
@@ -32,6 +34,7 @@ class QueueMemberAgentDissociatedEvent(TenantEvent):
 
 
 class QueueMemberUserAssociatedEvent(UserEvent):
+    service = 'confd'
     name = 'queue_member_user_associated'
     routing_key_fmt = 'config.queues.users.updated'
 
@@ -46,6 +49,7 @@ class QueueMemberUserAssociatedEvent(UserEvent):
 
 
 class QueueMemberUserDissociatedEvent(UserEvent):
+    service = 'confd'
     name = 'queue_member_user_dissociated'
     routing_key_fmt = 'config.queues.users.deleted'
 

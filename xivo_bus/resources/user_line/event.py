@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import UserEvent
 
 
 class UserLineAssociatedEvent(UserEvent):
+    service = 'confd'
     name = 'user_line_associated'
     routing_key_fmt = 'config.users.{user_uuid}.lines.{line[id]}.updated'
 
@@ -23,6 +24,7 @@ class UserLineAssociatedEvent(UserEvent):
 
 
 class UserLineDissociatedEvent(UserEvent):
+    service = 'confd'
     name = 'user_line_dissociated'
     routing_key_fmt = 'config.users.{user_uuid}.lines.{line[id]}.deleted'
 

@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class LineEndpointSIPAssociatedEvent(TenantEvent):
+    service = 'confd'
     name = 'line_endpoint_sip_associated'
     routing_key_fmt = (
         'config.lines.{line[id]}.endpoints.sip.{endpoint_sip[uuid]}.updated'
@@ -18,6 +19,7 @@ class LineEndpointSIPAssociatedEvent(TenantEvent):
 
 
 class LineEndpointSIPDissociatedEvent(TenantEvent):
+    service = 'confd'
     name = 'line_endpoint_sip_dissociated'
     routing_key_fmt = (
         'config.lines.{line[id]}.endpoints.sip.{endpoint_sip[uuid]}.deleted'
@@ -29,6 +31,7 @@ class LineEndpointSIPDissociatedEvent(TenantEvent):
 
 
 class LineEndpointSCCPAssociatedEvent(TenantEvent):
+    service = 'confd'
     name = 'line_endpoint_sccp_associated'
     routing_key_fmt = (
         'config.lines.{line[id]}.endpoints.sccp.{endpoint_sccp[id]}.updated'
@@ -40,6 +43,7 @@ class LineEndpointSCCPAssociatedEvent(TenantEvent):
 
 
 class LineEndpointSCCPDissociatedEvent(TenantEvent):
+    service = 'confd'
     name = 'line_endpoint_sccp_dissociated'
     routing_key_fmt = (
         'config.lines.{line[id]}.endpoints.sccp.{endpoint_sccp[id]}.deleted'
@@ -51,6 +55,7 @@ class LineEndpointSCCPDissociatedEvent(TenantEvent):
 
 
 class LineEndpointCustomAssociatedEvent(TenantEvent):
+    service = 'confd'
     name = 'line_endpoint_custom_associated'
     routing_key_fmt = (
         'config.lines.{line[id]}.endpoints.custom.{endpoint_custom[id]}.updated'
@@ -62,6 +67,7 @@ class LineEndpointCustomAssociatedEvent(TenantEvent):
 
 
 class LineEndpointCustomDissociatedEvent(TenantEvent):
+    service = 'confd'
     name = 'line_endpoint_custom_dissociated'
     routing_key_fmt = (
         'config.lines.{line[id]}.endpoints.custom.{endpoint_custom[id]}.deleted'

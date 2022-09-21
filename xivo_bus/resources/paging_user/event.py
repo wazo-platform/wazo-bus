@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class PagingCallerUsersAssociatedEvent(TenantEvent):
+    service = 'confd'
     name = 'paging_caller_users_associated'
     routing_key_fmt = 'config.pagings.callers.users.updated'
 
@@ -19,6 +20,7 @@ class PagingCallerUsersAssociatedEvent(TenantEvent):
 
 
 class PagingMemberUsersAssociatedEvent(TenantEvent):
+    service = 'confd'
     name = 'paging_member_users_associated'
     routing_key_fmt = 'config.pagings.members.users.updated'
 

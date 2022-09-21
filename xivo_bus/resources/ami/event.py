@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import ServiceEvent
 
 
 class AMIEvent(ServiceEvent):
+    service = 'amid'
     name = '{ami_event}'
     routing_key_fmt = 'ami.{name}'
 

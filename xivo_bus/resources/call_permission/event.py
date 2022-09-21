@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class CallPermissionCreatedEvent(TenantEvent):
+    service = 'confd'
     name = 'call_permission_created'
     routing_key_fmt = 'config.callpermission.created'
 
@@ -16,6 +17,7 @@ class CallPermissionCreatedEvent(TenantEvent):
 
 
 class CallPermissionDeletedEvent(TenantEvent):
+    service = 'confd'
     name = 'call_permission_deleted'
     routing_key_fmt = 'config.callpermission.deleted'
 
@@ -25,6 +27,7 @@ class CallPermissionDeletedEvent(TenantEvent):
 
 
 class CallPermissionEditedEvent(TenantEvent):
+    service = 'confd'
     name = 'call_permission_edited'
     routing_key_fmt = 'config.callpermission.edited'
 

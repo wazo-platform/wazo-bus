@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class IAXEndpointCreatedEvent(TenantEvent):
+    service = 'confd'
     name = 'iax_endpoint_created'
     routing_key_fmt = 'config.iax_endpoint.created'
 
@@ -15,6 +16,7 @@ class IAXEndpointCreatedEvent(TenantEvent):
 
 
 class IAXEndpointDeletedEvent(TenantEvent):
+    service = 'confd'
     name = 'iax_endpoint_deleted'
     routing_key_fmt = 'config.iax_endpoint.deleted'
 
@@ -23,6 +25,7 @@ class IAXEndpointDeletedEvent(TenantEvent):
 
 
 class IAXEndpointEditedEvent(TenantEvent):
+    service = 'confd'
     name = 'iax_endpoint_edited'
     routing_key_fmt = 'config.iax_endpoint.edited'
 

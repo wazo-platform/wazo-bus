@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class UserExternalAppCreatedEvent(TenantEvent):
+    service = 'confd'
     name = 'user_external_app_created'
     routing_key_fmt = 'config.user_external_apps.created'
 
@@ -15,6 +16,7 @@ class UserExternalAppCreatedEvent(TenantEvent):
 
 
 class UserExternalAppDeletedEvent(TenantEvent):
+    service = 'confd'
     name = 'user_external_app_deleted'
     routing_key_fmt = 'config.user_external_apps.deleted'
 
@@ -23,6 +25,7 @@ class UserExternalAppDeletedEvent(TenantEvent):
 
 
 class UserExternalAppEditedEvent(TenantEvent):
+    service = 'confd'
     name = 'user_external_app_edited'
     routing_key_fmt = 'config.user_external_apps.edited'
 

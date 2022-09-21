@@ -14,6 +14,7 @@ class _MeetingMixin(object):
 
 
 class MeetingCreatedEvent(_MeetingMixin, TenantEvent):
+    service = 'confd'
     name = 'meeting_created'
     routing_key_fmt = 'config.meetings.created'
 
@@ -22,6 +23,7 @@ class MeetingCreatedEvent(_MeetingMixin, TenantEvent):
 
 
 class MeetingDeletedEvent(_MeetingMixin, TenantEvent):
+    service = 'confd'
     name = 'meeting_deleted'
     routing_key_fmt = 'config.meetings.deleted'
 
@@ -30,6 +32,7 @@ class MeetingDeletedEvent(_MeetingMixin, TenantEvent):
 
 
 class MeetingEditedEvent(_MeetingMixin, TenantEvent):
+    service = 'confd'
     name = 'meeting_updated'
     routing_key_fmt = 'config.meetings.updated'
 
@@ -38,6 +41,7 @@ class MeetingEditedEvent(_MeetingMixin, TenantEvent):
 
 
 class MeetingProgressEvent(_MeetingMixin, TenantEvent):
+    service = 'confd'
     name = 'meeting_progress'
     routing_key_fmt = 'config.meetings.progress'
 
@@ -50,6 +54,7 @@ class MeetingProgressEvent(_MeetingMixin, TenantEvent):
 
 
 class MeetingUserProgressEvent(_MeetingMixin, UserEvent):
+    service = 'confd'
     name = 'meeting_user_progress'
     routing_key_fmt = 'config.users.{user_uuid}.meetings.progress'
 
@@ -63,6 +68,7 @@ class MeetingUserProgressEvent(_MeetingMixin, UserEvent):
 
 
 class MeetingParticipantJoinedEvent(_MeetingMixin, TenantEvent):
+    service = 'calld'
     name = 'meeting_participant_joined'
     routing_key_fmt = 'meetings.{meeting_uuid}.participants.joined'
 
@@ -74,6 +80,7 @@ class MeetingParticipantJoinedEvent(_MeetingMixin, TenantEvent):
 
 
 class MeetingParticipantLeftEvent(_MeetingMixin, TenantEvent):
+    service = 'calld'
     name = 'meeting_participant_left'
     routing_key_fmt = 'meetings.{meeting_uuid}.participants.left'
 
@@ -85,6 +92,7 @@ class MeetingParticipantLeftEvent(_MeetingMixin, TenantEvent):
 
 
 class MeetingUserParticipantJoinedEvent(_MeetingMixin, UserEvent):
+    service = 'calld'
     name = 'meeting_user_participant_joined'
     routing_key_fmt = 'meetings.users.{user_uuid}.participants.joined'
     required_acl_fmt = 'events.users.{user_uuid}.meetings.participants.joined'
@@ -97,6 +105,7 @@ class MeetingUserParticipantJoinedEvent(_MeetingMixin, UserEvent):
 
 
 class MeetingUserParticipantLeftEvent(_MeetingMixin, UserEvent):
+    service = 'calld'
     name = 'meeting_user_participant_left'
     routing_key_fmt = 'meetings.users.{user_uuid}.participants.left'
     required_acl_fmt = 'events.users.{user_uuid}.meetings.participants.left'
@@ -109,6 +118,7 @@ class MeetingUserParticipantLeftEvent(_MeetingMixin, UserEvent):
 
 
 class MeetingAuthorizationCreatedEvent(_MeetingMixin, TenantEvent):
+    service = 'confd'
     name = 'meeting_guest_authorization_created'
     routing_key_fmt = 'config.meeting_guest_authorizations.created'
 
@@ -119,6 +129,7 @@ class MeetingAuthorizationCreatedEvent(_MeetingMixin, TenantEvent):
 
 
 class MeetingAuthorizationDeletedEvent(_MeetingMixin, TenantEvent):
+    service = 'confd'
     name = 'meeting_guest_authorization_deleted'
     routing_key_fmt = 'config.meeting_guest_authorizations.deleted'
 
@@ -129,6 +140,7 @@ class MeetingAuthorizationDeletedEvent(_MeetingMixin, TenantEvent):
 
 
 class MeetingAuthorizationEditedEvent(_MeetingMixin, TenantEvent):
+    service = 'confd'
     name = 'meeting_guest_authorization_updated'
     routing_key_fmt = 'config.meeting_guest_authorizations.updated'
 
@@ -139,6 +151,7 @@ class MeetingAuthorizationEditedEvent(_MeetingMixin, TenantEvent):
 
 
 class MeetingUserAuthorizationCreatedEvent(_MeetingMixin, UserEvent):
+    service = 'confd'
     name = 'meeting_user_guest_authorization_created'
     routing_key_fmt = 'config.users.{user_uuid}.meeting_guest_authorizations.created'
     required_acl_fmt = 'events.users.{user_uuid}.meeting_guest_authorizations.created'
@@ -151,6 +164,7 @@ class MeetingUserAuthorizationCreatedEvent(_MeetingMixin, UserEvent):
 
 
 class MeetingUserAuthorizationDeletedEvent(_MeetingMixin, UserEvent):
+    service = 'confd'
     name = 'meeting_user_guest_authorization_deleted'
     routing_key_fmt = 'config.users.{user_uuid}.meeting_guest_authorizations.deleted'
     required_acl_fmt = 'events.users.{user_uuid}.meeting_guest_authorizations.deleted'
@@ -163,6 +177,7 @@ class MeetingUserAuthorizationDeletedEvent(_MeetingMixin, UserEvent):
 
 
 class MeetingUserAuthorizationEditedEvent(_MeetingMixin, UserEvent):
+    service = 'confd'
     name = 'meeting_user_guest_authorization_updated'
     routing_key_fmt = 'config.users.{user_uuid}.meeting_guest_authorizations.updated'
     required_acl_fmt = 'events.users.{user_uuid}.meeting_guest_authorizations.updated'

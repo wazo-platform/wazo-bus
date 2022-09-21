@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class ContextCreatedEvent(TenantEvent):
+    service = 'confd'
     name = 'context_created'
     routing_key_fmt = 'config.contexts.created'
 
@@ -15,6 +16,7 @@ class ContextCreatedEvent(TenantEvent):
 
 
 class ContextDeletedEvent(TenantEvent):
+    service = 'confd'
     name = 'context_deleted'
     routing_key_fmt = 'config.contexts.deleted'
 
@@ -23,6 +25,7 @@ class ContextDeletedEvent(TenantEvent):
 
 
 class ContextEditedEvent(TenantEvent):
+    service = 'confd'
     name = 'context_edited'
     routing_key_fmt = 'config.contexts.edited'
 

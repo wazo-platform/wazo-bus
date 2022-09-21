@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class SoundCreatedEvent(TenantEvent):
+    service = 'confd'
     name = 'sound_created'
     routing_key_fmt = 'config.sounds.created'
 
@@ -16,6 +17,7 @@ class SoundCreatedEvent(TenantEvent):
 
 
 class SoundDeletedEvent(TenantEvent):
+    service = 'confd'
     name = 'sound_deleted'
     routing_key_fmt = 'config.sounds.deleted'
 

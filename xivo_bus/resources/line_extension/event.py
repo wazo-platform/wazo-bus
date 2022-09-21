@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class LineExtensionAssociatedEvent(TenantEvent):
+    service = 'confd'
     name = 'line_extension_associated'
     routing_key_fmt = 'config.line_extension_associated.updated'
 
@@ -16,6 +17,7 @@ class LineExtensionAssociatedEvent(TenantEvent):
 
 
 class LineExtensionDissociatedEvent(TenantEvent):
+    service = 'confd'
     name = 'line_extension_dissociated'
     routing_key_fmt = 'config.line_extension_associated.deleted'
 

@@ -13,6 +13,7 @@ class _ApplicationMixin(object):
 
 
 class ApplicationCallDTMFReceivedEvent(_ApplicationMixin, TenantEvent):
+    service = 'calld'
     name = 'application_call_dtmf_received'
     routing_key_fmt = 'applications.{application_uuid}.calls.{call_id}.dtmf.created'
 
@@ -28,6 +29,7 @@ class ApplicationCallDTMFReceivedEvent(_ApplicationMixin, TenantEvent):
 
 
 class ApplicationCallEnteredEvent(_ApplicationMixin, UserEvent):
+    service = 'calld'
     name = 'application_call_entered'
     routing_key_fmt = 'applications.{application_uuid}.calls.created'
 
@@ -39,6 +41,7 @@ class ApplicationCallEnteredEvent(_ApplicationMixin, UserEvent):
 
 
 class ApplicationCallInitiatedEvent(_ApplicationMixin, UserEvent):
+    service = 'calld'
     name = 'application_call_initiated'
     routing_key_fmt = 'applications.{application_uuid}.calls.created'
 
@@ -50,6 +53,7 @@ class ApplicationCallInitiatedEvent(_ApplicationMixin, UserEvent):
 
 
 class ApplicationCallDeletedEvent(_ApplicationMixin, UserEvent):
+    service = 'calld'
     name = 'application_call_deleted'
     routing_key_fmt = 'applications.{application_uuid}.calls.{call[id]}.deleted'
 
@@ -61,6 +65,7 @@ class ApplicationCallDeletedEvent(_ApplicationMixin, UserEvent):
 
 
 class ApplicationCallUpdatedEvent(_ApplicationMixin, UserEvent):
+    service = 'calld'
     name = 'application_call_updated'
     routing_key_fmt = 'applications.{application_uuid}.calls.{call[id]}.updated'
 
@@ -72,6 +77,7 @@ class ApplicationCallUpdatedEvent(_ApplicationMixin, UserEvent):
 
 
 class ApplicationCallAnsweredEvent(_ApplicationMixin, UserEvent):
+    service = 'calld'
     name = 'application_call_answered'
     routing_key_fmt = 'applications.{application_uuid}.calls.{call[id]}.answered'
 
@@ -83,6 +89,7 @@ class ApplicationCallAnsweredEvent(_ApplicationMixin, UserEvent):
 
 
 class ApplicationCallProgressStartedEvent(_ApplicationMixin, UserEvent):
+    service = 'calld'
     name = 'application_progress_started'
     routing_key_fmt = (
         'applications.{application_uuid}.calls.{call[id]}.progress.started'
@@ -96,6 +103,7 @@ class ApplicationCallProgressStartedEvent(_ApplicationMixin, UserEvent):
 
 
 class ApplicationCallProgressStoppedEvent(_ApplicationMixin, UserEvent):
+    service = 'calld'
     name = 'application_progress_stopped'
     routing_key_fmt = (
         'applications.{application_uuid}.calls.{call[id]}.progress.stopped'
@@ -109,6 +117,7 @@ class ApplicationCallProgressStoppedEvent(_ApplicationMixin, UserEvent):
 
 
 class ApplicationDestinationNodeCreatedEvent(_ApplicationMixin, TenantEvent):
+    service = 'calld'
     name = 'application_destination_node_created'
     routing_key_fmt = 'applications.{application_uuid}.nodes.created'
 
@@ -120,6 +129,7 @@ class ApplicationDestinationNodeCreatedEvent(_ApplicationMixin, TenantEvent):
 
 
 class ApplicationNodeCreatedEvent(_ApplicationMixin, TenantEvent):
+    service = 'calld'
     name = 'application_node_created'
     routing_key_fmt = 'applications.{application_uuid}.nodes.created'
 
@@ -131,6 +141,7 @@ class ApplicationNodeCreatedEvent(_ApplicationMixin, TenantEvent):
 
 
 class ApplicationNodeUpdatedEvent(_ApplicationMixin, TenantEvent):
+    service = 'calld'
     name = 'application_node_updated'
     routing_key_fmt = 'applications.{application_uuid}.nodes.{node[uuid]}.updated'
 
@@ -142,6 +153,7 @@ class ApplicationNodeUpdatedEvent(_ApplicationMixin, TenantEvent):
 
 
 class ApplicationNodeDeletedEvent(_ApplicationMixin, TenantEvent):
+    service = 'calld'
     name = 'application_node_deleted'
     routing_key_fmt = 'applications.{application_uuid}.nodes.{node[uuid]}.deleted'
 
@@ -153,6 +165,7 @@ class ApplicationNodeDeletedEvent(_ApplicationMixin, TenantEvent):
 
 
 class ApplicationPlaybackCreatedEvent(_ApplicationMixin, TenantEvent):
+    service = 'calld'
     name = 'application_playback_created'
     routing_key_fmt = (
         'applications.{application_uuid}.playbacks.{playback[uuid]}.created'
@@ -169,6 +182,7 @@ class ApplicationPlaybackCreatedEvent(_ApplicationMixin, TenantEvent):
 
 
 class ApplicationPlaybackDeletedEvent(_ApplicationMixin, TenantEvent):
+    service = 'calld'
     name = 'application_playback_deleted'
     routing_key_fmt = (
         'applications.{application_uuid}.playbacks.{playback[uuid]}.deleted'
@@ -185,6 +199,7 @@ class ApplicationPlaybackDeletedEvent(_ApplicationMixin, TenantEvent):
 
 
 class ApplicationSnoopCreatedEvent(_ApplicationMixin, TenantEvent):
+    service = 'calld'
     name = 'application_snoop_created'
     routing_key_fmt = 'applications.{application_uuid}.snoops.{snoop[uuid]}.created'
 
@@ -196,6 +211,7 @@ class ApplicationSnoopCreatedEvent(_ApplicationMixin, TenantEvent):
 
 
 class ApplicationSnoopUpdatedEvent(_ApplicationMixin, TenantEvent):
+    service = 'calld'
     name = 'application_snoop_updated'
     routing_key_fmt = 'applications.{application_uuid}.snoops.{snoop[uuid]}.updated'
 
@@ -207,6 +223,7 @@ class ApplicationSnoopUpdatedEvent(_ApplicationMixin, TenantEvent):
 
 
 class ApplicationSnoopDeletedEvent(_ApplicationMixin, TenantEvent):
+    service = 'calld'
     name = 'application_snoop_deleted'
     routing_key_fmt = 'applications.{application_uuid}.snoops.{snoop[uuid]}.deleted'
 
@@ -218,6 +235,7 @@ class ApplicationSnoopDeletedEvent(_ApplicationMixin, TenantEvent):
 
 
 class ApplicationUserOutgoingCallCreatedEvent(_ApplicationMixin, UserEvent):
+    service = 'calld'
     name = 'application_user_outgoing_call_created'
     routing_key_fmt = (
         'applications.{application_uuid}.user_outgoing_call.{call[id]}.created'

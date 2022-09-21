@@ -6,6 +6,7 @@ from xivo_bus.resources.common.event import ServiceEvent
 
 
 class PluginInstallProgressEvent(ServiceEvent):
+    service = 'plugind'
     name = 'plugin_install_progress'
     routing_key_fmt = 'plugin.install.{uuid}.{status}'
 
@@ -17,6 +18,7 @@ class PluginInstallProgressEvent(ServiceEvent):
 
 
 class PluginUninstallProgressEvent(ServiceEvent):
+    service = 'plugind'
     name = 'plugin_uninstall_progress'
     routing_key_fmt = 'plugin.uninstall.{uuid}.{status}'
 

@@ -19,21 +19,25 @@ class _BaseUserEvent(TenantEvent):
 
 
 class UserCreatedEvent(_BaseUserEvent):
+    service = 'confd'
     name = 'user_created'
     routing_key_fmt = 'config.user.created'
 
 
 class UserDeletedEvent(_BaseUserEvent):
+    service = 'confd'
     name = 'user_deleted'
     routing_key_fmt = 'config.user.deleted'
 
 
 class UserEditedEvent(_BaseUserEvent):
+    service = 'confd'
     name = 'user_edited'
     routing_key_fmt = 'config.user.edited'
 
 
 class UserFallbackEditedEvent(UserEvent):
+    service = 'confd'
     name = 'user_fallback_edited'
     routing_key_fmt = 'config.users.fallbacks.edited'
 
@@ -49,6 +53,7 @@ class UserFallbackEditedEvent(UserEvent):
 
 
 class UserServiceEditedEvent(UserEvent):
+    service = 'confd'
     name = 'users_services_{service_name}_updated'
     routing_key_fmt = 'config.users.{user_uuid}.services.{service_name}.updated'
 
@@ -65,6 +70,7 @@ class UserServiceEditedEvent(UserEvent):
 
 
 class UserForwardEditedEvent(UserEvent):
+    service = 'confd'
     name = 'users_forwards_{forward_name}_updated'
     routing_key_fmt = 'config.users.{user_uuid}.forwards.{forward_name}.updated'
 

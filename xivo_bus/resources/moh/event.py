@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class MOHCreatedEvent(TenantEvent):
+    service = 'confd'
     name = 'moh_created'
     routing_key_fmt = 'config.moh.created'
 
@@ -15,6 +16,7 @@ class MOHCreatedEvent(TenantEvent):
 
 
 class MOHDeletedEvent(TenantEvent):
+    service = 'confd'
     name = 'moh_deleted'
     routing_key_fmt = 'config.moh.deleted'
 
@@ -23,6 +25,7 @@ class MOHDeletedEvent(TenantEvent):
 
 
 class MOHEditedEvent(TenantEvent):
+    service = 'confd'
     name = 'moh_edited'
     routing_key_fmt = 'config.moh.edited'
 

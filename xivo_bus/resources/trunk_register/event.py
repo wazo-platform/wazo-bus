@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class TrunkRegisterIAXAssociatedEvent(TenantEvent):
+    service = 'confd'
     name = 'trunk_register_iax_associated'
     routing_key_fmt = 'config.trunks.registers.iax.updated'
 
@@ -16,6 +17,7 @@ class TrunkRegisterIAXAssociatedEvent(TenantEvent):
 
 
 class TrunkRegisterIAXDissociatedEvent(TenantEvent):
+    service = 'confd'
     name = 'trunk_register_iax_dissociated'
     routing_key_fmt = 'config.trunks.registers.iax.deleted'
 

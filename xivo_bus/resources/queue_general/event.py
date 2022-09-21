@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import ServiceEvent
 
 
 class QueueGeneralEditedEvent(ServiceEvent):
+    service = 'confd'
     name = 'queue_general_edited'
     routing_key_fmt = 'config.queue_general.edited'
 

@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import UserEvent
 
 
 class UserAgentAssociatedEvent(UserEvent):
+    service = 'confd'
     name = 'user_agent_associated'
     routing_key_fmt = 'config.users.{user_uuid}.agents.updated'
 
@@ -19,6 +20,7 @@ class UserAgentAssociatedEvent(UserEvent):
 
 
 class UserAgentDissociatedEvent(UserEvent):
+    service = 'confd'
     name = 'user_agent_dissociated'
     routing_key_fmt = 'config.users.{user_uuid}.agents.deleted'
 

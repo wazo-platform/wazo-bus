@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class CallPickupInterceptorUsersAssociatedEvent(TenantEvent):
+    service = 'confd'
     name = 'call_pickup_interceptor_users_associated'
     routing_key_fmt = 'config.callpickups.interceptors.users.updated'
 
@@ -21,6 +22,7 @@ class CallPickupInterceptorUsersAssociatedEvent(TenantEvent):
 
 
 class CallPickupTargetUsersAssociatedEvent(TenantEvent):
+    service = 'confd'
     name = 'call_pickup_target_users_associated'
     routing_key_fmt = 'config.callpickups.targets.users.updated'
 
@@ -33,6 +35,7 @@ class CallPickupTargetUsersAssociatedEvent(TenantEvent):
 
 
 class CallPickupInterceptorGroupsAssociatedEvent(TenantEvent):
+    service = 'confd'
     name = 'call_pickup_interceptor_groups_associated'
     routing_key_fmt = 'config.callpickups.interceptors.groups.updated'
 
@@ -45,6 +48,7 @@ class CallPickupInterceptorGroupsAssociatedEvent(TenantEvent):
 
 
 class CallPickupTargetGroupsAssociatedEvent(TenantEvent):
+    service = 'confd'
     name = 'call_pickup_target_groups_associated'
     routing_key_fmt = 'config.callpickups.targets.groups.updated'
 

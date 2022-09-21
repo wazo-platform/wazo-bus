@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import ServiceEvent
 
 
 class RegisterSIPCreated(ServiceEvent):
+    service = 'confd'
     name = 'register_sip_created'
     routing_key_fmt = 'config.register.sip.created'
 
@@ -16,6 +17,7 @@ class RegisterSIPCreated(ServiceEvent):
 
 
 class RegisterSIPDeleted(ServiceEvent):
+    service = 'confd'
     name = 'register_sip_deleted'
     routing_key_fmt = 'config.register.sip.deleted'
 
@@ -25,6 +27,7 @@ class RegisterSIPDeleted(ServiceEvent):
 
 
 class RegisterSIPEditedEvent(ServiceEvent):
+    service = 'confd'
     name = 'register_sip_edited'
     routing_key_fmt = 'config.register.sip.edited'
 
@@ -34,6 +37,7 @@ class RegisterSIPEditedEvent(ServiceEvent):
 
 
 class RegisterIAXCreatedEvent(ServiceEvent):
+    service = 'confd'
     name = 'register_iax_created'
     routing_key_fmt = 'config.register.iax.created'
 
@@ -43,6 +47,7 @@ class RegisterIAXCreatedEvent(ServiceEvent):
 
 
 class RegisterIAXDeletedEvent(ServiceEvent):
+    service = 'confd'
     name = 'register_iax_deleted'
     routing_key_fmt = 'config.register.iax.deleted'
 
@@ -52,6 +57,7 @@ class RegisterIAXDeletedEvent(ServiceEvent):
 
 
 class RegisterIAXEditedEvent(ServiceEvent):
+    service = 'confd'
     name = 'register_iax_edited'
     routing_key_fmt = 'config.register.iax.edited'
 

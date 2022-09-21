@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class CallFilterCreatedEvent(TenantEvent):
+    service = 'confd'
     name = 'call_filter_created'
     routing_key_fmt = 'config.callfilter.created'
 
@@ -16,6 +17,7 @@ class CallFilterCreatedEvent(TenantEvent):
 
 
 class CallFilterDeletedEvent(TenantEvent):
+    service = 'confd'
     name = 'call_filter_deleted'
     routing_key_fmt = 'config.callfilter.deleted'
 
@@ -25,6 +27,7 @@ class CallFilterDeletedEvent(TenantEvent):
 
 
 class CallFilterEditedEvent(TenantEvent):
+    service = 'confd'
     name = 'call_filter_edited'
     routing_key_fmt = 'config.callfilter.edited'
 
@@ -34,6 +37,7 @@ class CallFilterEditedEvent(TenantEvent):
 
 
 class CallFilterFallbackEditedEvent(TenantEvent):
+    service = 'confd'
     name = 'call_filter_fallback_edited'
     routing_key_fmt = 'config.callfilters.fallbacks.edited'
 

@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class ExtensionCreatedEvent(TenantEvent):
+    service = 'confd'
     name = 'extension_created'
     routing_key_fmt = 'config.extensions.created'
 
@@ -20,6 +21,7 @@ class ExtensionCreatedEvent(TenantEvent):
 
 
 class ExtensionDeletedEvent(TenantEvent):
+    service = 'confd'
     name = 'extension_deleted'
     routing_key_fmt = 'config.extensions.deleted'
 
@@ -33,6 +35,7 @@ class ExtensionDeletedEvent(TenantEvent):
 
 
 class ExtensionEditedEvent(TenantEvent):
+    service = 'confd'
     name = 'extension_edited'
     routing_key_fmt = 'config.extensions.edited'
 

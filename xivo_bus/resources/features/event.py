@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import ServiceEvent
 
 
 class FeaturesApplicationmapEditedEvent(ServiceEvent):
+    service = 'confd'
     name = 'features_applicationmap_edited'
     routing_key_fmt = 'config.features_applicationmap.edited'
 
@@ -15,6 +16,7 @@ class FeaturesApplicationmapEditedEvent(ServiceEvent):
 
 
 class FeaturesFeaturemapEditedEvent(ServiceEvent):
+    service = 'confd'
     name = 'features_featuremap_edited'
     routing_key_fmt = 'config.features_featuremap.edited'
 
@@ -23,6 +25,7 @@ class FeaturesFeaturemapEditedEvent(ServiceEvent):
 
 
 class FeaturesGeneralEditedEvent(ServiceEvent):
+    service = 'confd'
     name = 'features_general_edited'
     routing_key_fmt = 'config.features_general.edited'
 

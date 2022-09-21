@@ -5,6 +5,7 @@ from xivo_bus.resources.common.event import ServiceEvent
 
 
 class RequestHandlersProgressEvent(ServiceEvent):
+    service = 'sysconfd'
     name = 'request_handlers_progress'
     routing_key_fmt = 'sysconfd.request_handlers.{uuid}.{status}'
 
@@ -18,6 +19,7 @@ class RequestHandlersProgressEvent(ServiceEvent):
 
 
 class AsteriskReloadProgressEvent(ServiceEvent):
+    service = 'sysconfd'
     name = 'asterisk_reload_progress'
     routing_key_fmt = 'sysconfd.asterisk.reload.{uuid}.{status}'
 
