@@ -35,6 +35,9 @@ class Event:
     def __getattr__(self, attr):
         return getattr(self.class_, attr)
 
+    def __lt__(self, other):
+        return self.name < other.name
+
     @staticmethod
     def is_event(class_):
         if not inspect.isclass(class_):
@@ -224,7 +227,7 @@ class EventSpecificationBuilder:
         with ThreadPoolExecutor() as executor:
             results = executor.map(self.get_resource_events, self.paths)
 
-        events = list(chain(*results))
+        events = sorted(chain(*results))
         specifications = self.generate_specifications(events)
 
         self.write_specifications(specifications, output_dir, dry_run=dry_run)
