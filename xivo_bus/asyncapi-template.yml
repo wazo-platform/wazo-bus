@@ -4,9 +4,21 @@ info:
   version: 0.0.1
 servers:
   production:
-    url: amqp://guest:guest@localhost:5672//
+    url: amqp://{username}:{password}@/localhost:{port}//
+    description: Local RabbitMQ messaging server for inter-service communication
     protocol: amqp
     protocolVersion: 0.9.1
+    variables:
+      username:
+        default: guest
+        description: Configurable through each service's config.yml file
+      password:
+        default: guest
+        description: Configurable through each service's config.yml file
+      port:
+        default: '5672'
+        description: Configurable through each service's config.yml file
+defaultContentType: application/json
 channels: {}
 components:
   messages: {}
