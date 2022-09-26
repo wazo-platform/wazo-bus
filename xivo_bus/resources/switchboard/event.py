@@ -4,9 +4,9 @@
 
 from __future__ import unicode_literals
 
-from xivo.permission import escape as escape_acl
 from xivo_bus.resources.common.event import TenantEvent, MultiUserEvent
 from xivo_bus.resources.common.routing_key import escape as escape_key
+from xivo_bus.resources.common.acl import escape as escape_acl
 
 
 class _SwitchboardMixin(object):
