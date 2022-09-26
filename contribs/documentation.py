@@ -11,18 +11,48 @@ import yaml
 
 from concurrent.futures import ThreadPoolExecutor
 from copy import deepcopy
-from glob import glob
 from itertools import chain
+from pathlib import Path
 from sys import stdout
 from time import time
 
 from xivo_bus.resources.common.abstract import AbstractEvent
 
 
+PACKAGE_NAME = 'xivo_bus'
+
 logging.basicConfig(stream=stdout, level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-RESOURCES_DIR = os.path.join("resources", "**")
+
+class AsyncAPITypes:
+    @staticmethod
+    def string():
+        return {'type': 'string'}
+
+    @staticmethod
+    def boolean():
+        return {'type': 'boolean'}
+
+    @staticmethod
+    def integer():
+        return {'type': 'integer'}
+
+    @staticmethod
+    def float_():
+        return {'type': 'float'}
+
+    @staticmethod
+    def uuid():
+        return {'type': 'string', 'format': 'uuid'}
+
+    @staticmethod
+    def datetime():
+        return {'type': 'string', 'format': 'date-time'}
+
+    @staticmethod
+    def object_(dict_=None):
+        return {'type': 'object', 'properties': dict_ or {}}
 
 
 class Event:
@@ -30,7 +60,7 @@ class Event:
         self.class_ = class_
 
         sig = inspect.signature(class_.__init__)
-        self.__keys__ = sig.parameters.keys()
+        self._keys = sig.parameters.keys()
 
     def __getattr__(self, attr):
         return getattr(self.class_, attr)
@@ -78,11 +108,11 @@ class Event:
         }
         required = ['name', 'required_access', 'origin_uuid', 'timestamp']
 
-        if 'tenant_uuid' in self.__keys__:
+        if 'tenant_uuid' in self._keys:
             headers['tenant_uuid'] = {'$ref': '#/components/schemas/tenant_uuid'}
             required.append('tenant_uuid')
 
-        if 'user_uuid' in self.__keys__:
+        if 'user_uuid' in self._keys:
             headers['user_uuid:{uuid}'] = {
                 '$ref': '#/components/schemas/user_uuid:{uuid}'
             }
@@ -93,31 +123,25 @@ class Event:
     def generate_payload(self):
         content = {}
         keys_ignore_list = ('tenant_uuid', 'user_uuid', 'self')
-        content_keys = [key for key in self.__keys__ if key not in keys_ignore_list]
+        content_keys = [key for key in self._keys if key not in keys_ignore_list]
 
         for key in content_keys:
             if key.endswith('uuid'):
-                content[key] = {'type': 'string', 'format': 'uuid'}
+                content[key] = AsyncAPITypes.uuid()
             elif key.endswith(('id', 'number')):
-                content[key] = {'type': 'integer'}
+                content[key] = AsyncAPITypes.integer()
             elif key.startswith('is_'):
-                content[key] = {'type': 'boolean'}
-            elif key.endswith('at'):
-                content[key] = {'type': 'string', 'format': 'date-time'}
+                content[key] = AsyncAPITypes.boolean()
+            elif key.endswith('_at'):
+                content[key] = AsyncAPITypes.datetime()
             elif key.endswith(('_data', '_info', '_schema')):
-                content[key] = {'type': 'object', 'properties': {}}
+                content[key] = AsyncAPITypes.object_()
             else:
-                content[key] = {'type': 'string'}
+                content[key] = AsyncAPITypes.string()
 
-        return {
-            'type': 'object',
-            'properties': {
-                'data': {
-                    'type': 'object',
-                    'properties': content,
-                }
-            },
-        }
+        return AsyncAPITypes.object_(
+            dict(data=AsyncAPITypes.object_(content)),
+        )
 
     def generate_parameters(self):
         parameters = {}
@@ -160,24 +184,34 @@ class Event:
 
 
 class EventSpecificationBuilder:
-    def __init__(self, input_schema, *, overwrite_all=False, **kwargs):
-        paths = sorted(glob(RESOURCES_DIR, recursive=False), reverse=False)
+    def __init__(self, input_schema, version):
+        self.platform_version = str(version)
+        self.base_path = self.get_package_path(PACKAGE_NAME)
+        resource_dir = self.base_path.joinpath('resources')
+        self.paths = [path for path in resource_dir.iterdir() if path.is_dir()]
 
         with open(input_schema, 'r') as file:
             self.input_schema = yaml.safe_load(file)
-        self.overwrite = overwrite_all
-        self.paths = [path for path in paths if '__' not in path]
 
-    def get_resource_events(self, path):
+    @staticmethod
+    def get_package_path(package_name):
+        module = importlib.import_module(package_name)
+        entrypoint = inspect.getfile(module)
+        return Path(os.path.dirname(entrypoint))
+
+    def get_resource_events(self, resource_path):
         events = []
-        file_paths = glob(os.path.join(path, '*.py'), recursive=False)
+        file_paths = sorted(resource_path.glob('*.py'))
 
-        for file_path in file_paths:
-            import_name = os.path.splitext(file_path)[0].replace('/', '.')
+        for path in file_paths:
+            name = os.path.splitext(path.relative_to(self.base_path))[0]
+            import_name = '.'.join([PACKAGE_NAME, name.replace('/', '.')])
+
             try:
                 module = importlib.import_module(import_name)
-            except ModuleNotFoundError:
-                raise
+            except ModuleNotFoundError as e:
+                print(f'skipping {name}: {e}')
+                continue
 
             events.extend(
                 Event(cls) for _, cls in inspect.getmembers(module, Event.is_event)
@@ -186,7 +220,9 @@ class EventSpecificationBuilder:
         return events
 
     def generate_specifications(self, events):
-        print(f'generating AsyncAPI specifications ({len(events)} events)')
+        print(
+            f'generating AsyncAPI specifications for `{self.platform_version}` ({len(events)} events)'
+        )
         specifications = {}
         for event in events:
             service = event.service
@@ -199,25 +235,28 @@ class EventSpecificationBuilder:
 
     def write_specifications(self, specifications, output_dir, *, dry_run=False):
         def write(service):
-            path = os.path.join(dirpath, f'{service}.yml')
+            service_name = (
+                '-'.join(['wazo', service]) if service != 'undefined' else service
+            )
+            path = Path(output_dir).joinpath(f'{service_name}.yml').resolve()
             schema = deepcopy(self.input_schema)
-            schema['info']['title'] = f'{service} events'
+            schema['info']['title'] = f'{service_name} events'
+            schema['info']['version'] = self.platform_version
             schema['channels'] = specifications[service]
 
-            if not dry_run:
-                with open(path, 'w+') as file:
-                    yaml.dump(schema, file, sort_keys=False)
-            print(f'would write \'{path}\'' if dry_run else f'wrote \'{path}\'')
+            if dry_run:
+                return f'would write \'{path}\''
 
-        dirpath = os.path.abspath(output_dir)
-        try:
-            os.makedirs(dirpath)
-        except OSError:
-            if not os.path.isdir(dirpath):
-                raise
+            with open(path, 'w') as file:
+                yaml.dump(schema, file, sort_keys=False)
+            size = path.stat().st_size / 1024
+            return f'wrote \'{path}\' ({size:.2f} KB)'
 
         with ThreadPoolExecutor() as executor:
-            executor.map(write, specifications.keys())
+            futs = [
+                executor.submit(write, service) for service in specifications.keys()
+            ]
+        [print(fut.result()) for fut in futs]
 
     def run(self, output_dir='asyncapi', *, dry_run=False):
         start_time = time()
@@ -235,8 +274,8 @@ class EventSpecificationBuilder:
         print(f'(execution took \'{exec_time:.3f}\' seconds)')
 
 
-def parse(template_file, output_dir, *, dry_run=False):
-    builder = EventSpecificationBuilder(template_file)
+def generate_documentation(template_file, output_dir, version, *, dry_run=False):
+    builder = EventSpecificationBuilder(template_file, version)
     builder.run(output_dir, dry_run=dry_run)
 
 
@@ -246,6 +285,7 @@ if __name__ == '__main__':
     )
 
     parser.add_argument('-o', type=str, dest='output_dir', required=True)
+    parser.add_argument('-p', type=str, dest='platform_version', required=True)
     parser.add_argument(
         '-t', type=str, dest='template_file', default='asyncapi-template.yml'
     )
@@ -253,9 +293,10 @@ if __name__ == '__main__':
         '--dry', action='store_true', dest='dry_run', help='don\'t write files'
     )
 
-    try:
-        parsed = parser.parse_args()
-    except argparse.ArgumentError as e:
-        print(e)
-
-    parse(parsed.template_file, parsed.output_dir, dry_run=parsed.dry_run)
+    parsed = parser.parse_args()
+    generate_documentation(
+        parsed.template_file,
+        parsed.output_dir,
+        parsed.platform_version,
+        dry_run=parsed.dry_run,
+    )
