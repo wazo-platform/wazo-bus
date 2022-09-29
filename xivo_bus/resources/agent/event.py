@@ -7,6 +7,8 @@ from xivo_bus.resources.common.event import TenantEvent, MultiUserEvent
 
 
 class AgentCreatedEvent(TenantEvent):
+    """A new agent has been created"""
+
     service = 'confd'
     name = 'agent_created'
     routing_key_fmt = 'config.agent.created'
@@ -17,6 +19,8 @@ class AgentCreatedEvent(TenantEvent):
 
 
 class AgentDeletedEvent(TenantEvent):
+    """An agent has been deleted"""
+
     service = 'confd'
     name = 'agent_deleted'
     routing_key_fmt = 'config.agent.deleted'
@@ -27,6 +31,7 @@ class AgentDeletedEvent(TenantEvent):
 
 
 class AgentEditedEvent(TenantEvent):
+    """An agent has been edited"""
     service = 'confd'
     name = 'agent_edited'
     routing_key_fmt = 'config.agent.edited'
@@ -37,6 +42,8 @@ class AgentEditedEvent(TenantEvent):
 
 
 class AgentPausedEvent(MultiUserEvent):
+    """An agent was paused"""
+
     service = 'agentd'
     name = 'agent_paused'
     routing_key_fmt = 'status.agent.pause'
@@ -54,6 +61,8 @@ class AgentPausedEvent(MultiUserEvent):
 
 
 class AgentUnpausedEvent(MultiUserEvent):
+    """An agent was unpaused"""
+
     service = 'agentd'
     name = 'agent_unpaused'
     routing_key_fmt = 'status.agent.unpause'
@@ -71,6 +80,8 @@ class AgentUnpausedEvent(MultiUserEvent):
 
 
 class AgentStatusUpdatedEvent(MultiUserEvent):
+    """An agent status has changed"""
+
     service = 'calld'
     name = 'agent_status_update'
     routing_key_fmt = 'status.agent'
