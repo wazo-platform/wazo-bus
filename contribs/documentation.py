@@ -27,28 +27,38 @@ logger = logging.getLogger(__name__)
 
 class AsyncAPITypes:
     @staticmethod
-    def string():
-        return {'type': 'string'}
+    def string(*, many=False):
+        fmt = {'type': 'string'}
+        return AsyncAPITypes.array(fmt) if many else fmt
 
     @staticmethod
-    def boolean():
-        return {'type': 'boolean'}
+    def boolean(*, many=False):
+        fmt = {'type': 'boolean'}
+        return AsyncAPITypes.array(fmt) if many else fmt
 
     @staticmethod
-    def integer():
-        return {'type': 'integer'}
+    def integer(*, many=False):
+        fmt = {'type': 'integer'}
+        return AsyncAPITypes.array(fmt) if many else fmt
 
     @staticmethod
-    def float_():
-        return {'type': 'float'}
+    def float_(*, many=False):
+        fmt = {'type': 'float'}
+        return AsyncAPITypes.array(fmt) if many else fmt
 
     @staticmethod
-    def uuid():
-        return {'type': 'string', 'format': 'uuid'}
+    def uuid(*, many=False):
+        fmt = {'type': 'string', 'format': 'uuid'}
+        return AsyncAPITypes.array(fmt) if many else fmt
 
     @staticmethod
-    def datetime():
-        return {'type': 'string', 'format': 'date-time'}
+    def datetime(*, many=False):
+        fmt = {'type': 'string', 'format': 'date-time'}
+        return AsyncAPITypes.array(fmt) if many else fmt
+
+    @staticmethod
+    def array(type_):
+        return {'type': 'array', 'items': type_}
 
     @staticmethod
     def object_(dict_=None):
@@ -128,6 +138,8 @@ class Event:
         for key in content_keys:
             if key.endswith('uuid'):
                 content[key] = AsyncAPITypes.uuid()
+            elif key.endswith('uuids'):
+                content[key] = AsyncAPITypes.uuid(many=True)
             elif key.endswith(('id', 'number')):
                 content[key] = AsyncAPITypes.integer()
             elif key.startswith('is_'):
