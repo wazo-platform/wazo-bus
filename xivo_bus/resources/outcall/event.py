@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class OutcallCreatedEvent(TenantEvent):
+    service = 'confd'
     name = 'outcall_created'
     routing_key_fmt = 'config.outcalls.created'
 
@@ -16,6 +17,7 @@ class OutcallCreatedEvent(TenantEvent):
 
 
 class OutcallDeletedEvent(TenantEvent):
+    service = 'confd'
     name = 'outcall_deleted'
     routing_key_fmt = 'config.outcalls.deleted'
 
@@ -25,6 +27,7 @@ class OutcallDeletedEvent(TenantEvent):
 
 
 class OutcallEditedEvent(TenantEvent):
+    service = 'confd'
     name = 'outcall_edited'
     routing_key_fmt = 'config.outcalls.edited'
 

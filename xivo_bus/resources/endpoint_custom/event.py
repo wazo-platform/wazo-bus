@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class CustomEndpointCreatedEvent(TenantEvent):
+    service = 'confd'
     name = 'custom_endpoint_created'
     routing_key_fmt = 'config.custom_endpoint.created'
 
@@ -15,6 +16,7 @@ class CustomEndpointCreatedEvent(TenantEvent):
 
 
 class CustomEndpointDeletedEvent(TenantEvent):
+    service = 'confd'
     name = 'custom_endpoint_deleted'
     routing_key_fmt = 'config.custom_endpoint.deleted'
 
@@ -23,6 +25,7 @@ class CustomEndpointDeletedEvent(TenantEvent):
 
 
 class CustomEndpointEditedEvent(TenantEvent):
+    service = 'confd'
     name = 'custom_endpoint_edited'
     routing_key_fmt = 'config.custom_endpoint.edited'
 

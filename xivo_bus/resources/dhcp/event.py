@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import ServiceEvent
 
 
 class DHCPEditedEvent(ServiceEvent):
+    service = 'confd'
     name = 'dhcp_edited'
     routing_key_fmt = 'config.dhcp.edited'
 

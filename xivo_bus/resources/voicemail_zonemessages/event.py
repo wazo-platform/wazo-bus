@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import ServiceEvent
 
 
 class VoicemailZoneMessagesEditedEvent(ServiceEvent):
+    service = 'confd'
     name = 'voicemail_zonemessages_edited'
     routing_key_fmt = 'config.voicemail_zonemessages.edited'
 

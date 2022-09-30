@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class ScheduleCreatedEvent(TenantEvent):
+    service = 'confd'
     name = 'schedule_created'
     routing_key_fmt = 'config.schedules.created'
 
@@ -16,6 +17,7 @@ class ScheduleCreatedEvent(TenantEvent):
 
 
 class ScheduleDeletedEvent(TenantEvent):
+    service = 'confd'
     name = 'schedule_deleted'
     routing_key_fmt = 'config.schedules.deleted'
 
@@ -25,6 +27,7 @@ class ScheduleDeletedEvent(TenantEvent):
 
 
 class ScheduleEditedEvent(TenantEvent):
+    service = 'confd'
     name = 'schedule_edited'
     routing_key_fmt = 'config.schedules.edited'
 

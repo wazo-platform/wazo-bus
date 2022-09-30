@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import ServiceEvent
 
 
 class LiveReloadEditedEvent(ServiceEvent):
+    service = 'confd'
     name = 'live_reload_edited'
     routing_key_fmt = 'config.live_reload.edited'
 

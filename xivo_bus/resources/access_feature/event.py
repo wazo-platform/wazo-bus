@@ -8,6 +8,7 @@ from xivo_bus.resources.common.event import ServiceEvent
 
 
 class AccessFeatureCreatedEvent(ServiceEvent):
+    service = 'confd'
     name = 'access_feature_created'
     routing_key_fmt = 'config.access_feature.created'
 
@@ -16,6 +17,7 @@ class AccessFeatureCreatedEvent(ServiceEvent):
 
 
 class AccessFeatureDeletedEvent(ServiceEvent):
+    service = 'confd'
     name = 'access_feature_deleted'
     routing_key_fmt = 'config.access_feature.deleted'
 
@@ -24,6 +26,7 @@ class AccessFeatureDeletedEvent(ServiceEvent):
 
 
 class AccessFeatureEditedEvent(ServiceEvent):
+    service = 'confd'
     name = 'access_feature_edited'
     routing_key_fmt = 'config.access_feature.edited'
 

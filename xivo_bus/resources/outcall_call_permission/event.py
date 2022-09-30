@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class OutcallCallPermissionAssociatedEvent(TenantEvent):
+    service = 'confd'
     name = 'outcall_call_permission_associated'
     routing_key_fmt = 'config.outcalls.{outcall_id}.callpermissions.updated'
 
@@ -19,6 +20,7 @@ class OutcallCallPermissionAssociatedEvent(TenantEvent):
 
 
 class OutcallCallPermissionDissociatedEvent(TenantEvent):
+    service = 'confd'
     name = 'outcall_call_permission_dissociated'
     routing_key_fmt = 'config.outcalls.{outcall_id}.callpermissions.deleted'
 

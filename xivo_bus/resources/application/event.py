@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class ApplicationCreatedEvent(TenantEvent):
+    service = 'confd'
     name = 'application_created'
     routing_key_fmt = 'config.applications.created'
 
@@ -15,6 +16,7 @@ class ApplicationCreatedEvent(TenantEvent):
 
 
 class ApplicationDeletedEvent(TenantEvent):
+    service = 'confd'
     name = 'application_deleted'
     routing_key_fmt = 'config.applications.deleted'
 
@@ -23,6 +25,7 @@ class ApplicationDeletedEvent(TenantEvent):
 
 
 class ApplicationEditedEvent(TenantEvent):
+    service = 'confd'
     name = 'application_edited'
     routing_key_fmt = 'config.applications.edited'
 

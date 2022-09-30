@@ -32,15 +32,18 @@ class _BaseUserLineExtensionEvent(UserEvent):
 
 
 class UserLineExtensionCreatedEvent(_BaseUserLineExtensionEvent):
+    service = 'confd'
     name = 'user_line_extension_created'
     routing_key_fmt = 'config.users.lines.extensions.created'
 
 
 class UserLineExtensionDeletedEvent(_BaseUserLineExtensionEvent):
+    service = 'confd'
     name = 'user_line_extension_deleted'
     routing_key_fmt = 'config.users.lines.extensions.deleted'
 
 
 class UserLineExtensionEditedEvent(_BaseUserLineExtensionEvent):
+    service = 'confd'
     name = 'user_line_extension_edited'
     routing_key_fmt = 'config.users.lines.extensions.edited'

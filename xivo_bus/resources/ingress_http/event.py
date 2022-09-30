@@ -6,6 +6,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class IngressHTTPCreatedEvent(TenantEvent):
+    service = 'confd'
     name = 'ingress_http_created'
     routing_key_fmt = 'config.ingresses.http.created'
 
@@ -14,6 +15,7 @@ class IngressHTTPCreatedEvent(TenantEvent):
 
 
 class IngressHTTPDeletedEvent(TenantEvent):
+    service = 'confd'
     name = 'ingress_http_deleted'
     routing_key_fmt = 'config.ingresses.http.deleted'
 
@@ -22,6 +24,7 @@ class IngressHTTPDeletedEvent(TenantEvent):
 
 
 class IngressHTTPEditedEvent(TenantEvent):
+    service = 'confd'
     name = 'ingress_http_edited'
     routing_key_fmt = 'config.ingresses.http.edited'
 

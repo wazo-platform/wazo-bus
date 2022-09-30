@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import ServiceEvent
 
 
 class ExtensionFeatureEditedEvent(ServiceEvent):
+    service = 'confd'
     name = 'extension_feature_edited'
     routing_key_fmt = 'config.extension_feature.edited'
 

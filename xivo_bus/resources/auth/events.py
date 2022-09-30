@@ -6,6 +6,7 @@ from xivo_bus.resources.common.event import TenantEvent, UserEvent
 
 
 class TenantCreatedEvent(TenantEvent):
+    service = 'auth'
     name = 'auth_tenant_added'
     routing_key_fmt = 'auth.tenants.{tenant_uuid}.created'
 
@@ -14,6 +15,7 @@ class TenantCreatedEvent(TenantEvent):
 
 
 class TenantUpdatedEvent(TenantEvent):
+    service = 'auth'
     name = 'auth_tenant_updated'
     routing_key_fmt = 'auth.tenants.{tenant_uuid}.updated'
 
@@ -23,6 +25,7 @@ class TenantUpdatedEvent(TenantEvent):
 
 
 class TenantDeletedEvent(TenantEvent):
+    service = 'auth'
     name = 'auth_tenant_deleted'
     routing_key_fmt = 'auth.tenants.{tenant_uuid}.deleted'
 
@@ -32,6 +35,7 @@ class TenantDeletedEvent(TenantEvent):
 
 
 class UserExternalAuthAddedEvent(UserEvent):
+    service = 'auth'
     name = 'auth_user_external_auth_added'
     routing_key_fmt = 'auth.users.{user_uuid}.external.{external_auth_name}.created'
 
@@ -41,6 +45,7 @@ class UserExternalAuthAddedEvent(UserEvent):
 
 
 class UserExternalAuthAuthorizedEvent(UserEvent):
+    service = 'auth'
     name = 'auth_user_external_auth_authorized'
     routing_key_fmt = 'auth.users.{user_uuid}.external.{external_auth_name}.authorized'
 
@@ -52,6 +57,7 @@ class UserExternalAuthAuthorizedEvent(UserEvent):
 
 
 class UserExternalAuthDeletedEvent(UserEvent):
+    service = 'auth'
     name = 'auth_user_external_auth_deleted'
     routing_key_fmt = 'auth.users.{user_uuid}.external.{external_auth_name}.deleted'
 
@@ -61,6 +67,7 @@ class UserExternalAuthDeletedEvent(UserEvent):
 
 
 class RefreshTokenCreatedEvent(UserEvent):
+    service = 'auth'
     name = 'auth_refresh_token_created'
     routing_key_fmt = 'auth.users.{user_uuid}.tokens.{client_id}.created'
 
@@ -75,6 +82,7 @@ class RefreshTokenCreatedEvent(UserEvent):
 
 
 class RefreshTokenDeletedEvent(UserEvent):
+    service = 'auth'
     name = 'auth_refresh_token_deleted'
     routing_key_fmt = 'auth.users.{user_uuid}.tokens.{client_id}.deleted'
 
@@ -89,6 +97,7 @@ class RefreshTokenDeletedEvent(UserEvent):
 
 
 class SessionCreatedEvent(UserEvent):
+    service = 'auth'
     name = 'auth_session_created'
     routing_key_fmt = 'auth.sessions.{session_uuid}.created'
 
@@ -104,6 +113,7 @@ class SessionCreatedEvent(UserEvent):
 
 
 class SessionDeletedEvent(UserEvent):
+    service = 'auth'
     name = 'auth_session_deleted'
     routing_key_fmt = 'auth.sessions.{session_uuid}.deleted'
 
@@ -118,6 +128,7 @@ class SessionDeletedEvent(UserEvent):
 
 
 class SessionExpireSoonEvent(UserEvent):
+    service = 'auth'
     name = 'auth_session_expire_soon'
     routing_key_fmt = 'auth.users.{user_uuid}.sessions.{session_uuid}.expire_soon'
 

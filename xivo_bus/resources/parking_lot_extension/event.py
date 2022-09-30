@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class ParkingLotExtensionAssociatedEvent(TenantEvent):
+    service = 'confd'
     name = 'parking_lot_extension_associated'
     routing_key_fmt = 'config.parkinglots.extensions.updated'
 
@@ -19,6 +20,7 @@ class ParkingLotExtensionAssociatedEvent(TenantEvent):
 
 
 class ParkingLotExtensionDissociatedEvent(TenantEvent):
+    service = 'confd'
     name = 'parking_lot_extension_dissociated'
     routing_key_fmt = 'config.parkinglots.extensions.deleted'
 

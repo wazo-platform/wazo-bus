@@ -6,6 +6,7 @@ from xivo_bus.resources.common.event import UserEvent
 
 
 class FavoriteAddedEvent(UserEvent):
+    service = 'dird'
     name = 'favorite_added'
     routing_key_fmt = 'directory.{user_uuid}.favorite.created'
 
@@ -20,6 +21,7 @@ class FavoriteAddedEvent(UserEvent):
 
 
 class FavoriteDeletedEvent(UserEvent):
+    service = 'dird'
     name = 'favorite_deleted'
     routing_key_fmt = 'directory.{user_uuid}.favorite.deleted'
 

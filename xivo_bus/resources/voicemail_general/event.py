@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import ServiceEvent
 
 
 class VoicemailGeneralEditedEvent(ServiceEvent):
+    service = 'confd'
     name = 'voicemail_general_edited'
     routing_key_fmt = 'config.voicemail_general.edited'
 

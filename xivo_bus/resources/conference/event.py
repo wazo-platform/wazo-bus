@@ -15,6 +15,7 @@ class _ConferenceMixin(object):
 
 
 class ConferenceCreatedEvent(_ConferenceMixin, TenantEvent):
+    service = 'confd'
     name = 'conference_created'
     routing_key_fmt = 'config.conferences.created'
 
@@ -26,6 +27,7 @@ class ConferenceCreatedEvent(_ConferenceMixin, TenantEvent):
 
 
 class ConferenceDeletedEvent(_ConferenceMixin, TenantEvent):
+    service = 'confd'
     name = 'conference_deleted'
     routing_key_fmt = 'config.conferences.deleted'
 
@@ -37,6 +39,7 @@ class ConferenceDeletedEvent(_ConferenceMixin, TenantEvent):
 
 
 class ConferenceEditedEvent(_ConferenceMixin, TenantEvent):
+    service = 'confd'
     name = 'conference_edited'
     routing_key_fmt = 'config.conferences.edited'
 
@@ -46,6 +49,7 @@ class ConferenceEditedEvent(_ConferenceMixin, TenantEvent):
 
 
 class ConferenceRecordStartedEvent(_ConferenceMixin, TenantEvent):
+    service = 'calld'
     name = 'conference_record_started'
     routing_key_fmt = 'conferences.{id}.record'
 
@@ -57,6 +61,7 @@ class ConferenceRecordStartedEvent(_ConferenceMixin, TenantEvent):
 
 
 class ConferenceRecordStoppedEvent(_ConferenceMixin, TenantEvent):
+    service = 'calld'
     name = 'conference_record_stopped'
     routing_key_fmt = 'conferences.{id}.record'
 
@@ -68,6 +73,7 @@ class ConferenceRecordStoppedEvent(_ConferenceMixin, TenantEvent):
 
 
 class ConferenceParticipantJoinedEvent(_ConferenceMixin, MultiUserEvent):
+    service = 'calld'
     name = 'conference_participant_joined'
     routing_key_fmt = 'conferences.{conference_id}.participants.joined'
 
@@ -79,6 +85,7 @@ class ConferenceParticipantJoinedEvent(_ConferenceMixin, MultiUserEvent):
 
 
 class ConferenceParticipantLeftEvent(_ConferenceMixin, MultiUserEvent):
+    service = 'calld'
     name = 'conference_participant_left'
     routing_key_fmt = 'conferences.{conference_id}.participants.left'
 
@@ -90,6 +97,7 @@ class ConferenceParticipantLeftEvent(_ConferenceMixin, MultiUserEvent):
 
 
 class ConferenceParticipantMutedEvent(_ConferenceMixin, TenantEvent):
+    service = 'calld'
     name = 'conference_participant_muted'
     routing_key_fmt = 'conferences.{conference_id}.participants.mute'
 
@@ -101,6 +109,7 @@ class ConferenceParticipantMutedEvent(_ConferenceMixin, TenantEvent):
 
 
 class ConferenceParticipantUnmutedEvent(_ConferenceMixin, TenantEvent):
+    service = 'calld'
     name = 'conference_participant_unmuted'
     routing_key_fmt = 'conferences.{conference_id}.particpants.mute'
 
@@ -112,6 +121,7 @@ class ConferenceParticipantUnmutedEvent(_ConferenceMixin, TenantEvent):
 
 
 class ConferenceParticipantTalkStartedEvent(_ConferenceMixin, MultiUserEvent):
+    service = 'calld'
     name = 'conference_participant_talk_started'
     routing_key_fmt = 'conferences.{conference_id}.participants.talk'
 
@@ -123,6 +133,7 @@ class ConferenceParticipantTalkStartedEvent(_ConferenceMixin, MultiUserEvent):
 
 
 class ConferenceParticipantTalkStoppedEvent(_ConferenceMixin, MultiUserEvent):
+    service = 'calld'
     name = 'conference_participant_talk_stopped'
     routing_key_fmt = 'conferences.{conference_id}.participants.talk'
 
@@ -134,6 +145,7 @@ class ConferenceParticipantTalkStoppedEvent(_ConferenceMixin, MultiUserEvent):
 
 
 class ConferenceUserParticipantJoinedEvent(_ConferenceMixin, UserEvent):
+    service = 'calld'
     name = 'conference_user_participant_joined'
     routing_key_fmt = 'conferences.users.{user_uuid}.participants.joined'
 
@@ -145,6 +157,7 @@ class ConferenceUserParticipantJoinedEvent(_ConferenceMixin, UserEvent):
 
 
 class ConferenceUserParticipantLeftEvent(_ConferenceMixin, UserEvent):
+    service = 'calld'
     name = 'conference_user_participant_left'
     routing_key_fmt = 'conferences.users.{user_uuid}.participants.left'
 
@@ -156,6 +169,7 @@ class ConferenceUserParticipantLeftEvent(_ConferenceMixin, UserEvent):
 
 
 class ConferenceUserParticipantTalkStartedEvent(_ConferenceMixin, UserEvent):
+    service = 'calld'
     name = 'conference_user_participant_talk_started'
     routing_key_fmt = 'conferences.users.{user_uuid}.participants.talk'
 
@@ -167,6 +181,7 @@ class ConferenceUserParticipantTalkStartedEvent(_ConferenceMixin, UserEvent):
 
 
 class ConferenceUserParticipantTalkStoppedEvent(_ConferenceMixin, UserEvent):
+    service = 'calld'
     name = 'conference_user_participant_talk_stopped'
     routing_key_fmt = 'conferences.users.{user_uuid}.participants.talk'
 

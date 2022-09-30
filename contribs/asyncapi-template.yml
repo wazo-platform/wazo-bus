@@ -1,0 +1,40 @@
+asyncapi: 2.0.0
+info:
+  title: WAZO Events API
+  version: unspecified
+servers:
+  production:
+    url: amqp://{username}:{password}@/localhost:{port}//
+    description: Local RabbitMQ messaging server for inter-service communication
+    protocol: amqp
+    protocolVersion: 0.9.1
+    variables:
+      username:
+        default: guest
+        description: Configurable through each service's config.yml file
+      password:
+        default: guest
+        description: Configurable through each service's config.yml file
+      port:
+        default: '5672'
+        description: Configurable through each service's config.yml file
+defaultContentType: application/json
+channels: {}
+components:
+  schemas:
+    origin_uuid:
+      type: string
+      format: uuid
+      description: Unique identifier of the publishing WAZO service
+    timestamp:
+      type: string
+      format: date-time
+      description: Date and time this event was published
+    tenant_uuid:
+      type: string
+      format: uuid
+      description: Unique identifier of this resource's tenant
+    user_uuid:{uuid}:
+      type: boolean
+      description: User's unique identifier that this event is intended for.
+        The format user_uuid:{uuid} allows multiple users to be the recipient of this event

@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import ServiceEvent
 
 
 class RTPGeneralEditedEvent(ServiceEvent):
+    service = 'confd'
     name = 'rtp_general_edited'
     routing_key_fmt = 'config.rtp_general.edited'
 
@@ -15,6 +16,7 @@ class RTPGeneralEditedEvent(ServiceEvent):
 
 
 class RTPIceHostCandidatesEditedEvent(ServiceEvent):
+    service = 'confd'
     name = 'rtp_ice_host_candidates_edited'
     routing_key_fmt = 'config.rtp_ice_host_candidates.edited'
 

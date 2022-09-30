@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class GroupCreatedEvent(TenantEvent):
+    service = 'confd'
     name = 'group_created'
     routing_key_fmt = 'config.groups.created'
 
@@ -15,6 +16,7 @@ class GroupCreatedEvent(TenantEvent):
 
 
 class GroupDeletedEvent(TenantEvent):
+    service = 'confd'
     name = 'group_deleted'
     routing_key_fmt = 'config.groups.deleted'
 
@@ -23,6 +25,7 @@ class GroupDeletedEvent(TenantEvent):
 
 
 class GroupEditedEvent(TenantEvent):
+    service = 'confd'
     name = 'group_edited'
     routing_key_fmt = 'config.groups.edited'
 
@@ -31,6 +34,7 @@ class GroupEditedEvent(TenantEvent):
 
 
 class GroupFallbackEditedEvent(TenantEvent):
+    service = 'confd'
     name = 'group_fallback_edited'
     routing_key_fmt = 'config.groups.fallbacks.edited'
 

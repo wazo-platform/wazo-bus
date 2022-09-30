@@ -8,6 +8,7 @@ from xivo_bus.resources.common.event import UserEvent
 class AdhocConferenceCreatedEvent(UserEvent):
     name = 'conference_adhoc_created'
     routing_key_fmt = 'conferences.users.{user_uuid}.adhoc.created'
+    service = 'calld'
 
     def __init__(self, conference_id, tenant_uuid, user_uuid):
         content = {'conference_id': conference_id}
@@ -19,6 +20,7 @@ class AdhocConferenceCreatedEvent(UserEvent):
 class AdhocConferenceDeletedEvent(UserEvent):
     name = 'conference_adhoc_deleted'
     routing_key_fmt = 'conferences.users.{user_uuid}.adhoc.deleted'
+    service = 'calld'
 
     def __init__(self, conference_id, tenant_uuid, user_uuid):
         content = {'conference_id': conference_id}
@@ -30,6 +32,7 @@ class AdhocConferenceDeletedEvent(UserEvent):
 class AdhocConferenceParticipantJoinedEvent(UserEvent):
     name = 'conference_adhoc_participant_joined'
     routing_key_fmt = 'conferences.users.{user_uuid}.adhoc.participants.joined'
+    service = 'calld'
 
     def __init__(self, conference_id, call_id, tenant_uuid, user_uuid):
         content = {'conference_id': conference_id, 'call_id': call_id}
@@ -41,6 +44,7 @@ class AdhocConferenceParticipantJoinedEvent(UserEvent):
 class AdhocConferenceParticipantLeftEvent(UserEvent):
     name = 'conference_adhoc_participant_left'
     routing_key_fmt = 'conferences.users.{user_uuid}.adhoc.participants.left'
+    service = 'calld'
 
     def __init__(self, conference_id, call_id, tenant_uuid, user_uuid):
         content = {'conference_id': conference_id, 'call_id': call_id}

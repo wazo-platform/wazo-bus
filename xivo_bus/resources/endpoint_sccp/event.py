@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class SCCPEndpointCreatedEvent(TenantEvent):
+    service = 'confd'
     name = 'sccp_endpoint_created'
     routing_key_fmt = 'config.sccp_endpoint.created'
 
@@ -15,6 +16,7 @@ class SCCPEndpointCreatedEvent(TenantEvent):
 
 
 class SCCPEndpointDeletedEvent(TenantEvent):
+    service = 'confd'
     name = 'sccp_endpoint_deleted'
     routing_key_fmt = 'config.sccp_endpoint.deleted'
 
@@ -23,6 +25,7 @@ class SCCPEndpointDeletedEvent(TenantEvent):
 
 
 class SCCPEndpointEditedEvent(TenantEvent):
+    service = 'confd'
     name = 'sccp_endpoint_edited'
     routing_key_fmt = 'config.sccp_endpoint.edited'
 

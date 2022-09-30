@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class SIPEndpointCreatedEvent(TenantEvent):
+    service = 'confd'
     name = 'sip_endpoint_created'
     routing_key_fmt = 'config.sip_endpoint.created'
 
@@ -15,6 +16,7 @@ class SIPEndpointCreatedEvent(TenantEvent):
 
 
 class SIPEndpointDeletedEvent(TenantEvent):
+    service = 'confd'
     name = 'sip_endpoint_deleted'
     routing_key_fmt = 'config.sip_endpoint.deleted'
 
@@ -23,6 +25,7 @@ class SIPEndpointDeletedEvent(TenantEvent):
 
 
 class SIPEndpointEditedEvent(TenantEvent):
+    service = 'confd'
     name = 'sip_endpoint_edited'
     routing_key_fmt = 'config.sip_endpoint.edited'
 
@@ -31,6 +34,7 @@ class SIPEndpointEditedEvent(TenantEvent):
 
 
 class SIPEndpointTemplateCreatedEvent(TenantEvent):
+    service = 'confd'
     name = 'sip_endpoint_template_created'
     routing_key_fmt = 'config.sip_endpoint_template.created'
 
@@ -39,6 +43,7 @@ class SIPEndpointTemplateCreatedEvent(TenantEvent):
 
 
 class SIPEndpointTemplateDeletedEvent(TenantEvent):
+    service = 'confd'
     name = 'sip_endpoint_template_deleted'
     routing_key_fmt = 'config.sip_endpoint_template.deleted'
 
@@ -47,6 +52,7 @@ class SIPEndpointTemplateDeletedEvent(TenantEvent):
 
 
 class SIPEndpointTemplateEditedEvent(TenantEvent):
+    service = 'confd'
     name = 'sip_endpoint_template_edited'
     routing_key_fmt = 'config.sip_endpoint_template.edited'
 

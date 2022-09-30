@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class CallPickupCreatedEvent(TenantEvent):
+    service = 'confd'
     name = 'call_pickup_created'
     routing_key_fmt = 'config.callpickup.created'
 
@@ -16,6 +17,7 @@ class CallPickupCreatedEvent(TenantEvent):
 
 
 class CallPickupDeletedEvent(TenantEvent):
+    service = 'confd'
     name = 'call_pickup_deleted'
     routing_key_fmt = 'config.callpickup.deleted'
 
@@ -25,6 +27,7 @@ class CallPickupDeletedEvent(TenantEvent):
 
 
 class CallPickupEditedEvent(TenantEvent):
+    service = 'confd'
     name = 'call_pickup_edited'
     routing_key_fmt = 'config.callpickup.edited'
 

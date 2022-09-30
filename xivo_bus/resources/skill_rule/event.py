@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class SkillRuleCreatedEvent(TenantEvent):
+    service = 'confd'
     name = 'skill_rule_created'
     routing_key_fmt = 'config.queues.skillrules.created'
 
@@ -16,6 +17,7 @@ class SkillRuleCreatedEvent(TenantEvent):
 
 
 class SkillRuleDeletedEvent(TenantEvent):
+    service = 'confd'
     name = 'skill_rule_deleted'
     routing_key_fmt = 'config.queues.skillrules.deleted'
 
@@ -25,6 +27,7 @@ class SkillRuleDeletedEvent(TenantEvent):
 
 
 class SkillRuleEditedEvent(TenantEvent):
+    service = 'confd'
     name = 'skill_rule_edited'
     routing_key_fmt = 'config.queues.skillrules.edited'
 

@@ -6,6 +6,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class CallLogExportCreatedEvent(TenantEvent):
+    service = 'call_logd'
     name = 'call_logd_export_created'
     routing_key_fmt = 'call_logd.export.created'
 
@@ -14,6 +15,7 @@ class CallLogExportCreatedEvent(TenantEvent):
 
 
 class CallLogExportUpdatedEvent(TenantEvent):
+    service = 'call_logd'
     name = 'call_logd_export_updated'
     routing_key_fmt = 'call_logd.export.updated'
 
@@ -22,6 +24,7 @@ class CallLogExportUpdatedEvent(TenantEvent):
 
 
 class CallLogRetentionUpdatedEvent(TenantEvent):
+    service = 'call_logd'
     name = 'call_logd_retention_updated'
     routing_key_fmt = 'call_logd.retention.updated'
 

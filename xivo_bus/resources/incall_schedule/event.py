@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class IncallScheduleAssociatedEvent(TenantEvent):
+    service = 'confd'
     name = 'incall_schedule_associated'
     routing_key_fmt = 'config.incalls.schedules.updated'
 
@@ -19,6 +20,7 @@ class IncallScheduleAssociatedEvent(TenantEvent):
 
 
 class IncallScheduleDissociatedEvent(TenantEvent):
+    service = 'confd'
     name = 'incall_schedule_dissociated'
     routing_key_fmt = 'config.incalls.schedules.deleted'
 

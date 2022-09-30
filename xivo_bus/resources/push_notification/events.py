@@ -5,6 +5,7 @@ from xivo_bus.resources.common.event import UserEvent
 
 
 class CallPushNotificationEvent(UserEvent):
+    service = 'calld'
     name = 'call_push_notification'
     routing_key_fmt = 'calls.call.push_notification'
     required_acl_fmt = 'events.calls.{user_uuid}'
@@ -16,6 +17,7 @@ class CallPushNotificationEvent(UserEvent):
 
 
 class CallCancelPushNotificationEvent(UserEvent):
+    service = 'calld'
     name = 'call_cancel_push_notification'
     routing_key_fmt = 'calls.call.cancel_push_notification'
     required_acl_fmt = 'events.calls.{user_uuid}'

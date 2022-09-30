@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class GroupMemberUsersAssociatedEvent(TenantEvent):
+    service = 'confd'
     name = 'group_member_users_associated'
     routing_key_fmt = 'config.groups.members.users.updated'
 
@@ -20,6 +21,7 @@ class GroupMemberUsersAssociatedEvent(TenantEvent):
 
 
 class GroupMemberExtensionsAssociatedEvent(TenantEvent):
+    service = 'confd'
     name = 'group_member_extensions_associated'
     routing_key_fmt = 'config.groups.members.extensions.updated'
 

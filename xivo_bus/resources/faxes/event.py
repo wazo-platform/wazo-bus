@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent, UserEvent
 
 
 class FaxOutboundCreatedEvent(TenantEvent):
+    service = 'calld'
     name = 'fax_outbound_created'
     routing_key_fmt = 'faxes.outbound.created'
 
@@ -15,6 +16,7 @@ class FaxOutboundCreatedEvent(TenantEvent):
 
 
 class FaxOutboundSucceededEvent(TenantEvent):
+    service = 'calld'
     name = 'fax_outbound_succeeded'
     routing_key_fmt = 'faxes.outbound.{id}.succeeded'
 
@@ -23,6 +25,7 @@ class FaxOutboundSucceededEvent(TenantEvent):
 
 
 class FaxOutboundFailedEvent(TenantEvent):
+    service = 'calld'
     name = 'fax_outbound_failed'
     routing_key_fmt = 'faxes.outbound.{id}.failed'
 
@@ -31,6 +34,7 @@ class FaxOutboundFailedEvent(TenantEvent):
 
 
 class FaxOutboundUserCreatedEvent(UserEvent):
+    service = 'calld'
     name = 'fax_outbound_user_created'
     routing_key_fmt = 'faxes.outbound.users.{user_uuid}.created'
 
@@ -41,6 +45,7 @@ class FaxOutboundUserCreatedEvent(UserEvent):
 
 
 class FaxOutboundUserSucceededEvent(UserEvent):
+    service = 'calld'
     name = 'fax_outbound_user_succeeded'
     routing_key_fmt = 'faxes.outbound.users.{user_uuid}.succeeded'
 
@@ -51,6 +56,7 @@ class FaxOutboundUserSucceededEvent(UserEvent):
 
 
 class FaxOutboundUserFailedEvent(UserEvent):
+    service = 'calld'
     name = 'fax_outbound_user_failed'
     routing_key_fmt = 'faxes.outbound.users.{user_uuid}.failed'
 

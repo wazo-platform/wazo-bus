@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import UserEvent
 
 
 class UserGroupsAssociatedEvent(UserEvent):
+    service = 'confd'
     name = 'user_groups_associated'
     routing_key_fmt = 'config.users.groups.updated'
 

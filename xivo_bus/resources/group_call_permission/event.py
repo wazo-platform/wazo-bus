@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class GroupCallPermissionAssociatedEvent(TenantEvent):
+    service = 'confd'
     name = 'group_call_permission_associated'
     routing_key_fmt = 'config.groups.{group_uuid}.callpermissions.updated'
 
@@ -20,6 +21,7 @@ class GroupCallPermissionAssociatedEvent(TenantEvent):
 
 
 class GroupCallPermissionDissociatedEvent(TenantEvent):
+    service = 'confd'
     name = 'group_call_permission_dissociated'
     routing_key_fmt = 'config.groups.{group_uuid}.callpermissions.deleted'
 

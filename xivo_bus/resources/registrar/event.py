@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import ServiceEvent
 
 
 class RegistrarCreatedEvent(ServiceEvent):
+    service = 'confd'
     name = 'registrar_created'
     routing_key_fmt = 'config.registrar.created'
 
@@ -15,6 +16,7 @@ class RegistrarCreatedEvent(ServiceEvent):
 
 
 class RegistrarDeletedEvent(ServiceEvent):
+    service = 'confd'
     name = 'registrar_deleted'
     routing_key_fmt = 'config.registrar.deleted'
 
@@ -23,6 +25,7 @@ class RegistrarDeletedEvent(ServiceEvent):
 
 
 class RegistrarEditedEvent(ServiceEvent):
+    service = 'confd'
     name = 'registrar_edited'
     routing_key_fmt = 'config.registrar.edited'
 

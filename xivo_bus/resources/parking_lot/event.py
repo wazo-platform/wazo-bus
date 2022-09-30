@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class ParkingLotCreatedEvent(TenantEvent):
+    service = 'confd'
     name = 'parking_lot_created'
     routing_key_fmt = 'config.parkinglots.created'
 
@@ -16,6 +17,7 @@ class ParkingLotCreatedEvent(TenantEvent):
 
 
 class ParkingLotDeletedEvent(TenantEvent):
+    service = 'confd'
     name = 'parking_lot_deleted'
     routing_key_fmt = 'config.parkinglots.deleted'
 
@@ -25,6 +27,7 @@ class ParkingLotDeletedEvent(TenantEvent):
 
 
 class ParkingLotEditedEvent(TenantEvent):
+    service = 'confd'
     name = 'parking_lot_edited'
     routing_key_fmt = 'config.parkinglots.edited'
 

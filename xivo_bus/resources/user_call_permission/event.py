@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import UserEvent
 
 
 class UserCallPermissionAssociatedEvent(UserEvent):
+    service = 'confd'
     name = 'user_call_permission_associated'
     routing_key_fmt = 'config.users.{user_uuid}.callpermissions.updated'
 
@@ -21,6 +22,7 @@ class UserCallPermissionAssociatedEvent(UserEvent):
 
 
 class UserCallPermissionDissociatedEvent(UserEvent):
+    service = 'confd'
     name = 'user_call_permission_dissociated'
     routing_key_fmt = 'config.users.{user_uuid}.callpermissions.deleted'
 

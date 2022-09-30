@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import UserEvent
 
 
 class UserScheduleAssociatedEvent(UserEvent):
+    service = 'confd'
     name = 'user_schedule_associated'
     routing_key_fmt = 'config.users.schedules.updated'
 
@@ -21,6 +22,7 @@ class UserScheduleAssociatedEvent(UserEvent):
 
 
 class UserScheduleDissociatedEvent(UserEvent):
+    service = 'confd'
     name = 'user_schedule_dissociated'
     routing_key_fmt = 'config.users.schedules.deleted'
 

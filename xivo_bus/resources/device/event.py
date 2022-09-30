@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class DeviceCreatedEvent(TenantEvent):
+    service = 'confd'
     name = 'device_created'
     routing_key_fmt = 'config.device.created'
 
@@ -16,6 +17,7 @@ class DeviceCreatedEvent(TenantEvent):
 
 
 class DeviceDeletedEvent(TenantEvent):
+    service = 'confd'
     name = 'device_deleted'
     routing_key_fmt = 'config.device.deleted'
 
@@ -25,6 +27,7 @@ class DeviceDeletedEvent(TenantEvent):
 
 
 class DeviceEditedEvent(TenantEvent):
+    service = 'confd'
     name = 'device_edited'
     routing_key_fmt = 'config.device.edited'
 

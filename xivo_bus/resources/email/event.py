@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import ServiceEvent
 
 
 class EmailConfigUpdatedEvent(ServiceEvent):
+    service = 'confd'
     name = 'email_config_updated'
     routing_key_fmt = 'config.email.updated'
 

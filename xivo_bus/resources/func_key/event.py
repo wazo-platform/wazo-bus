@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class FuncKeyTemplateCreatedEvent(TenantEvent):
+    service = 'confd'
     name = 'func_key_template_created'
     routing_key_fmt = 'config.funckey.template.created'
 
@@ -16,6 +17,7 @@ class FuncKeyTemplateCreatedEvent(TenantEvent):
 
 
 class FuncKeyTemplateDeletedEvent(TenantEvent):
+    service = 'confd'
     name = 'func_key_template_deleted'
     routing_key_fmt = 'config.funckey.template.deleted'
 
@@ -25,6 +27,7 @@ class FuncKeyTemplateDeletedEvent(TenantEvent):
 
 
 class FuncKeyTemplateEditedEvent(TenantEvent):
+    service = 'confd'
     name = 'func_key_template_edited'
     routing_key_fmt = 'config.funckey.template.edited'
 

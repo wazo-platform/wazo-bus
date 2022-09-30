@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class OutcallTrunksAssociatedEvent(TenantEvent):
+    service = 'confd'
     name = 'outcall_trunks_associated'
     routing_key_fmt = 'config.outcalls.trunks.updated'
 

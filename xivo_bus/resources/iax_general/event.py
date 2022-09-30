@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import ServiceEvent
 
 
 class IAXGeneralEditedEvent(ServiceEvent):
+    service = 'confd'
     name = 'iax_general_edited'
     routing_key_fmt = 'config.iax_general.edited'
 

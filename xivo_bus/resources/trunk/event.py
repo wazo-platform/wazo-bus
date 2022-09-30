@@ -7,6 +7,7 @@ from xivo_bus.resources.common.event import TenantEvent
 
 
 class TrunkCreatedEvent(TenantEvent):
+    service = 'confd'
     name = 'trunk_created'
     routing_key_fmt = 'config.trunk.created'
 
@@ -16,6 +17,7 @@ class TrunkCreatedEvent(TenantEvent):
 
 
 class TrunkDeletedEvent(TenantEvent):
+    service = 'confd'
     name = 'trunk_deleted'
     routing_key_fmt = 'config.trunk.deleted'
 
@@ -25,6 +27,7 @@ class TrunkDeletedEvent(TenantEvent):
 
 
 class TrunkEditedEvent(TenantEvent):
+    service = 'confd'
     name = 'trunk_edited'
     routing_key_fmt = 'config.trunk.edited'
 
@@ -34,6 +37,7 @@ class TrunkEditedEvent(TenantEvent):
 
 
 class TrunkStatusUpdatedEvent(TenantEvent):
+    service = 'calld'
     name = 'trunk_status_updated'
     routing_key_fmt = 'trunks.{id}.status.updated'
 
