@@ -35,3 +35,17 @@ class UserRoomMessageCreatedEvent(UserEvent):
         if room_uuid is None:
             raise ValueError('room_uuid must have a value')
         self.room_uuid = str(room_uuid)
+
+
+class UserRoomActivityEvent(UserEvent):
+    service = 'chatd'
+    name = 'chatd_user_room_activity_created'
+    routing_key_fmt = 'chatd.users.{user_uuid}.rooms.{room_uuid}.activities.created'
+
+    def __init__(self, activity, room_uuid, tenant_uuid, user_uuid):
+        super(UserRoomActivityEvent, self).__init__(
+            activity, tenant_uuid, user_uuid
+        )
+        if room_uuid is None:
+            raise ValueError('room_uuid must have a value')
+        self.room_uuid = str(room_uuid)
