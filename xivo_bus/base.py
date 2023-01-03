@@ -1,4 +1,4 @@
-# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -11,7 +11,7 @@ from kombu.utils.url import as_url
 ConnectionParams = namedtuple('ConnectionParams', 'user, password, host, port')
 
 
-class Base(object):
+class Base:
     '''Base class for publishers/consumers (to be extended by mixins)'''
 
     def __init__(
