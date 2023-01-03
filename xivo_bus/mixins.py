@@ -1,4 +1,4 @@
-# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import os
@@ -7,18 +7,18 @@ from amqp.exceptions import NotFound
 from contextlib import contextmanager
 from collections import defaultdict, namedtuple
 from datetime import datetime
-from kombu import binding as Binding, Connection, Exchange, Producer, Queue
+from kombu import binding as Binding, Connection, Exchange, Producer, Queue as AMQPQueue
 from kombu.exceptions import OperationalError
 from kombu.mixins import ConsumerMixin as KombuConsumer
-from six.moves.queue import Empty, Queue as FifoQueue
-from threading import Event, Lock, Thread
+from queue import Empty, Queue
+from threading import Event, Lock, Thread, main_thread, current_thread
 
 
 BusThread = namedtuple('BusThread', ['thread', 'on_stop', 'ready_flag'])
 Subscription = namedtuple('Subscription', ['handler', 'binding'])
 
 
-class ThreadableMixin(object):
+class ThreadableMixin:
     '''
     Mixin to provide methods for easy thread creation/management
 
@@ -58,11 +58,11 @@ class ThreadableMixin(object):
 
     def __enter__(self):
         self.start()
-        return super(ThreadableMixin, self).__enter__()
+        return super().__enter__()
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.stop()
-        super(ThreadableMixin, self).__exit__(exc_type, exc_value, traceback)
+        super().__exit__(exc_type, exc_value, traceback)
 
     def _register_thread(self, name, run, on_stop=None, **kwargs):
         if not callable(run):
@@ -143,7 +143,7 @@ class ConsumerMixin(KombuConsumer):
         self.__connection = Connection(self.url)
         self.__exchange = exchange if subscribe else self._default_exchange
         self.__subscriptions = defaultdict(list)
-        self.__queue = Queue(name=name, auto_delete=True, durable=False)
+        self.__queue = AMQPQueue(name=name, auto_delete=True, durable=False)
         self.__lock = Lock()
         self.__thread = None
         if hasattr(self, '_register_thread'):
@@ -294,9 +294,9 @@ class ConsumerMixin(KombuConsumer):
             interval,
         )
         if self.should_stop:
-            # Workaround to force kill the threaded consumer when a stop has been issued
-            # instead of looping forever to reestablish the connection
-            raise SystemExit
+            if current_thread() != main_thread():
+                raise SystemExit
+            self.connection.release()
 
     def create_connection(self):
         self.connection = self.__connection.clone()
@@ -318,7 +318,7 @@ class ConsumerMixin(KombuConsumer):
         self.__connection.release()
 
 
-class PublisherMixin(object):
+class PublisherMixin:
     '''
     Mixin providing RabbitMQ message publishing capabilities
 
@@ -394,7 +394,7 @@ class QueuePublisherMixin(PublisherMixin):
         retry_policy = self.queue_publisher_args
         super(QueuePublisherMixin, self).__init__(**kwargs)
         self.__flushing = False
-        self.__fifo = FifoQueue()
+        self.__fifo = Queue()
         self.__connection = Connection(self.url, transport_options=retry_policy)
         self.__thread = None
 
@@ -437,7 +437,7 @@ class QueuePublisherMixin(PublisherMixin):
         self.__fifo.put((payload, headers, routing_key))
 
 
-class WazoEventMixin(object):
+class WazoEventMixin:
     '''
     Mixin to handle message formatting for wazo events
 
