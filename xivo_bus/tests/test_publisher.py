@@ -12,7 +12,6 @@ SOME_HEADERS = {'header1': 'value1', 'override-me': 'value'}
 
 
 class TestPublisher(unittest.TestCase):
-
     def setUp(self):
         self.publish = Mock()
         self.producer = Mock()
@@ -31,15 +30,21 @@ class TestPublisher(unittest.TestCase):
 
         self.marshaler.marshal_message.assert_called_once_with(event)
         self.publish.assert_called_once_with(
-            sentinel.data, routing_key='foobar', headers=SOME_HEADERS, content_type='bazglop')
+            sentinel.data,
+            routing_key='foobar',
+            headers=SOME_HEADERS,
+            content_type='bazglop',
+        )
 
     def test_publish_with_headers(self):
         event = Mock()
         event.routing_key = 'foobar'
         custom_headers = {'user_uuid': 'some-uuid', 'override-me': 'overridden'}
-        expected_headers = {'header1': 'value1',
-                            'user_uuid': 'some-uuid',
-                            'override-me': 'overridden'}
+        expected_headers = {
+            'header1': 'value1',
+            'user_uuid': 'some-uuid',
+            'override-me': 'overridden',
+        }
         self.marshaler.content_type = 'bazglop'
         self.marshaler.metadata.return_value = SOME_HEADERS
 
@@ -47,7 +52,11 @@ class TestPublisher(unittest.TestCase):
 
         self.marshaler.marshal_message.assert_called_once_with(event)
         self.publish.assert_called_once_with(
-            sentinel.data, routing_key='foobar', headers=expected_headers, content_type='bazglop')
+            sentinel.data,
+            routing_key='foobar',
+            headers=expected_headers,
+            content_type='bazglop',
+        )
 
     def test_publisher_is_connected(self):
         self.producer.connection.connected = True

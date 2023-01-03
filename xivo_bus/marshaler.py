@@ -72,7 +72,7 @@ class CollectdMarshaler:
             type_instance=command.type_instance,
             interval=command.interval,
             time=command.time,
-            values=':'.join(command.values)
+            values=':'.join(command.values),
         )
 
     def metadata(self, _):

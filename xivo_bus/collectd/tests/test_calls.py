@@ -11,7 +11,6 @@ from ..calls import CallCollectdEvent
 
 
 class TestCallCollectdEvent(TestCase):
-
     def test_plugin_instance_validation_when_empty(self):
         event = CallCollectdEvent('', '')
 

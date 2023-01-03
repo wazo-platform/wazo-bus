@@ -8,9 +8,11 @@ from .common import CollectdEvent
 
 
 def validate_plugin_instance_fragment(plugin_instance_fragment):
-    result = ''.join(c for c in plugin_instance_fragment if (c in string.ascii_letters
-                                                             or c in string.digits
-                                                             or c == '-'))
+    result = ''.join(
+        c
+        for c in plugin_instance_fragment
+        if (c in string.ascii_letters or c in string.digits or c == '-')
+    )
     return result or '<unknown>'
 
 

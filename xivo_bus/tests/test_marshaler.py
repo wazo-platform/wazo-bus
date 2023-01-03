@@ -29,7 +29,6 @@ class EventTest(object):
 
 
 class TestMarshaler(unittest.TestCase):
-
     def setUp(self):
         self.uuid = SOME_UUID
         self.marshaler = Marshaler(self.uuid)
@@ -37,10 +36,12 @@ class TestMarshaler(unittest.TestCase):
         self.command.name = 'foobar'
         self.command.required_acl = 'some.acl'
         self.command.marshal.return_value = {'a': 1}
-        self.expected = {'name': 'foobar',
-                         'required_acl': 'some.acl',
-                         'origin_uuid': self.uuid,
-                         'data': {'a': 1}}
+        self.expected = {
+            'name': 'foobar',
+            'required_acl': 'some.acl',
+            'origin_uuid': self.uuid,
+            'data': {'a': 1},
+        }
 
     def test_marshal_message(self):
         result = self.marshaler.marshal_message(self.command)
@@ -64,16 +65,21 @@ class TestMarshaler(unittest.TestCase):
         assert_that(json.loads(result), has_entries(self.expected))
 
     def test_given_invalid_message_when_unmarshal_message_then_raise(self):
-        for invalid_message in ('asdlfkassdfsdfasdgas',
-                                {},
-                                {'data': None},
-                                {'origin_uuid': None}):
-            assert_that(calling(Marshaler.unmarshal_message).with_args(invalid_message, EventTest),
-                        raises(InvalidMessage))
+        for invalid_message in (
+            'asdlfkassdfsdfasdgas',
+            {},
+            {'data': None},
+            {'origin_uuid': None},
+        ):
+            assert_that(
+                calling(Marshaler.unmarshal_message).with_args(
+                    invalid_message, EventTest
+                ),
+                raises(InvalidMessage),
+            )
 
     def test_given_valid_message_when_unmarshal_message_then_return_object(self):
-        message = {'data': {'value': 1234},
-                   'origin_uuid': 'some-origin'}
+        message = {'data': {'value': 1234}, 'origin_uuid': 'some-origin'}
 
         result = Marshaler.unmarshal_message(message, EventTest)
 
@@ -91,7 +97,6 @@ class TestMarshaler(unittest.TestCase):
 
 
 class TestMarshalerCollectd(unittest.TestCase):
-
     def setUp(self):
         self.uuid = SOME_UUID
         self.marshaler = CollectdMarshaler(self.uuid)
@@ -100,7 +105,10 @@ class TestMarshalerCollectd(unittest.TestCase):
         command = Mock()
         command.is_valid.return_value = False
 
-        assert_that(calling(self.marshaler.marshal_message).with_args(command), raises(ValueError))
+        assert_that(
+            calling(self.marshaler.marshal_message).with_args(command),
+            raises(ValueError),
+        )
 
     def test_marshal_valid(self):
         command = Mock()
@@ -115,7 +123,9 @@ class TestMarshalerCollectd(unittest.TestCase):
 
         result = self.marshaler.marshal_message(command)
 
-        expected = 'PUTVAL {uuid}/my-plugin/mytype-myinstance interval=1 N:2:3'.format(uuid=self.uuid)
+        expected = 'PUTVAL {uuid}/my-plugin/mytype-myinstance interval=1 N:2:3'.format(
+            uuid=self.uuid
+        )
 
         assert_that(result, equal_to(expected))
 
@@ -132,6 +142,8 @@ class TestMarshalerCollectd(unittest.TestCase):
 
         result = self.marshaler.marshal_message(command)
 
-        expected = 'PUTVAL {uuid}/my-plugin/mytype-myinstance interval=1 42:2:3'.format(uuid=self.uuid)
+        expected = 'PUTVAL {uuid}/my-plugin/mytype-myinstance interval=1 42:2:3'.format(
+            uuid=self.uuid
+        )
 
         assert_that(result, equal_to(expected))
