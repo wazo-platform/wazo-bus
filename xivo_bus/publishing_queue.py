@@ -8,7 +8,7 @@ from queue import Queue, Empty
 logger = logging.getLogger(__name__)
 
 
-class PublishingQueue(object):
+class PublishingQueue:
     def __init__(self, publisher_factory):
         self._publish = None
         self._publisher_factory = publisher_factory
