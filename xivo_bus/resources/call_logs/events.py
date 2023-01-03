@@ -10,7 +10,7 @@ class CallLogCreatedEvent(TenantEvent):
     routing_key_fmt = 'call_log.created'
 
     def __init__(self, cdr_data, tenant_uuid):
-        super(CallLogCreatedEvent, self).__init__(cdr_data, tenant_uuid)
+        super().__init__(cdr_data, tenant_uuid)
 
 
 class CallLogUserCreatedEvent(UserEvent):
@@ -19,6 +19,4 @@ class CallLogUserCreatedEvent(UserEvent):
     routing_key_fmt = 'call_log.user.{user_uuid}.created'
 
     def __init__(self, cdr_data, tenant_uuid, user_uuid):
-        super(CallLogUserCreatedEvent, self).__init__(
-            cdr_data, tenant_uuid, user_uuid
-        )
+        super().__init__(cdr_data, tenant_uuid, user_uuid)

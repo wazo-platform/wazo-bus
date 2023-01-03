@@ -10,7 +10,7 @@ class GroupCreatedEvent(TenantEvent):
     routing_key_fmt = 'config.groups.created'
 
     def __init__(self, group, tenant_uuid):
-        super(GroupCreatedEvent, self).__init__(group, tenant_uuid)
+        super().__init__(group, tenant_uuid)
 
 
 class GroupDeletedEvent(TenantEvent):
@@ -19,7 +19,7 @@ class GroupDeletedEvent(TenantEvent):
     routing_key_fmt = 'config.groups.deleted'
 
     def __init__(self, group, tenant_uuid):
-        super(GroupDeletedEvent, self).__init__(group, tenant_uuid)
+        super().__init__(group, tenant_uuid)
 
 
 class GroupEditedEvent(TenantEvent):
@@ -28,7 +28,7 @@ class GroupEditedEvent(TenantEvent):
     routing_key_fmt = 'config.groups.edited'
 
     def __init__(self, group, tenant_uuid):
-        super(GroupEditedEvent, self).__init__(group, tenant_uuid)
+        super().__init__(group, tenant_uuid)
 
 
 class GroupFallbackEditedEvent(TenantEvent):
@@ -41,4 +41,4 @@ class GroupFallbackEditedEvent(TenantEvent):
             'id': group_id,
             'uuid': str(group_uuid),
         }
-        super(GroupFallbackEditedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

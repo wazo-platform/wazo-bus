@@ -11,7 +11,7 @@ class TrunkRegisterIAXAssociatedEvent(TenantEvent):
 
     def __init__(self, trunk_id, register_id, tenant_uuid):
         content = {'trunk_id': trunk_id, 'register_id': register_id}
-        super(TrunkRegisterIAXAssociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class TrunkRegisterIAXDissociatedEvent(TenantEvent):
@@ -24,4 +24,4 @@ class TrunkRegisterIAXDissociatedEvent(TenantEvent):
             'trunk_id': trunk_id,
             'register_id': register_id,
         }
-        super(TrunkRegisterIAXDissociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

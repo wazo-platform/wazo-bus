@@ -14,7 +14,7 @@ class ParkingLotExtensionAssociatedEvent(TenantEvent):
             'parking_lot_id': parking_id,
             'extension_id': extension_id,
         }
-        super(ParkingLotExtensionAssociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class ParkingLotExtensionDissociatedEvent(TenantEvent):
@@ -27,4 +27,4 @@ class ParkingLotExtensionDissociatedEvent(TenantEvent):
             'parking_lot_id': parking_id,
             'extension_id': extension_id,
         }
-        super(ParkingLotExtensionDissociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

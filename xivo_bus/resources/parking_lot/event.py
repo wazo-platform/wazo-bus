@@ -11,7 +11,7 @@ class ParkingLotCreatedEvent(TenantEvent):
 
     def __init__(self, parking_id, tenant_uuid):
         content = {'id': int(parking_id)}
-        super(ParkingLotCreatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class ParkingLotDeletedEvent(TenantEvent):
@@ -21,7 +21,7 @@ class ParkingLotDeletedEvent(TenantEvent):
 
     def __init__(self, parking_id, tenant_uuid):
         content = {'id': int(parking_id)}
-        super(ParkingLotDeletedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class ParkingLotEditedEvent(TenantEvent):
@@ -31,4 +31,4 @@ class ParkingLotEditedEvent(TenantEvent):
 
     def __init__(self, parking_id, tenant_uuid):
         content = {'id': int(parking_id)}
-        super(ParkingLotEditedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

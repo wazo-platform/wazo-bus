@@ -11,4 +11,4 @@ class ExtensionFeatureEditedEvent(ServiceEvent):
 
     def __init__(self, extension_id):
         content = {'id': extension_id}
-        super(ExtensionFeatureEditedEvent, self).__init__(content)
+        super().__init__(content)

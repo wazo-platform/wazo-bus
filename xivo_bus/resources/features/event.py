@@ -10,7 +10,7 @@ class FeaturesApplicationmapEditedEvent(ServiceEvent):
     routing_key_fmt = 'config.features_applicationmap.edited'
 
     def __init__(self):
-        super(FeaturesApplicationmapEditedEvent, self).__init__()
+        super().__init__()
 
 
 class FeaturesFeaturemapEditedEvent(ServiceEvent):
@@ -19,7 +19,7 @@ class FeaturesFeaturemapEditedEvent(ServiceEvent):
     routing_key_fmt = 'config.features_featuremap.edited'
 
     def __init__(self):
-        super(FeaturesFeaturemapEditedEvent, self).__init__()
+        super().__init__()
 
 
 class FeaturesGeneralEditedEvent(ServiceEvent):
@@ -28,4 +28,4 @@ class FeaturesGeneralEditedEvent(ServiceEvent):
     routing_key_fmt = 'config.features_general.edited'
 
     def __init__(self):
-        super(FeaturesGeneralEditedEvent, self).__init__()
+        super().__init__()

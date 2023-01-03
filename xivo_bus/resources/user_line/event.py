@@ -16,9 +16,7 @@ class UserLineAssociatedEvent(UserEvent):
             'main_user': main_user,
             'user': user,
         }
-        super(UserLineAssociatedEvent, self).__init__(
-            content, tenant_uuid, user['uuid']
-        )
+        super().__init__(content, tenant_uuid, user['uuid'])
 
 
 class UserLineDissociatedEvent(UserEvent):
@@ -33,6 +31,4 @@ class UserLineDissociatedEvent(UserEvent):
             'main_user': main_user,
             'user': user,
         }
-        super(UserLineDissociatedEvent, self).__init__(
-            content, tenant_uuid, user['uuid']
-        )
+        super().__init__(content, tenant_uuid, user['uuid'])

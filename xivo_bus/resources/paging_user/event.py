@@ -14,7 +14,7 @@ class PagingCallerUsersAssociatedEvent(TenantEvent):
             'paging_id': paging_id,
             'user_uuids': users,
         }
-        super(PagingCallerUsersAssociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class PagingMemberUsersAssociatedEvent(TenantEvent):
@@ -27,4 +27,4 @@ class PagingMemberUsersAssociatedEvent(TenantEvent):
             'paging_id': paging_id,
             'user_uuids': users,
         }
-        super(PagingMemberUsersAssociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

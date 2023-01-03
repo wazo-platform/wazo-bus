@@ -10,4 +10,4 @@ class QueueGeneralEditedEvent(ServiceEvent):
     routing_key_fmt = 'config.queue_general.edited'
 
     def __init__(self):
-        super(QueueGeneralEditedEvent, self).__init__()
+        super().__init__()

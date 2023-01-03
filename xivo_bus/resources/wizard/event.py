@@ -10,4 +10,4 @@ class WizardCreatedEvent(ServiceEvent):
     routing_key_fmt = 'config.wizard.created'
 
     def __init__(self):
-        super(WizardCreatedEvent, self).__init__()
+        super().__init__()

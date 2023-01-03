@@ -27,7 +27,7 @@ class TenantEvent(AbstractEvent):
     '''
 
     def __init__(self, content, tenant_uuid):
-        super(TenantEvent, self).__init__(content=content)
+        super().__init__(content=content)
         if tenant_uuid is None:
             raise ValueError('tenant_uuid must have a value')
         self.tenant_uuid = str(tenant_uuid)
@@ -48,13 +48,13 @@ class UserEvent(TenantEvent):
     '''
 
     def __init__(self, content, tenant_uuid, user_uuid):
-        super(UserEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
         delattr(self, 'user_uuid:*')
         self.user_uuid = str(user_uuid) if user_uuid else None
 
     @property
     def headers(self):
-        headers = super(UserEvent, self).headers
+        headers = super().headers
         uuid = headers.pop('user_uuid')
         if uuid:
             headers['user_uuid:{}'.format(uuid)] = True
@@ -77,7 +77,7 @@ class MultiUserEvent(TenantEvent):
     __slots__ = ('user_uuids',)
 
     def __init__(self, content, tenant_uuid, user_uuids):
-        super(MultiUserEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
         delattr(self, 'user_uuid:*')
         if not isinstance(user_uuids, list):
             raise ValueError('user_uuids must be a list of uuids')
@@ -85,7 +85,7 @@ class MultiUserEvent(TenantEvent):
 
     @property
     def headers(self):
-        headers = super(MultiUserEvent, self).headers
+        headers = super().headers
         for user_uuid in self.user_uuids:
             headers['user_uuid:{}'.format(user_uuid)] = True
         return headers

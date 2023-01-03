@@ -10,4 +10,4 @@ class DHCPEditedEvent(ServiceEvent):
     routing_key_fmt = 'config.dhcp.edited'
 
     def __init__(self):
-        super(DHCPEditedEvent, self).__init__()
+        super().__init__()

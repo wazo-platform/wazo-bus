@@ -14,7 +14,7 @@ class ConferenceExtensionAssociatedEvent(TenantEvent):
             'conference_id': conference_id,
             'extension_id': extension_id,
         }
-        super(ConferenceExtensionAssociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class ConferenceExtensionDissociatedEvent(TenantEvent):
@@ -27,4 +27,4 @@ class ConferenceExtensionDissociatedEvent(TenantEvent):
             'conference_id': conference_id,
             'extension_id': extension_id,
         }
-        super(ConferenceExtensionDissociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

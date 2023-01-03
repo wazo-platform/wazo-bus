@@ -10,4 +10,4 @@ class SCCPGeneralEditedEvent(ServiceEvent):
     routing_key_fmt = 'config.sccp_general.edited'
 
     def __init__(self):
-        super(SCCPGeneralEditedEvent, self).__init__()
+        super().__init__()

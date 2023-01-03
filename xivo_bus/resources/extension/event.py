@@ -15,7 +15,7 @@ class ExtensionCreatedEvent(TenantEvent):
             'exten': exten,
             'context': context,
         }
-        super(ExtensionCreatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class ExtensionDeletedEvent(TenantEvent):
@@ -29,7 +29,7 @@ class ExtensionDeletedEvent(TenantEvent):
             'exten': exten,
             'context': context,
         }
-        super(ExtensionDeletedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class ExtensionEditedEvent(TenantEvent):
@@ -43,4 +43,4 @@ class ExtensionEditedEvent(TenantEvent):
             'exten': exten,
             'context': context,
         }
-        super(ExtensionEditedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

@@ -18,7 +18,7 @@ class ServiceRegisteredEvent(ServiceEvent):
             'port': advertise_port,
             'tags': tags,
         }
-        super(ServiceRegisteredEvent, self).__init__(content)
+        super().__init__(content)
 
 
 class ServiceDeregisteredEvent(ServiceEvent):
@@ -31,4 +31,4 @@ class ServiceDeregisteredEvent(ServiceEvent):
             'service_id': service_id,
             'tags': tags,
         }
-        super(ServiceDeregisteredEvent, self).__init__(content)
+        super().__init__(content)

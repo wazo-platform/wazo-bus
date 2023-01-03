@@ -15,7 +15,7 @@ class GroupScheduleAssociatedEvent(TenantEvent):
             'group_uuid': str(group_uuid),
             'schedule_id': schedule_id,
         }
-        super(GroupScheduleAssociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class GroupScheduleDissociatedEvent(TenantEvent):
@@ -29,4 +29,4 @@ class GroupScheduleDissociatedEvent(TenantEvent):
             'group_uuid': str(group_uuid),
             'schedule_id': schedule_id,
         }
-        super(GroupScheduleDissociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

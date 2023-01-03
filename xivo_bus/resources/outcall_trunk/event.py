@@ -14,4 +14,4 @@ class OutcallTrunksAssociatedEvent(TenantEvent):
             'outcall_id': outcall_id,
             'trunk_ids': trunk_ids,
         }
-        super(OutcallTrunksAssociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

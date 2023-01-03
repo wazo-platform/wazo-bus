@@ -14,7 +14,7 @@ class UserAgentAssociatedEvent(UserEvent):
             'user_uuid': str(user_uuid),
             'agent_id': agent_id,
         }
-        super(UserAgentAssociatedEvent, self).__init__(content, tenant_uuid, user_uuid)
+        super().__init__(content, tenant_uuid, user_uuid)
 
 
 class UserAgentDissociatedEvent(UserEvent):
@@ -27,4 +27,4 @@ class UserAgentDissociatedEvent(UserEvent):
             'user_uuid': str(user_uuid),
             'agent_id': agent_id,
         }
-        super(UserAgentDissociatedEvent, self).__init__(content, tenant_uuid, user_uuid)
+        super().__init__(content, tenant_uuid, user_uuid)

@@ -13,7 +13,7 @@ class AgentCreatedEvent(TenantEvent):
 
     def __init__(self, agent_id, tenant_uuid):
         content = {'id': int(agent_id)}
-        super(AgentCreatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class AgentDeletedEvent(TenantEvent):
@@ -25,18 +25,19 @@ class AgentDeletedEvent(TenantEvent):
 
     def __init__(self, agent_id, tenant_uuid):
         content = {'id': int(agent_id)}
-        super(AgentDeletedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class AgentEditedEvent(TenantEvent):
     """An agent has been edited"""
+
     service = 'confd'
     name = 'agent_edited'
     routing_key_fmt = 'config.agent.edited'
 
     def __init__(self, agent_id, tenant_uuid):
         content = {'id': int(agent_id)}
-        super(AgentEditedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class AgentPausedEvent(MultiUserEvent):
@@ -55,7 +56,7 @@ class AgentPausedEvent(MultiUserEvent):
             'paused_reason': reason or '',
             'queue': queue,
         }
-        super(AgentPausedEvent, self).__init__(content, tenant_uuid, user_uuids)
+        super().__init__(content, tenant_uuid, user_uuids)
 
 
 class AgentUnpausedEvent(MultiUserEvent):
@@ -74,7 +75,7 @@ class AgentUnpausedEvent(MultiUserEvent):
             'paused_reason': reason or '',
             'queue': queue,
         }
-        super(AgentUnpausedEvent, self).__init__(content, tenant_uuid, user_uuids)
+        super().__init__(content, tenant_uuid, user_uuids)
 
 
 class AgentStatusUpdatedEvent(MultiUserEvent):
@@ -87,4 +88,4 @@ class AgentStatusUpdatedEvent(MultiUserEvent):
 
     def __init__(self, agent_id, status, tenant_uuid, user_uuids):
         content = {'agent_id': int(agent_id), 'status': status}
-        super(AgentStatusUpdatedEvent, self).__init__(content, tenant_uuid, user_uuids)
+        super().__init__(content, tenant_uuid, user_uuids)

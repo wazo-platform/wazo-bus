@@ -11,7 +11,7 @@ class AccessFeatureCreatedEvent(ServiceEvent):
     routing_key_fmt = 'config.access_feature.created'
 
     def __init__(self, access_feature_info):
-        super(AccessFeatureCreatedEvent, self).__init__(content=access_feature_info)
+        super().__init__(content=access_feature_info)
 
 
 class AccessFeatureDeletedEvent(ServiceEvent):
@@ -20,7 +20,7 @@ class AccessFeatureDeletedEvent(ServiceEvent):
     routing_key_fmt = 'config.access_feature.deleted'
 
     def __init__(self, access_feature_info):
-        super(AccessFeatureDeletedEvent, self).__init__(content=access_feature_info)
+        super().__init__(content=access_feature_info)
 
 
 class AccessFeatureEditedEvent(ServiceEvent):
@@ -29,4 +29,4 @@ class AccessFeatureEditedEvent(ServiceEvent):
     routing_key_fmt = 'config.access_feature.edited'
 
     def __init__(self, access_feature_info):
-        super(AccessFeatureEditedEvent, self).__init__(content=access_feature_info)
+        super().__init__(content=access_feature_info)

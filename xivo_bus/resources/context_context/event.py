@@ -14,4 +14,4 @@ class ContextContextsAssociatedEvent(TenantEvent):
             'context_id': context_id,
             'context_ids': context_ids,
         }
-        super(ContextContextsAssociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

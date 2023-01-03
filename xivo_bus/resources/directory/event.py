@@ -16,7 +16,7 @@ class FavoriteAddedEvent(UserEvent):
             'source': source_name,
             'source_entry_id': entry_id,
         }
-        super(FavoriteAddedEvent, self).__init__(content, tenant_uuid, user_uuid)
+        super().__init__(content, tenant_uuid, user_uuid)
 
 
 class FavoriteDeletedEvent(UserEvent):
@@ -31,4 +31,4 @@ class FavoriteDeletedEvent(UserEvent):
             'source': source_name,
             'source_entry_id': entry_id,
         }
-        super(FavoriteDeletedEvent, self).__init__(content, tenant_uuid, user_uuid)
+        super().__init__(content, tenant_uuid, user_uuid)

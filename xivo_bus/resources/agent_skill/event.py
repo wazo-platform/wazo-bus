@@ -14,7 +14,7 @@ class AgentSkillAssociatedEvent(TenantEvent):
             'agent_id': agent_id,
             'skill_id': skill_id,
         }
-        super(AgentSkillAssociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class AgentSkillDissociatedEvent(TenantEvent):
@@ -27,4 +27,4 @@ class AgentSkillDissociatedEvent(TenantEvent):
             'agent_id': agent_id,
             'skill_id': skill_id,
         }
-        super(AgentSkillDissociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

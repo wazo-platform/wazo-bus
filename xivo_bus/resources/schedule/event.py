@@ -11,7 +11,7 @@ class ScheduleCreatedEvent(TenantEvent):
 
     def __init__(self, schedule_id, tenant_uuid):
         content = {'id': int(schedule_id)}
-        super(ScheduleCreatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class ScheduleDeletedEvent(TenantEvent):
@@ -21,7 +21,7 @@ class ScheduleDeletedEvent(TenantEvent):
 
     def __init__(self, schedule_id, tenant_uuid):
         content = {'id': int(schedule_id)}
-        super(ScheduleDeletedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class ScheduleEditedEvent(TenantEvent):
@@ -31,4 +31,4 @@ class ScheduleEditedEvent(TenantEvent):
 
     def __init__(self, schedule_id, tenant_uuid):
         content = {'id': int(schedule_id)}
-        super(ScheduleEditedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

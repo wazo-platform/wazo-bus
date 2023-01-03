@@ -10,7 +10,7 @@ class UserExternalAppCreatedEvent(TenantEvent):
     routing_key_fmt = 'config.user_external_apps.created'
 
     def __init__(self, app, tenant_uuid):
-        super(UserExternalAppCreatedEvent, self).__init__(app, tenant_uuid)
+        super().__init__(app, tenant_uuid)
 
 
 class UserExternalAppDeletedEvent(TenantEvent):
@@ -19,7 +19,7 @@ class UserExternalAppDeletedEvent(TenantEvent):
     routing_key_fmt = 'config.user_external_apps.deleted'
 
     def __init__(self, app, tenant_uuid):
-        super(UserExternalAppDeletedEvent, self).__init__(app, tenant_uuid)
+        super().__init__(app, tenant_uuid)
 
 
 class UserExternalAppEditedEvent(TenantEvent):
@@ -28,4 +28,4 @@ class UserExternalAppEditedEvent(TenantEvent):
     routing_key_fmt = 'config.user_external_apps.edited'
 
     def __init__(self, app, tenant_uuid):
-        super(UserExternalAppEditedEvent, self).__init__(app, tenant_uuid)
+        super().__init__(app, tenant_uuid)

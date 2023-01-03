@@ -10,7 +10,7 @@ class CustomEndpointCreatedEvent(TenantEvent):
     routing_key_fmt = 'config.custom_endpoint.created'
 
     def __init__(self, endpoint_iax, tenant_uuid):
-        super(CustomEndpointCreatedEvent, self).__init__(endpoint_iax, tenant_uuid)
+        super().__init__(endpoint_iax, tenant_uuid)
 
 
 class CustomEndpointDeletedEvent(TenantEvent):
@@ -19,7 +19,7 @@ class CustomEndpointDeletedEvent(TenantEvent):
     routing_key_fmt = 'config.custom_endpoint.deleted'
 
     def __init__(self, endpoint_iax, tenant_uuid):
-        super(CustomEndpointDeletedEvent, self).__init__(endpoint_iax, tenant_uuid)
+        super().__init__(endpoint_iax, tenant_uuid)
 
 
 class CustomEndpointEditedEvent(TenantEvent):
@@ -28,4 +28,4 @@ class CustomEndpointEditedEvent(TenantEvent):
     routing_key_fmt = 'config.custom_endpoint.edited'
 
     def __init__(self, endpoint_iax, tenant_uuid):
-        super(CustomEndpointEditedEvent, self).__init__(endpoint_iax, tenant_uuid)
+        super().__init__(endpoint_iax, tenant_uuid)

@@ -10,7 +10,7 @@ class SIPEndpointCreatedEvent(TenantEvent):
     routing_key_fmt = 'config.sip_endpoint.created'
 
     def __init__(self, endpoint_sip, tenant_uuid):
-        super(SIPEndpointCreatedEvent, self).__init__(endpoint_sip, tenant_uuid)
+        super().__init__(endpoint_sip, tenant_uuid)
 
 
 class SIPEndpointDeletedEvent(TenantEvent):
@@ -19,7 +19,7 @@ class SIPEndpointDeletedEvent(TenantEvent):
     routing_key_fmt = 'config.sip_endpoint.deleted'
 
     def __init__(self, endpoint_sip, tenant_uuid):
-        super(SIPEndpointDeletedEvent, self).__init__(endpoint_sip, tenant_uuid)
+        super().__init__(endpoint_sip, tenant_uuid)
 
 
 class SIPEndpointEditedEvent(TenantEvent):
@@ -28,7 +28,7 @@ class SIPEndpointEditedEvent(TenantEvent):
     routing_key_fmt = 'config.sip_endpoint.edited'
 
     def __init__(self, endpoint_sip, tenant_uuid):
-        super(SIPEndpointEditedEvent, self).__init__(endpoint_sip, tenant_uuid)
+        super().__init__(endpoint_sip, tenant_uuid)
 
 
 class SIPEndpointTemplateCreatedEvent(TenantEvent):
@@ -37,7 +37,7 @@ class SIPEndpointTemplateCreatedEvent(TenantEvent):
     routing_key_fmt = 'config.sip_endpoint_template.created'
 
     def __init__(self, endpoint_sip, tenant_uuid):
-        super(SIPEndpointTemplateCreatedEvent, self).__init__(endpoint_sip, tenant_uuid)
+        super().__init__(endpoint_sip, tenant_uuid)
 
 
 class SIPEndpointTemplateDeletedEvent(TenantEvent):
@@ -46,7 +46,7 @@ class SIPEndpointTemplateDeletedEvent(TenantEvent):
     routing_key_fmt = 'config.sip_endpoint_template.deleted'
 
     def __init__(self, endpoint_sip, tenant_uuid):
-        super(SIPEndpointTemplateDeletedEvent, self).__init__(endpoint_sip, tenant_uuid)
+        super().__init__(endpoint_sip, tenant_uuid)
 
 
 class SIPEndpointTemplateEditedEvent(TenantEvent):
@@ -55,4 +55,4 @@ class SIPEndpointTemplateEditedEvent(TenantEvent):
     routing_key_fmt = 'config.sip_endpoint_template.edited'
 
     def __init__(self, endpoint_sip, tenant_uuid):
-        super(SIPEndpointTemplateEditedEvent, self).__init__(endpoint_sip, tenant_uuid)
+        super().__init__(endpoint_sip, tenant_uuid)

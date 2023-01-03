@@ -14,7 +14,7 @@ class IncallScheduleAssociatedEvent(TenantEvent):
             'incall_id': incall_id,
             'schedule_id': schedule_id,
         }
-        super(IncallScheduleAssociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class IncallScheduleDissociatedEvent(TenantEvent):
@@ -27,4 +27,4 @@ class IncallScheduleDissociatedEvent(TenantEvent):
             'incall_id': incall_id,
             'schedule_id': schedule_id,
         }
-        super(IncallScheduleDissociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

@@ -10,4 +10,4 @@ class SIPGeneralEditedEvent(ServiceEvent):
     routing_key_fmt = 'config.sip_general.edited'
 
     def __init__(self):
-        super(SIPGeneralEditedEvent, self).__init__()
+        super().__init__()

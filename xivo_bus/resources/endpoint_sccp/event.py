@@ -10,7 +10,7 @@ class SCCPEndpointCreatedEvent(TenantEvent):
     routing_key_fmt = 'config.sccp_endpoint.created'
 
     def __init__(self, endpoint_sccp, tenant_uuid):
-        super(SCCPEndpointCreatedEvent, self).__init__(endpoint_sccp, tenant_uuid)
+        super().__init__(endpoint_sccp, tenant_uuid)
 
 
 class SCCPEndpointDeletedEvent(TenantEvent):
@@ -19,7 +19,7 @@ class SCCPEndpointDeletedEvent(TenantEvent):
     routing_key_fmt = 'config.sccp_endpoint.deleted'
 
     def __init__(self, endpoint_sccp, tenant_uuid):
-        super(SCCPEndpointDeletedEvent, self).__init__(endpoint_sccp, tenant_uuid)
+        super().__init__(endpoint_sccp, tenant_uuid)
 
 
 class SCCPEndpointEditedEvent(TenantEvent):
@@ -28,4 +28,4 @@ class SCCPEndpointEditedEvent(TenantEvent):
     routing_key_fmt = 'config.sccp_endpoint.edited'
 
     def __init__(self, endpoint_sccp, tenant_uuid):
-        super(SCCPEndpointEditedEvent, self).__init__(endpoint_sccp, tenant_uuid)
+        super().__init__(endpoint_sccp, tenant_uuid)

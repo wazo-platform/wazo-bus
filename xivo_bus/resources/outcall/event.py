@@ -11,7 +11,7 @@ class OutcallCreatedEvent(TenantEvent):
 
     def __init__(self, outcall_id, tenant_uuid):
         content = {'id': outcall_id}
-        super(OutcallCreatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class OutcallDeletedEvent(TenantEvent):
@@ -21,7 +21,7 @@ class OutcallDeletedEvent(TenantEvent):
 
     def __init__(self, outcall_id, tenant_uuid):
         content = {'id': outcall_id}
-        super(OutcallDeletedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class OutcallEditedEvent(TenantEvent):
@@ -31,4 +31,4 @@ class OutcallEditedEvent(TenantEvent):
 
     def __init__(self, outcall_id, tenant_uuid):
         content = {'id': outcall_id}
-        super(OutcallEditedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

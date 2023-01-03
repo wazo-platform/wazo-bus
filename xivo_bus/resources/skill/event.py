@@ -11,7 +11,7 @@ class SkillCreatedEvent(TenantEvent):
 
     def __init__(self, skill_id, tenant_uuid):
         content = {'id': int(skill_id)}
-        super(SkillCreatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class SkillDeletedEvent(TenantEvent):
@@ -21,7 +21,7 @@ class SkillDeletedEvent(TenantEvent):
 
     def __init__(self, skill_id, tenant_uuid):
         content = {'id': int(skill_id)}
-        super(SkillDeletedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class SkillEditedEvent(TenantEvent):
@@ -31,4 +31,4 @@ class SkillEditedEvent(TenantEvent):
 
     def __init__(self, skill_id, tenant_uuid):
         content = {'id': int(skill_id)}
-        super(SkillEditedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

@@ -14,4 +14,4 @@ class UserGroupsAssociatedEvent(UserEvent):
             'user_uuid': str(user_uuid),
             'group_ids': group_ids,
         }
-        super(UserGroupsAssociatedEvent, self).__init__(content, tenant_uuid, user_uuid)
+        super().__init__(content, tenant_uuid, user_uuid)

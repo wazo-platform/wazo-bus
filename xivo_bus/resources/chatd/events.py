@@ -10,7 +10,7 @@ class PresenceUpdatedEvent(TenantEvent):
     routing_key_fmt = 'chatd.users.{uuid}.presences.updated'
 
     def __init__(self, user_presence_data, tenant_uuid):
-        super(PresenceUpdatedEvent, self).__init__(user_presence_data, tenant_uuid)
+        super().__init__(user_presence_data, tenant_uuid)
 
 
 class UserRoomCreatedEvent(UserEvent):
@@ -19,7 +19,7 @@ class UserRoomCreatedEvent(UserEvent):
     routing_key_fmt = 'chatd.users.{user_uuid}.rooms.created'
 
     def __init__(self, room_data, tenant_uuid, user_uuid):
-        super(UserRoomCreatedEvent, self).__init__(room_data, tenant_uuid, user_uuid)
+        super().__init__(room_data, tenant_uuid, user_uuid)
 
 
 class UserRoomMessageCreatedEvent(UserEvent):
@@ -28,9 +28,7 @@ class UserRoomMessageCreatedEvent(UserEvent):
     routing_key_fmt = 'chatd.users.{user_uuid}.rooms.{room_uuid}.messages.created'
 
     def __init__(self, message_data, room_uuid, tenant_uuid, user_uuid):
-        super(UserRoomMessageCreatedEvent, self).__init__(
-            message_data, tenant_uuid, user_uuid
-        )
+        super().__init__(message_data, tenant_uuid, user_uuid)
         if room_uuid is None:
             raise ValueError('room_uuid must have a value')
         self.room_uuid = str(room_uuid)

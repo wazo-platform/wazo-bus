@@ -10,4 +10,4 @@ class ProvisioningNetworkingEditedEvent(ServiceEvent):
     routing_key_fmt = 'config.provisioning.networking.edited'
 
     def __init__(self):
-        super(ProvisioningNetworkingEditedEvent, self).__init__()
+        super().__init__()

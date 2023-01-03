@@ -24,9 +24,7 @@ class _BaseUserLineExtensionEvent(UserEvent):
             'main_user': bool(main_user),
             'main_line': bool(main_line),
         }
-        super(_BaseUserLineExtensionEvent, self).__init__(
-            content, tenant_uuid, user_uuid
-        )
+        super().__init__(content, tenant_uuid, user_uuid)
 
 
 class UserLineExtensionCreatedEvent(_BaseUserLineExtensionEvent):

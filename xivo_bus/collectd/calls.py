@@ -55,5 +55,5 @@ class CallDurationCollectdEvent(CallCollectdEvent):
     type_instance = 'duration'
 
     def __init__(self, application, application_id, duration, time=None):
-        super(CallDurationCollectdEvent, self).__init__(application, application_id, time)
+        super().__init__(application, application_id, time)
         self.values = (str(round(duration, 3)),)

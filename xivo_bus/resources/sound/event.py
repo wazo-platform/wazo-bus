@@ -11,7 +11,7 @@ class SoundCreatedEvent(TenantEvent):
 
     def __init__(self, sound_name, tenant_uuid):
         content = {'name': sound_name}
-        super(SoundCreatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class SoundDeletedEvent(TenantEvent):
@@ -21,4 +21,4 @@ class SoundDeletedEvent(TenantEvent):
 
     def __init__(self, sound_name, tenant_uuid):
         content = {'name': sound_name}
-        super(SoundDeletedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

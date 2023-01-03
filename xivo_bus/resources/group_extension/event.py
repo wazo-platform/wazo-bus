@@ -15,7 +15,7 @@ class GroupExtensionAssociatedEvent(TenantEvent):
             'group_uuid': str(group_uuid),
             'extension_id': extension_id,
         }
-        super(GroupExtensionAssociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class GroupExtensionDissociatedEvent(TenantEvent):
@@ -29,4 +29,4 @@ class GroupExtensionDissociatedEvent(TenantEvent):
             'group_uuid': str(group_uuid),
             'extension_id': extension_id,
         }
-        super(GroupExtensionDissociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

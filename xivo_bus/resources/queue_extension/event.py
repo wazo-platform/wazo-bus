@@ -14,7 +14,7 @@ class QueueExtensionAssociatedEvent(TenantEvent):
             'queue_id': queue_id,
             'extension_id': extension_id,
         }
-        super(QueueExtensionAssociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class QueueExtensionDissociatedEvent(TenantEvent):
@@ -27,4 +27,4 @@ class QueueExtensionDissociatedEvent(TenantEvent):
             'queue_id': queue_id,
             'extension_id': extension_id,
         }
-        super(QueueExtensionDissociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

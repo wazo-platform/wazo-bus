@@ -10,4 +10,4 @@ class VoicemailGeneralEditedEvent(ServiceEvent):
     routing_key_fmt = 'config.voicemail_general.edited'
 
     def __init__(self):
-        super(VoicemailGeneralEditedEvent, self).__init__()
+        super().__init__()

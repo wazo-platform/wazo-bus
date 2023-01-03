@@ -10,4 +10,4 @@ class IAXCallNumberLimitsEditedEvent(ServiceEvent):
     routing_key_fmt = 'config.iax_callnumberlimits.edited'
 
     def __init__(self):
-        super(IAXCallNumberLimitsEditedEvent, self).__init__()
+        super().__init__()

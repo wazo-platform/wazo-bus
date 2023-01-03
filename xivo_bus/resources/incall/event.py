@@ -11,7 +11,7 @@ class IncallCreatedEvent(TenantEvent):
 
     def __init__(self, incall_id, tenant_uuid):
         content = {'id': incall_id}
-        super(IncallCreatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class IncallDeletedEvent(TenantEvent):
@@ -21,7 +21,7 @@ class IncallDeletedEvent(TenantEvent):
 
     def __init__(self, incall_id, tenant_uuid):
         content = {'id': incall_id}
-        super(IncallDeletedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class IncallEditedEvent(TenantEvent):
@@ -31,4 +31,4 @@ class IncallEditedEvent(TenantEvent):
 
     def __init__(self, incall_id, tenant_uuid):
         content = {'id': incall_id}
-        super(IncallEditedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

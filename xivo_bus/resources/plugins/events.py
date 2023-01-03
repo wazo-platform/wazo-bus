@@ -13,7 +13,7 @@ class PluginInstallProgressEvent(ServiceEvent):
         content = {'uuid': plugin_uuid, 'status': status}
         if errors:
             content.update(errors=errors)
-        super(PluginInstallProgressEvent, self).__init__(content)
+        super().__init__(content)
 
 
 class PluginUninstallProgressEvent(ServiceEvent):
@@ -25,4 +25,4 @@ class PluginUninstallProgressEvent(ServiceEvent):
         content = {'uuid': plugin_uuid, 'status': status}
         if errors:
             content.update(errors=errors)
-        super(PluginUninstallProgressEvent, self).__init__(content)
+        super().__init__(content)

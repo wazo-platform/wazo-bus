@@ -10,7 +10,7 @@ class MOHCreatedEvent(TenantEvent):
     routing_key_fmt = 'config.moh.created'
 
     def __init__(self, moh, tenant_uuid):
-        super(MOHCreatedEvent, self).__init__(moh, tenant_uuid)
+        super().__init__(moh, tenant_uuid)
 
 
 class MOHDeletedEvent(TenantEvent):
@@ -19,7 +19,7 @@ class MOHDeletedEvent(TenantEvent):
     routing_key_fmt = 'config.moh.deleted'
 
     def __init__(self, moh, tenant_uuid):
-        super(MOHDeletedEvent, self).__init__(moh, tenant_uuid)
+        super().__init__(moh, tenant_uuid)
 
 
 class MOHEditedEvent(TenantEvent):
@@ -28,4 +28,4 @@ class MOHEditedEvent(TenantEvent):
     routing_key_fmt = 'config.moh.edited'
 
     def __init__(self, moh, tenant_uuid):
-        super(MOHEditedEvent, self).__init__(moh, tenant_uuid)
+        super().__init__(moh, tenant_uuid)

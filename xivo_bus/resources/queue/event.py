@@ -11,7 +11,7 @@ class QueueCreatedEvent(TenantEvent):
 
     def __init__(self, queue_id, tenant_uuid):
         content = {'id': int(queue_id)}
-        super(QueueCreatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class QueueDeletedEvent(TenantEvent):
@@ -21,7 +21,7 @@ class QueueDeletedEvent(TenantEvent):
 
     def __init__(self, queue_id, tenant_uuid):
         content = {'id': int(queue_id)}
-        super(QueueDeletedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class QueueEditedEvent(TenantEvent):
@@ -31,7 +31,7 @@ class QueueEditedEvent(TenantEvent):
 
     def __init__(self, queue_id, tenant_uuid):
         content = {'id': int(queue_id)}
-        super(QueueEditedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class QueueFallbackEditedEvent(TenantEvent):
@@ -41,4 +41,4 @@ class QueueFallbackEditedEvent(TenantEvent):
 
     def __init__(self, queue_id, tenant_uuid):
         content = {'id': int(queue_id)}
-        super(QueueFallbackEditedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

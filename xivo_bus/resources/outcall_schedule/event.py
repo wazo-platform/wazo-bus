@@ -14,7 +14,7 @@ class OutcallScheduleAssociatedEvent(TenantEvent):
             'outcall_id': outcall_id,
             'schedule_id': schedule_id,
         }
-        super(OutcallScheduleAssociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class OutcallScheduleDissociatedEvent(TenantEvent):
@@ -27,4 +27,4 @@ class OutcallScheduleDissociatedEvent(TenantEvent):
             'outcall_id': outcall_id,
             'schedule_id': schedule_id,
         }
-        super(OutcallScheduleDissociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

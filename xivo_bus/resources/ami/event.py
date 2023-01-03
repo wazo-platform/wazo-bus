@@ -11,4 +11,4 @@ class AMIEvent(ServiceEvent):
 
     def __init__(self, ami_event, variables):
         self.name = type(self).name.format(ami_event=ami_event)
-        super(AMIEvent, self).__init__(variables)
+        super().__init__(variables)

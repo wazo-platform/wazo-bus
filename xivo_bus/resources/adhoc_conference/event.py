@@ -11,9 +11,7 @@ class AdhocConferenceCreatedEvent(UserEvent):
 
     def __init__(self, conference_id, tenant_uuid, user_uuid):
         content = {'conference_id': conference_id}
-        super(AdhocConferenceCreatedEvent, self).__init__(
-            content, tenant_uuid, user_uuid
-        )
+        super().__init__(content, tenant_uuid, user_uuid)
 
 
 class AdhocConferenceDeletedEvent(UserEvent):
@@ -23,9 +21,7 @@ class AdhocConferenceDeletedEvent(UserEvent):
 
     def __init__(self, conference_id, tenant_uuid, user_uuid):
         content = {'conference_id': conference_id}
-        super(AdhocConferenceDeletedEvent, self).__init__(
-            content, tenant_uuid, user_uuid
-        )
+        super().__init__(content, tenant_uuid, user_uuid)
 
 
 class AdhocConferenceParticipantJoinedEvent(UserEvent):
@@ -35,9 +31,7 @@ class AdhocConferenceParticipantJoinedEvent(UserEvent):
 
     def __init__(self, conference_id, call_id, tenant_uuid, user_uuid):
         content = {'conference_id': conference_id, 'call_id': call_id}
-        super(AdhocConferenceParticipantJoinedEvent, self).__init__(
-            content, tenant_uuid, user_uuid
-        )
+        super().__init__(content, tenant_uuid, user_uuid)
 
 
 class AdhocConferenceParticipantLeftEvent(UserEvent):
@@ -47,6 +41,4 @@ class AdhocConferenceParticipantLeftEvent(UserEvent):
 
     def __init__(self, conference_id, call_id, tenant_uuid, user_uuid):
         content = {'conference_id': conference_id, 'call_id': call_id}
-        super(AdhocConferenceParticipantLeftEvent, self).__init__(
-            content, tenant_uuid, user_uuid
-        )
+        super().__init__(content, tenant_uuid, user_uuid)

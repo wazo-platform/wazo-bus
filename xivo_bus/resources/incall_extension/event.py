@@ -14,7 +14,7 @@ class IncallExtensionAssociatedEvent(TenantEvent):
             'incall_id': incall_id,
             'extension_id': extension_id,
         }
-        super(IncallExtensionAssociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class IncallExtensionDissociatedEvent(TenantEvent):
@@ -27,4 +27,4 @@ class IncallExtensionDissociatedEvent(TenantEvent):
             'incall_id': incall_id,
             'extension_id': extension_id,
         }
-        super(IncallExtensionDissociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

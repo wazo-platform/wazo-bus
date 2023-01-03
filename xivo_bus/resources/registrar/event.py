@@ -10,7 +10,7 @@ class RegistrarCreatedEvent(ServiceEvent):
     routing_key_fmt = 'config.registrar.created'
 
     def __init__(self, registrar):
-        super(RegistrarCreatedEvent, self).__init__(registrar)
+        super().__init__(registrar)
 
 
 class RegistrarDeletedEvent(ServiceEvent):
@@ -19,7 +19,7 @@ class RegistrarDeletedEvent(ServiceEvent):
     routing_key_fmt = 'config.registrar.deleted'
 
     def __init__(self, registrar):
-        super(RegistrarDeletedEvent, self).__init__(registrar)
+        super().__init__(registrar)
 
 
 class RegistrarEditedEvent(ServiceEvent):
@@ -28,4 +28,4 @@ class RegistrarEditedEvent(ServiceEvent):
     routing_key_fmt = 'config.registrar.edited'
 
     def __init__(self, registrar):
-        super(RegistrarEditedEvent, self).__init__(registrar)
+        super().__init__(registrar)

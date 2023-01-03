@@ -10,7 +10,7 @@ class IngressHTTPCreatedEvent(TenantEvent):
     routing_key_fmt = 'config.ingresses.http.created'
 
     def __init__(self, ingress_http, tenant_uuid):
-        super(IngressHTTPCreatedEvent, self).__init__(ingress_http, tenant_uuid)
+        super().__init__(ingress_http, tenant_uuid)
 
 
 class IngressHTTPDeletedEvent(TenantEvent):
@@ -19,7 +19,7 @@ class IngressHTTPDeletedEvent(TenantEvent):
     routing_key_fmt = 'config.ingresses.http.deleted'
 
     def __init__(self, ingress_http, tenant_uuid):
-        super(IngressHTTPDeletedEvent, self).__init__(ingress_http, tenant_uuid)
+        super().__init__(ingress_http, tenant_uuid)
 
 
 class IngressHTTPEditedEvent(TenantEvent):
@@ -28,4 +28,4 @@ class IngressHTTPEditedEvent(TenantEvent):
     routing_key_fmt = 'config.ingresses.http.edited'
 
     def __init__(self, ingress_http, tenant_uuid):
-        super(IngressHTTPEditedEvent, self).__init__(ingress_http, tenant_uuid)
+        super().__init__(ingress_http, tenant_uuid)

@@ -1,4 +1,4 @@
-# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.common.event import ServiceEvent
@@ -15,7 +15,7 @@ class RequestHandlersProgressEvent(ServiceEvent):
             'status': status,
             'context': request_context,
         }
-        super(RequestHandlersProgressEvent, self).__init__(content)
+        super().__init__(content)
 
 
 class AsteriskReloadProgressEvent(ServiceEvent):
@@ -30,4 +30,4 @@ class AsteriskReloadProgressEvent(ServiceEvent):
             'command': command,
             'request_uuids': request_uuids,
         }
-        super(AsteriskReloadProgressEvent, self).__init__(content)
+        super().__init__(content)

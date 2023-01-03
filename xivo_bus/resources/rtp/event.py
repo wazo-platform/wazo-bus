@@ -10,7 +10,7 @@ class RTPGeneralEditedEvent(ServiceEvent):
     routing_key_fmt = 'config.rtp_general.edited'
 
     def __init__(self):
-        super(RTPGeneralEditedEvent, self).__init__()
+        super().__init__()
 
 
 class RTPIceHostCandidatesEditedEvent(ServiceEvent):
@@ -19,4 +19,4 @@ class RTPIceHostCandidatesEditedEvent(ServiceEvent):
     routing_key_fmt = 'config.rtp_ice_host_candidates.edited'
 
     def __init__(self):
-        super(RTPIceHostCandidatesEditedEvent, self).__init__()
+        super().__init__()

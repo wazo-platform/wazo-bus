@@ -14,9 +14,7 @@ class UserCallPermissionAssociatedEvent(UserEvent):
             'user_uuid': str(user_uuid),
             'call_permission_id': call_permission_id,
         }
-        super(UserCallPermissionAssociatedEvent, self).__init__(
-            content, tenant_uuid, user_uuid
-        )
+        super().__init__(content, tenant_uuid, user_uuid)
 
 
 class UserCallPermissionDissociatedEvent(UserEvent):
@@ -29,6 +27,4 @@ class UserCallPermissionDissociatedEvent(UserEvent):
             'user_uuid': str(user_uuid),
             'call_permission_id': call_permission_id,
         }
-        super(UserCallPermissionDissociatedEvent, self).__init__(
-            content, tenant_uuid, user_uuid
-        )
+        super().__init__(content, tenant_uuid, user_uuid)

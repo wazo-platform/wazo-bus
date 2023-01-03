@@ -6,7 +6,7 @@ from xivo_bus.resources.common.event import TenantEvent, UserEvent, MultiUserEve
 
 class _ConferenceMixin(object):
     def __init__(self, content, conference_id, *args):
-        super(_ConferenceMixin, self).__init__(content, *args)
+        super().__init__(content, *args)
         if not conference_id:
             raise ValueError('conference_id must have a value')
         self.conference_id = conference_id
@@ -19,9 +19,7 @@ class ConferenceCreatedEvent(_ConferenceMixin, TenantEvent):
 
     def __init__(self, conference_id, tenant_uuid):
         content = {'id': conference_id}
-        super(ConferenceCreatedEvent, self).__init__(
-            content, conference_id, tenant_uuid
-        )
+        super().__init__(content, conference_id, tenant_uuid)
 
 
 class ConferenceDeletedEvent(_ConferenceMixin, TenantEvent):
@@ -31,9 +29,7 @@ class ConferenceDeletedEvent(_ConferenceMixin, TenantEvent):
 
     def __init__(self, conference_id, tenant_uuid):
         content = {'id': conference_id}
-        super(ConferenceDeletedEvent, self).__init__(
-            content, conference_id, tenant_uuid
-        )
+        super().__init__(content, conference_id, tenant_uuid)
 
 
 class ConferenceEditedEvent(_ConferenceMixin, TenantEvent):
@@ -43,7 +39,7 @@ class ConferenceEditedEvent(_ConferenceMixin, TenantEvent):
 
     def __init__(self, conference_id, tenant_uuid):
         content = {'id': conference_id}
-        super(ConferenceEditedEvent, self).__init__(content, conference_id, tenant_uuid)
+        super().__init__(content, conference_id, tenant_uuid)
 
 
 class ConferenceRecordStartedEvent(_ConferenceMixin, TenantEvent):
@@ -53,9 +49,7 @@ class ConferenceRecordStartedEvent(_ConferenceMixin, TenantEvent):
 
     def __init__(self, conference_id, tenant_uuid):
         content = {'id': conference_id}
-        super(ConferenceRecordStartedEvent, self).__init__(
-            content, conference_id, tenant_uuid
-        )
+        super().__init__(content, conference_id, tenant_uuid)
 
 
 class ConferenceRecordStoppedEvent(_ConferenceMixin, TenantEvent):
@@ -65,9 +59,7 @@ class ConferenceRecordStoppedEvent(_ConferenceMixin, TenantEvent):
 
     def __init__(self, conference_id, tenant_uuid):
         content = {'id': conference_id}
-        super(ConferenceRecordStoppedEvent, self).__init__(
-            content, conference_id, tenant_uuid
-        )
+        super().__init__(content, conference_id, tenant_uuid)
 
 
 class ConferenceParticipantJoinedEvent(_ConferenceMixin, MultiUserEvent):
@@ -77,9 +69,7 @@ class ConferenceParticipantJoinedEvent(_ConferenceMixin, MultiUserEvent):
 
     def __init__(self, conference_id, participant, tenant_uuid, user_uuids):
         content = dict(participant, conference_id=conference_id)
-        super(ConferenceParticipantJoinedEvent, self).__init__(
-            content, conference_id, tenant_uuid, user_uuids
-        )
+        super().__init__(content, conference_id, tenant_uuid, user_uuids)
 
 
 class ConferenceParticipantLeftEvent(_ConferenceMixin, MultiUserEvent):
@@ -89,9 +79,7 @@ class ConferenceParticipantLeftEvent(_ConferenceMixin, MultiUserEvent):
 
     def __init__(self, conference_id, participant, tenant_uuid, user_uuids):
         content = dict(participant, conference_id=conference_id)
-        super(ConferenceParticipantLeftEvent, self).__init__(
-            content, conference_id, tenant_uuid, user_uuids
-        )
+        super().__init__(content, conference_id, tenant_uuid, user_uuids)
 
 
 class ConferenceParticipantMutedEvent(_ConferenceMixin, TenantEvent):
@@ -101,9 +89,7 @@ class ConferenceParticipantMutedEvent(_ConferenceMixin, TenantEvent):
 
     def __init__(self, conference_id, participant, tenant_uuid):
         content = dict(participant, conference_id=conference_id)
-        super(ConferenceParticipantMutedEvent, self).__init__(
-            content, conference_id, tenant_uuid
-        )
+        super().__init__(content, conference_id, tenant_uuid)
 
 
 class ConferenceParticipantUnmutedEvent(_ConferenceMixin, TenantEvent):
@@ -113,9 +99,7 @@ class ConferenceParticipantUnmutedEvent(_ConferenceMixin, TenantEvent):
 
     def __init__(self, conference_id, participant, tenant_uuid):
         content = dict(participant, conference_id=conference_id)
-        super(ConferenceParticipantUnmutedEvent, self).__init__(
-            content, conference_id, tenant_uuid
-        )
+        super().__init__(content, conference_id, tenant_uuid)
 
 
 class ConferenceParticipantTalkStartedEvent(_ConferenceMixin, MultiUserEvent):
@@ -125,9 +109,7 @@ class ConferenceParticipantTalkStartedEvent(_ConferenceMixin, MultiUserEvent):
 
     def __init__(self, conference_id, participant, tenant_uuid, user_uuids):
         content = dict(participant, conference_id=conference_id)
-        super(ConferenceParticipantTalkStartedEvent, self).__init__(
-            content, conference_id, tenant_uuid, user_uuids
-        )
+        super().__init__(content, conference_id, tenant_uuid, user_uuids)
 
 
 class ConferenceParticipantTalkStoppedEvent(_ConferenceMixin, MultiUserEvent):
@@ -137,9 +119,7 @@ class ConferenceParticipantTalkStoppedEvent(_ConferenceMixin, MultiUserEvent):
 
     def __init__(self, conference_id, participant, tenant_uuid, user_uuids):
         content = dict(participant, conference_id=conference_id)
-        super(ConferenceParticipantTalkStoppedEvent, self).__init__(
-            content, conference_id, tenant_uuid, user_uuids
-        )
+        super().__init__(content, conference_id, tenant_uuid, user_uuids)
 
 
 class ConferenceUserParticipantJoinedEvent(_ConferenceMixin, UserEvent):
@@ -149,9 +129,7 @@ class ConferenceUserParticipantJoinedEvent(_ConferenceMixin, UserEvent):
 
     def __init__(self, conference_id, participant, tenant_uuid, user_uuid):
         content = dict(participant, conference_id=conference_id)
-        super(ConferenceUserParticipantJoinedEvent, self).__init__(
-            content, conference_id, tenant_uuid, user_uuid
-        )
+        super().__init__(content, conference_id, tenant_uuid, user_uuid)
 
 
 class ConferenceUserParticipantLeftEvent(_ConferenceMixin, UserEvent):
@@ -161,9 +139,7 @@ class ConferenceUserParticipantLeftEvent(_ConferenceMixin, UserEvent):
 
     def __init__(self, conference_id, participant, tenant_uuid, user_uuid):
         content = dict(participant, conference_id=conference_id)
-        super(ConferenceUserParticipantLeftEvent, self).__init__(
-            content, conference_id, tenant_uuid, user_uuid
-        )
+        super().__init__(content, conference_id, tenant_uuid, user_uuid)
 
 
 class ConferenceUserParticipantTalkStartedEvent(_ConferenceMixin, UserEvent):
@@ -173,9 +149,7 @@ class ConferenceUserParticipantTalkStartedEvent(_ConferenceMixin, UserEvent):
 
     def __init__(self, conference_id, participant, tenant_uuid, user_uuid):
         content = dict(participant, conference_id=conference_id)
-        super(ConferenceUserParticipantTalkStartedEvent, self).__init__(
-            content, conference_id, tenant_uuid, user_uuid
-        )
+        super().__init__(content, conference_id, tenant_uuid, user_uuid)
 
 
 class ConferenceUserParticipantTalkStoppedEvent(_ConferenceMixin, UserEvent):
@@ -185,6 +159,4 @@ class ConferenceUserParticipantTalkStoppedEvent(_ConferenceMixin, UserEvent):
 
     def __init__(self, conference_id, participant, tenant_uuid, user_uuid):
         content = dict(participant, conference_id=conference_id)
-        super(ConferenceUserParticipantTalkStoppedEvent, self).__init__(
-            content, conference_id, tenant_uuid, user_uuid
-        )
+        super().__init__(content, conference_id, tenant_uuid, user_uuid)

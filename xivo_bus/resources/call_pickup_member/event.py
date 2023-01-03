@@ -14,9 +14,7 @@ class CallPickupInterceptorUsersAssociatedEvent(TenantEvent):
             'call_pickup_id': call_pickup_id,
             'user_uuids': users,
         }
-        super(CallPickupInterceptorUsersAssociatedEvent, self).__init__(
-            content, tenant_uuid
-        )
+        super().__init__(content, tenant_uuid)
 
 
 class CallPickupTargetUsersAssociatedEvent(TenantEvent):
@@ -29,7 +27,7 @@ class CallPickupTargetUsersAssociatedEvent(TenantEvent):
             'call_pickup_id': call_pickup_id,
             'user_uuids': users,
         }
-        super(CallPickupTargetUsersAssociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class CallPickupInterceptorGroupsAssociatedEvent(TenantEvent):
@@ -42,7 +40,7 @@ class CallPickupInterceptorGroupsAssociatedEvent(TenantEvent):
             'call_pickup_id': call_pickup_id,
             'group_ids': group_ids,
         }
-        super(CallPickupInterceptorGroupsAssociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class CallPickupTargetGroupsAssociatedEvent(TenantEvent):
@@ -55,4 +53,4 @@ class CallPickupTargetGroupsAssociatedEvent(TenantEvent):
             'call_pickup_id': call_pickup_id,
             'group_ids': group_ids,
         }
-        super(CallPickupTargetGroupsAssociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

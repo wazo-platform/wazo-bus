@@ -11,7 +11,7 @@ class SkillRuleCreatedEvent(TenantEvent):
 
     def __init__(self, skill_rule_id, tenant_uuid):
         content = {'id': int(skill_rule_id)}
-        super(SkillRuleCreatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class SkillRuleDeletedEvent(TenantEvent):
@@ -21,7 +21,7 @@ class SkillRuleDeletedEvent(TenantEvent):
 
     def __init__(self, skill_rule_id, tenant_uuid):
         content = {'id': int(skill_rule_id)}
-        super(SkillRuleDeletedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class SkillRuleEditedEvent(TenantEvent):
@@ -31,4 +31,4 @@ class SkillRuleEditedEvent(TenantEvent):
 
     def __init__(self, skill_rule_id, tenant_uuid):
         content = {'id': int(skill_rule_id)}
-        super(SkillRuleEditedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

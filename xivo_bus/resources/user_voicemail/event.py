@@ -14,9 +14,7 @@ class UserVoicemailAssociatedEvent(UserEvent):
             'user_uuid': str(user_uuid),
             'voicemail_id': int(voicemail_id),
         }
-        super(UserVoicemailAssociatedEvent, self).__init__(
-            content, tenant_uuid, user_uuid
-        )
+        super().__init__(content, tenant_uuid, user_uuid)
 
 
 class UserVoicemailDissociatedEvent(UserEvent):
@@ -29,6 +27,4 @@ class UserVoicemailDissociatedEvent(UserEvent):
             'user_uuid': user_uuid,
             'voicemail_id': int(voicemail_id),
         }
-        super(UserVoicemailDissociatedEvent, self).__init__(
-            content, tenant_uuid, user_uuid
-        )
+        super().__init__(content, tenant_uuid, user_uuid)

@@ -11,7 +11,7 @@ class LineExtensionAssociatedEvent(TenantEvent):
 
     def __init__(self, line_id, extension_id, tenant_uuid):
         content = {'line_id': line_id, 'extension_id': extension_id}
-        super(LineExtensionAssociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class LineExtensionDissociatedEvent(TenantEvent):
@@ -21,4 +21,4 @@ class LineExtensionDissociatedEvent(TenantEvent):
 
     def __init__(self, line_id, extension_id, tenant_uuid):
         content = {'line_id': line_id, 'extension_id': extension_id}
-        super(LineExtensionDissociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

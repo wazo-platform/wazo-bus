@@ -1,4 +1,4 @@
-# Copyright 2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2022-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from xivo_bus.resources.common.event import UserEvent
@@ -11,9 +11,7 @@ class CallPushNotificationEvent(UserEvent):
     required_acl_fmt = 'events.calls.{user_uuid}'
 
     def __init__(self, push_schema, tenant_uuid, user_uuid):
-        super(CallPushNotificationEvent, self).__init__(
-            push_schema, tenant_uuid, user_uuid
-        )
+        super().__init__(push_schema, tenant_uuid, user_uuid)
 
 
 class CallCancelPushNotificationEvent(UserEvent):
@@ -23,6 +21,4 @@ class CallCancelPushNotificationEvent(UserEvent):
     required_acl_fmt = 'events.calls.{user_uuid}'
 
     def __init__(self, push_schema, tenant_uuid, user_uuid):
-        super(CallCancelPushNotificationEvent, self).__init__(
-            push_schema, tenant_uuid, user_uuid
-        )
+        super().__init__(push_schema, tenant_uuid, user_uuid)

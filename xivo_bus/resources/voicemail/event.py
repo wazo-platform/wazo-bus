@@ -11,7 +11,7 @@ class VoicemailCreatedEvent(TenantEvent):
 
     def __init__(self, voicemail_id, tenant_uuid):
         content = {'id': int(voicemail_id)}
-        super(VoicemailCreatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class VoicemailDeletedEvent(TenantEvent):
@@ -21,7 +21,7 @@ class VoicemailDeletedEvent(TenantEvent):
 
     def __init__(self, voicemail_id, tenant_uuid):
         content = {'id': int(voicemail_id)}
-        super(VoicemailDeletedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class VoicemailEditedEvent(TenantEvent):
@@ -31,7 +31,7 @@ class VoicemailEditedEvent(TenantEvent):
 
     def __init__(self, voicemail_id, tenant_uuid):
         content = {'id': int(voicemail_id)}
-        super(VoicemailEditedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class UserVoicemailEditedEvent(UserEvent):
@@ -44,7 +44,7 @@ class UserVoicemailEditedEvent(UserEvent):
             'user_uuid': str(user_uuid),
             'voicemail_id': voicemail_id,
         }
-        super(UserVoicemailEditedEvent, self).__init__(content, tenant_uuid, user_uuid)
+        super().__init__(content, tenant_uuid, user_uuid)
 
 
 class UserVoicemailMessageCreatedEvent(UserEvent):
@@ -60,9 +60,7 @@ class UserVoicemailMessageCreatedEvent(UserEvent):
             'message_id': message_id,
             'message': message,
         }
-        super(UserVoicemailMessageCreatedEvent, self).__init__(
-            content, tenant_uuid, user_uuid
-        )
+        super().__init__(content, tenant_uuid, user_uuid)
 
 
 class UserVoicemailMessageUpdatedEvent(UserEvent):
@@ -78,9 +76,7 @@ class UserVoicemailMessageUpdatedEvent(UserEvent):
             'message_id': message_id,
             'message': message,
         }
-        super(UserVoicemailMessageUpdatedEvent, self).__init__(
-            content, tenant_uuid, user_uuid
-        )
+        super().__init__(content, tenant_uuid, user_uuid)
 
 
 class UserVoicemailMessageDeletedEvent(UserEvent):
@@ -96,6 +92,4 @@ class UserVoicemailMessageDeletedEvent(UserEvent):
             'message_id': message_id,
             'message': message,
         }
-        super(UserVoicemailMessageDeletedEvent, self).__init__(
-            content, tenant_uuid, user_uuid
-        )
+        super().__init__(content, tenant_uuid, user_uuid)

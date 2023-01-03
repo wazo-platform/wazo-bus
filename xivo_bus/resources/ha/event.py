@@ -10,4 +10,4 @@ class HAEditedEvent(ServiceEvent):
     routing_key_fmt = 'config.ha.edited'
 
     def __init__(self):
-        super(HAEditedEvent, self).__init__()
+        super().__init__()

@@ -11,7 +11,7 @@ class PagingCreatedEvent(TenantEvent):
 
     def __init__(self, paging_id, tenant_uuid):
         content = {'id': paging_id}
-        super(PagingCreatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class PagingDeletedEvent(TenantEvent):
@@ -21,7 +21,7 @@ class PagingDeletedEvent(TenantEvent):
 
     def __init__(self, paging_id, tenant_uuid):
         content = {'id': paging_id}
-        super(PagingDeletedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class PagingEditedEvent(TenantEvent):
@@ -31,4 +31,4 @@ class PagingEditedEvent(TenantEvent):
 
     def __init__(self, paging_id, tenant_uuid):
         content = {'id': paging_id}
-        super(PagingEditedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

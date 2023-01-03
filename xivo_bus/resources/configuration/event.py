@@ -11,4 +11,4 @@ class LiveReloadEditedEvent(ServiceEvent):
 
     def __init__(self, live_reload_enabled):
         content = {'live_reload_enabled': live_reload_enabled}
-        super(LiveReloadEditedEvent, self).__init__(content)
+        super().__init__(content)

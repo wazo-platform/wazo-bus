@@ -14,7 +14,7 @@ class CallFilterRecipientUsersAssociatedEvent(TenantEvent):
             'call_filter_id': call_filter_id,
             'user_uuids': users,
         }
-        super(CallFilterRecipientUsersAssociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class CallFilterSurrogateUsersAssociatedEvent(TenantEvent):
@@ -27,4 +27,4 @@ class CallFilterSurrogateUsersAssociatedEvent(TenantEvent):
             'call_filter_id': call_filter_id,
             'user_uuids': users,
         }
-        super(CallFilterSurrogateUsersAssociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

@@ -1,4 +1,4 @@
-# Copyright 2022-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2022-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.common.event import UserEvent
@@ -11,7 +11,7 @@ class CallCreatedEvent(UserEvent):
     required_acl_fmt = 'events.calls.{user_uuid}'
 
     def __init__(self, call_data, tenant_uuid, user_uuid):
-        super(CallCreatedEvent, self).__init__(call_data, tenant_uuid, user_uuid)
+        super().__init__(call_data, tenant_uuid, user_uuid)
 
 
 class CallEndedEvent(UserEvent):
@@ -21,7 +21,7 @@ class CallEndedEvent(UserEvent):
     required_acl_fmt = 'events.calls.{user_uuid}'
 
     def __init__(self, call_data, tenant_uuid, user_uuid):
-        super(CallEndedEvent, self).__init__(call_data, tenant_uuid, user_uuid)
+        super().__init__(call_data, tenant_uuid, user_uuid)
 
 
 class CallUpdatedEvent(UserEvent):
@@ -31,7 +31,7 @@ class CallUpdatedEvent(UserEvent):
     required_acl_fmt = 'events.calls.{user_uuid}'
 
     def __init__(self, call_data, tenant_uuid, user_uuid):
-        super(CallUpdatedEvent, self).__init__(call_data, tenant_uuid, user_uuid)
+        super().__init__(call_data, tenant_uuid, user_uuid)
 
 
 class CallAnsweredEvent(UserEvent):
@@ -41,7 +41,7 @@ class CallAnsweredEvent(UserEvent):
     required_acl_fmt = 'events.calls.{user_uuid}'
 
     def __init__(self, call_data, tenant_uuid, user_uuid):
-        super(CallAnsweredEvent, self).__init__(call_data, tenant_uuid, user_uuid)
+        super().__init__(call_data, tenant_uuid, user_uuid)
 
 
 class CallDTMFEvent(UserEvent):
@@ -56,7 +56,7 @@ class CallDTMFEvent(UserEvent):
             'digit': digit_number,
             'user_uuid': str(user_uuid),
         }
-        super(CallDTMFEvent, self).__init__(content, tenant_uuid, user_uuid)
+        super().__init__(content, tenant_uuid, user_uuid)
 
 
 class CallHeldEvent(UserEvent):
@@ -70,7 +70,7 @@ class CallHeldEvent(UserEvent):
             'call_id': call_id,
             'user_uuid': str(user_uuid),
         }
-        super(CallHeldEvent, self).__init__(content, tenant_uuid, user_uuid)
+        super().__init__(content, tenant_uuid, user_uuid)
 
 
 class CallResumedEvent(UserEvent):
@@ -84,7 +84,7 @@ class CallResumedEvent(UserEvent):
             'call_id': call_id,
             'user_uuid': str(user_uuid),
         }
-        super(CallResumedEvent, self).__init__(content, tenant_uuid, user_uuid)
+        super().__init__(content, tenant_uuid, user_uuid)
 
 
 class MissedCallEvent(UserEvent):
@@ -94,7 +94,7 @@ class MissedCallEvent(UserEvent):
     required_acl_fmt = 'events.calls.{user_uuid}'
 
     def __init__(self, call_schema, tenant_uuid, user_uuid):
-        super(MissedCallEvent, self).__init__(call_schema, tenant_uuid, user_uuid)
+        super().__init__(call_schema, tenant_uuid, user_uuid)
 
 
 class CallRelocateInitiatedEvent(UserEvent):
@@ -104,9 +104,7 @@ class CallRelocateInitiatedEvent(UserEvent):
     required_acl_fmt = 'events.relocates.{user_uuid}'
 
     def __init__(self, relocate_schema, tenant_uuid, user_uuid):
-        super(CallRelocateInitiatedEvent, self).__init__(
-            relocate_schema, tenant_uuid, user_uuid
-        )
+        super().__init__(relocate_schema, tenant_uuid, user_uuid)
 
 
 class CallRelocateAnsweredEvent(UserEvent):
@@ -116,9 +114,7 @@ class CallRelocateAnsweredEvent(UserEvent):
     required_acl_fmt = 'events.relocates.{user_uuid}'
 
     def __init__(self, relocate_schema, tenant_uuid, user_uuid):
-        super(CallRelocateAnsweredEvent, self).__init__(
-            relocate_schema, tenant_uuid, user_uuid
-        )
+        super().__init__(relocate_schema, tenant_uuid, user_uuid)
 
 
 class CallRelocateCompletedEvent(UserEvent):
@@ -128,9 +124,7 @@ class CallRelocateCompletedEvent(UserEvent):
     required_acl_fmt = 'events.relocates.{user_uuid}'
 
     def __init__(self, relocate_schema, tenant_uuid, user_uuid):
-        super(CallRelocateCompletedEvent, self).__init__(
-            relocate_schema, tenant_uuid, user_uuid
-        )
+        super().__init__(relocate_schema, tenant_uuid, user_uuid)
 
 
 class CallRelocateEndedEvent(UserEvent):
@@ -140,9 +134,7 @@ class CallRelocateEndedEvent(UserEvent):
     required_acl_fmt = 'events.relocates.{user_uuid}'
 
     def __init__(self, relocate_schema, tenant_uuid, user_uuid):
-        super(CallRelocateEndedEvent, self).__init__(
-            relocate_schema, tenant_uuid, user_uuid
-        )
+        super().__init__(relocate_schema, tenant_uuid, user_uuid)
 
 
 class CallTransferCreatedEvent(UserEvent):
@@ -152,9 +144,7 @@ class CallTransferCreatedEvent(UserEvent):
     required_acl_fmt = 'events.transfers.{user_uuid}'
 
     def __init__(self, transfer_schema, tenant_uuid, user_uuid):
-        super(CallTransferCreatedEvent, self).__init__(
-            transfer_schema, tenant_uuid, user_uuid
-        )
+        super().__init__(transfer_schema, tenant_uuid, user_uuid)
 
 
 class CallTransferUpdatedEvent(UserEvent):
@@ -164,9 +154,7 @@ class CallTransferUpdatedEvent(UserEvent):
     required_acl_fmt = 'events.transfers.{user_uuid}'
 
     def __init__(self, transfer_schema, tenant_uuid, user_uuid):
-        super(CallTransferUpdatedEvent, self).__init__(
-            transfer_schema, tenant_uuid, user_uuid
-        )
+        super().__init__(transfer_schema, tenant_uuid, user_uuid)
 
 
 class CallTransferAnsweredEvent(UserEvent):
@@ -176,9 +164,7 @@ class CallTransferAnsweredEvent(UserEvent):
     required_acl_fmt = 'events.transfers.{user_uuid}'
 
     def __init__(self, transfer_schema, tenant_uuid, user_uuid):
-        super(CallTransferAnsweredEvent, self).__init__(
-            transfer_schema, tenant_uuid, user_uuid
-        )
+        super().__init__(transfer_schema, tenant_uuid, user_uuid)
 
 
 class CallTransferCancelledEvent(UserEvent):
@@ -188,9 +174,7 @@ class CallTransferCancelledEvent(UserEvent):
     required_acl_fmt = 'events.transfers.{user_uuid}'
 
     def __init__(self, transfer_schema, tenant_uuid, user_uuid):
-        super(CallTransferCancelledEvent, self).__init__(
-            transfer_schema, tenant_uuid, user_uuid
-        )
+        super().__init__(transfer_schema, tenant_uuid, user_uuid)
 
 
 class CallTransferCompletedEvent(UserEvent):
@@ -200,9 +184,7 @@ class CallTransferCompletedEvent(UserEvent):
     required_acl_fmt = 'events.transfers.{user_uuid}'
 
     def __init__(self, transfer_schema, tenant_uuid, user_uuid):
-        super(CallTransferCompletedEvent, self).__init__(
-            transfer_schema, tenant_uuid, user_uuid
-        )
+        super().__init__(transfer_schema, tenant_uuid, user_uuid)
 
 
 class CallTransferAbandonedEvent(UserEvent):
@@ -212,9 +194,7 @@ class CallTransferAbandonedEvent(UserEvent):
     required_acl_fmt = 'events.transfers.{user_uuid}'
 
     def __init__(self, transfer_schema, tenant_uuid, user_uuid):
-        super(CallTransferAbandonedEvent, self).__init__(
-            transfer_schema, tenant_uuid, user_uuid
-        )
+        super().__init__(transfer_schema, tenant_uuid, user_uuid)
 
 
 class CallTransferEndedEvent(UserEvent):
@@ -224,6 +204,4 @@ class CallTransferEndedEvent(UserEvent):
     required_acl_fmt = 'events.transfers.{user_uuid}'
 
     def __init__(self, transfer_schema, tenant_uuid, user_uuid):
-        super(CallTransferEndedEvent, self).__init__(
-            transfer_schema, tenant_uuid, user_uuid
-        )
+        super().__init__(transfer_schema, tenant_uuid, user_uuid)

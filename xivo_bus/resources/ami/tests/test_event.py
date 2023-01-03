@@ -8,7 +8,6 @@ from ..event import AMIEvent
 
 
 class TestAMIEvent(unittest.TestCase):
-
     def test_marshal(self):
         event = AMIEvent(sentinel.name, sentinel.variables)
 

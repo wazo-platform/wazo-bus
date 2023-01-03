@@ -36,7 +36,7 @@ class ThreadableMixin:
     '''
 
     def __init__(self, **kwargs):
-        super(ThreadableMixin, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.__stop_flag = Event()
 
     @property
@@ -46,7 +46,7 @@ class ThreadableMixin:
     @property
     def is_running(self):
         status = all({bus_thread.thread.is_alive() for bus_thread in self.__threads})
-        return super(ThreadableMixin, self).is_running and status
+        return super().is_running and status
 
     @property
     def __threads(self):
@@ -135,7 +135,7 @@ class ConsumerMixin(KombuConsumer):
     consumer_args = {}
 
     def __init__(self, subscribe=None, **kwargs):
-        super(ConsumerMixin, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         name = '{name}.{id}'.format(name=self._name, id=os.urandom(3).hex())
         if subscribe:
             exchange = Exchange(subscribe['exchange_name'], subscribe['exchange_type'])
@@ -312,7 +312,7 @@ class ConsumerMixin(KombuConsumer):
             ready_flag.set()
 
     def __thread_run(self, ready_flag, **kwargs):
-        super(ConsumerMixin, self).run(ready_flag=ready_flag, **self.consumer_args)
+        super().run(ready_flag=ready_flag, **self.consumer_args)
 
     def __thread_stop(self):
         self.__connection.release()
@@ -334,7 +334,7 @@ class PublisherMixin:
     }
 
     def __init__(self, publish=None, **kwargs):
-        super(PublisherMixin, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         if publish:
             exchange = Exchange(publish['exchange_name'], publish['exchange_type'])
         self.__exchange = exchange if publish else self._default_exchange
@@ -392,7 +392,7 @@ class QueuePublisherMixin(PublisherMixin):
 
     def __init__(self, **kwargs):
         retry_policy = self.queue_publisher_args
-        super(QueuePublisherMixin, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.__flushing = False
         self.__fifo = Queue()
         self.__connection = Connection(self.url, transport_options=retry_policy)
@@ -450,7 +450,7 @@ class WazoEventMixin:
     '''
 
     def __init__(self, service_uuid=None, **kwargs):
-        super(WazoEventMixin, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.service_uuid = service_uuid
 
     def __generate_payload(self, event, headers, initial_data):

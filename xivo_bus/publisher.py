@@ -22,7 +22,7 @@ class BusPublisher(WazoEventMixin, PublisherMixin, Base):
         exchange_type='',
         **kwargs
     ):
-        super(BusPublisher, self).__init__(
+        super().__init__(
             name=name,
             service_uuid=service_uuid,
             username=username,
@@ -49,7 +49,7 @@ class BusPublisherWithQueue(WazoEventMixin, ThreadableMixin, QueuePublisherMixin
         exchange_type='',
         **kwargs
     ):
-        super(BusPublisherWithQueue, self).__init__(
+        super().__init__(
             name=name,
             service_uuid=service_uuid,
             username=username,
@@ -64,7 +64,6 @@ class BusPublisherWithQueue(WazoEventMixin, ThreadableMixin, QueuePublisherMixin
 
 # Deprecated, use BusPublisher instead
 class Publisher(object):
-
     def __init__(self, producer, marshaler, **connection_args):
         self._producer = producer
         self._marshaler = marshaler
@@ -102,12 +101,12 @@ class Publisher(object):
 # Deprecated, use BusPublisher instead
 class FailFastPublisher(Publisher):
     def __init__(self, producer, marshaler):
-        super(FailFastPublisher, self).__init__(producer, marshaler, max_retries=2)
+        super().__init__(producer, marshaler, max_retries=2)
 
 
 # Deprecated, use BusPublisher instead
 class LongLivedPublisher(Publisher):
     def __init__(self, producer, marshaler):
-        super(LongLivedPublisher, self).__init__(
+        super().__init__(
             producer, marshaler, interval_start=2, interval_step=2, interval_max=32
         )

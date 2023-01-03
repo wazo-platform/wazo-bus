@@ -14,9 +14,7 @@ class UserScheduleAssociatedEvent(UserEvent):
             'user_uuid': str(user_uuid),
             'schedule_id': schedule_id,
         }
-        super(UserScheduleAssociatedEvent, self).__init__(
-            content, tenant_uuid, user_uuid
-        )
+        super().__init__(content, tenant_uuid, user_uuid)
 
 
 class UserScheduleDissociatedEvent(UserEvent):
@@ -29,6 +27,4 @@ class UserScheduleDissociatedEvent(UserEvent):
             'user_uuid': str(user_uuid),
             'schedule_id': schedule_id,
         }
-        super(UserScheduleDissociatedEvent, self).__init__(
-            content, tenant_uuid, user_uuid
-        )
+        super().__init__(content, tenant_uuid, user_uuid)

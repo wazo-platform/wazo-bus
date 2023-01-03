@@ -13,7 +13,7 @@ class LineEndpointSIPAssociatedEvent(TenantEvent):
 
     def __init__(self, line, sip, tenant_uuid):
         content = {'line': line, 'endpoint_sip': sip}
-        super(LineEndpointSIPAssociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class LineEndpointSIPDissociatedEvent(TenantEvent):
@@ -25,7 +25,7 @@ class LineEndpointSIPDissociatedEvent(TenantEvent):
 
     def __init__(self, line, sip, tenant_uuid):
         content = {'line': line, 'endpoint_sip': sip}
-        super(LineEndpointSIPDissociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class LineEndpointSCCPAssociatedEvent(TenantEvent):
@@ -37,7 +37,7 @@ class LineEndpointSCCPAssociatedEvent(TenantEvent):
 
     def __init__(self, line, sccp, tenant_uuid):
         content = {'line': line, 'endpoint_sccp': sccp}
-        super(LineEndpointSCCPAssociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class LineEndpointSCCPDissociatedEvent(TenantEvent):
@@ -49,7 +49,7 @@ class LineEndpointSCCPDissociatedEvent(TenantEvent):
 
     def __init__(self, line, sccp, tenant_uuid):
         content = {'line': line, 'endpoint_sccp': sccp}
-        super(LineEndpointSCCPDissociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class LineEndpointCustomAssociatedEvent(TenantEvent):
@@ -61,7 +61,7 @@ class LineEndpointCustomAssociatedEvent(TenantEvent):
 
     def __init__(self, line, custom, tenant_uuid):
         content = {'line': line, 'endpoint_custom': custom}
-        super(LineEndpointCustomAssociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class LineEndpointCustomDissociatedEvent(TenantEvent):
@@ -73,4 +73,4 @@ class LineEndpointCustomDissociatedEvent(TenantEvent):
 
     def __init__(self, line, custom, tenant_uuid):
         content = {'line': line, 'endpoint_custom': custom}
-        super(LineEndpointCustomDissociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

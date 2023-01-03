@@ -3,4 +3,8 @@
 
 
 def escape(routing_key_part):
-    return routing_key_part.replace('.', '__DOT__').replace('#', '__HASH__').replace('*', '__STAR__')
+    return (
+        routing_key_part.replace('.', '__DOT__')
+        .replace('#', '__HASH__')
+        .replace('*', '__STAR__')
+    )

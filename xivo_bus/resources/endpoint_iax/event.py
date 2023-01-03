@@ -10,7 +10,7 @@ class IAXEndpointCreatedEvent(TenantEvent):
     routing_key_fmt = 'config.iax_endpoint.created'
 
     def __init__(self, endpoint_iax, tenant_uuid):
-        super(IAXEndpointCreatedEvent, self).__init__(endpoint_iax, tenant_uuid)
+        super().__init__(endpoint_iax, tenant_uuid)
 
 
 class IAXEndpointDeletedEvent(TenantEvent):
@@ -19,7 +19,7 @@ class IAXEndpointDeletedEvent(TenantEvent):
     routing_key_fmt = 'config.iax_endpoint.deleted'
 
     def __init__(self, endpoint_iax, tenant_uuid):
-        super(IAXEndpointDeletedEvent, self).__init__(endpoint_iax, tenant_uuid)
+        super().__init__(endpoint_iax, tenant_uuid)
 
 
 class IAXEndpointEditedEvent(TenantEvent):
@@ -28,4 +28,4 @@ class IAXEndpointEditedEvent(TenantEvent):
     routing_key_fmt = 'config.iax_endpoint.edited'
 
     def __init__(self, endpoint_iax, tenant_uuid):
-        super(IAXEndpointEditedEvent, self).__init__(endpoint_iax, tenant_uuid)
+        super().__init__(endpoint_iax, tenant_uuid)

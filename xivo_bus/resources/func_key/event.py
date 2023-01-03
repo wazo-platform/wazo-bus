@@ -11,7 +11,7 @@ class FuncKeyTemplateCreatedEvent(TenantEvent):
 
     def __init__(self, template_id, tenant_uuid):
         content = {'id': template_id}
-        super(FuncKeyTemplateCreatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class FuncKeyTemplateDeletedEvent(TenantEvent):
@@ -21,7 +21,7 @@ class FuncKeyTemplateDeletedEvent(TenantEvent):
 
     def __init__(self, template_id, tenant_uuid):
         content = {'id': template_id}
-        super(FuncKeyTemplateDeletedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class FuncKeyTemplateEditedEvent(TenantEvent):
@@ -31,4 +31,4 @@ class FuncKeyTemplateEditedEvent(TenantEvent):
 
     def __init__(self, template_id, tenant_uuid):
         content = {'id': template_id}
-        super(FuncKeyTemplateEditedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

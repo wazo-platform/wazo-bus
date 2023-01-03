@@ -10,7 +10,7 @@ class CallLogExportCreatedEvent(TenantEvent):
     routing_key_fmt = 'call_logd.export.created'
 
     def __init__(self, export_data, tenant_uuid):
-        super(CallLogExportCreatedEvent, self).__init__(export_data, tenant_uuid)
+        super().__init__(export_data, tenant_uuid)
 
 
 class CallLogExportUpdatedEvent(TenantEvent):
@@ -19,7 +19,7 @@ class CallLogExportUpdatedEvent(TenantEvent):
     routing_key_fmt = 'call_logd.export.updated'
 
     def __init__(self, export_data, tenant_uuid):
-        super(CallLogExportUpdatedEvent, self).__init__(export_data, tenant_uuid)
+        super().__init__(export_data, tenant_uuid)
 
 
 class CallLogRetentionUpdatedEvent(TenantEvent):
@@ -28,4 +28,4 @@ class CallLogRetentionUpdatedEvent(TenantEvent):
     routing_key_fmt = 'call_logd.retention.updated'
 
     def __init__(self, retention_data, tenant_uuid):
-        super(CallLogRetentionUpdatedEvent, self).__init__(retention_data, tenant_uuid)
+        super().__init__(retention_data, tenant_uuid)

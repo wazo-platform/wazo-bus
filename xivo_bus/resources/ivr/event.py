@@ -11,7 +11,7 @@ class IVRCreatedEvent(TenantEvent):
 
     def __init__(self, ivr_id, tenant_uuid):
         content = {'id': ivr_id}
-        super(IVRCreatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class IVRDeletedEvent(TenantEvent):
@@ -21,7 +21,7 @@ class IVRDeletedEvent(TenantEvent):
 
     def __init__(self, ivr_id, tenant_uuid):
         content = {'id': ivr_id}
-        super(IVRDeletedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class IVREditedEvent(TenantEvent):
@@ -31,4 +31,4 @@ class IVREditedEvent(TenantEvent):
 
     def __init__(self, ivr_id, tenant_uuid):
         content = {'id': ivr_id}
-        super(IVREditedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

@@ -10,4 +10,4 @@ class EmailConfigUpdatedEvent(ServiceEvent):
     routing_key_fmt = 'config.email.updated'
 
     def __init__(self):
-        super(EmailConfigUpdatedEvent, self).__init__()
+        super().__init__()

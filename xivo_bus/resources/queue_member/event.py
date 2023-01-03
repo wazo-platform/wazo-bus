@@ -15,7 +15,7 @@ class QueueMemberAgentAssociatedEvent(TenantEvent):
             'agent_id': agent_id,
             'penalty': penalty,
         }
-        super(QueueMemberAgentAssociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class QueueMemberAgentDissociatedEvent(TenantEvent):
@@ -28,7 +28,7 @@ class QueueMemberAgentDissociatedEvent(TenantEvent):
             'queue_id': queue_id,
             'agent_id': agent_id,
         }
-        super(QueueMemberAgentDissociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class QueueMemberUserAssociatedEvent(UserEvent):
@@ -41,9 +41,7 @@ class QueueMemberUserAssociatedEvent(UserEvent):
             'queue_id': queue_id,
             'user_uuid': str(user_uuid),
         }
-        super(QueueMemberUserAssociatedEvent, self).__init__(
-            content, tenant_uuid, user_uuid
-        )
+        super().__init__(content, tenant_uuid, user_uuid)
 
 
 class QueueMemberUserDissociatedEvent(UserEvent):
@@ -56,6 +54,4 @@ class QueueMemberUserDissociatedEvent(UserEvent):
             'queue_id': queue_id,
             'user_uuid': str(user_uuid),
         }
-        super(QueueMemberUserDissociatedEvent, self).__init__(
-            content, tenant_uuid, user_uuid
-        )
+        super().__init__(content, tenant_uuid, user_uuid)

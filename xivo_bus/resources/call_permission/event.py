@@ -11,7 +11,7 @@ class CallPermissionCreatedEvent(TenantEvent):
 
     def __init__(self, call_permission_id, tenant_uuid):
         content = {'id': call_permission_id}
-        super(CallPermissionCreatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class CallPermissionDeletedEvent(TenantEvent):
@@ -21,7 +21,7 @@ class CallPermissionDeletedEvent(TenantEvent):
 
     def __init__(self, call_permission_id, tenant_uuid):
         content = {'id': call_permission_id}
-        super(CallPermissionDeletedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class CallPermissionEditedEvent(TenantEvent):
@@ -31,4 +31,4 @@ class CallPermissionEditedEvent(TenantEvent):
 
     def __init__(self, call_permission_id, tenant_uuid):
         content = {'id': call_permission_id}
-        super(CallPermissionEditedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

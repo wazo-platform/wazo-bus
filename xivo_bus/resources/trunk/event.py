@@ -11,7 +11,7 @@ class TrunkCreatedEvent(TenantEvent):
 
     def __init__(self, trunk_id, tenant_uuid):
         content = {'id': int(trunk_id)}
-        super(TrunkCreatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class TrunkDeletedEvent(TenantEvent):
@@ -21,7 +21,7 @@ class TrunkDeletedEvent(TenantEvent):
 
     def __init__(self, trunk_id, tenant_uuid):
         content = {'id': int(trunk_id)}
-        super(TrunkDeletedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class TrunkEditedEvent(TenantEvent):
@@ -31,7 +31,7 @@ class TrunkEditedEvent(TenantEvent):
 
     def __init__(self, trunk_id, tenant_uuid):
         content = {'id': int(trunk_id)}
-        super(TrunkEditedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class TrunkStatusUpdatedEvent(TenantEvent):
@@ -55,4 +55,4 @@ class TrunkStatusUpdatedEvent(TenantEvent):
             'registered': endpoint_registered,
             'current_call_count': endpoint_current_call_count,
         }
-        super(TrunkStatusUpdatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

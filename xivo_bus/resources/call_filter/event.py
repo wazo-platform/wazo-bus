@@ -11,7 +11,7 @@ class CallFilterCreatedEvent(TenantEvent):
 
     def __init__(self, call_filter_id, tenant_uuid):
         content = {'id': call_filter_id}
-        super(CallFilterCreatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class CallFilterDeletedEvent(TenantEvent):
@@ -21,7 +21,7 @@ class CallFilterDeletedEvent(TenantEvent):
 
     def __init__(self, call_filter_id, tenant_uuid):
         content = {'id': call_filter_id}
-        super(CallFilterDeletedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class CallFilterEditedEvent(TenantEvent):
@@ -31,7 +31,7 @@ class CallFilterEditedEvent(TenantEvent):
 
     def __init__(self, call_filter_id, tenant_uuid):
         content = {'id': call_filter_id}
-        super(CallFilterEditedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class CallFilterFallbackEditedEvent(TenantEvent):
@@ -41,4 +41,4 @@ class CallFilterFallbackEditedEvent(TenantEvent):
 
     def __init__(self, call_filter_id, tenant_uuid):
         content = {'id': call_filter_id}
-        super(CallFilterFallbackEditedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
