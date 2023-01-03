@@ -9,7 +9,7 @@ class InvalidMessage(ValueError):
     pass
 
 
-class Marshaler(object):
+class Marshaler:
 
     content_type = 'application/json'
 
@@ -47,7 +47,7 @@ class Marshaler(object):
         return event
 
 
-class CollectdMarshaler(object):
+class CollectdMarshaler:
 
     content_type = 'text/collectd'
 
