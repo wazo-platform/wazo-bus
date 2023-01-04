@@ -92,7 +92,7 @@ class MultiUserEvent(TenantEvent):
 
 
 # Deprecated and should not be used for new events
-class BaseEvent(object):
+class BaseEvent:
     def __init__(self):
         self.routing_key = self.routing_key_fmt.format(**self._body)
         self.required_acl = 'events.{}'.format(self.routing_key)
@@ -118,7 +118,7 @@ class BaseEvent(object):
 
 
 # Deprecated and should not be used for new events
-class ResourceConfigEvent(object):
+class ResourceConfigEvent:
     def __init__(self, resource_id):
         self.id = int(resource_id)
 
@@ -137,7 +137,7 @@ class ResourceConfigEvent(object):
 
 
 # Deprecated and should not be used for new events
-class ArbitraryEvent(object):
+class ArbitraryEvent:
     def __init__(self, name, body, required_acl=None):
         self.name = name
         self._body = dict(body)

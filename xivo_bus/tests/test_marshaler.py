@@ -16,7 +16,7 @@ from xivo_bus.marshaler import CollectdMarshaler, Marshaler, InvalidMessage
 SOME_UUID = '15924520-1b3b-4ee4-xivo-8ce47a1e6c01'
 
 
-class EventTest(object):
+class EventTest:
     def __init__(self, value):
         self.value = value
 

@@ -7,7 +7,7 @@ from xivo_bus.resources.common.routing_key import escape as escape_key
 from xivo_bus.resources.common.acl import escape as escape_acl
 
 
-class _SwitchboardMixin(object):
+class _SwitchboardMixin:
     def __init__(self, content, switchboard_uuid, *args):
         super().__init__(content, *args)
         if switchboard_uuid is None:

@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
-class CollectdEvent(object):
+class CollectdEvent:
     interval = 10
     plugin = None
     plugin_instance = None

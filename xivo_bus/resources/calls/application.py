@@ -4,7 +4,7 @@
 from xivo_bus.resources.common.event import TenantEvent, UserEvent
 
 
-class _ApplicationMixin(object):
+class _ApplicationMixin:
     def __init__(self, content, application_uuid, *args):
         super().__init__(content, *args)
         if application_uuid is None:

@@ -63,7 +63,7 @@ class BusPublisherWithQueue(WazoEventMixin, ThreadableMixin, QueuePublisherMixin
 
 
 # Deprecated, use BusPublisher instead
-class Publisher(object):
+class Publisher:
     def __init__(self, producer, marshaler, **connection_args):
         self._producer = producer
         self._marshaler = marshaler
