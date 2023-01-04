@@ -1,10 +1,10 @@
 # Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from .common import CollectdEvent
+from .common import AbstractCollectdEvent
 
 
-class ChannelCollectdEvent(CollectdEvent):
+class ChannelCollectdEvent(AbstractCollectdEvent):
     plugin = 'channels'
     plugin_instance = 'global'
     routing_key = 'collectd.channels'

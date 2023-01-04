@@ -4,7 +4,7 @@
 
 import string
 
-from .common import CollectdEvent
+from .common import AbstractCollectdEvent
 
 
 def validate_plugin_instance_fragment(plugin_instance_fragment):
@@ -16,7 +16,7 @@ def validate_plugin_instance_fragment(plugin_instance_fragment):
     return result or '<unknown>'
 
 
-class CallCollectdEvent(CollectdEvent):
+class CallCollectdEvent(AbstractCollectdEvent):
     plugin = 'calls'
     plugin_instance = None
     routing_key = 'collectd.calls'

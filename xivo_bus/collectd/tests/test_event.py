@@ -3,12 +3,21 @@
 
 from unittest import TestCase
 
-from hamcrest import assert_that, is_
+from hamcrest import assert_that, is_, calling, raises
 
-from ..common import CollectdEvent
+from ..common import AbstractCollectdEvent
 
 
-class NoPluginCollectdEvent(CollectdEvent):
+class NoRoutingKeyCollectdEvent(AbstractCollectdEvent):
+    plugin = 'plugin'
+    plugin_instance = 'plugin_instance'
+    type_ = 'type'
+    type_instance = 'type_instance'
+    values = ('1',)
+
+
+class NoPluginCollectdEvent(AbstractCollectdEvent):
+    routing_key = 'collectd.test'
     plugin = None
     plugin_instance = 'plugin_instance'
     type_ = 'type'
@@ -16,7 +25,8 @@ class NoPluginCollectdEvent(CollectdEvent):
     values = ('1',)
 
 
-class NoPluginInstanceCollectdEvent(CollectdEvent):
+class NoPluginInstanceCollectdEvent(AbstractCollectdEvent):
+    routing_key = 'collectd.test'
     plugin = 'plugin'
     plugin_instance = None
     type_ = 'type'
@@ -24,7 +34,8 @@ class NoPluginInstanceCollectdEvent(CollectdEvent):
     values = ('1',)
 
 
-class NoTypeCollectdEvent(CollectdEvent):
+class NoTypeCollectdEvent(AbstractCollectdEvent):
+    routing_key = 'collectd.test'
     plugin = 'plugin'
     plugin_instance = 'plugin_instance'
     type_ = None
@@ -32,7 +43,8 @@ class NoTypeCollectdEvent(CollectdEvent):
     values = ('1',)
 
 
-class NoTypeInstanceCollectdEvent(CollectdEvent):
+class NoTypeInstanceCollectdEvent(AbstractCollectdEvent):
+    routing_key = 'collectd.test'
     plugin = 'plugin'
     plugin_instance = 'plugin_instance'
     type_ = 'type'
@@ -40,14 +52,16 @@ class NoTypeInstanceCollectdEvent(CollectdEvent):
     values = ('1',)
 
 
-class NoValuesCollectdEvent(CollectdEvent):
+class NoValuesCollectdEvent(AbstractCollectdEvent):
+    routing_key = 'collectd.test'
     plugin = 'plugin'
     plugin_instance = 'plugin_instance'
     type_ = 'type'
     type_instance = 'type_instance'
 
 
-class ValidCollectdEvent(CollectdEvent):
+class ValidCollectdEvent(AbstractCollectdEvent):
+    routing_key = 'collectd.test'
     plugin = 'plugin'
     plugin_instance = 'plugin_instance'
     type_ = 'type'
@@ -56,7 +70,8 @@ class ValidCollectdEvent(CollectdEvent):
     time = 12345
 
 
-class ValidWithTimeCollectdEvent(CollectdEvent):
+class ValidWithTimeCollectdEvent(AbstractCollectdEvent):
+    routing_key = 'collectd.test'
     plugin = 'plugin'
     plugin_instance = 'plugin_instance'
     type_ = 'type'
@@ -67,12 +82,11 @@ class ValidWithTimeCollectdEvent(CollectdEvent):
 
 class TestCollectdEvent(TestCase):
     def test_is_valid(self):
-        assert_that(CollectdEvent().is_valid(), is_(False))
+        assert_that(calling(NoRoutingKeyCollectdEvent), raises(TypeError))
         assert_that(NoPluginCollectdEvent().is_valid(), is_(False))
         assert_that(NoPluginInstanceCollectdEvent().is_valid(), is_(False))
         assert_that(NoTypeCollectdEvent().is_valid(), is_(False))
         assert_that(NoTypeInstanceCollectdEvent().is_valid(), is_(False))
         assert_that(NoValuesCollectdEvent().is_valid(), is_(False))
-
         assert_that(ValidCollectdEvent().is_valid(), is_(True))
         assert_that(ValidWithTimeCollectdEvent().is_valid(), is_(True))
