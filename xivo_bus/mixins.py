@@ -360,10 +360,16 @@ class PublisherMixin:
         headers, payload, routing_key = self._marshal(
             event, headers, payload, routing_key=routing_key
         )
+        content_type = getattr(self, 'content_type', None)
         with self.__lock:
             with self.Producer(self.__connection, **self.publisher_args) as publish:
-                publish(payload, headers=headers, routing_key=routing_key)
-        self.log.debug('Published \'%s\' (headers: %s)', event.name, headers)
+                publish(
+                    payload,
+                    headers=headers,
+                    routing_key=routing_key,
+                    content_type=content_type,
+                )
+        self.log.debug('Published %s', str(event))
 
 
 class QueuePublisherMixin(PublisherMixin):
@@ -500,3 +506,39 @@ class WazoEventMixin:
         event_data = payload.pop('data')
         headers = headers or payload
         return headers, event_data
+
+
+class CollectdMixin:
+    content_type = 'text/collectd'
+
+    def __init__(self, service_uuid=None, **kwargs):
+        super().__init__(**kwargs)
+        if not service_uuid:
+            raise ValueError('service must have an UUID')
+        self.service_uuid = service_uuid
+
+    def __generate_payload(self, event):
+        if not event.is_valid():
+            raise ValueError(event)
+
+        host = self.service_uuid
+
+        plugin = event.plugin
+        if event.plugin_instance:
+            plugin = f'{event.plugin}-{event.plugin_instance}'
+
+        type_ = f'{event.type_}-{event.type_instance}'
+        interval = event.interval
+        time = event.time
+        values = ':'.join(event.values)
+
+        return f'PUTVAL {host}/{plugin}/{type_} interval={interval} {time}:{values}'
+
+    def _marshal(self, event, headers, payload, routing_key=None):
+        routing_key = routing_key or getattr(event, 'routing_key', None)
+        payload = self.__generate_payload(event)
+
+        return headers, payload, routing_key
+
+    def _unmarshal(self, event_name, headers, payload):
+        pass
