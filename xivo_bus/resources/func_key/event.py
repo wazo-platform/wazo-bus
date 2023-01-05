@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-# Copyright 2014-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2014-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import unicode_literals
 from xivo_bus.resources.common.event import TenantEvent
 
 
@@ -13,7 +11,7 @@ class FuncKeyTemplateCreatedEvent(TenantEvent):
 
     def __init__(self, template_id, tenant_uuid):
         content = {'id': template_id}
-        super(FuncKeyTemplateCreatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class FuncKeyTemplateDeletedEvent(TenantEvent):
@@ -23,7 +21,7 @@ class FuncKeyTemplateDeletedEvent(TenantEvent):
 
     def __init__(self, template_id, tenant_uuid):
         content = {'id': template_id}
-        super(FuncKeyTemplateDeletedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class FuncKeyTemplateEditedEvent(TenantEvent):
@@ -33,4 +31,4 @@ class FuncKeyTemplateEditedEvent(TenantEvent):
 
     def __init__(self, template_id, tenant_uuid):
         content = {'id': template_id}
-        super(FuncKeyTemplateEditedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

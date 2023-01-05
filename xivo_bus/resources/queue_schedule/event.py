@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import unicode_literals
 from xivo_bus.resources.common.event import TenantEvent
 
 
@@ -16,7 +14,7 @@ class QueueScheduleAssociatedEvent(TenantEvent):
             'queue_id': queue_id,
             'schedule_id': schedule_id,
         }
-        super(QueueScheduleAssociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class QueueScheduleDissociatedEvent(TenantEvent):
@@ -29,4 +27,4 @@ class QueueScheduleDissociatedEvent(TenantEvent):
             'queue_id': queue_id,
             'schedule_id': schedule_id,
         }
-        super(QueueScheduleDissociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

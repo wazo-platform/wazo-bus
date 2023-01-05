@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.common.event import ServiceEvent
@@ -19,7 +18,7 @@ class ServiceRegisteredEvent(ServiceEvent):
             'port': advertise_port,
             'tags': tags,
         }
-        super(ServiceRegisteredEvent, self).__init__(content)
+        super().__init__(content)
 
 
 class ServiceDeregisteredEvent(ServiceEvent):
@@ -32,4 +31,4 @@ class ServiceDeregisteredEvent(ServiceEvent):
             'service_id': service_id,
             'tags': tags,
         }
-        super(ServiceDeregisteredEvent, self).__init__(content)
+        super().__init__(content)

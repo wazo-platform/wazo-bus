@@ -1,12 +1,12 @@
-# Copyright 2022-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2022-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.common.event import TenantEvent, UserEvent
 
 
-class _ApplicationMixin(object):
+class _ApplicationMixin:
     def __init__(self, content, application_uuid, *args):
-        super(_ApplicationMixin, self).__init__(content, *args)
+        super().__init__(content, *args)
         if application_uuid is None:
             raise ValueError('application_uuid must have a value')
         self.application_uuid = str(application_uuid)
@@ -23,9 +23,7 @@ class ApplicationCallDTMFReceivedEvent(_ApplicationMixin, TenantEvent):
             'call_id': call_id,
             'dtmf': dtmf,
         }
-        super(ApplicationCallDTMFReceivedEvent, self).__init__(
-            content, application_uuid, tenant_uuid
-        )
+        super().__init__(content, application_uuid, tenant_uuid)
 
 
 class ApplicationCallEnteredEvent(_ApplicationMixin, UserEvent):
@@ -35,9 +33,7 @@ class ApplicationCallEnteredEvent(_ApplicationMixin, UserEvent):
 
     def __init__(self, call_schema, application_uuid, tenant_uuid, user_uuid):
         content = {'application_uuid': str(application_uuid), 'call': call_schema}
-        super(ApplicationCallEnteredEvent, self).__init__(
-            content, application_uuid, tenant_uuid, user_uuid
-        )
+        super().__init__(content, application_uuid, tenant_uuid, user_uuid)
 
 
 class ApplicationCallInitiatedEvent(_ApplicationMixin, UserEvent):
@@ -47,9 +43,7 @@ class ApplicationCallInitiatedEvent(_ApplicationMixin, UserEvent):
 
     def __init__(self, call_schema, application_uuid, tenant_uuid, user_uuid):
         content = {'application_uuid': str(application_uuid), 'call': call_schema}
-        super(ApplicationCallInitiatedEvent, self).__init__(
-            content, application_uuid, tenant_uuid, user_uuid
-        )
+        super().__init__(content, application_uuid, tenant_uuid, user_uuid)
 
 
 class ApplicationCallDeletedEvent(_ApplicationMixin, UserEvent):
@@ -59,9 +53,7 @@ class ApplicationCallDeletedEvent(_ApplicationMixin, UserEvent):
 
     def __init__(self, call_schema, application_uuid, tenant_uuid, user_uuid):
         content = {'application_uuid': str(application_uuid), 'call': call_schema}
-        super(ApplicationCallDeletedEvent, self).__init__(
-            content, application_uuid, tenant_uuid, user_uuid
-        )
+        super().__init__(content, application_uuid, tenant_uuid, user_uuid)
 
 
 class ApplicationCallUpdatedEvent(_ApplicationMixin, UserEvent):
@@ -71,9 +63,7 @@ class ApplicationCallUpdatedEvent(_ApplicationMixin, UserEvent):
 
     def __init__(self, call_schema, application_uuid, tenant_uuid, user_uuid):
         content = {'application_uuid': str(application_uuid), 'call': call_schema}
-        super(ApplicationCallUpdatedEvent, self).__init__(
-            content, application_uuid, tenant_uuid, user_uuid
-        )
+        super().__init__(content, application_uuid, tenant_uuid, user_uuid)
 
 
 class ApplicationCallAnsweredEvent(_ApplicationMixin, UserEvent):
@@ -83,9 +73,7 @@ class ApplicationCallAnsweredEvent(_ApplicationMixin, UserEvent):
 
     def __init__(self, call_schema, application_uuid, tenant_uuid, user_uuid):
         content = {'application_uuid': str(application_uuid), 'call': call_schema}
-        super(ApplicationCallAnsweredEvent, self).__init__(
-            content, application_uuid, tenant_uuid, user_uuid
-        )
+        super().__init__(content, application_uuid, tenant_uuid, user_uuid)
 
 
 class ApplicationCallProgressStartedEvent(_ApplicationMixin, UserEvent):
@@ -97,9 +85,7 @@ class ApplicationCallProgressStartedEvent(_ApplicationMixin, UserEvent):
 
     def __init__(self, call_schema, application_uuid, tenant_uuid, user_uuid):
         content = {'application_uuid': str(application_uuid), 'call': call_schema}
-        super(ApplicationCallProgressStartedEvent, self).__init__(
-            content, application_uuid, tenant_uuid, user_uuid
-        )
+        super().__init__(content, application_uuid, tenant_uuid, user_uuid)
 
 
 class ApplicationCallProgressStoppedEvent(_ApplicationMixin, UserEvent):
@@ -111,9 +97,7 @@ class ApplicationCallProgressStoppedEvent(_ApplicationMixin, UserEvent):
 
     def __init__(self, call_schema, application_uuid, tenant_uuid, user_uuid):
         content = {'application_uuid': str(application_uuid), 'call': call_schema}
-        super(ApplicationCallProgressStoppedEvent, self).__init__(
-            content, application_uuid, tenant_uuid, user_uuid
-        )
+        super().__init__(content, application_uuid, tenant_uuid, user_uuid)
 
 
 class ApplicationDestinationNodeCreatedEvent(_ApplicationMixin, TenantEvent):
@@ -123,9 +107,7 @@ class ApplicationDestinationNodeCreatedEvent(_ApplicationMixin, TenantEvent):
 
     def __init__(self, node_schema, application_uuid, tenant_uuid):
         content = {'application_uuid': str(application_uuid), 'node': node_schema}
-        super(ApplicationDestinationNodeCreatedEvent, self).__init__(
-            content, application_uuid, tenant_uuid
-        )
+        super().__init__(content, application_uuid, tenant_uuid)
 
 
 class ApplicationNodeCreatedEvent(_ApplicationMixin, TenantEvent):
@@ -135,9 +117,7 @@ class ApplicationNodeCreatedEvent(_ApplicationMixin, TenantEvent):
 
     def __init__(self, node_schema, application_uuid, tenant_uuid):
         content = {'application_uuid': str(application_uuid), 'node': node_schema}
-        super(ApplicationNodeCreatedEvent, self).__init__(
-            content, application_uuid, tenant_uuid
-        )
+        super().__init__(content, application_uuid, tenant_uuid)
 
 
 class ApplicationNodeUpdatedEvent(_ApplicationMixin, TenantEvent):
@@ -147,9 +127,7 @@ class ApplicationNodeUpdatedEvent(_ApplicationMixin, TenantEvent):
 
     def __init__(self, node_schema, application_uuid, tenant_uuid):
         content = {'application_uuid': str(application_uuid), 'node': node_schema}
-        super(ApplicationNodeUpdatedEvent, self).__init__(
-            content, application_uuid, tenant_uuid
-        )
+        super().__init__(content, application_uuid, tenant_uuid)
 
 
 class ApplicationNodeDeletedEvent(_ApplicationMixin, TenantEvent):
@@ -159,9 +137,7 @@ class ApplicationNodeDeletedEvent(_ApplicationMixin, TenantEvent):
 
     def __init__(self, node_schema, application_uuid, tenant_uuid):
         content = {'application_uuid': str(application_uuid), 'node': node_schema}
-        super(ApplicationNodeDeletedEvent, self).__init__(
-            content, application_uuid, tenant_uuid
-        )
+        super().__init__(content, application_uuid, tenant_uuid)
 
 
 class ApplicationPlaybackCreatedEvent(_ApplicationMixin, TenantEvent):
@@ -176,9 +152,7 @@ class ApplicationPlaybackCreatedEvent(_ApplicationMixin, TenantEvent):
             'application_uuid': str(application_uuid),
             'playback': playback_schema,
         }
-        super(ApplicationPlaybackCreatedEvent, self).__init__(
-            content, application_uuid, tenant_uuid
-        )
+        super().__init__(content, application_uuid, tenant_uuid)
 
 
 class ApplicationPlaybackDeletedEvent(_ApplicationMixin, TenantEvent):
@@ -193,9 +167,7 @@ class ApplicationPlaybackDeletedEvent(_ApplicationMixin, TenantEvent):
             'application_uuid': str(application_uuid),
             'playback': playback_schema,
         }
-        super(ApplicationPlaybackDeletedEvent, self).__init__(
-            content, application_uuid, tenant_uuid
-        )
+        super().__init__(content, application_uuid, tenant_uuid)
 
 
 class ApplicationSnoopCreatedEvent(_ApplicationMixin, TenantEvent):
@@ -205,9 +177,7 @@ class ApplicationSnoopCreatedEvent(_ApplicationMixin, TenantEvent):
 
     def __init__(self, snoop_schema, application_uuid, tenant_uuid):
         content = {'application_uuid': str(application_uuid), 'snoop': snoop_schema}
-        super(ApplicationSnoopCreatedEvent, self).__init__(
-            content, application_uuid, tenant_uuid
-        )
+        super().__init__(content, application_uuid, tenant_uuid)
 
 
 class ApplicationSnoopUpdatedEvent(_ApplicationMixin, TenantEvent):
@@ -217,9 +187,7 @@ class ApplicationSnoopUpdatedEvent(_ApplicationMixin, TenantEvent):
 
     def __init__(self, snoop_schema, application_uuid, tenant_uuid):
         content = {'application_uuid': str(application_uuid), 'snoop': snoop_schema}
-        super(ApplicationSnoopUpdatedEvent, self).__init__(
-            content, application_uuid, tenant_uuid
-        )
+        super().__init__(content, application_uuid, tenant_uuid)
 
 
 class ApplicationSnoopDeletedEvent(_ApplicationMixin, TenantEvent):
@@ -229,9 +197,7 @@ class ApplicationSnoopDeletedEvent(_ApplicationMixin, TenantEvent):
 
     def __init__(self, snoop_schema, application_uuid, tenant_uuid):
         content = {'application_uuid': str(application_uuid), 'snoop': snoop_schema}
-        super(ApplicationSnoopDeletedEvent, self).__init__(
-            content, application_uuid, tenant_uuid
-        )
+        super().__init__(content, application_uuid, tenant_uuid)
 
 
 class ApplicationUserOutgoingCallCreatedEvent(_ApplicationMixin, UserEvent):
@@ -243,6 +209,4 @@ class ApplicationUserOutgoingCallCreatedEvent(_ApplicationMixin, UserEvent):
 
     def __init__(self, call_schema, application_uuid, tenant_uuid, user_uuid):
         content = {'application_uuid': str(application_uuid), 'call': call_schema}
-        super(ApplicationUserOutgoingCallCreatedEvent, self).__init__(
-            content, application_uuid, tenant_uuid, user_uuid
-        )
+        super().__init__(content, application_uuid, tenant_uuid, user_uuid)

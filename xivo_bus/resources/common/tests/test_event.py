@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-# Copyright 2013-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import unicode_literals
 
 from unittest import TestCase
 from hamcrest import assert_that, equal_to
@@ -26,7 +24,7 @@ class AbstractEvent(BaseEvent):
 
     def __init__(self, **body):
         self._body = body
-        super(AbstractEvent, self).__init__()
+        super().__init__()
 
 
 class SomeServiceEvent(ServiceEvent):
@@ -35,7 +33,7 @@ class SomeServiceEvent(ServiceEvent):
 
     def __init__(self, a, b):
         content = {'a': a, 'b': b}
-        super(SomeServiceEvent, self).__init__(content)
+        super().__init__(content)
 
 
 class SomeTenantEvent(TenantEvent):
@@ -44,7 +42,7 @@ class SomeTenantEvent(TenantEvent):
 
     def __init__(self, a, b, tenant_uuid):
         content = {'a': a, 'b': b}
-        super(SomeTenantEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class SomeUserEvent(UserEvent):
@@ -53,7 +51,7 @@ class SomeUserEvent(UserEvent):
 
     def __init__(self, a, b, tenant_uuid, user_uuid):
         content = {'a': a, 'b': b}
-        super(SomeUserEvent, self).__init__(content, tenant_uuid, user_uuid)
+        super().__init__(content, tenant_uuid, user_uuid)
 
 
 class SomeMultiUserEvent(MultiUserEvent):
@@ -62,7 +60,7 @@ class SomeMultiUserEvent(MultiUserEvent):
 
     def __init__(self, a, b, tenant_uuid, user_uuids):
         content = {'a': a, 'b': b}
-        super(SomeMultiUserEvent, self).__init__(content, tenant_uuid, user_uuids)
+        super().__init__(content, tenant_uuid, user_uuids)
 
 
 class TestServiceEvent(TestCase):

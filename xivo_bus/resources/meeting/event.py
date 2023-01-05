@@ -1,13 +1,12 @@
-# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import unicode_literals
 from xivo_bus.resources.common.event import TenantEvent, UserEvent
 
 
-class _MeetingMixin(object):
+class _MeetingMixin:
     def __init__(self, content, meeting_uuid, *args):
-        super(_MeetingMixin, self).__init__(content, *args)
+        super().__init__(content, *args)
         if meeting_uuid is None:
             raise ValueError('meeting_uuid must have a value')
         self.meeting_uuid = str(meeting_uuid)
@@ -19,7 +18,7 @@ class MeetingCreatedEvent(_MeetingMixin, TenantEvent):
     routing_key_fmt = 'config.meetings.created'
 
     def __init__(self, meeting, tenant_uuid):
-        super(MeetingCreatedEvent, self).__init__(meeting, meeting['uuid'], tenant_uuid)
+        super().__init__(meeting, meeting['uuid'], tenant_uuid)
 
 
 class MeetingDeletedEvent(_MeetingMixin, TenantEvent):
@@ -28,7 +27,7 @@ class MeetingDeletedEvent(_MeetingMixin, TenantEvent):
     routing_key_fmt = 'config.meetings.deleted'
 
     def __init__(self, meeting, tenant_uuid):
-        super(MeetingDeletedEvent, self).__init__(meeting, meeting['uuid'], tenant_uuid)
+        super().__init__(meeting, meeting['uuid'], tenant_uuid)
 
 
 class MeetingEditedEvent(_MeetingMixin, TenantEvent):
@@ -37,7 +36,7 @@ class MeetingEditedEvent(_MeetingMixin, TenantEvent):
     routing_key_fmt = 'config.meetings.updated'
 
     def __init__(self, meeting, tenant_uuid):
-        super(MeetingEditedEvent, self).__init__(meeting, meeting['uuid'], tenant_uuid)
+        super().__init__(meeting, meeting['uuid'], tenant_uuid)
 
 
 class MeetingProgressEvent(_MeetingMixin, TenantEvent):
@@ -48,9 +47,7 @@ class MeetingProgressEvent(_MeetingMixin, TenantEvent):
     def __init__(self, meeting, status, tenant_uuid):
         content = dict(meeting)
         content['status'] = status
-        super(MeetingProgressEvent, self).__init__(
-            content, meeting['uuid'], tenant_uuid
-        )
+        super().__init__(content, meeting['uuid'], tenant_uuid)
 
 
 class MeetingUserProgressEvent(_MeetingMixin, UserEvent):
@@ -62,9 +59,7 @@ class MeetingUserProgressEvent(_MeetingMixin, UserEvent):
         content = dict(meeting)
         content['status'] = status
         content['user_uuid'] = user_uuid
-        super(MeetingUserProgressEvent, self).__init__(
-            content, meeting['uuid'], tenant_uuid, user_uuid
-        )
+        super().__init__(content, meeting['uuid'], tenant_uuid, user_uuid)
 
 
 class MeetingParticipantJoinedEvent(_MeetingMixin, TenantEvent):
@@ -74,9 +69,7 @@ class MeetingParticipantJoinedEvent(_MeetingMixin, TenantEvent):
 
     def __init__(self, participant_data, meeting_uuid, tenant_uuid):
         content = dict(participant_data, meeting_uuid=meeting_uuid)
-        super(MeetingParticipantJoinedEvent, self).__init__(
-            content, meeting_uuid, tenant_uuid
-        )
+        super().__init__(content, meeting_uuid, tenant_uuid)
 
 
 class MeetingParticipantLeftEvent(_MeetingMixin, TenantEvent):
@@ -86,9 +79,7 @@ class MeetingParticipantLeftEvent(_MeetingMixin, TenantEvent):
 
     def __init__(self, participant_data, meeting_uuid, tenant_uuid):
         content = dict(participant_data, meeting_uuid=meeting_uuid)
-        super(MeetingParticipantLeftEvent, self).__init__(
-            content, meeting_uuid, tenant_uuid
-        )
+        super().__init__(content, meeting_uuid, tenant_uuid)
 
 
 class MeetingUserParticipantJoinedEvent(_MeetingMixin, UserEvent):
@@ -99,9 +90,7 @@ class MeetingUserParticipantJoinedEvent(_MeetingMixin, UserEvent):
 
     def __init__(self, participant_data, meeting_uuid, tenant_uuid, user_uuid):
         content = dict(participant_data, meeting_uuid=meeting_uuid)
-        super(MeetingUserParticipantJoinedEvent, self).__init__(
-            content, meeting_uuid, tenant_uuid, user_uuid
-        )
+        super().__init__(content, meeting_uuid, tenant_uuid, user_uuid)
 
 
 class MeetingUserParticipantLeftEvent(_MeetingMixin, UserEvent):
@@ -112,9 +101,7 @@ class MeetingUserParticipantLeftEvent(_MeetingMixin, UserEvent):
 
     def __init__(self, participant_data, meeting_uuid, tenant_uuid, user_uuid):
         content = dict(participant_data, meeting_uuid=meeting_uuid)
-        super(MeetingUserParticipantLeftEvent, self).__init__(
-            content, meeting_uuid, tenant_uuid, user_uuid
-        )
+        super().__init__(content, meeting_uuid, tenant_uuid, user_uuid)
 
 
 class MeetingAuthorizationCreatedEvent(_MeetingMixin, TenantEvent):
@@ -123,9 +110,7 @@ class MeetingAuthorizationCreatedEvent(_MeetingMixin, TenantEvent):
     routing_key_fmt = 'config.meeting_guest_authorizations.created'
 
     def __init__(self, meeting_authorization, meeting_uuid, tenant_uuid):
-        super(MeetingAuthorizationCreatedEvent, self).__init__(
-            meeting_authorization, meeting_uuid, tenant_uuid
-        )
+        super().__init__(meeting_authorization, meeting_uuid, tenant_uuid)
 
 
 class MeetingAuthorizationDeletedEvent(_MeetingMixin, TenantEvent):
@@ -134,9 +119,7 @@ class MeetingAuthorizationDeletedEvent(_MeetingMixin, TenantEvent):
     routing_key_fmt = 'config.meeting_guest_authorizations.deleted'
 
     def __init__(self, meeting_authorization, meeting_uuid, tenant_uuid):
-        super(MeetingAuthorizationDeletedEvent, self).__init__(
-            meeting_authorization, meeting_uuid, tenant_uuid
-        )
+        super().__init__(meeting_authorization, meeting_uuid, tenant_uuid)
 
 
 class MeetingAuthorizationEditedEvent(_MeetingMixin, TenantEvent):
@@ -145,9 +128,7 @@ class MeetingAuthorizationEditedEvent(_MeetingMixin, TenantEvent):
     routing_key_fmt = 'config.meeting_guest_authorizations.updated'
 
     def __init__(self, meeting_authorization, meeting_uuid, tenant_uuid):
-        super(MeetingAuthorizationEditedEvent, self).__init__(
-            meeting_authorization, meeting_uuid, tenant_uuid
-        )
+        super().__init__(meeting_authorization, meeting_uuid, tenant_uuid)
 
 
 class MeetingUserAuthorizationCreatedEvent(_MeetingMixin, UserEvent):
@@ -158,9 +139,7 @@ class MeetingUserAuthorizationCreatedEvent(_MeetingMixin, UserEvent):
 
     def __init__(self, meeting_authorization, meeting_uuid, tenant_uuid, user_uuid):
         content = dict(meeting_authorization, user_uuid=user_uuid)
-        super(MeetingUserAuthorizationCreatedEvent, self).__init__(
-            content, meeting_uuid, tenant_uuid, user_uuid
-        )
+        super().__init__(content, meeting_uuid, tenant_uuid, user_uuid)
 
 
 class MeetingUserAuthorizationDeletedEvent(_MeetingMixin, UserEvent):
@@ -171,9 +150,7 @@ class MeetingUserAuthorizationDeletedEvent(_MeetingMixin, UserEvent):
 
     def __init__(self, meeting_authorization, meeting_uuid, tenant_uuid, user_uuid):
         content = dict(meeting_authorization, user_uuid=user_uuid)
-        super(MeetingUserAuthorizationDeletedEvent, self).__init__(
-            content, meeting_uuid, tenant_uuid, user_uuid
-        )
+        super().__init__(content, meeting_uuid, tenant_uuid, user_uuid)
 
 
 class MeetingUserAuthorizationEditedEvent(_MeetingMixin, UserEvent):
@@ -184,6 +161,4 @@ class MeetingUserAuthorizationEditedEvent(_MeetingMixin, UserEvent):
 
     def __init__(self, meeting_authorization, meeting_uuid, tenant_uuid, user_uuid):
         content = dict(meeting_authorization, user_uuid=user_uuid)
-        super(MeetingUserAuthorizationEditedEvent, self).__init__(
-            content, meeting_uuid, tenant_uuid, user_uuid
-        )
+        super().__init__(content, meeting_uuid, tenant_uuid, user_uuid)

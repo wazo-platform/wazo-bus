@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-# Copyright 2013-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import unicode_literals
 from xivo_bus.resources.common.event import TenantEvent, UserEvent
 
 
@@ -15,7 +13,7 @@ class _BaseUserEvent(TenantEvent):
             'created_at': str(created_at) if created_at is not None else None,
             'tenant_uuid': str(tenant_uuid),
         }
-        super(_BaseUserEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class UserCreatedEvent(_BaseUserEvent):
@@ -49,7 +47,7 @@ class UserFallbackEditedEvent(UserEvent):
             'created_at': None,
             'tenant_uuid': str(tenant_uuid),
         }
-        super(UserFallbackEditedEvent, self).__init__(content, tenant_uuid, user_uuid)
+        super().__init__(content, tenant_uuid, user_uuid)
 
 
 class UserServiceEditedEvent(UserEvent):
@@ -65,7 +63,7 @@ class UserServiceEditedEvent(UserEvent):
             'tenant_uuid': str(tenant_uuid),
             'enabled': service_enabled,
         }
-        super(UserServiceEditedEvent, self).__init__(content, tenant_uuid, user_uuid)
+        super().__init__(content, tenant_uuid, user_uuid)
         self.service_name = service_name
 
 
@@ -91,5 +89,5 @@ class UserForwardEditedEvent(UserEvent):
             'enabled': forward_enabled,
             'destination': forward_dest,
         }
-        super(UserForwardEditedEvent, self).__init__(content, tenant_uuid, user_uuid)
+        super().__init__(content, tenant_uuid, user_uuid)
         self.forward_name = forward_name

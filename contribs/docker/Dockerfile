@@ -7,7 +7,7 @@ ENV PATH="/opt/venv/bin:$PATH"
 RUN true \
     && mkdir -p /app/output \
     && install -dm777 /app/output \
-    && pip install --upgrade pip pyyaml 'importlib-metadata<5' kombu six \
+    && pip install --upgrade pip pyyaml 'importlib-metadata<5' kombu \
         https://github.com/wazo-platform/xivo-bus/archive/master.zip
 
 COPY asyncapi-template.yml /app

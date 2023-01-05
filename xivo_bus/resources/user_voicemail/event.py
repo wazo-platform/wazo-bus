@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-# Copyright 2013-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import unicode_literals
 from xivo_bus.resources.common.event import UserEvent
 
 
@@ -16,9 +14,7 @@ class UserVoicemailAssociatedEvent(UserEvent):
             'user_uuid': str(user_uuid),
             'voicemail_id': int(voicemail_id),
         }
-        super(UserVoicemailAssociatedEvent, self).__init__(
-            content, tenant_uuid, user_uuid
-        )
+        super().__init__(content, tenant_uuid, user_uuid)
 
 
 class UserVoicemailDissociatedEvent(UserEvent):
@@ -31,6 +27,4 @@ class UserVoicemailDissociatedEvent(UserEvent):
             'user_uuid': user_uuid,
             'voicemail_id': int(voicemail_id),
         }
-        super(UserVoicemailDissociatedEvent, self).__init__(
-            content, tenant_uuid, user_uuid
-        )
+        super().__init__(content, tenant_uuid, user_uuid)

@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import unicode_literals
 from xivo_bus.resources.common.event import TenantEvent
 
 
@@ -13,7 +11,7 @@ class QueueCreatedEvent(TenantEvent):
 
     def __init__(self, queue_id, tenant_uuid):
         content = {'id': int(queue_id)}
-        super(QueueCreatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class QueueDeletedEvent(TenantEvent):
@@ -23,7 +21,7 @@ class QueueDeletedEvent(TenantEvent):
 
     def __init__(self, queue_id, tenant_uuid):
         content = {'id': int(queue_id)}
-        super(QueueDeletedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class QueueEditedEvent(TenantEvent):
@@ -33,7 +31,7 @@ class QueueEditedEvent(TenantEvent):
 
     def __init__(self, queue_id, tenant_uuid):
         content = {'id': int(queue_id)}
-        super(QueueEditedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class QueueFallbackEditedEvent(TenantEvent):
@@ -43,4 +41,4 @@ class QueueFallbackEditedEvent(TenantEvent):
 
     def __init__(self, queue_id, tenant_uuid):
         content = {'id': int(queue_id)}
-        super(QueueFallbackEditedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

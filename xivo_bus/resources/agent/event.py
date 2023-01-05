@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import unicode_literals
 from xivo_bus.resources.common.event import TenantEvent, MultiUserEvent
 
 
@@ -15,7 +13,7 @@ class AgentCreatedEvent(TenantEvent):
 
     def __init__(self, agent_id, tenant_uuid):
         content = {'id': int(agent_id)}
-        super(AgentCreatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class AgentDeletedEvent(TenantEvent):
@@ -27,18 +25,19 @@ class AgentDeletedEvent(TenantEvent):
 
     def __init__(self, agent_id, tenant_uuid):
         content = {'id': int(agent_id)}
-        super(AgentDeletedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class AgentEditedEvent(TenantEvent):
     """An agent has been edited"""
+
     service = 'confd'
     name = 'agent_edited'
     routing_key_fmt = 'config.agent.edited'
 
     def __init__(self, agent_id, tenant_uuid):
         content = {'id': int(agent_id)}
-        super(AgentEditedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class AgentPausedEvent(MultiUserEvent):
@@ -57,7 +56,7 @@ class AgentPausedEvent(MultiUserEvent):
             'paused_reason': reason or '',
             'queue': queue,
         }
-        super(AgentPausedEvent, self).__init__(content, tenant_uuid, user_uuids)
+        super().__init__(content, tenant_uuid, user_uuids)
 
 
 class AgentUnpausedEvent(MultiUserEvent):
@@ -76,7 +75,7 @@ class AgentUnpausedEvent(MultiUserEvent):
             'paused_reason': reason or '',
             'queue': queue,
         }
-        super(AgentUnpausedEvent, self).__init__(content, tenant_uuid, user_uuids)
+        super().__init__(content, tenant_uuid, user_uuids)
 
 
 class AgentStatusUpdatedEvent(MultiUserEvent):
@@ -89,4 +88,4 @@ class AgentStatusUpdatedEvent(MultiUserEvent):
 
     def __init__(self, agent_id, status, tenant_uuid, user_uuids):
         content = {'agent_id': int(agent_id), 'status': status}
-        super(AgentStatusUpdatedEvent, self).__init__(content, tenant_uuid, user_uuids)
+        super().__init__(content, tenant_uuid, user_uuids)

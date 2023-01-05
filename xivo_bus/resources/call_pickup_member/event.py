@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import unicode_literals
 from xivo_bus.resources.common.event import TenantEvent
 
 
@@ -16,9 +14,7 @@ class CallPickupInterceptorUsersAssociatedEvent(TenantEvent):
             'call_pickup_id': call_pickup_id,
             'user_uuids': users,
         }
-        super(CallPickupInterceptorUsersAssociatedEvent, self).__init__(
-            content, tenant_uuid
-        )
+        super().__init__(content, tenant_uuid)
 
 
 class CallPickupTargetUsersAssociatedEvent(TenantEvent):
@@ -31,7 +27,7 @@ class CallPickupTargetUsersAssociatedEvent(TenantEvent):
             'call_pickup_id': call_pickup_id,
             'user_uuids': users,
         }
-        super(CallPickupTargetUsersAssociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class CallPickupInterceptorGroupsAssociatedEvent(TenantEvent):
@@ -44,7 +40,7 @@ class CallPickupInterceptorGroupsAssociatedEvent(TenantEvent):
             'call_pickup_id': call_pickup_id,
             'group_ids': group_ids,
         }
-        super(CallPickupInterceptorGroupsAssociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class CallPickupTargetGroupsAssociatedEvent(TenantEvent):
@@ -57,4 +53,4 @@ class CallPickupTargetGroupsAssociatedEvent(TenantEvent):
             'call_pickup_id': call_pickup_id,
             'group_ids': group_ids,
         }
-        super(CallPickupTargetGroupsAssociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

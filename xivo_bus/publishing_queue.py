@@ -1,19 +1,18 @@
-# -*- coding: utf-8 -*-
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
 
-from six.moves import queue
+from queue import Queue, Empty
 
 logger = logging.getLogger(__name__)
 
 
-class PublishingQueue(object):
+class PublishingQueue:
     def __init__(self, publisher_factory):
         self._publish = None
         self._publisher_factory = publisher_factory
-        self._queue = queue.Queue()
+        self._queue = Queue()
         self._running = False
         self._should_stop = False
         self._flushing = False
@@ -24,7 +23,7 @@ class PublishingQueue(object):
         while not self._should_stop or self._flushing:
             try:
                 payload, headers, routing_key, kwargs = self._queue.get(timeout=0.1)
-            except queue.Empty:
+            except Empty:
                 self._flushing = False
                 continue
 

@@ -1,17 +1,15 @@
-# -*- coding: utf-8 -*-
-# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import unicode_literals
 
 from xivo_bus.resources.common.event import TenantEvent, MultiUserEvent
 from xivo_bus.resources.common.routing_key import escape as escape_key
 from xivo_bus.resources.common.acl import escape as escape_acl
 
 
-class _SwitchboardMixin(object):
+class _SwitchboardMixin:
     def __init__(self, content, switchboard_uuid, *args):
-        super(_SwitchboardMixin, self).__init__(content, *args)
+        super().__init__(content, *args)
         if switchboard_uuid is None:
             raise ValueError('switchboard_uuid must have a value')
         self.switchboard_uuid = str(switchboard_uuid)
@@ -24,9 +22,7 @@ class SwitchboardCreatedEvent(_SwitchboardMixin, TenantEvent):
     required_acl_fmt = 'switchboards.{switchboard_uuid}.created'
 
     def __init__(self, switchboard, switchboard_uuid, tenant_uuid):
-        super(SwitchboardCreatedEvent, self).__init__(
-            switchboard, switchboard_uuid, tenant_uuid
-        )
+        super().__init__(switchboard, switchboard_uuid, tenant_uuid)
 
 
 class SwitchboardDeletedEvent(_SwitchboardMixin, TenantEvent):
@@ -36,9 +32,7 @@ class SwitchboardDeletedEvent(_SwitchboardMixin, TenantEvent):
     required_acl_fmt = 'switchboards.{switchboard_uuid}.deleted'
 
     def __init__(self, switchboard, switchboard_uuid, tenant_uuid):
-        super(SwitchboardDeletedEvent, self).__init__(
-            switchboard, switchboard_uuid, tenant_uuid
-        )
+        super().__init__(switchboard, switchboard_uuid, tenant_uuid)
 
 
 class SwitchboardEditedEvent(_SwitchboardMixin, TenantEvent):
@@ -48,9 +42,7 @@ class SwitchboardEditedEvent(_SwitchboardMixin, TenantEvent):
     required_acl_fmt = 'switchboards.{switchboard_uuid}.edited'
 
     def __init__(self, switchboard, switchboard_uuid, tenant_uuid):
-        super(SwitchboardEditedEvent, self).__init__(
-            switchboard, switchboard_uuid, tenant_uuid
-        )
+        super().__init__(switchboard, switchboard_uuid, tenant_uuid)
 
 
 class SwitchboardFallbackEditedEvent(_SwitchboardMixin, TenantEvent):
@@ -60,9 +52,7 @@ class SwitchboardFallbackEditedEvent(_SwitchboardMixin, TenantEvent):
     required_acl_fmt = 'switchboards.fallbacks.edited'
 
     def __init__(self, fallback, switchboard_uuid, tenant_uuid):
-        super(SwitchboardFallbackEditedEvent, self).__init__(
-            fallback, switchboard_uuid, tenant_uuid
-        )
+        super().__init__(fallback, switchboard_uuid, tenant_uuid)
 
 
 class SwitchboardMemberUserAssociatedEvent(_SwitchboardMixin, MultiUserEvent):
@@ -76,9 +66,7 @@ class SwitchboardMemberUserAssociatedEvent(_SwitchboardMixin, MultiUserEvent):
             'switchboard_uuid': str(switchboard_uuid),
             'users': [{'uuid': str(uuid)} for uuid in user_uuids],
         }
-        super(SwitchboardMemberUserAssociatedEvent, self).__init__(
-            content, switchboard_uuid, tenant_uuid, user_uuids
-        )
+        super().__init__(content, switchboard_uuid, tenant_uuid, user_uuids)
 
 
 class SwitchboardQueuedCallsUpdatedEvent(_SwitchboardMixin, TenantEvent):
@@ -91,9 +79,7 @@ class SwitchboardQueuedCallsUpdatedEvent(_SwitchboardMixin, TenantEvent):
             'switchboard_uuid': str(switchboard_uuid),
             'items': items,
         }
-        super(SwitchboardQueuedCallsUpdatedEvent, self).__init__(
-            content, switchboard_uuid, tenant_uuid
-        )
+        super().__init__(content, switchboard_uuid, tenant_uuid)
 
 
 class SwitchboardQueuedCallAnsweredEvent(_SwitchboardMixin, TenantEvent):
@@ -102,9 +88,7 @@ class SwitchboardQueuedCallAnsweredEvent(_SwitchboardMixin, TenantEvent):
     routing_key_fmt = (
         'switchboards.{{switchboard_uuid}}.calls.queued.{queued_call_id}.answer.updated'
     )
-    required_acl_fmt = (
-        'events.switchboards.{{switchboard_uuid}}.calls.queued.{queued_call_id}.answer.updated'
-    )
+    required_acl_fmt = 'events.switchboards.{{switchboard_uuid}}.calls.queued.{queued_call_id}.answer.updated'
 
     def __init__(self, operator_call_id, queued_call_id, switchboard_uuid, tenant_uuid):
         content = {
@@ -118,9 +102,7 @@ class SwitchboardQueuedCallAnsweredEvent(_SwitchboardMixin, TenantEvent):
         self.required_acl_fmt = self.required_acl_fmt.format(
             queued_call_id=escape_acl(queued_call_id)
         )
-        super(SwitchboardQueuedCallAnsweredEvent, self).__init__(
-            content, switchboard_uuid, tenant_uuid
-        )
+        super().__init__(content, switchboard_uuid, tenant_uuid)
 
 
 class SwitchboardHeldCallsUpdatedEvent(_SwitchboardMixin, TenantEvent):
@@ -133,9 +115,7 @@ class SwitchboardHeldCallsUpdatedEvent(_SwitchboardMixin, TenantEvent):
             'switchboard_uuid': str(switchboard_uuid),
             'items': items,
         }
-        super(SwitchboardHeldCallsUpdatedEvent, self).__init__(
-            content, switchboard_uuid, tenant_uuid
-        )
+        super().__init__(content, switchboard_uuid, tenant_uuid)
 
 
 class SwitchboardHeldCallAnsweredEvent(_SwitchboardMixin, TenantEvent):
@@ -144,9 +124,7 @@ class SwitchboardHeldCallAnsweredEvent(_SwitchboardMixin, TenantEvent):
     routing_key_fmt = (
         'switchboards.{{switchboard_uuid}}.calls.held.{held_call_id}.answer.updated'
     )
-    required_acl_fmt = (
-        'events.switchboards.{{switchboard_uuid}}.calls.held.{held_call_id}.answer.updated'
-    )
+    required_acl_fmt = 'events.switchboards.{{switchboard_uuid}}.calls.held.{held_call_id}.answer.updated'
 
     def __init__(self, operator_call_id, held_call_id, switchboard_uuid, tenant_uuid):
         content = {
@@ -160,6 +138,4 @@ class SwitchboardHeldCallAnsweredEvent(_SwitchboardMixin, TenantEvent):
         self.required_acl_fmt = self.required_acl_fmt.format(
             held_call_id=escape_acl(held_call_id)
         )
-        super(SwitchboardHeldCallAnsweredEvent, self).__init__(
-            content, switchboard_uuid, tenant_uuid
-        )
+        super().__init__(content, switchboard_uuid, tenant_uuid)

@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import unicode_literals
 from xivo_bus.resources.common.event import ServiceEvent
 
 
@@ -12,7 +10,7 @@ class ConfBridgeWazoDefaultBridgeEditedEvent(ServiceEvent):
     routing_key_fmt = 'config.confbridge_wazo_default_bridge.edited'
 
     def __init__(self):
-        super(ConfBridgeWazoDefaultBridgeEditedEvent, self).__init__()
+        super().__init__()
 
 
 class ConfBridgeWazoDefaultUserEditedEvent(ServiceEvent):
@@ -21,4 +19,4 @@ class ConfBridgeWazoDefaultUserEditedEvent(ServiceEvent):
     routing_key_fmt = 'config.confbridge_wazo_default_user.edited'
 
     def __init__(self):
-        super(ConfBridgeWazoDefaultUserEditedEvent, self).__init__()
+        super().__init__()

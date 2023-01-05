@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import unicode_literals
 from xivo_bus.resources.common.event import TenantEvent
 
 
@@ -13,7 +11,7 @@ class CallPickupCreatedEvent(TenantEvent):
 
     def __init__(self, call_pickup_id, tenant_uuid):
         content = {'id': call_pickup_id}
-        super(CallPickupCreatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class CallPickupDeletedEvent(TenantEvent):
@@ -23,7 +21,7 @@ class CallPickupDeletedEvent(TenantEvent):
 
     def __init__(self, call_pickup_id, tenant_uuid):
         content = {'id': call_pickup_id}
-        super(CallPickupDeletedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class CallPickupEditedEvent(TenantEvent):
@@ -33,4 +31,4 @@ class CallPickupEditedEvent(TenantEvent):
 
     def __init__(self, call_pickup_id, tenant_uuid):
         content = {'id': call_pickup_id}
-        super(CallPickupEditedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

@@ -1,4 +1,4 @@
-# Copyright 2020-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from .base import Base
@@ -18,7 +18,7 @@ class BusConsumer(WazoEventMixin, ThreadableMixin, ConsumerMixin, Base):
         subscribe=None,
         **kwargs
     ):
-        super(BusConsumer, self).__init__(
+        super().__init__(
             name=name,
             username=username,
             password=password,

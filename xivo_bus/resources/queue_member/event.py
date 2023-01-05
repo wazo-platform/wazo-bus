@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-# Copyright 2013-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import unicode_literals
 from xivo_bus.resources.common.event import TenantEvent, UserEvent
 
 
@@ -17,7 +15,7 @@ class QueueMemberAgentAssociatedEvent(TenantEvent):
             'agent_id': agent_id,
             'penalty': penalty,
         }
-        super(QueueMemberAgentAssociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class QueueMemberAgentDissociatedEvent(TenantEvent):
@@ -30,7 +28,7 @@ class QueueMemberAgentDissociatedEvent(TenantEvent):
             'queue_id': queue_id,
             'agent_id': agent_id,
         }
-        super(QueueMemberAgentDissociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class QueueMemberUserAssociatedEvent(UserEvent):
@@ -43,9 +41,7 @@ class QueueMemberUserAssociatedEvent(UserEvent):
             'queue_id': queue_id,
             'user_uuid': str(user_uuid),
         }
-        super(QueueMemberUserAssociatedEvent, self).__init__(
-            content, tenant_uuid, user_uuid
-        )
+        super().__init__(content, tenant_uuid, user_uuid)
 
 
 class QueueMemberUserDissociatedEvent(UserEvent):
@@ -58,6 +54,4 @@ class QueueMemberUserDissociatedEvent(UserEvent):
             'queue_id': queue_id,
             'user_uuid': str(user_uuid),
         }
-        super(QueueMemberUserDissociatedEvent, self).__init__(
-            content, tenant_uuid, user_uuid
-        )
+        super().__init__(content, tenant_uuid, user_uuid)

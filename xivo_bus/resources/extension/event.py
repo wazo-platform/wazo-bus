@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-# Copyright 2013-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import unicode_literals
 from xivo_bus.resources.common.event import TenantEvent
 
 
@@ -17,7 +15,7 @@ class ExtensionCreatedEvent(TenantEvent):
             'exten': exten,
             'context': context,
         }
-        super(ExtensionCreatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class ExtensionDeletedEvent(TenantEvent):
@@ -31,7 +29,7 @@ class ExtensionDeletedEvent(TenantEvent):
             'exten': exten,
             'context': context,
         }
-        super(ExtensionDeletedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class ExtensionEditedEvent(TenantEvent):
@@ -45,4 +43,4 @@ class ExtensionEditedEvent(TenantEvent):
             'exten': exten,
             'context': context,
         }
-        super(ExtensionEditedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

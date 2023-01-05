@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-# Copyright 2013-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import unicode_literals
 from xivo_bus.resources.common.event import TenantEvent, UserEvent
 
 
@@ -13,7 +11,7 @@ class VoicemailCreatedEvent(TenantEvent):
 
     def __init__(self, voicemail_id, tenant_uuid):
         content = {'id': int(voicemail_id)}
-        super(VoicemailCreatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class VoicemailDeletedEvent(TenantEvent):
@@ -23,7 +21,7 @@ class VoicemailDeletedEvent(TenantEvent):
 
     def __init__(self, voicemail_id, tenant_uuid):
         content = {'id': int(voicemail_id)}
-        super(VoicemailDeletedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class VoicemailEditedEvent(TenantEvent):
@@ -33,7 +31,7 @@ class VoicemailEditedEvent(TenantEvent):
 
     def __init__(self, voicemail_id, tenant_uuid):
         content = {'id': int(voicemail_id)}
-        super(VoicemailEditedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class UserVoicemailEditedEvent(UserEvent):
@@ -46,7 +44,7 @@ class UserVoicemailEditedEvent(UserEvent):
             'user_uuid': str(user_uuid),
             'voicemail_id': voicemail_id,
         }
-        super(UserVoicemailEditedEvent, self).__init__(content, tenant_uuid, user_uuid)
+        super().__init__(content, tenant_uuid, user_uuid)
 
 
 class UserVoicemailMessageCreatedEvent(UserEvent):
@@ -62,9 +60,7 @@ class UserVoicemailMessageCreatedEvent(UserEvent):
             'message_id': message_id,
             'message': message,
         }
-        super(UserVoicemailMessageCreatedEvent, self).__init__(
-            content, tenant_uuid, user_uuid
-        )
+        super().__init__(content, tenant_uuid, user_uuid)
 
 
 class UserVoicemailMessageUpdatedEvent(UserEvent):
@@ -80,9 +76,7 @@ class UserVoicemailMessageUpdatedEvent(UserEvent):
             'message_id': message_id,
             'message': message,
         }
-        super(UserVoicemailMessageUpdatedEvent, self).__init__(
-            content, tenant_uuid, user_uuid
-        )
+        super().__init__(content, tenant_uuid, user_uuid)
 
 
 class UserVoicemailMessageDeletedEvent(UserEvent):
@@ -98,6 +92,4 @@ class UserVoicemailMessageDeletedEvent(UserEvent):
             'message_id': message_id,
             'message': message,
         }
-        super(UserVoicemailMessageDeletedEvent, self).__init__(
-            content, tenant_uuid, user_uuid
-        )
+        super().__init__(content, tenant_uuid, user_uuid)

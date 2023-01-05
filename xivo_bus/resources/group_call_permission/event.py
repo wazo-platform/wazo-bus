@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import unicode_literals
 from xivo_bus.resources.common.event import TenantEvent
 
 
@@ -17,7 +15,7 @@ class GroupCallPermissionAssociatedEvent(TenantEvent):
             'group_uuid': str(group_uuid),
             'call_permission_id': call_permission_id,
         }
-        super(GroupCallPermissionAssociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class GroupCallPermissionDissociatedEvent(TenantEvent):
@@ -31,4 +29,4 @@ class GroupCallPermissionDissociatedEvent(TenantEvent):
             'group_uuid': str(group_uuid),
             'call_permission_id': call_permission_id,
         }
-        super(GroupCallPermissionDissociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

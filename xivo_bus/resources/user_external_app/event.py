@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-# Copyright 2020-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import unicode_literals
 from xivo_bus.resources.common.event import TenantEvent
 
 
@@ -12,7 +10,7 @@ class UserExternalAppCreatedEvent(TenantEvent):
     routing_key_fmt = 'config.user_external_apps.created'
 
     def __init__(self, app, tenant_uuid):
-        super(UserExternalAppCreatedEvent, self).__init__(app, tenant_uuid)
+        super().__init__(app, tenant_uuid)
 
 
 class UserExternalAppDeletedEvent(TenantEvent):
@@ -21,7 +19,7 @@ class UserExternalAppDeletedEvent(TenantEvent):
     routing_key_fmt = 'config.user_external_apps.deleted'
 
     def __init__(self, app, tenant_uuid):
-        super(UserExternalAppDeletedEvent, self).__init__(app, tenant_uuid)
+        super().__init__(app, tenant_uuid)
 
 
 class UserExternalAppEditedEvent(TenantEvent):
@@ -30,4 +28,4 @@ class UserExternalAppEditedEvent(TenantEvent):
     routing_key_fmt = 'config.user_external_apps.edited'
 
     def __init__(self, app, tenant_uuid):
-        super(UserExternalAppEditedEvent, self).__init__(app, tenant_uuid)
+        super().__init__(app, tenant_uuid)

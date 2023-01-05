@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import unicode_literals
 
 import string
 
@@ -10,9 +8,11 @@ from .common import CollectdEvent
 
 
 def validate_plugin_instance_fragment(plugin_instance_fragment):
-    result = ''.join(c for c in plugin_instance_fragment if (c in string.ascii_letters
-                                                             or c in string.digits
-                                                             or c == '-'))
+    result = ''.join(
+        c
+        for c in plugin_instance_fragment
+        if (c in string.ascii_letters or c in string.digits or c == '-')
+    )
     return result or '<unknown>'
 
 
@@ -57,5 +57,5 @@ class CallDurationCollectdEvent(CallCollectdEvent):
     type_instance = 'duration'
 
     def __init__(self, application, application_id, duration, time=None):
-        super(CallDurationCollectdEvent, self).__init__(application, application_id, time)
+        super().__init__(application, application_id, time)
         self.values = (str(round(duration, 3)),)

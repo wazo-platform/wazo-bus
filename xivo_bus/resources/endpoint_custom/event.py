@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import unicode_literals
 from xivo_bus.resources.common.event import TenantEvent
 
 
@@ -12,7 +10,7 @@ class CustomEndpointCreatedEvent(TenantEvent):
     routing_key_fmt = 'config.custom_endpoint.created'
 
     def __init__(self, endpoint_iax, tenant_uuid):
-        super(CustomEndpointCreatedEvent, self).__init__(endpoint_iax, tenant_uuid)
+        super().__init__(endpoint_iax, tenant_uuid)
 
 
 class CustomEndpointDeletedEvent(TenantEvent):
@@ -21,7 +19,7 @@ class CustomEndpointDeletedEvent(TenantEvent):
     routing_key_fmt = 'config.custom_endpoint.deleted'
 
     def __init__(self, endpoint_iax, tenant_uuid):
-        super(CustomEndpointDeletedEvent, self).__init__(endpoint_iax, tenant_uuid)
+        super().__init__(endpoint_iax, tenant_uuid)
 
 
 class CustomEndpointEditedEvent(TenantEvent):
@@ -30,4 +28,4 @@ class CustomEndpointEditedEvent(TenantEvent):
     routing_key_fmt = 'config.custom_endpoint.edited'
 
     def __init__(self, endpoint_iax, tenant_uuid):
-        super(CustomEndpointEditedEvent, self).__init__(endpoint_iax, tenant_uuid)
+        super().__init__(endpoint_iax, tenant_uuid)

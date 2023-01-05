@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import unicode_literals
 from xivo_bus.resources.common.event import UserEvent
 
 
@@ -16,9 +14,7 @@ class UserCallPermissionAssociatedEvent(UserEvent):
             'user_uuid': str(user_uuid),
             'call_permission_id': call_permission_id,
         }
-        super(UserCallPermissionAssociatedEvent, self).__init__(
-            content, tenant_uuid, user_uuid
-        )
+        super().__init__(content, tenant_uuid, user_uuid)
 
 
 class UserCallPermissionDissociatedEvent(UserEvent):
@@ -31,6 +27,4 @@ class UserCallPermissionDissociatedEvent(UserEvent):
             'user_uuid': str(user_uuid),
             'call_permission_id': call_permission_id,
         }
-        super(UserCallPermissionDissociatedEvent, self).__init__(
-            content, tenant_uuid, user_uuid
-        )
+        super().__init__(content, tenant_uuid, user_uuid)

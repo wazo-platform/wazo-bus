@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import unicode_literals
 from xivo_bus.resources.common.event import TenantEvent
 
 
@@ -17,7 +15,7 @@ class GroupScheduleAssociatedEvent(TenantEvent):
             'group_uuid': str(group_uuid),
             'schedule_id': schedule_id,
         }
-        super(GroupScheduleAssociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class GroupScheduleDissociatedEvent(TenantEvent):
@@ -31,4 +29,4 @@ class GroupScheduleDissociatedEvent(TenantEvent):
             'group_uuid': str(group_uuid),
             'schedule_id': schedule_id,
         }
-        super(GroupScheduleDissociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)

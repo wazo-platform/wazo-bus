@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-# Copyright 2019-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import unicode_literals
 from xivo_bus.resources.common.event import TenantEvent, UserEvent
 
 
@@ -12,7 +10,7 @@ class FaxOutboundCreatedEvent(TenantEvent):
     routing_key_fmt = 'faxes.outbound.created'
 
     def __init__(self, fax_schema, tenant_uuid):
-        super(FaxOutboundCreatedEvent, self).__init__(fax_schema, tenant_uuid)
+        super().__init__(fax_schema, tenant_uuid)
 
 
 class FaxOutboundSucceededEvent(TenantEvent):
@@ -21,7 +19,7 @@ class FaxOutboundSucceededEvent(TenantEvent):
     routing_key_fmt = 'faxes.outbound.{id}.succeeded'
 
     def __init__(self, fax_schema, tenant_uuid):
-        super(FaxOutboundSucceededEvent, self).__init__(fax_schema, tenant_uuid)
+        super().__init__(fax_schema, tenant_uuid)
 
 
 class FaxOutboundFailedEvent(TenantEvent):
@@ -30,7 +28,7 @@ class FaxOutboundFailedEvent(TenantEvent):
     routing_key_fmt = 'faxes.outbound.{id}.failed'
 
     def __init__(self, fax_schema, tenant_uuid):
-        super(FaxOutboundFailedEvent, self).__init__(fax_schema, tenant_uuid)
+        super().__init__(fax_schema, tenant_uuid)
 
 
 class FaxOutboundUserCreatedEvent(UserEvent):
@@ -39,9 +37,7 @@ class FaxOutboundUserCreatedEvent(UserEvent):
     routing_key_fmt = 'faxes.outbound.users.{user_uuid}.created'
 
     def __init__(self, fax_schema, tenant_uuid, user_uuid):
-        super(FaxOutboundUserCreatedEvent, self).__init__(
-            fax_schema, tenant_uuid, user_uuid
-        )
+        super().__init__(fax_schema, tenant_uuid, user_uuid)
 
 
 class FaxOutboundUserSucceededEvent(UserEvent):
@@ -50,9 +46,7 @@ class FaxOutboundUserSucceededEvent(UserEvent):
     routing_key_fmt = 'faxes.outbound.users.{user_uuid}.succeeded'
 
     def __init__(self, fax_schema, tenant_uuid, user_uuid):
-        super(FaxOutboundUserSucceededEvent, self).__init__(
-            fax_schema, tenant_uuid, user_uuid
-        )
+        super().__init__(fax_schema, tenant_uuid, user_uuid)
 
 
 class FaxOutboundUserFailedEvent(UserEvent):
@@ -61,6 +55,4 @@ class FaxOutboundUserFailedEvent(UserEvent):
     routing_key_fmt = 'faxes.outbound.users.{user_uuid}.failed'
 
     def __init__(self, fax_schema, tenant_uuid, user_uuid):
-        super(FaxOutboundUserFailedEvent, self).__init__(
-            fax_schema, tenant_uuid, user_uuid
-        )
+        super().__init__(fax_schema, tenant_uuid, user_uuid)

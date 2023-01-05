@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-# Copyright 2012-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2012-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import json
@@ -10,7 +9,7 @@ class InvalidMessage(ValueError):
     pass
 
 
-class Marshaler(object):
+class Marshaler:
 
     content_type = 'application/json'
 
@@ -48,7 +47,7 @@ class Marshaler(object):
         return event
 
 
-class CollectdMarshaler(object):
+class CollectdMarshaler:
 
     content_type = 'text/collectd'
 
@@ -73,7 +72,7 @@ class CollectdMarshaler(object):
             type_instance=command.type_instance,
             interval=command.interval,
             time=command.time,
-            values=':'.join(command.values)
+            values=':'.join(command.values),
         )
 
     def metadata(self, _):

@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.common.event import UserEvent
@@ -17,7 +16,7 @@ class FavoriteAddedEvent(UserEvent):
             'source': source_name,
             'source_entry_id': entry_id,
         }
-        super(FavoriteAddedEvent, self).__init__(content, tenant_uuid, user_uuid)
+        super().__init__(content, tenant_uuid, user_uuid)
 
 
 class FavoriteDeletedEvent(UserEvent):
@@ -32,4 +31,4 @@ class FavoriteDeletedEvent(UserEvent):
             'source': source_name,
             'source_entry_id': entry_id,
         }
-        super(FavoriteDeletedEvent, self).__init__(content, tenant_uuid, user_uuid)
+        super().__init__(content, tenant_uuid, user_uuid)

@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.common.event import ServiceEvent
@@ -14,7 +13,7 @@ class PluginInstallProgressEvent(ServiceEvent):
         content = {'uuid': plugin_uuid, 'status': status}
         if errors:
             content.update(errors=errors)
-        super(PluginInstallProgressEvent, self).__init__(content)
+        super().__init__(content)
 
 
 class PluginUninstallProgressEvent(ServiceEvent):
@@ -26,4 +25,4 @@ class PluginUninstallProgressEvent(ServiceEvent):
         content = {'uuid': plugin_uuid, 'status': status}
         if errors:
             content.update(errors=errors)
-        super(PluginUninstallProgressEvent, self).__init__(content)
+        super().__init__(content)

@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import unicode_literals
 from xivo_bus.resources.common.event import TenantEvent
 
 
@@ -13,7 +11,7 @@ class TrunkRegisterIAXAssociatedEvent(TenantEvent):
 
     def __init__(self, trunk_id, register_id, tenant_uuid):
         content = {'trunk_id': trunk_id, 'register_id': register_id}
-        super(TrunkRegisterIAXAssociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
 
 
 class TrunkRegisterIAXDissociatedEvent(TenantEvent):
@@ -26,4 +24,4 @@ class TrunkRegisterIAXDissociatedEvent(TenantEvent):
             'trunk_id': trunk_id,
             'register_id': register_id,
         }
-        super(TrunkRegisterIAXDissociatedEvent, self).__init__(content, tenant_uuid)
+        super().__init__(content, tenant_uuid)
