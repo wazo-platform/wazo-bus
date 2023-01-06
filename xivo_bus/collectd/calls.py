@@ -4,10 +4,10 @@
 
 import string
 
-from .common import AbstractCollectdEvent
+from .common import CollectdEvent
 
 
-def validate_plugin_instance_fragment(plugin_instance_fragment):
+def _validate_plugin_instance_fragment(plugin_instance_fragment):
     result = ''.join(
         c
         for c in plugin_instance_fragment
@@ -16,43 +16,47 @@ def validate_plugin_instance_fragment(plugin_instance_fragment):
     return result or '<unknown>'
 
 
-class CallCollectdEvent(AbstractCollectdEvent):
+class _BaseCallCollectdEvent(CollectdEvent):
+    routing_key_fmt = 'collectd.calls'
     plugin = 'calls'
-    plugin_instance = None
-    routing_key = 'collectd.calls'
     type_ = 'counter'
-    type_instance = None
     values = ('1',)
 
     def __init__(self, application, application_id, time=None):
+        super().__init__()
         if time:
             self.time = int(time)
 
-        application = validate_plugin_instance_fragment(application)
+        application = _validate_plugin_instance_fragment(application)
         if application_id is not None:
-            application_id = validate_plugin_instance_fragment(application_id)
+            application_id = _validate_plugin_instance_fragment(application_id)
             self.plugin_instance = '{}.{}'.format(application, application_id)
         else:
             self.plugin_instance = application
 
 
-class CallStartCollectdEvent(CallCollectdEvent):
+class CallStartCollectdEvent(_BaseCallCollectdEvent):
+    name = 'collectd_call_started'
     type_instance = 'start'
 
 
-class CallConnectCollectdEvent(CallCollectdEvent):
+class CallConnectCollectdEvent(_BaseCallCollectdEvent):
+    name = 'collectd_call_connected'
     type_instance = 'connect'
 
 
-class CallEndCollectdEvent(CallCollectdEvent):
+class CallEndCollectdEvent(_BaseCallCollectdEvent):
+    name = 'collectd_call_ended'
     type_instance = 'end'
 
 
-class CallAbandonedCollectdEvent(CallCollectdEvent):
+class CallAbandonedCollectdEvent(_BaseCallCollectdEvent):
+    name = 'collectd_call_abandoned'
     type_instance = 'abandoned'
 
 
-class CallDurationCollectdEvent(CallCollectdEvent):
+class CallDurationCollectdEvent(_BaseCallCollectdEvent):
+    name = 'collectd_call_duration'
     type_ = 'gauge'
     type_instance = 'duration'
 

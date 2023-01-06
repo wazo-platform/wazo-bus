@@ -1,12 +1,25 @@
 # Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
+from ..resources.common.abstract import AbstractEvent
 
 
-class AbstractCollectdEvent(ABC):
+class CollectdEvent(AbstractEvent):
+    '''
+    Base Collectd Event
+
+    subclasses must define the following attributes:
+      * name
+      * routing_key_fmt
+      * plugin
+      * type_
+    '''
+
     interval = 10
+    plugin_instance = None
     time = 'N'
+    type_instance = None
     values = ()
 
     @property
@@ -16,22 +29,7 @@ class AbstractCollectdEvent(ABC):
 
     @property
     @abstractmethod
-    def plugin_instance(self):
-        pass
-
-    @property
-    @abstractmethod
-    def routing_key(self):
-        pass
-
-    @property
-    @abstractmethod
     def type_(self):
-        pass
-
-    @property
-    @abstractmethod
-    def type_instance(self):
         pass
 
     def is_valid(self):
@@ -47,11 +45,11 @@ class AbstractCollectdEvent(ABC):
     def __str__(self):
         content = ', '.join(
             [
-                f'plugin={self.plugin}',
-                f'plugin_instance={self.plugin_instance}',
-                f'type={self.type_}',
-                f'type_instance={self.type_instance}',
+                f'plugin=\'{self.plugin}\'',
+                f'plugin_instance=\'{self.plugin_instance}\'',
+                f'type=\'{self.type_}\'',
+                f'type_instance=\'{self.type_instance}\'',
                 f'values={self.values}',
             ]
         )
-        return f'<Collectd Event: {content}>'
+        return f'CollectdEvent({content})'
