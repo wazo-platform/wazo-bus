@@ -115,22 +115,3 @@ class BaseEvent:
     @classmethod
     def unmarshal(cls, body):
         return cls(**body)
-
-
-# Deprecated and should not be used for new events
-class ResourceConfigEvent:
-    def __init__(self, resource_id):
-        self.id = int(resource_id)
-
-    def marshal(self):
-        return {'id': self.id}
-
-    @classmethod
-    def unmarshal(cls, msg):
-        return cls(msg['id'])
-
-    def __eq__(self, other):
-        return self.id == other.id
-
-    def __ne__(self, other):
-        return self.id != other.id
