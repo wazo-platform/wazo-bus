@@ -89,29 +89,3 @@ class MultiUserEvent(TenantEvent):
         for user_uuid in self.user_uuids:
             headers['user_uuid:{}'.format(user_uuid)] = True
         return headers
-
-
-# Deprecated and should not be used for new events
-class BaseEvent:
-    def __init__(self):
-        self.routing_key = self.routing_key_fmt.format(**self._body)
-        self.required_acl = 'events.{}'.format(self.routing_key)
-
-    def marshal(self):
-        return self._body
-
-    def __ne__(self, other):
-        return not self == other
-
-    def __eq__(self, other):
-        return self.__class__ == other.__class__ and self._body == other._body
-
-    def __str__(self):
-        return '{}({})'.format(self.__class__.__name__, self._body)
-
-    def __repr__(self):
-        return self.__str__()
-
-    @classmethod
-    def unmarshal(cls, body):
-        return cls(**body)
