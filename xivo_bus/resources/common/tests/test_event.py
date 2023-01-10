@@ -6,25 +6,12 @@ from unittest import TestCase
 from hamcrest import assert_that, equal_to
 from uuid import uuid4
 
-from ..event import ResourceConfigEvent, BaseEvent
-
-
 from ..event import ServiceEvent, TenantEvent, UserEvent, MultiUserEvent
-
 
 TENANT_UUID = uuid4()
 USER_UUID = uuid4()
 USER2_UUID = uuid4()
 USER3_UUID = uuid4()
-
-
-class AbstractEvent(BaseEvent):
-    name = 'abstract_name_event'
-    routing_key_fmt = 'abstract.routing_key.{id}'
-
-    def __init__(self, **body):
-        self._body = body
-        super().__init__()
 
 
 class SomeServiceEvent(ServiceEvent):
@@ -168,47 +155,3 @@ class TestMultiUserEvent(TestCase):
                 }
             ),
         )
-
-
-class TestBaseEvent(TestCase):
-
-    Event = AbstractEvent
-
-    def setUp(self):
-        self.user_id = 2
-        self.body = {'id': self.user_id, 'field': 'value'}
-
-    def test_marshal(self):
-        event = self.Event(**self.body)
-        assert_that(event.marshal(), equal_to(self.body))
-
-    def test_unmarshal(self):
-        event = self.Event.unmarshal(self.body)
-        expected = self.Event(**self.body)
-        assert_that(event, equal_to(expected))
-
-
-class ConcreteResourceConfigEvent(ResourceConfigEvent):
-
-    name = 'foo'
-
-
-RESOURCE_ID = 42
-
-
-class TestResourceConfigEvent(TestCase):
-    def setUp(self):
-        self.msg = {'id': RESOURCE_ID}
-
-    def test_marshal(self):
-        command = ConcreteResourceConfigEvent(RESOURCE_ID)
-
-        msg = command.marshal()
-
-        self.assertEqual(msg, self.msg)
-
-    def test_unmarshal(self):
-        command = ConcreteResourceConfigEvent.unmarshal(self.msg)
-
-        self.assertEqual(command.name, ConcreteResourceConfigEvent.name)
-        self.assertEqual(command.id, RESOURCE_ID)
