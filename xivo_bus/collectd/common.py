@@ -1,15 +1,36 @@
 # Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from abc import abstractmethod
+from ..resources.common.abstract import AbstractEvent
 
-class CollectdEvent:
+
+class CollectdEvent(AbstractEvent):
+    '''
+    Base Collectd Event
+
+    subclasses must define the following attributes:
+      * name
+      * routing_key_fmt
+      * plugin
+      * type_
+    '''
+
     interval = 10
-    plugin = None
     plugin_instance = None
-    type_ = None
+    time = 'N'
     type_instance = None
     values = ()
-    time = 'N'
+
+    @property
+    @abstractmethod
+    def plugin(self):
+        pass
+
+    @property
+    @abstractmethod
+    def type_(self):
+        pass
 
     def is_valid(self):
         return (
@@ -20,3 +41,15 @@ class CollectdEvent:
             and (self.time == 'N' or isinstance(self.time, int))
             and len(self.values) > 0
         )
+
+    def __str__(self):
+        content = ', '.join(
+            [
+                f'plugin=\'{self.plugin}\'',
+                f'plugin_instance=\'{self.plugin_instance}\'',
+                f'type=\'{self.type_}\'',
+                f'type_instance=\'{self.type_instance}\'',
+                f'values={self.values}',
+            ]
+        )
+        return f'CollectdEvent({content})'
