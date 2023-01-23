@@ -25,10 +25,11 @@ class Base:
         exchange_type='',
         **kwargs
     ):
+        durable = kwargs.pop('exchange_durable', True)
         self._name = name or type(self).__name__
         self._logger = logging.getLogger(type(self).__name__)
         self._connection_params = ConnectionParams(username, password, host, port)
-        self._default_exchange = Exchange(name=exchange_name, type=exchange_type)
+        self._default_exchange = Exchange(name=exchange_name, type=exchange_type, durable=durable)
 
     @property
     def url(self):
