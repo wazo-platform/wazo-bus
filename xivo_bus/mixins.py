@@ -196,7 +196,7 @@ class ConsumerMixin(KombuConsumer):
     def __dispatch(self, event_name, payload, headers=None):
         with self.__lock:
             subscriptions = self.__subscriptions[event_name].copy()
-        for (handler, _) in subscriptions:
+        for handler, _ in subscriptions:
             try:
                 handler(payload)
             except Exception:
