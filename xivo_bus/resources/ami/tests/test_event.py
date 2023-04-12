@@ -3,7 +3,7 @@
 
 
 import unittest
-from mock import sentinel
+from unittest.mock import sentinel
 from ..event import AMIEvent
 
 

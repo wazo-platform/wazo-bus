@@ -4,5 +4,4 @@ pytest
 requests
 
 # From xivo-bus
-importlib_metadata==1.6.0  # from kombu
-kombu==4.6.11
+kombu==5.0.2
