@@ -1,4 +1,4 @@
-# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from datetime import datetime
@@ -62,7 +62,7 @@ class TestHeaders(BusIntegrationTest):
 
             assert_that(
                 self.local_messages(event.name, 1),
-                has_item((has_entry('value', 'first'))),
+                has_item(has_entry('value', 'first')),
             )
 
     def test_publish_wrong_expected_headers_value(self):

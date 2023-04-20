@@ -30,7 +30,7 @@ class _BaseCallCollectdEvent(CollectdEvent):
         application = _validate_plugin_instance_fragment(application)
         if application_id is not None:
             application_id = _validate_plugin_instance_fragment(application_id)
-            self.plugin_instance = '{}.{}'.format(application, application_id)
+            self.plugin_instance = f'{application}.{application_id}'
         else:
             self.plugin_instance = application
 

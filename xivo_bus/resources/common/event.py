@@ -57,7 +57,7 @@ class UserEvent(TenantEvent):
         headers = super().headers
         uuid = headers.pop('user_uuid')
         if uuid:
-            headers['user_uuid:{}'.format(uuid)] = True
+            headers[f'user_uuid:{uuid}'] = True
         return headers
 
 
@@ -87,5 +87,5 @@ class MultiUserEvent(TenantEvent):
     def headers(self):
         headers = super().headers
         for user_uuid in self.user_uuids:
-            headers['user_uuid:{}'.format(user_uuid)] = True
+            headers[f'user_uuid:{user_uuid}'] = True
         return headers
