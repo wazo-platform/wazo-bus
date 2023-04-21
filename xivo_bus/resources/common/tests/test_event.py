@@ -108,7 +108,7 @@ class TestUserEvent(TestCase):
                 {
                     'name': 'some_user_event',
                     'tenant_uuid': str(TENANT_UUID),
-                    'user_uuid:{uuid}'.format(uuid=USER_UUID): True,
+                    f'user_uuid:{USER_UUID}': True,
                 }
             ),
         )
@@ -138,9 +138,9 @@ class TestMultiUserEvent(TestCase):
                 {
                     'name': 'some_multi_user_event',
                     'tenant_uuid': str(TENANT_UUID),
-                    'user_uuid:{uuid}'.format(uuid=USER_UUID): True,
-                    'user_uuid:{uuid}'.format(uuid=USER2_UUID): True,
-                    'user_uuid:{uuid}'.format(uuid=USER3_UUID): True,
+                    f'user_uuid:{USER_UUID}': True,
+                    f'user_uuid:{USER2_UUID}': True,
+                    f'user_uuid:{USER3_UUID}': True,
                 }
             ),
         )

@@ -71,7 +71,7 @@ class ThreadableMixin:
         bus_thread = BusThread(
             Thread(
                 target=self.__wrap_thread(run),
-                name='{}:{}'.format(self._name, name),
+                name=f'{self._name}:{name}',
                 args=(self, name, ready_flag),
                 kwargs=kwargs,
             ),
@@ -83,9 +83,7 @@ class ThreadableMixin:
 
     def start(self):
         if self.is_running:
-            raise RuntimeError(
-                '{} threads are already running'.format(len(self.__threads))
-            )
+            raise RuntimeError(f'{len(self.__threads)} threads are already running')
 
         for bus_thread in self.__threads:
             bus_thread.thread.start()
@@ -136,7 +134,7 @@ class ConsumerMixin(KombuConsumer):
 
     def __init__(self, subscribe=None, **kwargs):
         super().__init__(**kwargs)
-        name = '{name}.{id}'.format(name=self._name, id=os.urandom(3).hex())
+        name = f'{self._name}.{os.urandom(3).hex()}'
         if subscribe:
             exchange = Exchange(subscribe['exchange_name'], subscribe['exchange_type'])
 

@@ -55,11 +55,11 @@ class AbstractEvent(metaclass=ABCMeta):
             variables = dict(**self.content)
             variables.update(vars(self), name=self.name)
             return self.required_acl_fmt.format(**variables)
-        return 'events.{}'.format(self.routing_key)
+        return f'events.{self.routing_key}'
 
     @property
     def required_access(self):
-        return 'event.{}'.format(self.name)
+        return f'event.{self.name}'
 
     @property
     def headers(self):

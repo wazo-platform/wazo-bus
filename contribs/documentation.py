@@ -1,4 +1,4 @@
-# Copyright 2022-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2022-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import argparse
@@ -202,7 +202,7 @@ class EventSpecificationBuilder:
         resource_dir = self.base_path.joinpath('resources')
         self.paths = [path for path in resource_dir.iterdir() if path.is_dir()]
 
-        with open(input_schema, 'r') as file:
+        with open(input_schema) as file:
             self.input_schema = yaml.safe_load(file)
 
     @staticmethod
