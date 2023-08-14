@@ -9,6 +9,6 @@ class ExtensionFeatureEditedEvent(ServiceEvent):
     name = 'extension_feature_edited'
     routing_key_fmt = 'config.extension_feature.edited'
 
-    def __init__(self, extension_id):
-        content = {'id': extension_id}
+    def __init__(self, feature_extension_uuid):
+        content = {'uuid': feature_extension_uuid}
         super().__init__(content)
