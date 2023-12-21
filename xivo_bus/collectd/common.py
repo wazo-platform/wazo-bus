@@ -17,23 +17,24 @@ class CollectdEvent(AbstractEvent):
       * type_
     '''
 
-    interval = 10
-    plugin_instance = None
-    time = 'N'
-    type_instance = None
-    values = ()
+    routing_key_fmt: str
+    interval: int = 10
+    plugin_instance: str | None = None
+    time: str | int = 'N'
+    type_instance: str | None = None
+    values: tuple[str, ...] = ()
 
     @property
     @abstractmethod
-    def plugin(self):
+    def plugin(self) -> str:
         pass
 
     @property
     @abstractmethod
-    def type_(self):
+    def type_(self) -> str:
         pass
 
-    def is_valid(self):
+    def is_valid(self) -> bool:
         return (
             self.plugin is not None
             and self.plugin_instance is not None
@@ -43,7 +44,7 @@ class CollectdEvent(AbstractEvent):
             and len(self.values) > 0
         )
 
-    def __str__(self):
+    def __str__(self) -> str:
         content = ', '.join(
             [
                 f'plugin=\'{self.plugin}\'',
