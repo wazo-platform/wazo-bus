@@ -85,6 +85,8 @@ class ThreadableMixin(BaseProtocol):
             Starts execution of registered thread
         * `stop`:
             Kill all running threads
+
+    Private methods:
         * `_register_thread`:
             Allows another mixin to register a thread for execution
     '''
@@ -101,7 +103,7 @@ class ThreadableMixin(BaseProtocol):
     @property
     def is_running(self) -> bool:
         status = all({bus_thread.thread.is_alive() for bus_thread in self.__threads})
-        return super().is_running and status
+        return super().is_running and status  # type: ignore[safe-super]
 
     @property
     def __threads(self) -> list[BusThread]:
@@ -109,11 +111,12 @@ class ThreadableMixin(BaseProtocol):
 
     def __enter__(self) -> Self:
         self.start()
-        return super().__enter__()
+        super().__enter__()  # type: ignore[safe-super]
+        return self
 
     def __exit__(self, *args: Any) -> None:
         self.stop()
-        super().__exit__(*args)
+        super().__exit__(*args)  # type: ignore[safe-super]
 
     def _register_thread(
         self,
