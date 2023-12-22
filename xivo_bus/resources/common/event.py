@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
+
 from .abstract import EventProtocol
 
 
@@ -14,7 +16,7 @@ class ServiceEvent(EventProtocol):
     make it through the websocket.
     '''
 
-    def __init__(self, content: dict | None = None):
+    def __init__(self, content: Mapping | None = None):
         self.content = content or {}
 
 
@@ -29,7 +31,7 @@ class TenantEvent(EventProtocol):
         - tenant_uuid
     '''
 
-    def __init__(self, content: dict | None, tenant_uuid: str):
+    def __init__(self, content: Mapping | None, tenant_uuid: str):
         super().__init__(content=content)
         if tenant_uuid is None:
             raise ValueError('tenant_uuid must have a value')
@@ -50,7 +52,9 @@ class UserEvent(TenantEvent):
         - user_uuid
     '''
 
-    def __init__(self, content: dict | None, tenant_uuid: str, user_uuid: str | None):
+    def __init__(
+        self, content: Mapping | None, tenant_uuid: str, user_uuid: str | None
+    ):
         super().__init__(content, tenant_uuid)
         delattr(self, 'user_uuid:*')
         self.user_uuid = str(user_uuid) if user_uuid else None
@@ -79,7 +83,9 @@ class MultiUserEvent(TenantEvent):
 
     __slots__ = ('user_uuids',)
 
-    def __init__(self, content: dict, tenant_uuid: str, user_uuids: list[str]):
+    def __init__(
+        self, content: Mapping | None, tenant_uuid: str, user_uuids: list[str]
+    ):
         super().__init__(content, tenant_uuid)
         delattr(self, 'user_uuid:*')
         if not isinstance(user_uuids, list):

@@ -4,14 +4,15 @@
 from __future__ import annotations
 
 from abc import ABCMeta, abstractmethod
+from collections.abc import Mapping
 from typing import Any, Protocol
 
 
 class EventProtocol(Protocol):
     __slots__ = ('content',)
-    content: dict
+    content: Mapping
 
-    def __init__(self, content: dict | None = None):
+    def __init__(self, content: Mapping | None = None):
         self.content = content or {}
 
     def __eq__(self, other: Any) -> bool:
@@ -72,7 +73,7 @@ class EventProtocol(Protocol):
         return headers
 
     def marshal(self) -> dict:
-        return self.content
+        return dict(self.content)
 
 
 #  NOTE: Deprecated since 24.01, use EventProtocol instead
