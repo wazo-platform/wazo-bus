@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
-def escape(routing_key_part):
+def escape(routing_key_part: str) -> str:
     return (
         routing_key_part.replace('.', '__DOT__')
         .replace('#', '__HASH__')
