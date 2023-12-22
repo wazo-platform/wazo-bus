@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from .base import Base
-from .mixins import ThreadableMixin, ConsumerMixin, WazoEventMixin
+from .mixins import ConsumerMixin, ThreadableMixin, WazoEventMixin
 
 
 class BusConsumer(WazoEventMixin, ThreadableMixin, ConsumerMixin, Base):

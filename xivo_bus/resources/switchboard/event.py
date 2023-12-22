@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
-from xivo_bus.resources.common.event import TenantEvent, MultiUserEvent
-from xivo_bus.resources.common.routing_key import escape as escape_key
 from xivo_bus.resources.common.acl import escape as escape_acl
+from xivo_bus.resources.common.event import MultiUserEvent, TenantEvent
+from xivo_bus.resources.common.routing_key import escape as escape_key
 
 
 class _SwitchboardMixin:

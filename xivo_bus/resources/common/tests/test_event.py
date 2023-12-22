@@ -3,10 +3,11 @@
 
 
 from unittest import TestCase
-from hamcrest import assert_that, equal_to
 from uuid import uuid4
 
-from ..event import ServiceEvent, TenantEvent, UserEvent, MultiUserEvent
+from hamcrest import assert_that, equal_to
+
+from ..event import MultiUserEvent, ServiceEvent, TenantEvent, UserEvent
 
 TENANT_UUID = uuid4()
 USER_UUID = uuid4()

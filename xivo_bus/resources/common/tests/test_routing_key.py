@@ -3,9 +3,7 @@
 
 import unittest
 
-from hamcrest import assert_that
-from hamcrest import equal_to
-from hamcrest import is_not
+from hamcrest import assert_that, equal_to, is_not
 
 from ..routing_key import escape
 

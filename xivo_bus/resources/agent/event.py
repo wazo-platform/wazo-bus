@@ -1,7 +1,7 @@
 # Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_bus.resources.common.event import TenantEvent, MultiUserEvent
+from xivo_bus.resources.common.event import MultiUserEvent, TenantEvent
 
 
 class AgentCreatedEvent(TenantEvent):

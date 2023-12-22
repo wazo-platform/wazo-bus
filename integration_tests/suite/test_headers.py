@@ -2,17 +2,19 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from datetime import datetime
+
 from hamcrest import (
     assert_that,
-    has_entry,
-    has_entries,
-    has_key,
-    has_items,
-    has_item,
     empty,
-    is_,
+    has_entries,
+    has_entry,
+    has_item,
+    has_items,
+    has_key,
     has_length,
+    is_,
 )
+
 from .helpers.base import BusIntegrationTest
 from .helpers.events import MockEvent
 

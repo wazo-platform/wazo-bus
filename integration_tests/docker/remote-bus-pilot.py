@@ -1,16 +1,16 @@
-# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import logging
 import os
 import sys
-import logging
-
-from flask import Flask, request, jsonify
-from threading import Lock
 from collections import defaultdict, namedtuple
-from xivo_bus.base import Base
-from xivo_bus.mixins import ThreadableMixin, QueuePublisherMixin, ConsumerMixin
+from threading import Lock
 
+from flask import Flask, jsonify, request
+
+from xivo_bus.base import Base
+from xivo_bus.mixins import ConsumerMixin, QueuePublisherMixin, ThreadableMixin
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logger = logging.getLogger("remote-bus-pilot")

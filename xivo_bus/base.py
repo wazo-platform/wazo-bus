@@ -2,11 +2,10 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
-
 from collections import namedtuple
+
 from kombu import Exchange
 from kombu.utils.url import as_url
-
 
 ConnectionParams = namedtuple('ConnectionParams', 'user, password, host, port')
 

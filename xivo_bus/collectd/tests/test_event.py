@@ -3,7 +3,7 @@
 
 from unittest import TestCase
 
-from hamcrest import assert_that, is_, calling, raises
+from hamcrest import assert_that, calling, is_, raises
 
 from ..common import CollectdEvent
 

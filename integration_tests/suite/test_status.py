@@ -1,9 +1,9 @@
-# Copyright 2022-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2022-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import assert_that, calling, raises, has_item, has_entry
-from wazo_test_helpers import until
+from hamcrest import assert_that, calling, has_entry, has_item, raises
 from kombu.exceptions import OperationalError
+from wazo_test_helpers import until
 
 from .helpers.base import BusIntegrationTest
 from .helpers.events import MockEvent

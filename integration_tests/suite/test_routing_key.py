@@ -1,16 +1,17 @@
-# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from datetime import datetime
+
 from hamcrest import (
     assert_that,
-    has_item,
-    is_,
     empty,
-    has_entry,
-    has_items,
     has_entries,
+    has_entry,
+    has_item,
+    has_items,
     has_key,
+    is_,
 )
 
 from .helpers.base import BusIntegrationTest

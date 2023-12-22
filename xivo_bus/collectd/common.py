@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from abc import abstractmethod
+
 from ..resources.common.abstract import AbstractEvent
 
 

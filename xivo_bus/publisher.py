@@ -4,7 +4,7 @@
 import logging
 
 from .base import Base
-from .mixins import QueuePublisherMixin, PublisherMixin, ThreadableMixin, WazoEventMixin
+from .mixins import PublisherMixin, QueuePublisherMixin, ThreadableMixin, WazoEventMixin
 
 logger = logging.getLogger(__name__)
 

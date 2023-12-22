@@ -1,22 +1,23 @@
-# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import os
 from contextlib import contextmanager
-from hamcrest import assert_that, is_
 from uuid import uuid4
 
+from hamcrest import assert_that, is_
+from wazo_test_helpers import until
 from wazo_test_helpers.asset_launching_test_case import (
     AssetLaunchingTestCase,
     NoSuchService,
 )
-from wazo_test_helpers import until
+
 from xivo_bus.consumer import BusConsumer
 from xivo_bus.publisher import BusPublisherWithQueue
 
+from .accumulator import MessageAccumulator
 from .remote_bus import RemoteBusApiClient
 from .wait_strategies import wait_for_rabbitmq
-from .accumulator import MessageAccumulator
 
 
 class Bus(BusConsumer, BusPublisherWithQueue):

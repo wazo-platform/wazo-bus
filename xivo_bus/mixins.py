@@ -2,17 +2,18 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import os
+from collections import defaultdict, namedtuple
+from contextlib import contextmanager
+from datetime import datetime
+from queue import Empty, Queue
+from threading import Event, Lock, Thread, current_thread, main_thread
 
 from amqp.exceptions import NotFound
-from contextlib import contextmanager
-from collections import defaultdict, namedtuple
-from datetime import datetime
-from kombu import binding as Binding, Connection, Exchange, Producer, Queue as AMQPQueue
+from kombu import Connection, Exchange, Producer
+from kombu import Queue as AMQPQueue
+from kombu import binding as Binding
 from kombu.exceptions import OperationalError
 from kombu.mixins import ConsumerMixin as KombuConsumer
-from queue import Empty, Queue
-from threading import Event, Lock, Thread, main_thread, current_thread
-
 
 BusThread = namedtuple('BusThread', ['thread', 'on_stop', 'ready_flag'])
 Subscription = namedtuple('Subscription', ['handler', 'binding'])
