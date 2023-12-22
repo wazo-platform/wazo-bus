@@ -1,6 +1,8 @@
 # Copyright 2022-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from __future__ import annotations
+
 from abc import ABCMeta, abstractmethod
 from typing import Any
 
