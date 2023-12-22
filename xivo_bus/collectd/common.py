@@ -5,10 +5,10 @@ from __future__ import annotations
 
 from abc import abstractmethod
 
-from ..resources.common.abstract import AbstractEvent
+from ..resources.common.abstract import EventProtocol
 
 
-class CollectdEvent(AbstractEvent):
+class CollectdEvent(EventProtocol):
     '''
     Base Collectd Event
 

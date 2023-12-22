@@ -11,7 +11,7 @@ from kombu import Exchange
 from kombu.utils.url import as_url
 from typing_extensions import Self
 
-from .resources.common.abstract import AbstractEvent
+from .resources.common.abstract import EventProtocol
 
 
 class ConnectionParams(NamedTuple):
@@ -54,7 +54,7 @@ class BaseProtocol(Protocol):
 
     def _marshal(
         self,
-        event: AbstractEvent,
+        event: EventProtocol,
         headers: dict | None,
         payload: dict | None,
         routing_key: str | None = None,
@@ -114,7 +114,7 @@ class Base(BaseProtocol):
 
     def _marshal(
         self,
-        event: AbstractEvent,
+        event: EventProtocol,
         headers: dict | None,
         payload: dict | None,
         routing_key: str | None = None,

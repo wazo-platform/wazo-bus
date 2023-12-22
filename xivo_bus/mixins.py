@@ -23,7 +23,7 @@ from typing_extensions import Self
 
 from .base import BaseProtocol
 from .collectd.common import CollectdEvent
-from .resources.common.abstract import AbstractEvent
+from .resources.common.abstract import EventProtocol
 
 EventHandlerType = Callable[[dict], None]
 ThreadTargetType = Callable[..., None]
@@ -428,7 +428,7 @@ class PublisherMixin(BaseProtocol):
 
     def publish(
         self,
-        event: AbstractEvent,
+        event: EventProtocol,
         headers: dict | None = None,
         routing_key: str | None = None,
         payload: dict | None = None,
@@ -514,7 +514,7 @@ class QueuePublisherMixin(PublisherMixin, ThreadableProtocol):
 
     def publish_soon(
         self,
-        event: AbstractEvent,
+        event: EventProtocol,
         headers: dict | None = None,
         routing_key: str | None = None,
         payload: dict | None = None,
@@ -542,7 +542,7 @@ class WazoEventMixin(BaseProtocol):
         self.service_uuid = service_uuid
 
     def __generate_payload(
-        self, event: AbstractEvent, headers: dict, initial_data: dict | None
+        self, event: EventProtocol, headers: dict, initial_data: dict | None
     ) -> dict:
         payload: dict = {}
         data = initial_data.copy() if initial_data else {}
@@ -556,7 +556,7 @@ class WazoEventMixin(BaseProtocol):
             return payload
 
     def __generate_headers(
-        self, event: AbstractEvent, extra_headers: dict | None
+        self, event: EventProtocol, extra_headers: dict | None
     ) -> dict:
         headers = {}
         headers.update(extra_headers or {})
@@ -583,7 +583,7 @@ class WazoEventMixin(BaseProtocol):
 
     def _marshal(
         self,
-        event: AbstractEvent,
+        event: EventProtocol,
         headers: dict | None,
         payload: dict | None,
         routing_key: str | None = None,

@@ -4,11 +4,12 @@
 from __future__ import annotations
 
 from abc import ABCMeta, abstractmethod
-from typing import Any
+from typing import Any, Protocol
 
 
-class AbstractEvent(metaclass=ABCMeta):
+class EventProtocol(Protocol):
     __slots__ = ('content',)
+    content: dict
 
     def __init__(self, content: dict | None = None):
         self.content = content or {}
@@ -36,12 +37,12 @@ class AbstractEvent(metaclass=ABCMeta):
     @property
     @abstractmethod
     def name(self) -> str:
-        pass
+        ...
 
     @property
     @abstractmethod
     def routing_key_fmt(self) -> str:
-        pass
+        ...
 
     @property
     def routing_key(self) -> str:
@@ -72,3 +73,9 @@ class AbstractEvent(metaclass=ABCMeta):
 
     def marshal(self) -> dict:
         return self.content
+
+
+#  NOTE: Deprecated since 24.01, use EventProtocol instead
+class AbstractEvent(EventProtocol, metaclass=ABCMeta):
+    def __init__(self, content: dict | None = None):
+        self.content = content or {}

@@ -1,10 +1,12 @@
 # Copyright 2013-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from .abstract import AbstractEvent
+from __future__ import annotations
+
+from .abstract import EventProtocol
 
 
-class ServiceEvent(AbstractEvent):
+class ServiceEvent(EventProtocol):
     '''
     ### Service-level event base class
 
@@ -12,10 +14,11 @@ class ServiceEvent(AbstractEvent):
     make it through the websocket.
     '''
 
-    pass
+    def __init__(self, content: dict | None = None):
+        self.content = content or {}
 
 
-class TenantEvent(AbstractEvent):
+class TenantEvent(EventProtocol):
     '''
     ### Tenant-level event base class
 
