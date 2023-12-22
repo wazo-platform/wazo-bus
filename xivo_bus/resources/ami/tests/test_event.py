@@ -4,6 +4,7 @@
 
 import unittest
 from unittest.mock import sentinel
+
 from ..event import AMIEvent
 
 

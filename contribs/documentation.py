@@ -7,8 +7,6 @@ import inspect
 import logging
 import os
 import re
-import yaml
-
 from concurrent.futures import ThreadPoolExecutor
 from copy import deepcopy
 from itertools import chain
@@ -16,8 +14,9 @@ from pathlib import Path
 from sys import stdout
 from time import time
 
-from xivo_bus.resources.common.abstract import AbstractEvent
+import yaml
 
+from xivo_bus.resources.common.abstract import AbstractEvent
 
 PACKAGE_NAME = 'xivo_bus'
 
