@@ -10,7 +10,7 @@ from contextlib import contextmanager
 from datetime import datetime
 from queue import Empty, Queue
 from threading import Event, Lock, Thread, current_thread, main_thread
-from typing import Any, Callable, ClassVar, NamedTuple, Protocol, Type, TypedDict
+from typing import Any, Callable, ClassVar, NamedTuple, Protocol, TypedDict
 
 from amqp.exceptions import NotFound
 from kombu import Connection, Consumer, Exchange, Message, Producer
