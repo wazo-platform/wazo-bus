@@ -9,7 +9,7 @@ class CallFilterRecipientUsersAssociatedEvent(TenantEvent):
     name = 'call_filter_recipient_users_associated'
     routing_key_fmt = 'config.callfilters.recipients.users.updated'
 
-    def __init__(self, call_filter_id, users, tenant_uuid):
+    def __init__(self, call_filter_id: int, users: list[str], tenant_uuid: str):
         content = {
             'call_filter_id': call_filter_id,
             'user_uuids': users,
@@ -22,7 +22,7 @@ class CallFilterSurrogateUsersAssociatedEvent(TenantEvent):
     name = 'call_filter_surrogate_users_associated'
     routing_key_fmt = 'config.callfilters.surrogates.users.updated'
 
-    def __init__(self, call_filter_id, users, tenant_uuid):
+    def __init__(self, call_filter_id: int, users: list[str], tenant_uuid: str):
         content = {
             'call_filter_id': call_filter_id,
             'user_uuids': users,

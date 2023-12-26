@@ -1,7 +1,8 @@
 # Copyright 2020-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_bus.resources.common.event import TenantEvent
+from ..common.event import TenantEvent
+from .types import ExternalAppDict
 
 
 class ExternalAppCreatedEvent(TenantEvent):
@@ -9,7 +10,7 @@ class ExternalAppCreatedEvent(TenantEvent):
     name = 'external_app_created'
     routing_key_fmt = 'config.external_apps.created'
 
-    def __init__(self, app, tenant_uuid):
+    def __init__(self, app: ExternalAppDict, tenant_uuid: str):
         super().__init__(app, tenant_uuid)
 
 
@@ -18,7 +19,7 @@ class ExternalAppDeletedEvent(TenantEvent):
     name = 'external_app_deleted'
     routing_key_fmt = 'config.external_apps.deleted'
 
-    def __init__(self, app, tenant_uuid):
+    def __init__(self, app: ExternalAppDict, tenant_uuid: str):
         super().__init__(app, tenant_uuid)
 
 
@@ -27,5 +28,5 @@ class ExternalAppEditedEvent(TenantEvent):
     name = 'external_app_edited'
     routing_key_fmt = 'config.external_apps.edited'
 
-    def __init__(self, app, tenant_uuid):
+    def __init__(self, app: ExternalAppDict, tenant_uuid: str):
         super().__init__(app, tenant_uuid)

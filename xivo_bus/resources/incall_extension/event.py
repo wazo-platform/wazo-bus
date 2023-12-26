@@ -9,7 +9,7 @@ class IncallExtensionAssociatedEvent(TenantEvent):
     name = 'incall_extension_associated'
     routing_key_fmt = 'config.incalls.extensions.updated'
 
-    def __init__(self, incall_id, extension_id, tenant_uuid):
+    def __init__(self, incall_id: int, extension_id: int, tenant_uuid: str):
         content = {
             'incall_id': incall_id,
             'extension_id': extension_id,
@@ -22,7 +22,7 @@ class IncallExtensionDissociatedEvent(TenantEvent):
     name = 'incall_extension_dissociated'
     routing_key_fmt = 'config.incalls.extensions.deleted'
 
-    def __init__(self, incall_id, extension_id, tenant_uuid):
+    def __init__(self, incall_id: int, extension_id: int, tenant_uuid: str):
         content = {
             'incall_id': incall_id,
             'extension_id': extension_id,

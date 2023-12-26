@@ -1,11 +1,20 @@
 # Copyright 2013-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_bus.resources.common.event import TenantEvent, UserEvent
+from __future__ import annotations
+
+from ..common.event import TenantEvent, UserEvent
 
 
 class _BaseUserEvent(TenantEvent):
-    def __init__(self, user_id, user_uuid, subscription_type, created_at, tenant_uuid):
+    def __init__(
+        self,
+        user_id: int,
+        user_uuid: str,
+        subscription_type: str,
+        created_at: str | None,
+        tenant_uuid: str,
+    ):
         content = {
             'id': int(user_id),
             'uuid': str(user_uuid),
@@ -39,7 +48,7 @@ class UserFallbackEditedEvent(UserEvent):
     name = 'user_fallback_edited'
     routing_key_fmt = 'config.users.fallbacks.edited'
 
-    def __init__(self, user_id, tenant_uuid, user_uuid):
+    def __init__(self, user_id: int, tenant_uuid: str, user_uuid: str):
         content = {
             'id': int(user_id),
             'uuid': str(user_uuid),
@@ -55,7 +64,14 @@ class UserServiceEditedEvent(UserEvent):
     name = 'users_services_{service_name}_updated'
     routing_key_fmt = 'config.users.{user_uuid}.services.{service_name}.updated'
 
-    def __init__(self, user_id, service_name, service_enabled, tenant_uuid, user_uuid):
+    def __init__(
+        self,
+        user_id: int,
+        service_name: str,
+        service_enabled: bool,
+        tenant_uuid: str,
+        user_uuid: str,
+    ):
         self.name = type(self).name.format(service_name=service_name)
         content = {
             'user_id': int(user_id),
@@ -74,12 +90,12 @@ class UserForwardEditedEvent(UserEvent):
 
     def __init__(
         self,
-        user_id,
-        forward_name,
-        forward_enabled,
-        forward_dest,
-        tenant_uuid,
-        user_uuid,
+        user_id: int,
+        forward_name: str,
+        forward_enabled: bool,
+        forward_dest: str,
+        tenant_uuid: str,
+        user_uuid: str,
     ):
         self.name = type(self).name.format(forward_name=forward_name)
         content = {

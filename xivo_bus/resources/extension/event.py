@@ -9,7 +9,7 @@ class ExtensionCreatedEvent(TenantEvent):
     name = 'extension_created'
     routing_key_fmt = 'config.extensions.created'
 
-    def __init__(self, extension_id, exten, context, tenant_uuid):
+    def __init__(self, extension_id: int, exten: str, context: str, tenant_uuid: str):
         content = {
             'id': int(extension_id),
             'exten': exten,
@@ -23,7 +23,7 @@ class ExtensionDeletedEvent(TenantEvent):
     name = 'extension_deleted'
     routing_key_fmt = 'config.extensions.deleted'
 
-    def __init__(self, extension_id, exten, context, tenant_uuid):
+    def __init__(self, extension_id: int, exten: str, context: str, tenant_uuid: str):
         content = {
             'id': int(extension_id),
             'exten': exten,
@@ -37,7 +37,7 @@ class ExtensionEditedEvent(TenantEvent):
     name = 'extension_edited'
     routing_key_fmt = 'config.extensions.edited'
 
-    def __init__(self, extension_id, exten, context, tenant_uuid):
+    def __init__(self, extension_id: int, exten: str, context: str, tenant_uuid: str):
         content = {
             'id': int(extension_id),
             'exten': exten,

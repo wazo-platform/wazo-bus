@@ -1,7 +1,7 @@
 # Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_bus.resources.common.event import ServiceEvent
+from ..common.event import ServiceEvent
 
 
 class WizardCreatedEvent(ServiceEvent):
@@ -9,5 +9,5 @@ class WizardCreatedEvent(ServiceEvent):
     name = 'wizard_created'
     routing_key_fmt = 'config.wizard.created'
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()

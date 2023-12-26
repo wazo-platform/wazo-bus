@@ -7,14 +7,14 @@ from xivo_bus.resources.common.event import UserEvent
 class _BaseUserLineExtensionEvent(UserEvent):
     def __init__(
         self,
-        user_line_extension_id,
-        user_id,
-        line_id,
-        extension_id,
-        main_user,
-        main_line,
-        tenant_uuid,
-        user_uuid,
+        user_line_extension_id: int,
+        user_id: int,
+        line_id: int,
+        extension_id: int,
+        main_user: bool,
+        main_line: bool,
+        tenant_uuid: str,
+        user_uuid: str,
     ):
         content = {
             'id': int(user_line_extension_id),

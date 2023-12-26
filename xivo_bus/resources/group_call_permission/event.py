@@ -9,7 +9,9 @@ class GroupCallPermissionAssociatedEvent(TenantEvent):
     name = 'group_call_permission_associated'
     routing_key_fmt = 'config.groups.{group_uuid}.callpermissions.updated'
 
-    def __init__(self, group_id, group_uuid, call_permission_id, tenant_uuid):
+    def __init__(
+        self, group_id: int, group_uuid: str, call_permission_id: int, tenant_uuid: str
+    ):
         content = {
             'group_id': group_id,
             'group_uuid': str(group_uuid),
@@ -23,7 +25,9 @@ class GroupCallPermissionDissociatedEvent(TenantEvent):
     name = 'group_call_permission_dissociated'
     routing_key_fmt = 'config.groups.{group_uuid}.callpermissions.deleted'
 
-    def __init__(self, group_id, group_uuid, call_permission_id, tenant_uuid):
+    def __init__(
+        self, group_id: int, group_uuid: str, call_permission_id: int, tenant_uuid: str
+    ):
         content = {
             'group_id': group_id,
             'group_uuid': str(group_uuid),

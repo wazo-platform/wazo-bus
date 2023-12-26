@@ -9,7 +9,7 @@ class ConferenceExtensionAssociatedEvent(TenantEvent):
     name = 'conference_extension_associated'
     routing_key_fmt = 'config.conferences.extensions.updated'
 
-    def __init__(self, conference_id, extension_id, tenant_uuid):
+    def __init__(self, conference_id: int, extension_id: int, tenant_uuid: str):
         content = {
             'conference_id': conference_id,
             'extension_id': extension_id,
@@ -22,7 +22,7 @@ class ConferenceExtensionDissociatedEvent(TenantEvent):
     name = 'conference_extension_dissociated'
     routing_key_fmt = 'config.conferences.extensions.deleted'
 
-    def __init__(self, conference_id, extension_id, tenant_uuid):
+    def __init__(self, conference_id: int, extension_id: int, tenant_uuid: str):
         content = {
             'conference_id': conference_id,
             'extension_id': extension_id,

@@ -9,7 +9,14 @@ class FavoriteAddedEvent(UserEvent):
     name = 'favorite_added'
     routing_key_fmt = 'directory.{user_uuid}.favorite.created'
 
-    def __init__(self, source_name, entry_id, wazo_uuid, tenant_uuid, user_uuid):
+    def __init__(
+        self,
+        source_name: str,
+        entry_id: str,
+        wazo_uuid: str,
+        tenant_uuid: str,
+        user_uuid: str,
+    ):
         content = {
             'xivo_uuid': str(wazo_uuid),
             'user_uuid': str(user_uuid),
@@ -24,7 +31,14 @@ class FavoriteDeletedEvent(UserEvent):
     name = 'favorite_deleted'
     routing_key_fmt = 'directory.{user_uuid}.favorite.deleted'
 
-    def __init__(self, source_name, entry_id, wazo_uuid, tenant_uuid, user_uuid):
+    def __init__(
+        self,
+        source_name: str,
+        entry_id: str,
+        wazo_uuid: str,
+        tenant_uuid: str,
+        user_uuid: str,
+    ):
         content = {
             'xivo_uuid': str(wazo_uuid),
             'user_uuid': str(user_uuid),

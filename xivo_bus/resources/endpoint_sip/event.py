@@ -1,7 +1,8 @@
 # Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_bus.resources.common.event import TenantEvent
+from ..common.event import TenantEvent
+from .types import EndpointSIPDict
 
 
 class SIPEndpointCreatedEvent(TenantEvent):
@@ -9,8 +10,8 @@ class SIPEndpointCreatedEvent(TenantEvent):
     name = 'sip_endpoint_created'
     routing_key_fmt = 'config.sip_endpoint.created'
 
-    def __init__(self, endpoint_sip, tenant_uuid):
-        super().__init__(endpoint_sip, tenant_uuid)
+    def __init__(self, endpoint: EndpointSIPDict, tenant_uuid: str):
+        super().__init__(endpoint, tenant_uuid)
 
 
 class SIPEndpointDeletedEvent(TenantEvent):
@@ -18,8 +19,8 @@ class SIPEndpointDeletedEvent(TenantEvent):
     name = 'sip_endpoint_deleted'
     routing_key_fmt = 'config.sip_endpoint.deleted'
 
-    def __init__(self, endpoint_sip, tenant_uuid):
-        super().__init__(endpoint_sip, tenant_uuid)
+    def __init__(self, endpoint: EndpointSIPDict, tenant_uuid: str):
+        super().__init__(endpoint, tenant_uuid)
 
 
 class SIPEndpointEditedEvent(TenantEvent):
@@ -27,8 +28,8 @@ class SIPEndpointEditedEvent(TenantEvent):
     name = 'sip_endpoint_edited'
     routing_key_fmt = 'config.sip_endpoint.edited'
 
-    def __init__(self, endpoint_sip, tenant_uuid):
-        super().__init__(endpoint_sip, tenant_uuid)
+    def __init__(self, endpoint: EndpointSIPDict, tenant_uuid: str):
+        super().__init__(endpoint, tenant_uuid)
 
 
 class SIPEndpointTemplateCreatedEvent(TenantEvent):
@@ -36,8 +37,8 @@ class SIPEndpointTemplateCreatedEvent(TenantEvent):
     name = 'sip_endpoint_template_created'
     routing_key_fmt = 'config.sip_endpoint_template.created'
 
-    def __init__(self, endpoint_sip, tenant_uuid):
-        super().__init__(endpoint_sip, tenant_uuid)
+    def __init__(self, endpoint: EndpointSIPDict, tenant_uuid: str):
+        super().__init__(endpoint, tenant_uuid)
 
 
 class SIPEndpointTemplateDeletedEvent(TenantEvent):
@@ -45,8 +46,8 @@ class SIPEndpointTemplateDeletedEvent(TenantEvent):
     name = 'sip_endpoint_template_deleted'
     routing_key_fmt = 'config.sip_endpoint_template.deleted'
 
-    def __init__(self, endpoint_sip, tenant_uuid):
-        super().__init__(endpoint_sip, tenant_uuid)
+    def __init__(self, endpoint: EndpointSIPDict, tenant_uuid: str):
+        super().__init__(endpoint, tenant_uuid)
 
 
 class SIPEndpointTemplateEditedEvent(TenantEvent):
@@ -54,5 +55,5 @@ class SIPEndpointTemplateEditedEvent(TenantEvent):
     name = 'sip_endpoint_template_edited'
     routing_key_fmt = 'config.sip_endpoint_template.edited'
 
-    def __init__(self, endpoint_sip, tenant_uuid):
-        super().__init__(endpoint_sip, tenant_uuid)
+    def __init__(self, endpoint: EndpointSIPDict, tenant_uuid: str):
+        super().__init__(endpoint, tenant_uuid)

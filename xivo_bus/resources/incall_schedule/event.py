@@ -9,7 +9,7 @@ class IncallScheduleAssociatedEvent(TenantEvent):
     name = 'incall_schedule_associated'
     routing_key_fmt = 'config.incalls.schedules.updated'
 
-    def __init__(self, incall_id, schedule_id, tenant_uuid):
+    def __init__(self, incall_id: int, schedule_id: int, tenant_uuid: str):
         content = {
             'incall_id': incall_id,
             'schedule_id': schedule_id,
@@ -22,7 +22,7 @@ class IncallScheduleDissociatedEvent(TenantEvent):
     name = 'incall_schedule_dissociated'
     routing_key_fmt = 'config.incalls.schedules.deleted'
 
-    def __init__(self, incall_id, schedule_id, tenant_uuid):
+    def __init__(self, incall_id: int, schedule_id: int, tenant_uuid: str):
         content = {
             'incall_id': incall_id,
             'schedule_id': schedule_id,
