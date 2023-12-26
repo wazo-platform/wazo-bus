@@ -9,7 +9,7 @@ from typing import Any, NamedTuple, Protocol
 
 from kombu import Exchange
 from kombu.utils.url import as_url
-from typing_extensions import Self
+from typing_extensions import TypeAlias
 
 from .resources.common.abstract import EventProtocol
 
@@ -66,7 +66,7 @@ class BaseProtocol(Protocol):
     ) -> tuple[dict, dict]:
         ...
 
-    def __enter__(self) -> Self:
+    def __enter__(self) -> TypeAlias:
         ...
 
     def __exit__(
@@ -126,7 +126,7 @@ class Base(BaseProtocol):
     ) -> tuple[dict, dict]:
         return headers, payload
 
-    def __enter__(self) -> Self:
+    def __enter__(self) -> TypeAlias:
         return self
 
     def __exit__(

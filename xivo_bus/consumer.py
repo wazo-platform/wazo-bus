@@ -14,7 +14,7 @@ from .mixins import (
 )
 
 
-class BusConsumer(WazoEventMixin, ThreadableMixin, ConsumerMixin, Base):  # type: ignore[misc]
+class BusConsumer(WazoEventMixin, ThreadableMixin, ConsumerMixin, Base):
     def __init__(
         self,
         name: str | None = None,

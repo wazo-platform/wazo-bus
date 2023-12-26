@@ -39,7 +39,7 @@ class BusPublisher(WazoEventMixin, PublisherMixin, Base):
 
 
 # Deprecated, thread should be avoided to respect WPEP-0004
-class BusPublisherWithQueue(  # type: ignore[misc]
+class BusPublisherWithQueue(
     WazoEventMixin,
     ThreadableMixin,
     QueuePublisherMixin,

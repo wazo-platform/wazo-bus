@@ -19,7 +19,7 @@ from kombu import binding as Binding
 from kombu.exceptions import OperationalError
 from kombu.mixins import ConsumerMixin as KombuConsumer
 from kombu.transport.base import StdChannel
-from typing_extensions import Self
+from typing_extensions import TypeAlias
 
 from .base import BaseProtocol
 from .collectd.common import CollectdEvent
@@ -109,14 +109,14 @@ class ThreadableMixin(BaseProtocol):
     def __threads(self) -> list[BusThread]:
         return self.__internal_threads_list
 
-    def __enter__(self) -> Self:
+    def __enter__(self) -> TypeAlias:
         self.start()
-        super().__enter__()  # type: ignore[safe-super]
+        super().__enter__()
         return self
 
     def __exit__(self, *args: Any) -> None:
         self.stop()
-        super().__exit__(*args)  # type: ignore[safe-super]
+        super().__exit__(*args)
 
     def _register_thread(
         self,
@@ -163,7 +163,9 @@ class ThreadableMixin(BaseProtocol):
 
     @staticmethod
     def __wrap_thread(func: ThreadTargetType) -> ThreadTargetType:
-        def wrapper(self: Self, name: str, ready_flag: Event, **kwargs: Any) -> None:
+        def wrapper(
+            self: TypeAlias, name: str, ready_flag: Event, **kwargs: Any
+        ) -> None:
             self.log.debug('Started AMQP thread \'%s\'', name)
             while not self.is_stopping:
                 try:
