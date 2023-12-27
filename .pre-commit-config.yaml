@@ -34,3 +34,15 @@ repos:
     rev: 1.1.1
     hooks:
       - id: wazo-copyright-check
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.7.1
+    hooks:
+      - id: mypy
+        pass_filenames: false
+        args: ["."]
+        language_version: "3.10"
+        exclude: build/
+        additional_dependencies:
+          - "types-pyyaml"
+          - "types-requests"
+          - "types-setuptools"
