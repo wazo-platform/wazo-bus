@@ -1,9 +1,9 @@
-# Copyright 2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2023-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
 
-from typing import Any, TypedDict
+from typing import Annotated, Any, TypedDict
 
 
 class ExtensionDict(TypedDict, total=False):
@@ -30,8 +30,8 @@ class QueuedCallDict(TypedDict, total=False):
 
 
 class SwitchboardDict(TypedDict, total=False):
-    uuid: str
-    tenant_uuid: str
+    uuid: Annotated[str, {'format': 'uuid'}]
+    tenant_uuid: Annotated[str, {'format': 'uuid'}]
     name: str
     timeout: int
     queue_music_on_hold: str
@@ -47,6 +47,6 @@ class SwitchboardFallbackDict(TypedDict, total=False):
 
 
 class UserDict(TypedDict, total=False):
-    uuid: str
+    uuid: Annotated[str, {'format': 'uuid'}]
     firstname: str
     lastname: str

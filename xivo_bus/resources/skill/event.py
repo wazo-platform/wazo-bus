@@ -1,5 +1,7 @@
-# Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
+
+from typing import Annotated
 
 from ..common.event import TenantEvent
 
@@ -9,7 +11,7 @@ class SkillCreatedEvent(TenantEvent):
     name = 'skill_created'
     routing_key_fmt = 'config.agents.skills.created'
 
-    def __init__(self, skill_id: int, tenant_uuid: str):
+    def __init__(self, skill_id: int, tenant_uuid: Annotated[str, {'format': 'uuid'}]):
         content = {'id': int(skill_id)}
         super().__init__(content, tenant_uuid)
 
@@ -19,7 +21,7 @@ class SkillDeletedEvent(TenantEvent):
     name = 'skill_deleted'
     routing_key_fmt = 'config.agents.skills.deleted'
 
-    def __init__(self, skill_id: int, tenant_uuid: str):
+    def __init__(self, skill_id: int, tenant_uuid: Annotated[str, {'format': 'uuid'}]):
         content = {'id': int(skill_id)}
         super().__init__(content, tenant_uuid)
 
@@ -29,6 +31,6 @@ class SkillEditedEvent(TenantEvent):
     name = 'skill_edited'
     routing_key_fmt = 'config.agents.skills.edited'
 
-    def __init__(self, skill_id: int, tenant_uuid: str):
+    def __init__(self, skill_id: int, tenant_uuid: Annotated[str, {'format': 'uuid'}]):
         content = {'id': int(skill_id)}
         super().__init__(content, tenant_uuid)

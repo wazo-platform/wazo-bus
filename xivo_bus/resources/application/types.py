@@ -3,12 +3,12 @@
 
 from __future__ import annotations
 
-from typing import TypedDict
+from typing import Annotated, TypedDict
 
 
 class ApplicationDict(TypedDict, total=False):
-    uuid: str
-    tenant_uuid: str
+    uuid: Annotated[str, {'format': 'uuid'}]
+    tenant_uuid: Annotated[str, {'format': 'uuid'}]
     name: str
     destination: str | None
     destination_options: dict[str, str]

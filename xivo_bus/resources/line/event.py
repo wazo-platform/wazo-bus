@@ -1,5 +1,7 @@
-# Copyright 2013-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
+
+from typing import Annotated
 
 from ..common.event import TenantEvent
 from .types import LineDict
@@ -10,7 +12,7 @@ class LineCreatedEvent(TenantEvent):
     name = 'line_created'
     routing_key_fmt = 'config.line.created'
 
-    def __init__(self, line: LineDict, tenant_uuid: str):
+    def __init__(self, line: LineDict, tenant_uuid: Annotated[str, {'format': 'uuid'}]):
         super().__init__(line, tenant_uuid)
 
 
@@ -19,7 +21,7 @@ class LineDeletedEvent(TenantEvent):
     name = 'line_deleted'
     routing_key_fmt = 'config.line.deleted'
 
-    def __init__(self, line: LineDict, tenant_uuid: str):
+    def __init__(self, line: LineDict, tenant_uuid: Annotated[str, {'format': 'uuid'}]):
         super().__init__(line, tenant_uuid)
 
 
@@ -28,7 +30,7 @@ class LineEditedEvent(TenantEvent):
     name = 'line_edited'
     routing_key_fmt = 'config.line.edited'
 
-    def __init__(self, line: LineDict, tenant_uuid: str):
+    def __init__(self, line: LineDict, tenant_uuid: Annotated[str, {'format': 'uuid'}]):
         super().__init__(line, tenant_uuid)
 
 
@@ -44,7 +46,7 @@ class LineStatusUpdatedEvent(TenantEvent):
         endpoint_name: str,
         endpoint_registered: bool,
         endpoint_current_call_count: int,
-        tenant_uuid: str,
+        tenant_uuid: Annotated[str, {'format': 'uuid'}],
     ):
         content = {
             'id': line_id,

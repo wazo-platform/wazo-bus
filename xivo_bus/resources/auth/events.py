@@ -1,5 +1,7 @@
-# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
+
+from typing import Annotated
 
 from xivo_bus.resources.common.event import TenantEvent, UserEvent
 
@@ -11,7 +13,9 @@ class TenantCreatedEvent(TenantEvent):
     name = 'auth_tenant_added'
     routing_key_fmt = 'auth.tenants.{tenant_uuid}.created'
 
-    def __init__(self, tenant_data: TenantDict, tenant_uuid: str):
+    def __init__(
+        self, tenant_data: TenantDict, tenant_uuid: Annotated[str, {'format': 'uuid'}]
+    ):
         super().__init__(tenant_data, tenant_uuid)
 
 
@@ -20,7 +24,7 @@ class TenantUpdatedEvent(TenantEvent):
     name = 'auth_tenant_updated'
     routing_key_fmt = 'auth.tenants.{tenant_uuid}.updated'
 
-    def __init__(self, name: str, tenant_uuid: str):
+    def __init__(self, name: str, tenant_uuid: Annotated[str, {'format': 'uuid'}]):
         content = {'uuid': tenant_uuid, 'name': name}
         super().__init__(content, tenant_uuid)
 
@@ -30,7 +34,7 @@ class TenantDeletedEvent(TenantEvent):
     name = 'auth_tenant_deleted'
     routing_key_fmt = 'auth.tenants.{tenant_uuid}.deleted'
 
-    def __init__(self, tenant_uuid: str):
+    def __init__(self, tenant_uuid: Annotated[str, {'format': 'uuid'}]):
         content = {'uuid': tenant_uuid}
         super().__init__(content, tenant_uuid)
 
@@ -40,7 +44,12 @@ class UserExternalAuthAddedEvent(UserEvent):
     name = 'auth_user_external_auth_added'
     routing_key_fmt = 'auth.users.{user_uuid}.external.{external_auth_name}.created'
 
-    def __init__(self, external_auth_name: str, tenant_uuid: str, user_uuid: str):
+    def __init__(
+        self,
+        external_auth_name: str,
+        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        user_uuid: Annotated[str, {'format': 'uuid'}],
+    ):
         content = {'user_uuid': user_uuid, 'external_auth_name': external_auth_name}
         super().__init__(content, tenant_uuid, user_uuid)
 
@@ -50,7 +59,12 @@ class UserExternalAuthAuthorizedEvent(UserEvent):
     name = 'auth_user_external_auth_authorized'
     routing_key_fmt = 'auth.users.{user_uuid}.external.{external_auth_name}.authorized'
 
-    def __init__(self, external_auth_name: str, tenant_uuid: str, user_uuid: str):
+    def __init__(
+        self,
+        external_auth_name: str,
+        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        user_uuid: Annotated[str, {'format': 'uuid'}],
+    ):
         content = {'user_uuid': user_uuid, 'external_auth_name': external_auth_name}
         super().__init__(content, tenant_uuid, user_uuid)
 
@@ -60,7 +74,12 @@ class UserExternalAuthDeletedEvent(UserEvent):
     name = 'auth_user_external_auth_deleted'
     routing_key_fmt = 'auth.users.{user_uuid}.external.{external_auth_name}.deleted'
 
-    def __init__(self, external_auth_name: str, tenant_uuid: str, user_uuid: str):
+    def __init__(
+        self,
+        external_auth_name: str,
+        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        user_uuid: Annotated[str, {'format': 'uuid'}],
+    ):
         content = {'user_uuid': user_uuid, 'external_auth_name': external_auth_name}
         super().__init__(content, tenant_uuid, user_uuid)
 
@@ -71,7 +90,11 @@ class RefreshTokenCreatedEvent(UserEvent):
     routing_key_fmt = 'auth.users.{user_uuid}.tokens.{client_id}.created'
 
     def __init__(
-        self, client_id: str, is_mobile: bool, tenant_uuid: str, user_uuid: str
+        self,
+        client_id: str,
+        is_mobile: bool,
+        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        user_uuid: Annotated[str, {'format': 'uuid'}],
     ):
         content = {
             'client_id': client_id,
@@ -88,7 +111,11 @@ class RefreshTokenDeletedEvent(UserEvent):
     routing_key_fmt = 'auth.users.{user_uuid}.tokens.{client_id}.deleted'
 
     def __init__(
-        self, client_id: str, is_mobile: bool, tenant_uuid: str, user_uuid: str
+        self,
+        client_id: str,
+        is_mobile: bool,
+        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        user_uuid: Annotated[str, {'format': 'uuid'}],
     ):
         content = {
             'client_id': client_id,
@@ -105,7 +132,11 @@ class SessionCreatedEvent(UserEvent):
     routing_key_fmt = 'auth.sessions.{session_uuid}.created'
 
     def __init__(
-        self, session_uuid: str, is_mobile: bool, tenant_uuid: str, user_uuid: str
+        self,
+        session_uuid: Annotated[str, {'format': 'uuid'}],
+        is_mobile: bool,
+        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        user_uuid: Annotated[str, {'format': 'uuid'}],
     ):
         content = {
             'uuid': session_uuid,
@@ -122,7 +153,12 @@ class SessionDeletedEvent(UserEvent):
     name = 'auth_session_deleted'
     routing_key_fmt = 'auth.sessions.{session_uuid}.deleted'
 
-    def __init__(self, session_uuid: str, tenant_uuid: str, user_uuid: str):
+    def __init__(
+        self,
+        session_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        user_uuid: Annotated[str, {'format': 'uuid'}],
+    ):
         content = {
             'uuid': session_uuid,
             'user_uuid': user_uuid,
@@ -137,7 +173,12 @@ class SessionExpireSoonEvent(UserEvent):
     name = 'auth_session_expire_soon'
     routing_key_fmt = 'auth.users.{user_uuid}.sessions.{session_uuid}.expire_soon'
 
-    def __init__(self, session_uuid: str, tenant_uuid: str, user_uuid: str):
+    def __init__(
+        self,
+        session_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        user_uuid: Annotated[str, {'format': 'uuid'}],
+    ):
         content = {
             'uuid': session_uuid,
             'user_uuid': user_uuid,

@@ -1,5 +1,7 @@
-# Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
+
+from typing import Annotated
 
 from ..common.event import TenantEvent
 
@@ -9,7 +11,12 @@ class QueueScheduleAssociatedEvent(TenantEvent):
     name = 'queue_schedule_associated'
     routing_key_fmt = 'config.queues.schedules.updated'
 
-    def __init__(self, queue_id: int, schedule_id: int, tenant_uuid: str):
+    def __init__(
+        self,
+        queue_id: int,
+        schedule_id: int,
+        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+    ):
         content = {
             'queue_id': queue_id,
             'schedule_id': schedule_id,
@@ -22,7 +29,12 @@ class QueueScheduleDissociatedEvent(TenantEvent):
     name = 'queue_schedule_dissociated'
     routing_key_fmt = 'config.queues.schedules.deleted'
 
-    def __init__(self, queue_id: int, schedule_id: int, tenant_uuid: str):
+    def __init__(
+        self,
+        queue_id: int,
+        schedule_id: int,
+        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+    ):
         content = {
             'queue_id': queue_id,
             'schedule_id': schedule_id,

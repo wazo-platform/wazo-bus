@@ -1,5 +1,7 @@
-# Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
+
+from typing import Annotated
 
 from xivo_bus.resources.common.event import TenantEvent
 
@@ -9,7 +11,12 @@ class CallFilterRecipientUsersAssociatedEvent(TenantEvent):
     name = 'call_filter_recipient_users_associated'
     routing_key_fmt = 'config.callfilters.recipients.users.updated'
 
-    def __init__(self, call_filter_id: int, users: list[str], tenant_uuid: str):
+    def __init__(
+        self,
+        call_filter_id: int,
+        users: list[str],
+        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+    ):
         content = {
             'call_filter_id': call_filter_id,
             'user_uuids': users,
@@ -22,7 +29,12 @@ class CallFilterSurrogateUsersAssociatedEvent(TenantEvent):
     name = 'call_filter_surrogate_users_associated'
     routing_key_fmt = 'config.callfilters.surrogates.users.updated'
 
-    def __init__(self, call_filter_id: int, users: list[str], tenant_uuid: str):
+    def __init__(
+        self,
+        call_filter_id: int,
+        users: list[str],
+        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+    ):
         content = {
             'call_filter_id': call_filter_id,
             'user_uuids': users,

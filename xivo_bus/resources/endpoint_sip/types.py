@@ -1,9 +1,9 @@
-# Copyright 2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2023-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
 
-from typing import TypedDict
+from typing import Annotated, TypedDict
 
 
 class EndpointSIPAuthSectionOptionsDict(TypedDict, total=False):
@@ -23,8 +23,8 @@ class EndpointSIPRegistrationSectionOptionsDict(TypedDict, total=False):
 
 
 class EndpointSIPDict(TypedDict, total=False):
-    uuid: str
-    tenant_uuid: str
+    uuid: Annotated[str, {'format': 'uuid'}]
+    tenant_uuid: Annotated[str, {'format': 'uuid'}]
     name: str
     label: str
     auth_section_options: EndpointSIPAuthSectionOptionsDict

@@ -1,5 +1,7 @@
-# Copyright 2019-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
+
+from typing import Annotated
 
 from ..common.event import TenantEvent
 from .types import (
@@ -17,7 +19,12 @@ class LineEndpointSIPAssociatedEvent(TenantEvent):
         'config.lines.{line[id]}.endpoints.sip.{endpoint_sip[uuid]}.updated'
     )
 
-    def __init__(self, line: LineDict, sip: LineEndpointSIPDict, tenant_uuid: str):
+    def __init__(
+        self,
+        line: LineDict,
+        sip: LineEndpointSIPDict,
+        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+    ):
         content = {'line': line, 'endpoint_sip': sip}
         super().__init__(content, tenant_uuid)
 
@@ -29,7 +36,12 @@ class LineEndpointSIPDissociatedEvent(TenantEvent):
         'config.lines.{line[id]}.endpoints.sip.{endpoint_sip[uuid]}.deleted'
     )
 
-    def __init__(self, line: LineDict, sip: LineEndpointSIPDict, tenant_uuid: str):
+    def __init__(
+        self,
+        line: LineDict,
+        sip: LineEndpointSIPDict,
+        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+    ):
         content = {'line': line, 'endpoint_sip': sip}
         super().__init__(content, tenant_uuid)
 
@@ -41,7 +53,12 @@ class LineEndpointSCCPAssociatedEvent(TenantEvent):
         'config.lines.{line[id]}.endpoints.sccp.{endpoint_sccp[id]}.updated'
     )
 
-    def __init__(self, line: LineDict, sccp: LineEndpointSCCPDict, tenant_uuid: str):
+    def __init__(
+        self,
+        line: LineDict,
+        sccp: LineEndpointSCCPDict,
+        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+    ):
         content = {'line': line, 'endpoint_sccp': sccp}
         super().__init__(content, tenant_uuid)
 
@@ -53,7 +70,12 @@ class LineEndpointSCCPDissociatedEvent(TenantEvent):
         'config.lines.{line[id]}.endpoints.sccp.{endpoint_sccp[id]}.deleted'
     )
 
-    def __init__(self, line: LineDict, sccp: LineEndpointSCCPDict, tenant_uuid: str):
+    def __init__(
+        self,
+        line: LineDict,
+        sccp: LineEndpointSCCPDict,
+        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+    ):
         content = {'line': line, 'endpoint_sccp': sccp}
         super().__init__(content, tenant_uuid)
 
@@ -66,7 +88,10 @@ class LineEndpointCustomAssociatedEvent(TenantEvent):
     )
 
     def __init__(
-        self, line: LineDict, custom: LineEndpointCustomDict, tenant_uuid: str
+        self,
+        line: LineDict,
+        custom: LineEndpointCustomDict,
+        tenant_uuid: Annotated[str, {'format': 'uuid'}],
     ):
         content = {'line': line, 'endpoint_custom': custom}
         super().__init__(content, tenant_uuid)
@@ -80,7 +105,10 @@ class LineEndpointCustomDissociatedEvent(TenantEvent):
     )
 
     def __init__(
-        self, line: LineDict, custom: LineEndpointCustomDict, tenant_uuid: str
+        self,
+        line: LineDict,
+        custom: LineEndpointCustomDict,
+        tenant_uuid: Annotated[str, {'format': 'uuid'}],
     ):
         content = {'line': line, 'endpoint_custom': custom}
         super().__init__(content, tenant_uuid)

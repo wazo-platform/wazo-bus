@@ -3,11 +3,11 @@
 
 from __future__ import annotations
 
-from typing import TypedDict
+from typing import Annotated, TypedDict
 
 
 class ContextDict(TypedDict, total=False):
     id: int
     name: str
     type: str
-    tenant_uuid: str
+    tenant_uuid: Annotated[str, {'format': 'uuid'}]

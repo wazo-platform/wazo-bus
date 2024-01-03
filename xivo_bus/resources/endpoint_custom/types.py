@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-from typing import TypedDict
+from typing import Annotated, TypedDict
 
 
 class EndpointCustomLineDict(TypedDict, total=False):
@@ -16,7 +16,7 @@ class EndpointCustomTrunkDict(TypedDict, total=False):
 
 class EndpointCustomDict(TypedDict, total=False):
     id: int
-    tenant_uuid: str
+    tenant_uuid: Annotated[str, {'format': 'uuid'}]
     interface: str
     trunk: EndpointCustomTrunkDict
     line: EndpointCustomLineDict

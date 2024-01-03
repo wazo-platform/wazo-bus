@@ -1,5 +1,7 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
+
+from typing import Annotated
 
 from ..common.event import TenantEvent
 from .types import GroupExtensionDict
@@ -11,7 +13,11 @@ class GroupMemberUsersAssociatedEvent(TenantEvent):
     routing_key_fmt = 'config.groups.members.users.updated'
 
     def __init__(
-        self, group_id: int, group_uuid: str, users: list[str], tenant_uuid: str
+        self,
+        group_id: int,
+        group_uuid: Annotated[str, {'format': 'uuid'}],
+        users: list[str],
+        tenant_uuid: Annotated[str, {'format': 'uuid'}],
     ):
         content = {
             'group_id': group_id,
@@ -29,9 +35,9 @@ class GroupMemberExtensionsAssociatedEvent(TenantEvent):
     def __init__(
         self,
         group_id: int,
-        group_uuid: str,
+        group_uuid: Annotated[str, {'format': 'uuid'}],
         extensions: list[GroupExtensionDict],
-        tenant_uuid: str,
+        tenant_uuid: Annotated[str, {'format': 'uuid'}],
     ):
         content = {
             'group_id': group_id,

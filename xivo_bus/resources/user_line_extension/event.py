@@ -1,7 +1,9 @@
-# Copyright 2013-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_bus.resources.common.event import UserEvent
+from typing import Annotated
+
+from ..common.event import UserEvent
 
 
 class _BaseUserLineExtensionEvent(UserEvent):
@@ -13,8 +15,8 @@ class _BaseUserLineExtensionEvent(UserEvent):
         extension_id: int,
         main_user: bool,
         main_line: bool,
-        tenant_uuid: str,
-        user_uuid: str,
+        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        user_uuid: Annotated[str, {'format': 'uuid'}],
     ):
         content = {
             'id': int(user_line_extension_id),

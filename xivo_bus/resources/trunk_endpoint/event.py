@@ -1,5 +1,7 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
+
+from typing import Annotated
 
 from ..common.event import TenantEvent
 from .types import EndpointCustomDict, EndpointIAXDict, EndpointSIPDict, TrunkDict
@@ -12,7 +14,12 @@ class TrunkEndpointSIPAssociatedEvent(TenantEvent):
         'config.trunks.{trunk[id]}.endpoints.sip.{endpoint_sip[uuid]}.updated'
     )
 
-    def __init__(self, trunk: TrunkDict, sip: EndpointSIPDict, tenant_uuid: str):
+    def __init__(
+        self,
+        trunk: TrunkDict,
+        sip: EndpointSIPDict,
+        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+    ):
         content = {
             'trunk': trunk,
             'endpoint_sip': sip,
@@ -27,7 +34,12 @@ class TrunkEndpointSIPDissociatedEvent(TenantEvent):
         'config.trunks.{trunk[id]}.endpoints.sip.{endpoint_sip[uuid]}.deleted'
     )
 
-    def __init__(self, trunk: TrunkDict, sip: EndpointSIPDict, tenant_uuid: str):
+    def __init__(
+        self,
+        trunk: TrunkDict,
+        sip: EndpointSIPDict,
+        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+    ):
         content = {
             'trunk': trunk,
             'endpoint_sip': sip,
@@ -42,7 +54,12 @@ class TrunkEndpointIAXAssociatedEvent(TenantEvent):
         'config.trunks.{trunk[id]}.endpoints.iax.{endpoint_iax[id]}.updated'
     )
 
-    def __init__(self, trunk: TrunkDict, iax: EndpointIAXDict, tenant_uuid: str):
+    def __init__(
+        self,
+        trunk: TrunkDict,
+        iax: EndpointIAXDict,
+        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+    ):
         content = {
             'trunk': trunk,
             'endpoint_iax': iax,
@@ -57,7 +74,12 @@ class TrunkEndpointIAXDissociatedEvent(TenantEvent):
         'config.trunks.{trunk[id]}.endpoints.iax.{endpoint_iax[id]}.deleted'
     )
 
-    def __init__(self, trunk: TrunkDict, iax: EndpointIAXDict, tenant_uuid: str):
+    def __init__(
+        self,
+        trunk: TrunkDict,
+        iax: EndpointIAXDict,
+        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+    ):
         content = {
             'trunk': trunk,
             'endpoint_iax': iax,
@@ -72,7 +94,12 @@ class TrunkEndpointCustomAssociatedEvent(TenantEvent):
         'config.trunks.{trunk[id]}.endpoints.custom.{endpoint_custom[id]}.updated'
     )
 
-    def __init__(self, trunk: TrunkDict, custom: EndpointCustomDict, tenant_uuid: str):
+    def __init__(
+        self,
+        trunk: TrunkDict,
+        custom: EndpointCustomDict,
+        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+    ):
         content = {
             'trunk': trunk,
             'endpoint_custom': custom,
@@ -87,7 +114,12 @@ class TrunkEndpointCustomDissociatedEvent(TenantEvent):
         'config.trunks.{trunk[id]}.endpoints.custom.{endpoint_custom[id]}.deleted'
     )
 
-    def __init__(self, trunk: TrunkDict, custom: EndpointCustomDict, tenant_uuid: str):
+    def __init__(
+        self,
+        trunk: TrunkDict,
+        custom: EndpointCustomDict,
+        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+    ):
         content = {
             'trunk': trunk,
             'endpoint_custom': custom,

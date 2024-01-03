@@ -1,7 +1,9 @@
-# Copyright 2013-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
+
+from typing import Annotated
 
 from ..common.event import TenantEvent, UserEvent
 
@@ -10,10 +12,10 @@ class _BaseUserEvent(TenantEvent):
     def __init__(
         self,
         user_id: int,
-        user_uuid: str,
+        user_uuid: Annotated[str, {'format': 'uuid'}],
         subscription_type: str,
         created_at: str | None,
-        tenant_uuid: str,
+        tenant_uuid: Annotated[str, {'format': 'uuid'}],
     ):
         content = {
             'id': int(user_id),
@@ -48,7 +50,12 @@ class UserFallbackEditedEvent(UserEvent):
     name = 'user_fallback_edited'
     routing_key_fmt = 'config.users.fallbacks.edited'
 
-    def __init__(self, user_id: int, tenant_uuid: str, user_uuid: str):
+    def __init__(
+        self,
+        user_id: int,
+        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        user_uuid: Annotated[str, {'format': 'uuid'}],
+    ):
         content = {
             'id': int(user_id),
             'uuid': str(user_uuid),
@@ -69,8 +76,8 @@ class UserServiceEditedEvent(UserEvent):
         user_id: int,
         service_name: str,
         service_enabled: bool,
-        tenant_uuid: str,
-        user_uuid: str,
+        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        user_uuid: Annotated[str, {'format': 'uuid'}],
     ):
         self.name = type(self).name.format(service_name=service_name)
         content = {
@@ -94,8 +101,8 @@ class UserForwardEditedEvent(UserEvent):
         forward_name: str,
         forward_enabled: bool,
         forward_dest: str,
-        tenant_uuid: str,
-        user_uuid: str,
+        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        user_uuid: Annotated[str, {'format': 'uuid'}],
     ):
         self.name = type(self).name.format(forward_name=forward_name)
         content = {

@@ -1,5 +1,7 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
+
+from typing import Annotated
 
 from xivo_bus.resources.common.event import TenantEvent
 
@@ -9,7 +11,12 @@ class ConferenceExtensionAssociatedEvent(TenantEvent):
     name = 'conference_extension_associated'
     routing_key_fmt = 'config.conferences.extensions.updated'
 
-    def __init__(self, conference_id: int, extension_id: int, tenant_uuid: str):
+    def __init__(
+        self,
+        conference_id: int,
+        extension_id: int,
+        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+    ):
         content = {
             'conference_id': conference_id,
             'extension_id': extension_id,
@@ -22,7 +29,12 @@ class ConferenceExtensionDissociatedEvent(TenantEvent):
     name = 'conference_extension_dissociated'
     routing_key_fmt = 'config.conferences.extensions.deleted'
 
-    def __init__(self, conference_id: int, extension_id: int, tenant_uuid: str):
+    def __init__(
+        self,
+        conference_id: int,
+        extension_id: int,
+        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+    ):
         content = {
             'conference_id': conference_id,
             'extension_id': extension_id,
