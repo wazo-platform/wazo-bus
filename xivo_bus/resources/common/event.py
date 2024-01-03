@@ -1,4 +1,4 @@
-# Copyright 2013-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
@@ -20,7 +20,7 @@ class ServiceEvent(EventProtocol):
         self.content = content or {}
 
 
-class TenantEvent(EventProtocol):
+class TenantEvent(ServiceEvent):
     '''
     ### Tenant-level event base class
 
@@ -32,7 +32,7 @@ class TenantEvent(EventProtocol):
     '''
 
     def __init__(self, content: Mapping | None, tenant_uuid: str):
-        super().__init__(content=content)
+        super().__init__(content)
         if tenant_uuid is None:
             raise ValueError('tenant_uuid must have a value')
         self.tenant_uuid = str(tenant_uuid)
