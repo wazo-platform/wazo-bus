@@ -1,4 +1,4 @@
-# Copyright 2022-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2022-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
@@ -15,7 +15,18 @@ from itertools import chain
 from pathlib import Path
 from sys import stdout
 from time import time
-from typing import Any
+from types import UnionType
+from typing import (
+    Annotated,
+    Any,
+    Callable,
+    Literal,
+    Union,
+    get_args,
+    get_origin,
+    get_type_hints,
+    is_typeddict,
+)
 
 import yaml
 from typing_extensions import TypeAlias
@@ -27,46 +38,118 @@ logger = logging.getLogger(__name__)
 
 
 class AsyncAPITypes:
-    @staticmethod
-    def string(*, many: bool = False) -> dict:
-        fmt = {'type': 'string'}
-        return AsyncAPITypes.array(fmt) if many else fmt
+    class Types:
+        @classmethod
+        def array(cls, format: dict[str, str]) -> dict:
+            return {'type': 'array', 'items': format}
 
-    @staticmethod
-    def boolean(*, many: bool = False) -> dict:
-        fmt = {'type': 'boolean'}
-        return AsyncAPITypes.array(fmt) if many else fmt
+        @classmethod
+        def boolean(cls) -> dict:
+            return {'type': 'boolean'}
 
-    @staticmethod
-    def integer(*, many: bool = False) -> dict:
-        fmt = {'type': 'integer'}
-        return AsyncAPITypes.array(fmt) if many else fmt
+        @classmethod
+        def datetime(cls) -> dict:
+            return cls.string(format='date-time')
 
-    @staticmethod
-    def float_(*, many: bool = False) -> dict:
-        fmt = {'type': 'float'}
-        return AsyncAPITypes.array(fmt) if many else fmt
+        @classmethod
+        def float_(cls) -> dict:
+            return {'type': 'float'}
 
-    @staticmethod
-    def uuid(*, many: bool = False) -> dict:
-        fmt = {'type': 'string', 'format': 'uuid'}
-        return AsyncAPITypes.array(fmt) if many else fmt
+        @classmethod
+        def integer(cls) -> dict:
+            return {'type': 'integer'}
 
-    @staticmethod
-    def datetime(*, many: bool = False) -> dict:
-        fmt = {'type': 'string', 'format': 'date-time'}
-        return AsyncAPITypes.array(fmt) if many else fmt
+        @classmethod
+        def object_(cls, content: dict | None = None) -> dict:
+            return {'type': 'object', 'properties': content or {}}
 
-    @staticmethod
-    def array(type_: Any) -> dict:
-        return {'type': 'array', 'items': type_}
+        @classmethod
+        def string(cls, *, format: str | None = None, const: str | None = None) -> dict:
+            content = {'type': 'string'}
+            if format:
+                content['format'] = format
+            if const:
+                content['const'] = const
+            return content
 
-    @staticmethod
-    def object_(dict_: dict | None = None) -> dict:
-        return {'type': 'object', 'properties': dict_ or {}}
+        @classmethod
+        def uuid(cls) -> dict:
+            return cls.string(format='uuid')
+
+    _TYPES_FACTORIES: dict[type | Any, Callable[..., dict]] = {
+        Any: Types.object_,
+        bool: Types.boolean,
+        dict: Types.object_,
+        float: Types.float_,
+        int: Types.integer,
+        str: Types.string,
+    }
+
+    @classmethod
+    def scan_hint(cls, hint: type) -> dict[str, str]:
+        def recurse(type_: type, metadata: dict | None = None) -> dict:
+            metadata = metadata or {}
+
+            if origin_type := get_origin(type_):
+                subtype, *args = get_args(type_)
+
+                if origin_type is Annotated:
+                    return recurse(subtype, metadata=args[0])
+
+                elif origin_type is Literal:
+                    return cls.Types.string(const=subtype)
+
+                elif origin_type in (UnionType, Union):
+                    return recurse(subtype)
+
+                elif origin_type in (list, set, tuple):
+                    if len(args) > 0:
+                        raise TypeError('arrays cannot have multiple types')
+                    return cls.Types.array(recurse(subtype, metadata=metadata))
+
+                elif origin_type is dict:
+                    return cls.Types.object_()
+
+            elif is_typeddict(type_):
+                content = {
+                    name: recurse(subtype)
+                    for name, subtype in get_type_hints(
+                        type_, include_extras=True
+                    ).items()
+                }
+                return cls.Types.object_(content)
+
+            elif type_ in cls._TYPES_FACTORIES.keys():
+                factory = cls._TYPES_FACTORIES[type_]
+                return factory(**metadata)
+
+            raise TypeError(f'unhandled type: {type_}')
+
+        return recurse(hint)
+
+    @classmethod
+    def from_init(cls, class_: type, *, ignore_keys: set[str] | None = None) -> dict:
+        ignore_keys = ignore_keys or set()
+        init_fn = getattr(class_, '__init__')
+
+        hints: dict[str, type] = {
+            param: type_
+            for param, type_ in get_type_hints(init_fn, include_extras=True).items()
+            if param not in ignore_keys
+        }
+
+        return {param: cls.scan_hint(hint) for param, hint in hints.items()}
 
 
 class Event:
+    _DEFAULT_PAYLOAD_IGNORE_KEYS = {
+        'self',
+        'return',
+        'tenant_uuid',
+        'user_uuid',
+        'user_uuids',
+    }
+
     def __init__(self, class_: type):
         self.class_ = class_
         sig = inspect.signature(getattr(class_, '__init__'))
@@ -125,7 +208,7 @@ class Event:
             headers['tenant_uuid'] = {'$ref': '#/components/schemas/tenant_uuid'}
             required.append('tenant_uuid')
 
-        if 'user_uuid' in self._keys:
+        if any([key in self._keys for key in ('user_uuid', 'user_uuids')]):
             headers['user_uuid:{uuid}'] = {
                 '$ref': '#/components/schemas/user_uuid:{uuid}'
             }
@@ -134,28 +217,8 @@ class Event:
         return {'type': 'object', 'properties': headers, 'required': required}
 
     def generate_payload(self) -> dict:
-        content = {}
-        keys_ignore_list = ('tenant_uuid', 'user_uuid', 'self')
-        content_keys = [key for key in self._keys if key not in keys_ignore_list]
-
-        for key in content_keys:
-            if key.endswith('uuid'):
-                content[key] = AsyncAPITypes.uuid()
-            elif key.endswith('uuids'):
-                content[key] = AsyncAPITypes.uuid(many=True)
-            elif key.endswith(('id', 'number')):
-                content[key] = AsyncAPITypes.integer()
-            elif key.startswith('is_'):
-                content[key] = AsyncAPITypes.boolean()
-            elif key.endswith('_at'):
-                content[key] = AsyncAPITypes.datetime()
-            elif key.endswith(('_data', '_info', '_schema')):
-                content[key] = AsyncAPITypes.object_()
-            else:
-                content[key] = AsyncAPITypes.string()
-
-        return AsyncAPITypes.object_(
-            dict(data=AsyncAPITypes.object_(content)),
+        return AsyncAPITypes.from_init(
+            self.class_, ignore_keys=self._DEFAULT_PAYLOAD_IGNORE_KEYS
         )
 
     def generate_parameters(self) -> dict:
