@@ -5,6 +5,8 @@ from __future__ import annotations
 
 from typing import Annotated, TypedDict
 
+from ..common.types import Format
+
 
 class EndpointCustomDict(TypedDict, total=False):
     id: int
@@ -15,7 +17,7 @@ class EndpointSCCPDict(TypedDict, total=False):
 
 
 class EndpointSIPDict(TypedDict, total=False):
-    uuid: Annotated[str, {'format': 'uuid'}]
+    uuid: Annotated[str, Format('uuid')]
 
 
 class LineDict(TypedDict, total=False):
@@ -28,5 +30,5 @@ class LineDict(TypedDict, total=False):
 
 class UserDict(TypedDict, total=False):
     id: int
-    uuid: Annotated[str, {'format': 'uuid'}]
-    tenant_uuid: Annotated[str, {'format': 'uuid'}]
+    uuid: Annotated[str, Format('uuid')]
+    tenant_uuid: Annotated[str, Format('uuid')]

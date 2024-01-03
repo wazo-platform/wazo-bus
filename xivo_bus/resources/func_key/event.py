@@ -3,7 +3,8 @@
 
 from typing import Annotated
 
-from xivo_bus.resources.common.event import TenantEvent
+from ..common.event import TenantEvent
+from ..common.types import Format
 
 
 class FuncKeyTemplateCreatedEvent(TenantEvent):
@@ -11,9 +12,7 @@ class FuncKeyTemplateCreatedEvent(TenantEvent):
     name = 'func_key_template_created'
     routing_key_fmt = 'config.funckey.template.created'
 
-    def __init__(
-        self, template_id: int, tenant_uuid: Annotated[str, {'format': 'uuid'}]
-    ):
+    def __init__(self, template_id: int, tenant_uuid: Annotated[str, Format('uuid')]):
         content = {'id': template_id}
         super().__init__(content, tenant_uuid)
 
@@ -23,9 +22,7 @@ class FuncKeyTemplateDeletedEvent(TenantEvent):
     name = 'func_key_template_deleted'
     routing_key_fmt = 'config.funckey.template.deleted'
 
-    def __init__(
-        self, template_id: int, tenant_uuid: Annotated[str, {'format': 'uuid'}]
-    ):
+    def __init__(self, template_id: int, tenant_uuid: Annotated[str, Format('uuid')]):
         content = {'id': template_id}
         super().__init__(content, tenant_uuid)
 
@@ -35,8 +32,6 @@ class FuncKeyTemplateEditedEvent(TenantEvent):
     name = 'func_key_template_edited'
     routing_key_fmt = 'config.funckey.template.edited'
 
-    def __init__(
-        self, template_id: int, tenant_uuid: Annotated[str, {'format': 'uuid'}]
-    ):
+    def __init__(self, template_id: int, tenant_uuid: Annotated[str, Format('uuid')]):
         content = {'id': template_id}
         super().__init__(content, tenant_uuid)

@@ -3,7 +3,8 @@
 
 from typing import Annotated
 
-from xivo_bus.resources.common.event import TenantEvent
+from ..common.event import TenantEvent
+from ..common.types import Format
 
 
 class GroupScheduleAssociatedEvent(TenantEvent):
@@ -14,9 +15,9 @@ class GroupScheduleAssociatedEvent(TenantEvent):
     def __init__(
         self,
         group_id: int,
-        group_uuid: Annotated[str, {'format': 'uuid'}],
+        group_uuid: Annotated[str, Format('uuid')],
         schedule_id: int,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'group_id': group_id,
@@ -34,9 +35,9 @@ class GroupScheduleDissociatedEvent(TenantEvent):
     def __init__(
         self,
         group_id: int,
-        group_uuid: Annotated[str, {'format': 'uuid'}],
+        group_uuid: Annotated[str, Format('uuid')],
         schedule_id: int,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'group_id': group_id,

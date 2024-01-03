@@ -5,6 +5,8 @@ from __future__ import annotations
 
 from typing import Annotated, TypedDict
 
+from ..common.types import Format
+
 
 class EndpointIAXTrunkDict(TypedDict, total=False):
     id: int
@@ -12,5 +14,5 @@ class EndpointIAXTrunkDict(TypedDict, total=False):
 
 class EndpointIAXDict(TypedDict, total=False):
     id: int
-    tenant_uuid: Annotated[str, {'format': 'uuid'}]
+    tenant_uuid: Annotated[str, Format('uuid')]
     trunk: EndpointIAXTrunkDict

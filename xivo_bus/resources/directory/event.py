@@ -3,7 +3,8 @@
 
 from typing import Annotated
 
-from xivo_bus.resources.common.event import UserEvent
+from ..common.event import UserEvent
+from ..common.types import Format
 
 
 class FavoriteAddedEvent(UserEvent):
@@ -15,9 +16,9 @@ class FavoriteAddedEvent(UserEvent):
         self,
         source_name: str,
         entry_id: str,
-        wazo_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        wazo_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'xivo_uuid': str(wazo_uuid),
@@ -37,9 +38,9 @@ class FavoriteDeletedEvent(UserEvent):
         self,
         source_name: str,
         entry_id: str,
-        wazo_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        wazo_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'xivo_uuid': str(wazo_uuid),

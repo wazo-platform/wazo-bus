@@ -4,6 +4,7 @@
 from typing import Annotated
 
 from ..common.event import TenantEvent, UserEvent
+from ..common.types import Format
 from .types import FaxDict
 
 
@@ -12,7 +13,7 @@ class FaxOutboundCreatedEvent(TenantEvent):
     name = 'fax_outbound_created'
     routing_key_fmt = 'faxes.outbound.created'
 
-    def __init__(self, fax: FaxDict, tenant_uuid: Annotated[str, {'format': 'uuid'}]):
+    def __init__(self, fax: FaxDict, tenant_uuid: Annotated[str, Format('uuid')]):
         super().__init__(fax, tenant_uuid)
 
 
@@ -21,7 +22,7 @@ class FaxOutboundSucceededEvent(TenantEvent):
     name = 'fax_outbound_succeeded'
     routing_key_fmt = 'faxes.outbound.{id}.succeeded'
 
-    def __init__(self, fax: FaxDict, tenant_uuid: Annotated[str, {'format': 'uuid'}]):
+    def __init__(self, fax: FaxDict, tenant_uuid: Annotated[str, Format('uuid')]):
         super().__init__(fax, tenant_uuid)
 
 
@@ -30,7 +31,7 @@ class FaxOutboundFailedEvent(TenantEvent):
     name = 'fax_outbound_failed'
     routing_key_fmt = 'faxes.outbound.{id}.failed'
 
-    def __init__(self, fax: FaxDict, tenant_uuid: Annotated[str, {'format': 'uuid'}]):
+    def __init__(self, fax: FaxDict, tenant_uuid: Annotated[str, Format('uuid')]):
         super().__init__(fax, tenant_uuid)
 
 
@@ -42,8 +43,8 @@ class FaxOutboundUserCreatedEvent(UserEvent):
     def __init__(
         self,
         fax: FaxDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(fax, tenant_uuid, user_uuid)
 
@@ -56,8 +57,8 @@ class FaxOutboundUserSucceededEvent(UserEvent):
     def __init__(
         self,
         fax: FaxDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(fax, tenant_uuid, user_uuid)
 
@@ -70,7 +71,7 @@ class FaxOutboundUserFailedEvent(UserEvent):
     def __init__(
         self,
         fax: FaxDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(fax, tenant_uuid, user_uuid)

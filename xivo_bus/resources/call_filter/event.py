@@ -3,7 +3,8 @@
 
 from typing import Annotated
 
-from xivo_bus.resources.common.event import TenantEvent
+from ..common.event import TenantEvent
+from ..common.types import Format
 
 
 class CallFilterCreatedEvent(TenantEvent):
@@ -12,7 +13,7 @@ class CallFilterCreatedEvent(TenantEvent):
     routing_key_fmt = 'config.callfilter.created'
 
     def __init__(
-        self, call_filter_id: int, tenant_uuid: Annotated[str, {'format': 'uuid'}]
+        self, call_filter_id: int, tenant_uuid: Annotated[str, Format('uuid')]
     ):
         content = {'id': call_filter_id}
         super().__init__(content, tenant_uuid)
@@ -24,7 +25,7 @@ class CallFilterDeletedEvent(TenantEvent):
     routing_key_fmt = 'config.callfilter.deleted'
 
     def __init__(
-        self, call_filter_id: int, tenant_uuid: Annotated[str, {'format': 'uuid'}]
+        self, call_filter_id: int, tenant_uuid: Annotated[str, Format('uuid')]
     ):
         content = {'id': call_filter_id}
         super().__init__(content, tenant_uuid)
@@ -36,7 +37,7 @@ class CallFilterEditedEvent(TenantEvent):
     routing_key_fmt = 'config.callfilter.edited'
 
     def __init__(
-        self, call_filter_id: int, tenant_uuid: Annotated[str, {'format': 'uuid'}]
+        self, call_filter_id: int, tenant_uuid: Annotated[str, Format('uuid')]
     ):
         content = {'id': call_filter_id}
         super().__init__(content, tenant_uuid)
@@ -48,7 +49,7 @@ class CallFilterFallbackEditedEvent(TenantEvent):
     routing_key_fmt = 'config.callfilters.fallbacks.edited'
 
     def __init__(
-        self, call_filter_id: int, tenant_uuid: Annotated[str, {'format': 'uuid'}]
+        self, call_filter_id: int, tenant_uuid: Annotated[str, Format('uuid')]
     ):
         content = {'id': call_filter_id}
         super().__init__(content, tenant_uuid)

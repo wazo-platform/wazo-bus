@@ -7,6 +7,7 @@ from collections.abc import Mapping
 from typing import Annotated, Any
 
 from ..common.event import MultiUserEvent, TenantEvent, UserEvent
+from ..common.types import Format
 from .types import ParticipantDict
 
 
@@ -23,9 +24,7 @@ class ConferenceCreatedEvent(_ConferenceMixin, TenantEvent):
     name = 'conference_created'
     routing_key_fmt = 'config.conferences.created'
 
-    def __init__(
-        self, conference_id: int, tenant_uuid: Annotated[str, {'format': 'uuid'}]
-    ):
+    def __init__(self, conference_id: int, tenant_uuid: Annotated[str, Format('uuid')]):
         content = {'id': conference_id}
         super().__init__(content, conference_id, tenant_uuid)
 
@@ -35,9 +34,7 @@ class ConferenceDeletedEvent(_ConferenceMixin, TenantEvent):
     name = 'conference_deleted'
     routing_key_fmt = 'config.conferences.deleted'
 
-    def __init__(
-        self, conference_id: int, tenant_uuid: Annotated[str, {'format': 'uuid'}]
-    ):
+    def __init__(self, conference_id: int, tenant_uuid: Annotated[str, Format('uuid')]):
         content = {'id': conference_id}
         super().__init__(content, conference_id, tenant_uuid)
 
@@ -47,9 +44,7 @@ class ConferenceEditedEvent(_ConferenceMixin, TenantEvent):
     name = 'conference_edited'
     routing_key_fmt = 'config.conferences.edited'
 
-    def __init__(
-        self, conference_id: int, tenant_uuid: Annotated[str, {'format': 'uuid'}]
-    ):
+    def __init__(self, conference_id: int, tenant_uuid: Annotated[str, Format('uuid')]):
         content = {'id': conference_id}
         super().__init__(content, conference_id, tenant_uuid)
 
@@ -59,9 +54,7 @@ class ConferenceRecordStartedEvent(_ConferenceMixin, TenantEvent):
     name = 'conference_record_started'
     routing_key_fmt = 'conferences.{id}.record'
 
-    def __init__(
-        self, conference_id: int, tenant_uuid: Annotated[str, {'format': 'uuid'}]
-    ):
+    def __init__(self, conference_id: int, tenant_uuid: Annotated[str, Format('uuid')]):
         content = {'id': conference_id}
         super().__init__(content, conference_id, tenant_uuid)
 
@@ -71,9 +64,7 @@ class ConferenceRecordStoppedEvent(_ConferenceMixin, TenantEvent):
     name = 'conference_record_stopped'
     routing_key_fmt = 'conferences.{id}.record'
 
-    def __init__(
-        self, conference_id: int, tenant_uuid: Annotated[str, {'format': 'uuid'}]
-    ):
+    def __init__(self, conference_id: int, tenant_uuid: Annotated[str, Format('uuid')]):
         content = {'id': conference_id}
         super().__init__(content, conference_id, tenant_uuid)
 
@@ -87,7 +78,7 @@ class ConferenceParticipantJoinedEvent(_ConferenceMixin, MultiUserEvent):
         self,
         conference_id: int,
         participant: ParticipantDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
         user_uuids: list[str],
     ):
         content = dict(participant, conference_id=conference_id)
@@ -103,7 +94,7 @@ class ConferenceParticipantLeftEvent(_ConferenceMixin, MultiUserEvent):
         self,
         conference_id: int,
         participant: ParticipantDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
         user_uuids: list[str],
     ):
         content = dict(participant, conference_id=conference_id)
@@ -119,7 +110,7 @@ class ConferenceParticipantMutedEvent(_ConferenceMixin, TenantEvent):
         self,
         conference_id: int,
         participant: ParticipantDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = dict(participant, conference_id=conference_id)
         super().__init__(content, conference_id, tenant_uuid)
@@ -134,7 +125,7 @@ class ConferenceParticipantUnmutedEvent(_ConferenceMixin, TenantEvent):
         self,
         conference_id: int,
         participant: ParticipantDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = dict(participant, conference_id=conference_id)
         super().__init__(content, conference_id, tenant_uuid)
@@ -149,7 +140,7 @@ class ConferenceParticipantTalkStartedEvent(_ConferenceMixin, MultiUserEvent):
         self,
         conference_id: int,
         participant: ParticipantDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
         user_uuids: list[str],
     ):
         content = dict(participant, conference_id=conference_id)
@@ -165,7 +156,7 @@ class ConferenceParticipantTalkStoppedEvent(_ConferenceMixin, MultiUserEvent):
         self,
         conference_id: int,
         participant: ParticipantDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
         user_uuids: list[str],
     ):
         content = dict(participant, conference_id=conference_id)
@@ -181,8 +172,8 @@ class ConferenceUserParticipantJoinedEvent(_ConferenceMixin, UserEvent):
         self,
         conference_id: int,
         participant: ParticipantDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = dict(participant, conference_id=conference_id)
         super().__init__(content, conference_id, tenant_uuid, user_uuid)
@@ -197,8 +188,8 @@ class ConferenceUserParticipantLeftEvent(_ConferenceMixin, UserEvent):
         self,
         conference_id: int,
         participant: ParticipantDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = dict(participant, conference_id=conference_id)
         super().__init__(content, conference_id, tenant_uuid, user_uuid)
@@ -213,8 +204,8 @@ class ConferenceUserParticipantTalkStartedEvent(_ConferenceMixin, UserEvent):
         self,
         conference_id: int,
         participant: ParticipantDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = dict(participant, conference_id=conference_id)
         super().__init__(content, conference_id, tenant_uuid, user_uuid)
@@ -229,8 +220,8 @@ class ConferenceUserParticipantTalkStoppedEvent(_ConferenceMixin, UserEvent):
         self,
         conference_id: int,
         participant: ParticipantDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = dict(participant, conference_id=conference_id)
         super().__init__(content, conference_id, tenant_uuid, user_uuid)

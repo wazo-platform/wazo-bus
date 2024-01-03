@@ -5,7 +5,9 @@ from __future__ import annotations
 
 from typing import Annotated, TypedDict
 
+from ..common.types import Format
+
 
 class GroupDict(TypedDict, total=False):
     id: int
-    uuid: Annotated[str, {'format': 'uuid'}]
+    uuid: Annotated[str, Format('uuid')]

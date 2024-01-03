@@ -5,8 +5,10 @@ from __future__ import annotations
 
 from typing import Annotated, TypedDict
 
+from ..common.types import Format
+
 
 class PJSIPTransportDict(TypedDict, total=False):
-    uuid: Annotated[str, {'format': 'uuid'}]
+    uuid: Annotated[str, Format('uuid')]
     name: str
     options: list[str]

@@ -4,6 +4,7 @@
 from typing import Annotated
 
 from ..common.event import TenantEvent
+from ..common.types import Format
 
 
 class SoundCreatedEvent(TenantEvent):
@@ -11,9 +12,7 @@ class SoundCreatedEvent(TenantEvent):
     name = 'sound_created'
     routing_key_fmt = 'config.sounds.created'
 
-    def __init__(
-        self, sound_name: str, tenant_uuid: Annotated[str, {'format': 'uuid'}]
-    ):
+    def __init__(self, sound_name: str, tenant_uuid: Annotated[str, Format('uuid')]):
         content = {'name': sound_name}
         super().__init__(content, tenant_uuid)
 
@@ -23,8 +22,6 @@ class SoundDeletedEvent(TenantEvent):
     name = 'sound_deleted'
     routing_key_fmt = 'config.sounds.deleted'
 
-    def __init__(
-        self, sound_name: str, tenant_uuid: Annotated[str, {'format': 'uuid'}]
-    ):
+    def __init__(self, sound_name: str, tenant_uuid: Annotated[str, Format('uuid')]):
         content = {'name': sound_name}
         super().__init__(content, tenant_uuid)

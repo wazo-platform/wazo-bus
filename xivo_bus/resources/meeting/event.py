@@ -7,6 +7,7 @@ from collections.abc import Mapping
 from typing import Annotated, Any
 
 from ..common.event import TenantEvent, UserEvent
+from ..common.types import Format
 from .types import MeetingAuthorizationDict, MeetingDict, MeetingParticipantDict
 
 
@@ -14,7 +15,7 @@ class _MeetingMixin:
     def __init__(
         self,
         content: Mapping,
-        meeting_uuid: Annotated[str, {'format': 'uuid'}],
+        meeting_uuid: Annotated[str, Format('uuid')],
         *args: Any,
     ):
         super().__init__(content, *args)  # type: ignore[call-arg]
@@ -29,7 +30,7 @@ class MeetingCreatedEvent(_MeetingMixin, TenantEvent):
     routing_key_fmt = 'config.meetings.created'
 
     def __init__(
-        self, meeting: MeetingDict, tenant_uuid: Annotated[str, {'format': 'uuid'}]
+        self, meeting: MeetingDict, tenant_uuid: Annotated[str, Format('uuid')]
     ):
         super().__init__(meeting, meeting['uuid'], tenant_uuid)
 
@@ -40,7 +41,7 @@ class MeetingDeletedEvent(_MeetingMixin, TenantEvent):
     routing_key_fmt = 'config.meetings.deleted'
 
     def __init__(
-        self, meeting: MeetingDict, tenant_uuid: Annotated[str, {'format': 'uuid'}]
+        self, meeting: MeetingDict, tenant_uuid: Annotated[str, Format('uuid')]
     ):
         super().__init__(meeting, meeting['uuid'], tenant_uuid)
 
@@ -51,7 +52,7 @@ class MeetingEditedEvent(_MeetingMixin, TenantEvent):
     routing_key_fmt = 'config.meetings.updated'
 
     def __init__(
-        self, meeting: MeetingDict, tenant_uuid: Annotated[str, {'format': 'uuid'}]
+        self, meeting: MeetingDict, tenant_uuid: Annotated[str, Format('uuid')]
     ):
         super().__init__(meeting, meeting['uuid'], tenant_uuid)
 
@@ -65,7 +66,7 @@ class MeetingProgressEvent(_MeetingMixin, TenantEvent):
         self,
         meeting: MeetingDict,
         status: str,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = dict(meeting)
         content['status'] = status
@@ -81,8 +82,8 @@ class MeetingUserProgressEvent(_MeetingMixin, UserEvent):
         self,
         meeting: MeetingDict,
         status: str,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = dict(meeting)
         content['status'] = status
@@ -98,8 +99,8 @@ class MeetingParticipantJoinedEvent(_MeetingMixin, TenantEvent):
     def __init__(
         self,
         participant: MeetingParticipantDict,
-        meeting_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        meeting_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = dict(participant, meeting_uuid=meeting_uuid)
         super().__init__(content, meeting_uuid, tenant_uuid)
@@ -113,8 +114,8 @@ class MeetingParticipantLeftEvent(_MeetingMixin, TenantEvent):
     def __init__(
         self,
         participant: MeetingParticipantDict,
-        meeting_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        meeting_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = dict(participant, meeting_uuid=meeting_uuid)
         super().__init__(content, meeting_uuid, tenant_uuid)
@@ -129,9 +130,9 @@ class MeetingUserParticipantJoinedEvent(_MeetingMixin, UserEvent):
     def __init__(
         self,
         participant: MeetingParticipantDict,
-        meeting_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        meeting_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = dict(participant, meeting_uuid=meeting_uuid)
         super().__init__(content, meeting_uuid, tenant_uuid, user_uuid)
@@ -146,9 +147,9 @@ class MeetingUserParticipantLeftEvent(_MeetingMixin, UserEvent):
     def __init__(
         self,
         participant: MeetingParticipantDict,
-        meeting_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        meeting_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = dict(participant, meeting_uuid=meeting_uuid)
         super().__init__(content, meeting_uuid, tenant_uuid, user_uuid)
@@ -162,8 +163,8 @@ class MeetingAuthorizationCreatedEvent(_MeetingMixin, TenantEvent):
     def __init__(
         self,
         meeting_authorization: MeetingAuthorizationDict,
-        meeting_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        meeting_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(meeting_authorization, meeting_uuid, tenant_uuid)
 
@@ -176,8 +177,8 @@ class MeetingAuthorizationDeletedEvent(_MeetingMixin, TenantEvent):
     def __init__(
         self,
         meeting_authorization: MeetingAuthorizationDict,
-        meeting_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        meeting_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(meeting_authorization, meeting_uuid, tenant_uuid)
 
@@ -190,8 +191,8 @@ class MeetingAuthorizationEditedEvent(_MeetingMixin, TenantEvent):
     def __init__(
         self,
         meeting_authorization: MeetingAuthorizationDict,
-        meeting_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        meeting_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(meeting_authorization, meeting_uuid, tenant_uuid)
 
@@ -205,9 +206,9 @@ class MeetingUserAuthorizationCreatedEvent(_MeetingMixin, UserEvent):
     def __init__(
         self,
         meeting_authorization: MeetingAuthorizationDict,
-        meeting_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        meeting_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = dict(meeting_authorization, user_uuid=user_uuid)
         super().__init__(content, meeting_uuid, tenant_uuid, user_uuid)
@@ -222,9 +223,9 @@ class MeetingUserAuthorizationDeletedEvent(_MeetingMixin, UserEvent):
     def __init__(
         self,
         meeting_authorization: MeetingAuthorizationDict,
-        meeting_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        meeting_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = dict(meeting_authorization, user_uuid=user_uuid)
         super().__init__(content, meeting_uuid, tenant_uuid, user_uuid)
@@ -239,9 +240,9 @@ class MeetingUserAuthorizationEditedEvent(_MeetingMixin, UserEvent):
     def __init__(
         self,
         meeting_authorization: MeetingAuthorizationDict,
-        meeting_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        meeting_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = dict(meeting_authorization, user_uuid=user_uuid)
         super().__init__(content, meeting_uuid, tenant_uuid, user_uuid)

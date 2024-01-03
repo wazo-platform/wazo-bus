@@ -4,6 +4,7 @@
 from typing import Annotated
 
 from ..common.event import TenantEvent
+from ..common.types import Format
 
 
 class QueueScheduleAssociatedEvent(TenantEvent):
@@ -15,7 +16,7 @@ class QueueScheduleAssociatedEvent(TenantEvent):
         self,
         queue_id: int,
         schedule_id: int,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'queue_id': queue_id,
@@ -33,7 +34,7 @@ class QueueScheduleDissociatedEvent(TenantEvent):
         self,
         queue_id: int,
         schedule_id: int,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'queue_id': queue_id,

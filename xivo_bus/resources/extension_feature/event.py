@@ -3,7 +3,8 @@
 
 from typing import Annotated
 
-from xivo_bus.resources.common.event import ServiceEvent
+from ..common.event import ServiceEvent
+from ..common.types import Format
 
 
 class ExtensionFeatureEditedEvent(ServiceEvent):
@@ -11,6 +12,6 @@ class ExtensionFeatureEditedEvent(ServiceEvent):
     name = 'extension_feature_edited'
     routing_key_fmt = 'config.extension_feature.edited'
 
-    def __init__(self, feature_extension_uuid: Annotated[str, {'format': 'uuid'}]):
+    def __init__(self, feature_extension_uuid: Annotated[str, Format('uuid')]):
         content = {'uuid': feature_extension_uuid}
         super().__init__(content)

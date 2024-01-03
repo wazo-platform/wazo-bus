@@ -4,6 +4,7 @@
 from typing import Annotated
 
 from ..common.event import UserEvent
+from ..common.types import Format
 from .types import LineDict, UserDict
 
 
@@ -18,7 +19,7 @@ class UserLineAssociatedEvent(UserEvent):
         line: LineDict,
         main_user: bool,
         main_line: bool,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'line': line,
@@ -40,7 +41,7 @@ class UserLineDissociatedEvent(UserEvent):
         line: LineDict,
         main_user: bool,
         main_line: bool,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'line': line,

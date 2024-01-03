@@ -5,6 +5,8 @@ from __future__ import annotations
 
 from typing import Annotated, Any, TypedDict
 
+from ..common.types import Format
+
 
 class ExtensionDict(TypedDict, total=False):
     id: int
@@ -30,8 +32,8 @@ class QueuedCallDict(TypedDict, total=False):
 
 
 class SwitchboardDict(TypedDict, total=False):
-    uuid: Annotated[str, {'format': 'uuid'}]
-    tenant_uuid: Annotated[str, {'format': 'uuid'}]
+    uuid: Annotated[str, Format('uuid')]
+    tenant_uuid: Annotated[str, Format('uuid')]
     name: str
     timeout: int
     queue_music_on_hold: str
@@ -47,6 +49,6 @@ class SwitchboardFallbackDict(TypedDict, total=False):
 
 
 class UserDict(TypedDict, total=False):
-    uuid: Annotated[str, {'format': 'uuid'}]
+    uuid: Annotated[str, Format('uuid')]
     firstname: str
     lastname: str

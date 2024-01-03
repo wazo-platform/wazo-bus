@@ -4,6 +4,7 @@
 from typing import Annotated
 
 from ..common.event import TenantEvent
+from ..common.types import Format
 from .types import GroupExtensionDict
 
 
@@ -15,9 +16,9 @@ class GroupMemberUsersAssociatedEvent(TenantEvent):
     def __init__(
         self,
         group_id: int,
-        group_uuid: Annotated[str, {'format': 'uuid'}],
+        group_uuid: Annotated[str, Format('uuid')],
         users: list[str],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'group_id': group_id,
@@ -35,9 +36,9 @@ class GroupMemberExtensionsAssociatedEvent(TenantEvent):
     def __init__(
         self,
         group_id: int,
-        group_uuid: Annotated[str, {'format': 'uuid'}],
+        group_uuid: Annotated[str, Format('uuid')],
         extensions: list[GroupExtensionDict],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'group_id': group_id,

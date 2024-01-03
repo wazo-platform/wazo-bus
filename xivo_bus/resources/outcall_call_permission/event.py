@@ -4,6 +4,7 @@
 from typing import Annotated
 
 from ..common.event import TenantEvent
+from ..common.types import Format
 
 
 class OutcallCallPermissionAssociatedEvent(TenantEvent):
@@ -15,7 +16,7 @@ class OutcallCallPermissionAssociatedEvent(TenantEvent):
         self,
         outcall_id: int,
         call_permission_id: int,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'outcall_id': outcall_id,
@@ -33,7 +34,7 @@ class OutcallCallPermissionDissociatedEvent(TenantEvent):
         self,
         outcall_id: int,
         call_permission_id: int,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'outcall_id': outcall_id,

@@ -3,7 +3,8 @@
 
 from typing import Annotated
 
-from xivo_bus.resources.common.event import TenantEvent
+from ..common.event import TenantEvent
+from ..common.types import Format
 
 
 class CallPermissionCreatedEvent(TenantEvent):
@@ -12,7 +13,7 @@ class CallPermissionCreatedEvent(TenantEvent):
     routing_key_fmt = 'config.callpermission.created'
 
     def __init__(
-        self, call_permission_id: int, tenant_uuid: Annotated[str, {'format': 'uuid'}]
+        self, call_permission_id: int, tenant_uuid: Annotated[str, Format('uuid')]
     ):
         content = {'id': call_permission_id}
         super().__init__(content, tenant_uuid)
@@ -24,7 +25,7 @@ class CallPermissionDeletedEvent(TenantEvent):
     routing_key_fmt = 'config.callpermission.deleted'
 
     def __init__(
-        self, call_permission_id: int, tenant_uuid: Annotated[str, {'format': 'uuid'}]
+        self, call_permission_id: int, tenant_uuid: Annotated[str, Format('uuid')]
     ):
         content = {'id': call_permission_id}
         super().__init__(content, tenant_uuid)
@@ -36,7 +37,7 @@ class CallPermissionEditedEvent(TenantEvent):
     routing_key_fmt = 'config.callpermission.edited'
 
     def __init__(
-        self, call_permission_id: int, tenant_uuid: Annotated[str, {'format': 'uuid'}]
+        self, call_permission_id: int, tenant_uuid: Annotated[str, Format('uuid')]
     ):
         content = {'id': call_permission_id}
         super().__init__(content, tenant_uuid)

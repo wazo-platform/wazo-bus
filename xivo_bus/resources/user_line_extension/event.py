@@ -4,6 +4,7 @@
 from typing import Annotated
 
 from ..common.event import UserEvent
+from ..common.types import Format
 
 
 class _BaseUserLineExtensionEvent(UserEvent):
@@ -15,8 +16,8 @@ class _BaseUserLineExtensionEvent(UserEvent):
         extension_id: int,
         main_user: bool,
         main_line: bool,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'id': int(user_line_extension_id),

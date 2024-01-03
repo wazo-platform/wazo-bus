@@ -4,6 +4,7 @@
 from typing import Annotated
 
 from ..common.event import TenantEvent
+from ..common.types import Format
 from .types import (
     LineDict,
     LineEndpointCustomDict,
@@ -23,7 +24,7 @@ class LineEndpointSIPAssociatedEvent(TenantEvent):
         self,
         line: LineDict,
         sip: LineEndpointSIPDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {'line': line, 'endpoint_sip': sip}
         super().__init__(content, tenant_uuid)
@@ -40,7 +41,7 @@ class LineEndpointSIPDissociatedEvent(TenantEvent):
         self,
         line: LineDict,
         sip: LineEndpointSIPDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {'line': line, 'endpoint_sip': sip}
         super().__init__(content, tenant_uuid)
@@ -57,7 +58,7 @@ class LineEndpointSCCPAssociatedEvent(TenantEvent):
         self,
         line: LineDict,
         sccp: LineEndpointSCCPDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {'line': line, 'endpoint_sccp': sccp}
         super().__init__(content, tenant_uuid)
@@ -74,7 +75,7 @@ class LineEndpointSCCPDissociatedEvent(TenantEvent):
         self,
         line: LineDict,
         sccp: LineEndpointSCCPDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {'line': line, 'endpoint_sccp': sccp}
         super().__init__(content, tenant_uuid)
@@ -91,7 +92,7 @@ class LineEndpointCustomAssociatedEvent(TenantEvent):
         self,
         line: LineDict,
         custom: LineEndpointCustomDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {'line': line, 'endpoint_custom': custom}
         super().__init__(content, tenant_uuid)
@@ -108,7 +109,7 @@ class LineEndpointCustomDissociatedEvent(TenantEvent):
         self,
         line: LineDict,
         custom: LineEndpointCustomDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {'line': line, 'endpoint_custom': custom}
         super().__init__(content, tenant_uuid)

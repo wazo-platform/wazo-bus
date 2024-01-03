@@ -3,7 +3,8 @@
 
 from typing import Annotated
 
-from xivo_bus.resources.common.event import TenantEvent
+from ..common.event import TenantEvent
+from ..common.types import Format
 
 
 class CallPickupInterceptorUsersAssociatedEvent(TenantEvent):
@@ -15,7 +16,7 @@ class CallPickupInterceptorUsersAssociatedEvent(TenantEvent):
         self,
         call_pickup_id: int,
         users: list[str],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'call_pickup_id': call_pickup_id,
@@ -33,7 +34,7 @@ class CallPickupTargetUsersAssociatedEvent(TenantEvent):
         self,
         call_pickup_id: int,
         users: list[str],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'call_pickup_id': call_pickup_id,
@@ -51,7 +52,7 @@ class CallPickupInterceptorGroupsAssociatedEvent(TenantEvent):
         self,
         call_pickup_id: int,
         group_ids: list[int],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'call_pickup_id': call_pickup_id,
@@ -69,7 +70,7 @@ class CallPickupTargetGroupsAssociatedEvent(TenantEvent):
         self,
         call_pickup_id: int,
         group_ids: list[int],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'call_pickup_id': call_pickup_id,

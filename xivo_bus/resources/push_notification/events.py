@@ -4,6 +4,7 @@
 from typing import Annotated
 
 from ..common.event import UserEvent
+from ..common.types import Format
 from .types import PushMobileDict
 
 
@@ -16,8 +17,8 @@ class CallPushNotificationEvent(UserEvent):
     def __init__(
         self,
         push: PushMobileDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(push, tenant_uuid, user_uuid)
 
@@ -31,7 +32,7 @@ class CallCancelPushNotificationEvent(UserEvent):
     def __init__(
         self,
         push: PushMobileDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(push, tenant_uuid, user_uuid)

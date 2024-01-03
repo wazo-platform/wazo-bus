@@ -5,11 +5,13 @@ from __future__ import annotations
 
 from typing import Annotated, TypedDict
 
+from ..common.types import Format
+
 
 class CallLogExportDataDict(TypedDict, total=False):
-    uuid: Annotated[str, {'format': 'uuid'}]
-    tenant_uuid: Annotated[str, {'format': 'uuid'}]
-    user_uuid: Annotated[str, {'format': 'uuid'}]
-    requested_at: Annotated[str, {'format': 'date-time'}]
+    uuid: Annotated[str, Format('uuid')]
+    tenant_uuid: Annotated[str, Format('uuid')]
+    user_uuid: Annotated[str, Format('uuid')]
+    requested_at: Annotated[str, Format('date-time')]
     filename: str
     status: str

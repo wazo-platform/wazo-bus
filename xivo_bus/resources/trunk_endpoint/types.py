@@ -5,10 +5,12 @@ from __future__ import annotations
 
 from typing import Annotated, TypedDict
 
+from ..common.types import Format
+
 
 class EndpointSIPDict(TypedDict, total=False):
-    uuid: Annotated[str, {'format': 'uuid'}]
-    tenant_uuid: Annotated[str, {'format': 'uuid'}]
+    uuid: Annotated[str, Format('uuid')]
+    tenant_uuid: Annotated[str, Format('uuid')]
     name: str
     auth_section_options: EndpointSIPAuthSectionOptionsDict
     registration_section_options: EndpointSIPRegistrationSectionOptionsDict
@@ -24,16 +26,16 @@ class EndpointSIPRegistrationSectionOptionsDict(TypedDict, total=False):
 
 class EndpointIAXDict(TypedDict, total=False):
     id: int
-    tenant_uuid: Annotated[str, {'format': 'uuid'}]
+    tenant_uuid: Annotated[str, Format('uuid')]
     name: str
 
 
 class EndpointCustomDict(TypedDict, total=False):
     id: int
-    tenant_uuid: Annotated[str, {'format': 'uuid'}]
+    tenant_uuid: Annotated[str, Format('uuid')]
     interface: str
 
 
 class TrunkDict(TypedDict, total=False):
     id: int
-    tenant_uuid: Annotated[str, {'format': 'uuid'}]
+    tenant_uuid: Annotated[str, Format('uuid')]

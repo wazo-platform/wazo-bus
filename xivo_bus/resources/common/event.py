@@ -7,6 +7,7 @@ from collections.abc import Mapping
 from typing import Annotated
 
 from .abstract import EventProtocol
+from .types import Format
 
 
 class ServiceEvent(EventProtocol):
@@ -33,7 +34,7 @@ class TenantEvent(ServiceEvent):
     '''
 
     def __init__(
-        self, content: Mapping | None, tenant_uuid: Annotated[str, {'format': 'uuid'}]
+        self, content: Mapping | None, tenant_uuid: Annotated[str, Format('uuid')]
     ):
         super().__init__(content)
         if tenant_uuid is None:
@@ -58,8 +59,8 @@ class UserEvent(TenantEvent):
     def __init__(
         self,
         content: Mapping | None,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}] | None,
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')] | None,
     ):
         super().__init__(content, tenant_uuid)
         delattr(self, 'user_uuid:*')
@@ -92,7 +93,7 @@ class MultiUserEvent(TenantEvent):
     def __init__(
         self,
         content: Mapping | None,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
         user_uuids: list[str],
     ):
         super().__init__(content, tenant_uuid)

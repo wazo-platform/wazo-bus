@@ -4,6 +4,7 @@
 from typing import Annotated
 
 from ..common.event import TenantEvent
+from ..common.types import Format
 from .types import ContextDict
 
 
@@ -13,7 +14,7 @@ class ContextCreatedEvent(TenantEvent):
     routing_key_fmt = 'config.contexts.created'
 
     def __init__(
-        self, context_data: ContextDict, tenant_uuid: Annotated[str, {'format': 'uuid'}]
+        self, context_data: ContextDict, tenant_uuid: Annotated[str, Format('uuid')]
     ):
         super().__init__(context_data, tenant_uuid)
 
@@ -24,7 +25,7 @@ class ContextDeletedEvent(TenantEvent):
     routing_key_fmt = 'config.contexts.deleted'
 
     def __init__(
-        self, context_data: ContextDict, tenant_uuid: Annotated[str, {'format': 'uuid'}]
+        self, context_data: ContextDict, tenant_uuid: Annotated[str, Format('uuid')]
     ):
         super().__init__(context_data, tenant_uuid)
 
@@ -35,6 +36,6 @@ class ContextEditedEvent(TenantEvent):
     routing_key_fmt = 'config.contexts.edited'
 
     def __init__(
-        self, context_data: ContextDict, tenant_uuid: Annotated[str, {'format': 'uuid'}]
+        self, context_data: ContextDict, tenant_uuid: Annotated[str, Format('uuid')]
     ):
         super().__init__(context_data, tenant_uuid)

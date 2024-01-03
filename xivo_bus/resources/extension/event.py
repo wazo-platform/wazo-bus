@@ -3,7 +3,8 @@
 
 from typing import Annotated
 
-from xivo_bus.resources.common.event import TenantEvent
+from ..common.event import TenantEvent
+from ..common.types import Format
 
 
 class ExtensionCreatedEvent(TenantEvent):
@@ -16,7 +17,7 @@ class ExtensionCreatedEvent(TenantEvent):
         extension_id: int,
         exten: str,
         context: str,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'id': int(extension_id),
@@ -36,7 +37,7 @@ class ExtensionDeletedEvent(TenantEvent):
         extension_id: int,
         exten: str,
         context: str,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'id': int(extension_id),
@@ -56,7 +57,7 @@ class ExtensionEditedEvent(TenantEvent):
         extension_id: int,
         exten: str,
         context: str,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'id': int(extension_id),

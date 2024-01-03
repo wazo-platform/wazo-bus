@@ -5,6 +5,8 @@ from __future__ import annotations
 
 from typing import Annotated, TypedDict
 
+from ..common.types import Format
+
 
 class EndpointSIPAuthSectionOptionsDict(TypedDict, total=False):
     username: str
@@ -23,8 +25,8 @@ class EndpointSIPRegistrationSectionOptionsDict(TypedDict, total=False):
 
 
 class EndpointSIPDict(TypedDict, total=False):
-    uuid: Annotated[str, {'format': 'uuid'}]
-    tenant_uuid: Annotated[str, {'format': 'uuid'}]
+    uuid: Annotated[str, Format('uuid')]
+    tenant_uuid: Annotated[str, Format('uuid')]
     name: str
     label: str
     auth_section_options: EndpointSIPAuthSectionOptionsDict

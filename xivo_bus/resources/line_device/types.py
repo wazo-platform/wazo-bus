@@ -5,13 +5,15 @@ from __future__ import annotations
 
 from typing import Annotated, TypedDict
 
+from ..common.types import Format
+
 
 class DeviceDict(TypedDict, total=False):
     id: str
 
 
 class LineEndpointSIPDict(TypedDict, total=False):
-    uuid: Annotated[str, {'format': 'uuid'}]
+    uuid: Annotated[str, Format('uuid')]
 
 
 class LineEndpointSCCPDict(TypedDict, total=False):

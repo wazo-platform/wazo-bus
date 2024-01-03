@@ -3,7 +3,8 @@
 
 from typing import Annotated
 
-from xivo_bus.resources.common.event import TenantEvent
+from ..common.event import TenantEvent
+from ..common.types import Format
 
 
 class CallPickupCreatedEvent(TenantEvent):
@@ -12,7 +13,7 @@ class CallPickupCreatedEvent(TenantEvent):
     routing_key_fmt = 'config.callpickup.created'
 
     def __init__(
-        self, call_pickup_id: int, tenant_uuid: Annotated[str, {'format': 'uuid'}]
+        self, call_pickup_id: int, tenant_uuid: Annotated[str, Format('uuid')]
     ):
         content = {'id': call_pickup_id}
         super().__init__(content, tenant_uuid)
@@ -24,7 +25,7 @@ class CallPickupDeletedEvent(TenantEvent):
     routing_key_fmt = 'config.callpickup.deleted'
 
     def __init__(
-        self, call_pickup_id: int, tenant_uuid: Annotated[str, {'format': 'uuid'}]
+        self, call_pickup_id: int, tenant_uuid: Annotated[str, Format('uuid')]
     ):
         content = {'id': call_pickup_id}
         super().__init__(content, tenant_uuid)
@@ -36,7 +37,7 @@ class CallPickupEditedEvent(TenantEvent):
     routing_key_fmt = 'config.callpickup.edited'
 
     def __init__(
-        self, call_pickup_id: int, tenant_uuid: Annotated[str, {'format': 'uuid'}]
+        self, call_pickup_id: int, tenant_uuid: Annotated[str, Format('uuid')]
     ):
         content = {'id': call_pickup_id}
         super().__init__(content, tenant_uuid)

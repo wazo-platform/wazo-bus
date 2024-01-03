@@ -5,9 +5,11 @@ from __future__ import annotations
 
 from typing import Annotated, TypedDict
 
+from ..common.types import Format
+
 
 class LineDict(TypedDict, total=False):
     id: int
     protocol: str
     name: str
-    tenant_uuid: Annotated[str, {'format': 'uuid'}]
+    tenant_uuid: Annotated[str, Format('uuid')]

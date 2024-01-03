@@ -4,6 +4,7 @@
 from typing import Annotated
 
 from ..common.event import UserEvent
+from ..common.types import Format
 
 
 class UserAgentAssociatedEvent(UserEvent):
@@ -14,8 +15,8 @@ class UserAgentAssociatedEvent(UserEvent):
     def __init__(
         self,
         agent_id: int,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'user_uuid': str(user_uuid),
@@ -32,8 +33,8 @@ class UserAgentDissociatedEvent(UserEvent):
     def __init__(
         self,
         agent_id: int,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'user_uuid': str(user_uuid),

@@ -5,9 +5,11 @@ from __future__ import annotations
 
 from typing import Annotated, TypedDict
 
+from ..common.types import Format
+
 
 class TenantDict(TypedDict, total=False):
-    uuid: Annotated[str, {'format': 'uuid'}]
+    uuid: Annotated[str, Format('uuid')]
     name: str
     slug: str
     domain_names: list[str]

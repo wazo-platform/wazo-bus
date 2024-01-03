@@ -4,6 +4,7 @@
 from typing import Annotated
 
 from ..common.event import TenantEvent
+from ..common.types import Format
 
 
 class PagingCallerUsersAssociatedEvent(TenantEvent):
@@ -15,7 +16,7 @@ class PagingCallerUsersAssociatedEvent(TenantEvent):
         self,
         paging_id: int,
         users: list[str],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'paging_id': paging_id,
@@ -33,7 +34,7 @@ class PagingMemberUsersAssociatedEvent(TenantEvent):
         self,
         paging_id: int,
         users: list[str],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'paging_id': paging_id,

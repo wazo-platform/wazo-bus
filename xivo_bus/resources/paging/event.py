@@ -4,6 +4,7 @@
 from typing import Annotated
 
 from ..common.event import TenantEvent
+from ..common.types import Format
 
 
 class PagingCreatedEvent(TenantEvent):
@@ -11,7 +12,7 @@ class PagingCreatedEvent(TenantEvent):
     name = 'paging_created'
     routing_key_fmt = 'config.pagings.created'
 
-    def __init__(self, paging_id: int, tenant_uuid: Annotated[str, {'format': 'uuid'}]):
+    def __init__(self, paging_id: int, tenant_uuid: Annotated[str, Format('uuid')]):
         content = {'id': paging_id}
         super().__init__(content, tenant_uuid)
 
@@ -21,7 +22,7 @@ class PagingDeletedEvent(TenantEvent):
     name = 'paging_deleted'
     routing_key_fmt = 'config.pagings.deleted'
 
-    def __init__(self, paging_id: int, tenant_uuid: Annotated[str, {'format': 'uuid'}]):
+    def __init__(self, paging_id: int, tenant_uuid: Annotated[str, Format('uuid')]):
         content = {'id': paging_id}
         super().__init__(content, tenant_uuid)
 
@@ -31,6 +32,6 @@ class PagingEditedEvent(TenantEvent):
     name = 'paging_edited'
     routing_key_fmt = 'config.pagings.edited'
 
-    def __init__(self, paging_id: int, tenant_uuid: Annotated[str, {'format': 'uuid'}]):
+    def __init__(self, paging_id: int, tenant_uuid: Annotated[str, Format('uuid')]):
         content = {'id': paging_id}
         super().__init__(content, tenant_uuid)

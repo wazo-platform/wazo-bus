@@ -3,7 +3,8 @@
 
 from typing import Annotated
 
-from xivo_bus.resources.common.event import TenantEvent
+from ..common.event import TenantEvent
+from ..common.types import Format
 
 
 class ContextContextsAssociatedEvent(TenantEvent):
@@ -15,7 +16,7 @@ class ContextContextsAssociatedEvent(TenantEvent):
         self,
         context_id: int,
         context_ids: list[int],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'context_id': context_id,

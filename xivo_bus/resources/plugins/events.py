@@ -6,6 +6,7 @@ from __future__ import annotations
 from typing import Annotated
 
 from ..common.event import ServiceEvent
+from ..common.types import Format
 from .types import PluginErrorDict
 
 
@@ -16,7 +17,7 @@ class PluginInstallProgressEvent(ServiceEvent):
 
     def __init__(
         self,
-        plugin_uuid: Annotated[str, {'format': 'uuid'}],
+        plugin_uuid: Annotated[str, Format('uuid')],
         status: str,
         errors: PluginErrorDict | None = None,
     ):
@@ -33,7 +34,7 @@ class PluginUninstallProgressEvent(ServiceEvent):
 
     def __init__(
         self,
-        plugin_uuid: Annotated[str, {'format': 'uuid'}],
+        plugin_uuid: Annotated[str, Format('uuid')],
         status: str,
         errors: PluginErrorDict | None = None,
     ):

@@ -3,8 +3,8 @@
 
 from typing import Annotated
 
-from xivo_bus.resources.common.event import TenantEvent, UserEvent
-
+from ..common.event import TenantEvent, UserEvent
+from ..common.types import Format
 from .types import CDRDataDict
 
 
@@ -14,7 +14,7 @@ class CallLogCreatedEvent(TenantEvent):
     routing_key_fmt = 'call_log.created'
 
     def __init__(
-        self, cdr_data: CDRDataDict, tenant_uuid: Annotated[str, {'format': 'uuid'}]
+        self, cdr_data: CDRDataDict, tenant_uuid: Annotated[str, Format('uuid')]
     ):
         super().__init__(cdr_data, tenant_uuid)
 
@@ -27,7 +27,7 @@ class CallLogUserCreatedEvent(UserEvent):
     def __init__(
         self,
         cdr_data: CDRDataDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(cdr_data, tenant_uuid, user_uuid)

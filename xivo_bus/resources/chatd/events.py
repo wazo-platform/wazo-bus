@@ -6,6 +6,7 @@ from __future__ import annotations
 from typing import Annotated
 
 from ..common.event import TenantEvent, UserEvent
+from ..common.types import Format
 from .types import MessageDict, RoomDict, UserPresenceDict
 
 
@@ -17,7 +18,7 @@ class PresenceUpdatedEvent(TenantEvent):
     def __init__(
         self,
         user_presence_data: UserPresenceDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(user_presence_data, tenant_uuid)
 
@@ -30,8 +31,8 @@ class UserRoomCreatedEvent(UserEvent):
     def __init__(
         self,
         room_data: RoomDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(room_data, tenant_uuid, user_uuid)
 
@@ -44,9 +45,9 @@ class UserRoomMessageCreatedEvent(UserEvent):
     def __init__(
         self,
         message_data: MessageDict,
-        room_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        room_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(message_data, tenant_uuid, user_uuid)
         if room_uuid is None:

@@ -3,7 +3,8 @@
 
 from typing import Annotated
 
-from xivo_bus.resources.common.event import TenantEvent
+from ..common.event import TenantEvent
+from ..common.types import Format
 
 
 class AgentSkillAssociatedEvent(TenantEvent):
@@ -15,7 +16,7 @@ class AgentSkillAssociatedEvent(TenantEvent):
         self,
         agent_id: int,
         skill_id: int,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'agent_id': agent_id,
@@ -33,7 +34,7 @@ class AgentSkillDissociatedEvent(TenantEvent):
         self,
         agent_id: int,
         skill_id: int,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'agent_id': agent_id,

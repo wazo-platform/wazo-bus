@@ -4,6 +4,7 @@
 from typing import Annotated
 
 from ..common.event import UserEvent
+from ..common.types import Format
 from .types import CallDict, RelocateDict, TransferDict
 
 
@@ -16,8 +17,8 @@ class CallCreatedEvent(UserEvent):
     def __init__(
         self,
         call: CallDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(call, tenant_uuid, user_uuid)
 
@@ -31,8 +32,8 @@ class CallEndedEvent(UserEvent):
     def __init__(
         self,
         call: CallDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(call, tenant_uuid, user_uuid)
 
@@ -46,8 +47,8 @@ class CallUpdatedEvent(UserEvent):
     def __init__(
         self,
         call: CallDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(call, tenant_uuid, user_uuid)
 
@@ -61,8 +62,8 @@ class CallAnsweredEvent(UserEvent):
     def __init__(
         self,
         call: CallDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(call, tenant_uuid, user_uuid)
 
@@ -77,8 +78,8 @@ class CallDTMFEvent(UserEvent):
         self,
         call_id: str,
         digit_number: str,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'call_id': call_id,
@@ -97,8 +98,8 @@ class CallHeldEvent(UserEvent):
     def __init__(
         self,
         call_id: str,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'call_id': call_id,
@@ -116,8 +117,8 @@ class CallResumedEvent(UserEvent):
     def __init__(
         self,
         call_id: str,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'call_id': call_id,
@@ -135,8 +136,8 @@ class MissedCallEvent(UserEvent):
     def __init__(
         self,
         call: CallDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(call, tenant_uuid, user_uuid)
 
@@ -150,8 +151,8 @@ class CallRelocateInitiatedEvent(UserEvent):
     def __init__(
         self,
         relocate: RelocateDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(relocate, tenant_uuid, user_uuid)
 
@@ -165,8 +166,8 @@ class CallRelocateAnsweredEvent(UserEvent):
     def __init__(
         self,
         relocate: RelocateDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(relocate, tenant_uuid, user_uuid)
 
@@ -180,8 +181,8 @@ class CallRelocateCompletedEvent(UserEvent):
     def __init__(
         self,
         relocate: RelocateDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(relocate, tenant_uuid, user_uuid)
 
@@ -195,8 +196,8 @@ class CallRelocateEndedEvent(UserEvent):
     def __init__(
         self,
         relocate: RelocateDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(relocate, tenant_uuid, user_uuid)
 
@@ -210,8 +211,8 @@ class CallTransferCreatedEvent(UserEvent):
     def __init__(
         self,
         transfer: TransferDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(transfer, tenant_uuid, user_uuid)
 
@@ -225,8 +226,8 @@ class CallTransferUpdatedEvent(UserEvent):
     def __init__(
         self,
         transfer: TransferDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(transfer, tenant_uuid, user_uuid)
 
@@ -240,8 +241,8 @@ class CallTransferAnsweredEvent(UserEvent):
     def __init__(
         self,
         transfer: TransferDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(transfer, tenant_uuid, user_uuid)
 
@@ -255,8 +256,8 @@ class CallTransferCancelledEvent(UserEvent):
     def __init__(
         self,
         transfer: TransferDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(transfer, tenant_uuid, user_uuid)
 
@@ -270,8 +271,8 @@ class CallTransferCompletedEvent(UserEvent):
     def __init__(
         self,
         transfer: TransferDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(transfer, tenant_uuid, user_uuid)
 
@@ -285,8 +286,8 @@ class CallTransferAbandonedEvent(UserEvent):
     def __init__(
         self,
         transfer: TransferDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(transfer, tenant_uuid, user_uuid)
 
@@ -300,7 +301,7 @@ class CallTransferEndedEvent(UserEvent):
     def __init__(
         self,
         transfer: TransferDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(transfer, tenant_uuid, user_uuid)

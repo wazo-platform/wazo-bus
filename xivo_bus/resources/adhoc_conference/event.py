@@ -3,7 +3,8 @@
 
 from typing import Annotated
 
-from xivo_bus.resources.common.event import UserEvent
+from ..common.event import UserEvent
+from ..common.types import Format
 
 
 class AdhocConferenceCreatedEvent(UserEvent):
@@ -14,8 +15,8 @@ class AdhocConferenceCreatedEvent(UserEvent):
     def __init__(
         self,
         conference_id: int,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = {'conference_id': conference_id}
         super().__init__(content, tenant_uuid, user_uuid)
@@ -29,8 +30,8 @@ class AdhocConferenceDeletedEvent(UserEvent):
     def __init__(
         self,
         conference_id: int,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = {'conference_id': conference_id}
         super().__init__(content, tenant_uuid, user_uuid)
@@ -45,8 +46,8 @@ class AdhocConferenceParticipantJoinedEvent(UserEvent):
         self,
         conference_id: int,
         call_id: str,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = {'conference_id': conference_id, 'call_id': call_id}
         super().__init__(content, tenant_uuid, user_uuid)
@@ -61,8 +62,8 @@ class AdhocConferenceParticipantLeftEvent(UserEvent):
         self,
         conference_id: int,
         call_id: str,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = {'conference_id': conference_id, 'call_id': call_id}
         super().__init__(content, tenant_uuid, user_uuid)

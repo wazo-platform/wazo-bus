@@ -4,6 +4,7 @@
 from typing import Annotated
 
 from ..common.event import TenantEvent
+from ..common.types import Format
 
 
 class LineExtensionAssociatedEvent(TenantEvent):
@@ -15,7 +16,7 @@ class LineExtensionAssociatedEvent(TenantEvent):
         self,
         line_id: int,
         extension_id: int,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {'line_id': line_id, 'extension_id': extension_id}
         super().__init__(content, tenant_uuid)
@@ -30,7 +31,7 @@ class LineExtensionDissociatedEvent(TenantEvent):
         self,
         line_id: int,
         extension_id: int,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {'line_id': line_id, 'extension_id': extension_id}
         super().__init__(content, tenant_uuid)

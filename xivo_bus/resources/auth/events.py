@@ -3,8 +3,8 @@
 
 from typing import Annotated
 
-from xivo_bus.resources.common.event import TenantEvent, UserEvent
-
+from ..common.event import TenantEvent, UserEvent
+from ..common.types import Format
 from .types import TenantDict
 
 
@@ -14,7 +14,7 @@ class TenantCreatedEvent(TenantEvent):
     routing_key_fmt = 'auth.tenants.{tenant_uuid}.created'
 
     def __init__(
-        self, tenant_data: TenantDict, tenant_uuid: Annotated[str, {'format': 'uuid'}]
+        self, tenant_data: TenantDict, tenant_uuid: Annotated[str, Format('uuid')]
     ):
         super().__init__(tenant_data, tenant_uuid)
 
@@ -24,7 +24,7 @@ class TenantUpdatedEvent(TenantEvent):
     name = 'auth_tenant_updated'
     routing_key_fmt = 'auth.tenants.{tenant_uuid}.updated'
 
-    def __init__(self, name: str, tenant_uuid: Annotated[str, {'format': 'uuid'}]):
+    def __init__(self, name: str, tenant_uuid: Annotated[str, Format('uuid')]):
         content = {'uuid': tenant_uuid, 'name': name}
         super().__init__(content, tenant_uuid)
 
@@ -34,7 +34,7 @@ class TenantDeletedEvent(TenantEvent):
     name = 'auth_tenant_deleted'
     routing_key_fmt = 'auth.tenants.{tenant_uuid}.deleted'
 
-    def __init__(self, tenant_uuid: Annotated[str, {'format': 'uuid'}]):
+    def __init__(self, tenant_uuid: Annotated[str, Format('uuid')]):
         content = {'uuid': tenant_uuid}
         super().__init__(content, tenant_uuid)
 
@@ -47,8 +47,8 @@ class UserExternalAuthAddedEvent(UserEvent):
     def __init__(
         self,
         external_auth_name: str,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = {'user_uuid': user_uuid, 'external_auth_name': external_auth_name}
         super().__init__(content, tenant_uuid, user_uuid)
@@ -62,8 +62,8 @@ class UserExternalAuthAuthorizedEvent(UserEvent):
     def __init__(
         self,
         external_auth_name: str,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = {'user_uuid': user_uuid, 'external_auth_name': external_auth_name}
         super().__init__(content, tenant_uuid, user_uuid)
@@ -77,8 +77,8 @@ class UserExternalAuthDeletedEvent(UserEvent):
     def __init__(
         self,
         external_auth_name: str,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = {'user_uuid': user_uuid, 'external_auth_name': external_auth_name}
         super().__init__(content, tenant_uuid, user_uuid)
@@ -93,8 +93,8 @@ class RefreshTokenCreatedEvent(UserEvent):
         self,
         client_id: str,
         is_mobile: bool,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'client_id': client_id,
@@ -114,8 +114,8 @@ class RefreshTokenDeletedEvent(UserEvent):
         self,
         client_id: str,
         is_mobile: bool,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'client_id': client_id,
@@ -133,10 +133,10 @@ class SessionCreatedEvent(UserEvent):
 
     def __init__(
         self,
-        session_uuid: Annotated[str, {'format': 'uuid'}],
+        session_uuid: Annotated[str, Format('uuid')],
         is_mobile: bool,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'uuid': session_uuid,
@@ -155,9 +155,9 @@ class SessionDeletedEvent(UserEvent):
 
     def __init__(
         self,
-        session_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        session_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'uuid': session_uuid,
@@ -175,9 +175,9 @@ class SessionExpireSoonEvent(UserEvent):
 
     def __init__(
         self,
-        session_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        session_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'uuid': session_uuid,

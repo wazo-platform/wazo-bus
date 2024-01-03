@@ -4,6 +4,7 @@
 from typing import Annotated
 
 from ..common.event import TenantEvent
+from ..common.types import Format
 from .types import LineDict
 
 
@@ -12,7 +13,7 @@ class LineCreatedEvent(TenantEvent):
     name = 'line_created'
     routing_key_fmt = 'config.line.created'
 
-    def __init__(self, line: LineDict, tenant_uuid: Annotated[str, {'format': 'uuid'}]):
+    def __init__(self, line: LineDict, tenant_uuid: Annotated[str, Format('uuid')]):
         super().__init__(line, tenant_uuid)
 
 
@@ -21,7 +22,7 @@ class LineDeletedEvent(TenantEvent):
     name = 'line_deleted'
     routing_key_fmt = 'config.line.deleted'
 
-    def __init__(self, line: LineDict, tenant_uuid: Annotated[str, {'format': 'uuid'}]):
+    def __init__(self, line: LineDict, tenant_uuid: Annotated[str, Format('uuid')]):
         super().__init__(line, tenant_uuid)
 
 
@@ -30,7 +31,7 @@ class LineEditedEvent(TenantEvent):
     name = 'line_edited'
     routing_key_fmt = 'config.line.edited'
 
-    def __init__(self, line: LineDict, tenant_uuid: Annotated[str, {'format': 'uuid'}]):
+    def __init__(self, line: LineDict, tenant_uuid: Annotated[str, Format('uuid')]):
         super().__init__(line, tenant_uuid)
 
 
@@ -46,7 +47,7 @@ class LineStatusUpdatedEvent(TenantEvent):
         endpoint_name: str,
         endpoint_registered: bool,
         endpoint_current_call_count: int,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'id': line_id,

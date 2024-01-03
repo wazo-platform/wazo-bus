@@ -3,8 +3,8 @@
 
 from typing import Annotated
 
-from xivo_bus.resources.common.event import TenantEvent
-
+from ..common.event import TenantEvent
+from ..common.types import Format
 from .types import ApplicationDict
 
 
@@ -16,7 +16,7 @@ class ApplicationCreatedEvent(TenantEvent):
     def __init__(
         self,
         application: ApplicationDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(application, tenant_uuid)
 
@@ -29,7 +29,7 @@ class ApplicationDeletedEvent(TenantEvent):
     def __init__(
         self,
         application: ApplicationDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(application, tenant_uuid)
 
@@ -42,6 +42,6 @@ class ApplicationEditedEvent(TenantEvent):
     def __init__(
         self,
         application: ApplicationDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(application, tenant_uuid)

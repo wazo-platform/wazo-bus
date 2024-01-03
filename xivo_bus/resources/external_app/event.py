@@ -4,6 +4,7 @@
 from typing import Annotated
 
 from ..common.event import TenantEvent
+from ..common.types import Format
 from .types import ExternalAppDict
 
 
@@ -13,7 +14,7 @@ class ExternalAppCreatedEvent(TenantEvent):
     routing_key_fmt = 'config.external_apps.created'
 
     def __init__(
-        self, app: ExternalAppDict, tenant_uuid: Annotated[str, {'format': 'uuid'}]
+        self, app: ExternalAppDict, tenant_uuid: Annotated[str, Format('uuid')]
     ):
         super().__init__(app, tenant_uuid)
 
@@ -24,7 +25,7 @@ class ExternalAppDeletedEvent(TenantEvent):
     routing_key_fmt = 'config.external_apps.deleted'
 
     def __init__(
-        self, app: ExternalAppDict, tenant_uuid: Annotated[str, {'format': 'uuid'}]
+        self, app: ExternalAppDict, tenant_uuid: Annotated[str, Format('uuid')]
     ):
         super().__init__(app, tenant_uuid)
 
@@ -35,6 +36,6 @@ class ExternalAppEditedEvent(TenantEvent):
     routing_key_fmt = 'config.external_apps.edited'
 
     def __init__(
-        self, app: ExternalAppDict, tenant_uuid: Annotated[str, {'format': 'uuid'}]
+        self, app: ExternalAppDict, tenant_uuid: Annotated[str, Format('uuid')]
     ):
         super().__init__(app, tenant_uuid)

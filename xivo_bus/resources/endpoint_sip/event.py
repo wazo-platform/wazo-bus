@@ -4,6 +4,7 @@
 from typing import Annotated
 
 from ..common.event import TenantEvent
+from ..common.types import Format
 from .types import EndpointSIPDict
 
 
@@ -13,7 +14,7 @@ class SIPEndpointCreatedEvent(TenantEvent):
     routing_key_fmt = 'config.sip_endpoint.created'
 
     def __init__(
-        self, endpoint: EndpointSIPDict, tenant_uuid: Annotated[str, {'format': 'uuid'}]
+        self, endpoint: EndpointSIPDict, tenant_uuid: Annotated[str, Format('uuid')]
     ):
         super().__init__(endpoint, tenant_uuid)
 
@@ -24,7 +25,7 @@ class SIPEndpointDeletedEvent(TenantEvent):
     routing_key_fmt = 'config.sip_endpoint.deleted'
 
     def __init__(
-        self, endpoint: EndpointSIPDict, tenant_uuid: Annotated[str, {'format': 'uuid'}]
+        self, endpoint: EndpointSIPDict, tenant_uuid: Annotated[str, Format('uuid')]
     ):
         super().__init__(endpoint, tenant_uuid)
 
@@ -35,7 +36,7 @@ class SIPEndpointEditedEvent(TenantEvent):
     routing_key_fmt = 'config.sip_endpoint.edited'
 
     def __init__(
-        self, endpoint: EndpointSIPDict, tenant_uuid: Annotated[str, {'format': 'uuid'}]
+        self, endpoint: EndpointSIPDict, tenant_uuid: Annotated[str, Format('uuid')]
     ):
         super().__init__(endpoint, tenant_uuid)
 
@@ -46,7 +47,7 @@ class SIPEndpointTemplateCreatedEvent(TenantEvent):
     routing_key_fmt = 'config.sip_endpoint_template.created'
 
     def __init__(
-        self, endpoint: EndpointSIPDict, tenant_uuid: Annotated[str, {'format': 'uuid'}]
+        self, endpoint: EndpointSIPDict, tenant_uuid: Annotated[str, Format('uuid')]
     ):
         super().__init__(endpoint, tenant_uuid)
 
@@ -57,7 +58,7 @@ class SIPEndpointTemplateDeletedEvent(TenantEvent):
     routing_key_fmt = 'config.sip_endpoint_template.deleted'
 
     def __init__(
-        self, endpoint: EndpointSIPDict, tenant_uuid: Annotated[str, {'format': 'uuid'}]
+        self, endpoint: EndpointSIPDict, tenant_uuid: Annotated[str, Format('uuid')]
     ):
         super().__init__(endpoint, tenant_uuid)
 
@@ -68,6 +69,6 @@ class SIPEndpointTemplateEditedEvent(TenantEvent):
     routing_key_fmt = 'config.sip_endpoint_template.edited'
 
     def __init__(
-        self, endpoint: EndpointSIPDict, tenant_uuid: Annotated[str, {'format': 'uuid'}]
+        self, endpoint: EndpointSIPDict, tenant_uuid: Annotated[str, Format('uuid')]
     ):
         super().__init__(endpoint, tenant_uuid)

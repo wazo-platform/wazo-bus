@@ -4,6 +4,7 @@
 from typing import Annotated
 
 from ..common.event import TenantEvent
+from ..common.types import Format
 from .types import ApplicationDict, LineDict
 
 
@@ -16,7 +17,7 @@ class LineApplicationAssociatedEvent(TenantEvent):
         self,
         line: LineDict,
         application: ApplicationDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {'line': line, 'application': application}
         super().__init__(content, tenant_uuid)
@@ -31,7 +32,7 @@ class LineApplicationDissociatedEvent(TenantEvent):
         self,
         line: LineDict,
         application: ApplicationDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {'line': line, 'application': application}
         super().__init__(content, tenant_uuid)

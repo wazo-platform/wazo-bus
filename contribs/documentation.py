@@ -44,37 +44,34 @@ class AsyncAPITypes:
             return {'type': 'array', 'items': format}
 
         @classmethod
-        def boolean(cls) -> dict:
+        def boolean(cls, *metadata: Any) -> dict:
             return {'type': 'boolean'}
 
         @classmethod
-        def datetime(cls) -> dict:
-            return cls.string(format='date-time')
-
-        @classmethod
-        def float_(cls) -> dict:
+        def float_(cls, *metadata: Any) -> dict:
             return {'type': 'float'}
 
         @classmethod
-        def integer(cls) -> dict:
+        def integer(cls, *metadata: Any) -> dict:
             return {'type': 'integer'}
 
         @classmethod
-        def object_(cls, content: dict | None = None) -> dict:
+        def object_(cls, content: dict | None = None, *metadata: Any) -> dict:
             return {'type': 'object', 'properties': content or {}}
 
         @classmethod
-        def string(cls, *, format: str | None = None, const: str | None = None) -> dict:
+        def string(cls, *metadata: Any) -> dict:
             content = {'type': 'string'}
-            if format:
-                content['format'] = format
-            if const:
-                content['const'] = const
-            return content
 
-        @classmethod
-        def uuid(cls) -> dict:
-            return cls.string(format='uuid')
+            for obj in metadata:
+                print(obj)
+                if hasattr(obj, 'format'):
+                    content['format'] = obj.format
+
+                if hasattr(obj, 'const'):
+                    content['const'] = obj.const
+
+            return content
 
     _TYPES_FACTORIES: dict[type | Any, Callable[..., dict]] = {
         Any: Types.object_,
@@ -86,18 +83,16 @@ class AsyncAPITypes:
     }
 
     @classmethod
-    def scan_hint(cls, hint: type) -> dict[str, str]:
-        def recurse(type_: type, metadata: dict | None = None) -> dict:
-            metadata = metadata or {}
-
+    def _scan_hint(cls, hint: type) -> dict[str, str]:
+        def recurse(type_: type, *metadata: Any) -> dict:
             if origin_type := get_origin(type_):
                 subtype, *args = get_args(type_)
 
                 if origin_type is Annotated:
-                    return recurse(subtype, metadata=args[0])
+                    return recurse(subtype, *args)
 
                 elif origin_type is Literal:
-                    return cls.Types.string(const=subtype)
+                    return cls.Types.string(*args)
 
                 elif origin_type in (UnionType, Union):
                     return recurse(subtype)
@@ -105,7 +100,7 @@ class AsyncAPITypes:
                 elif origin_type in (list, set, tuple):
                     if len(args) > 0:
                         raise TypeError('arrays cannot have multiple types')
-                    return cls.Types.array(recurse(subtype, metadata=metadata))
+                    return cls.Types.array(recurse(subtype))
 
                 elif origin_type is dict:
                     return cls.Types.object_()
@@ -121,7 +116,7 @@ class AsyncAPITypes:
 
             elif type_ in cls._TYPES_FACTORIES.keys():
                 factory = cls._TYPES_FACTORIES[type_]
-                return factory(**metadata)
+                return factory(*metadata)
 
             raise TypeError(f'unhandled type: {type_}')
 
@@ -138,7 +133,7 @@ class AsyncAPITypes:
             if param not in ignore_keys
         }
 
-        return {param: cls.scan_hint(hint) for param, hint in hints.items()}
+        return {param: cls._scan_hint(hint) for param, hint in hints.items()}
 
 
 class Event:

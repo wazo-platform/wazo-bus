@@ -5,8 +5,8 @@ from __future__ import annotations
 
 from typing import Annotated, Any
 
-from xivo_bus.resources.common.event import TenantEvent, UserEvent
-
+from ..common.event import TenantEvent, UserEvent
+from ..common.types import Format
 from .types import (
     ApplicationCallDict,
     ApplicationCallPlayDict,
@@ -19,7 +19,7 @@ class _ApplicationMixin:
     def __init__(
         self,
         content: dict,
-        application_uuid: Annotated[str, {'format': 'uuid'}],
+        application_uuid: Annotated[str, Format('uuid')],
         *args: Any,
     ):
         super().__init__(content, *args)  # type: ignore[call-arg]
@@ -37,8 +37,8 @@ class ApplicationCallDTMFReceivedEvent(_ApplicationMixin, TenantEvent):
         self,
         call_id: str,
         dtmf: str,
-        application_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        application_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'application_uuid': str(application_uuid),
@@ -56,9 +56,9 @@ class ApplicationCallEnteredEvent(_ApplicationMixin, UserEvent):
     def __init__(
         self,
         application_call: ApplicationCallDict,
-        application_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        application_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = {'application_uuid': str(application_uuid), 'call': application_call}
         super().__init__(content, application_uuid, tenant_uuid, user_uuid)
@@ -72,9 +72,9 @@ class ApplicationCallInitiatedEvent(_ApplicationMixin, UserEvent):
     def __init__(
         self,
         application_call: ApplicationCallDict,
-        application_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        application_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = {'application_uuid': str(application_uuid), 'call': application_call}
         super().__init__(content, application_uuid, tenant_uuid, user_uuid)
@@ -88,9 +88,9 @@ class ApplicationCallDeletedEvent(_ApplicationMixin, UserEvent):
     def __init__(
         self,
         application_call: ApplicationCallDict,
-        application_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        application_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = {'application_uuid': str(application_uuid), 'call': application_call}
         super().__init__(content, application_uuid, tenant_uuid, user_uuid)
@@ -104,9 +104,9 @@ class ApplicationCallUpdatedEvent(_ApplicationMixin, UserEvent):
     def __init__(
         self,
         application_call: ApplicationCallDict,
-        application_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        application_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = {'application_uuid': str(application_uuid), 'call': application_call}
         super().__init__(content, application_uuid, tenant_uuid, user_uuid)
@@ -120,9 +120,9 @@ class ApplicationCallAnsweredEvent(_ApplicationMixin, UserEvent):
     def __init__(
         self,
         application_call: ApplicationCallDict,
-        application_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        application_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = {'application_uuid': str(application_uuid), 'call': application_call}
         super().__init__(content, application_uuid, tenant_uuid, user_uuid)
@@ -138,9 +138,9 @@ class ApplicationCallProgressStartedEvent(_ApplicationMixin, UserEvent):
     def __init__(
         self,
         application_call: ApplicationCallDict,
-        application_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        application_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = {'application_uuid': str(application_uuid), 'call': application_call}
         super().__init__(content, application_uuid, tenant_uuid, user_uuid)
@@ -156,9 +156,9 @@ class ApplicationCallProgressStoppedEvent(_ApplicationMixin, UserEvent):
     def __init__(
         self,
         application_call: ApplicationCallDict,
-        application_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        application_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = {'application_uuid': str(application_uuid), 'call': application_call}
         super().__init__(content, application_uuid, tenant_uuid, user_uuid)
@@ -172,8 +172,8 @@ class ApplicationDestinationNodeCreatedEvent(_ApplicationMixin, TenantEvent):
     def __init__(
         self,
         node: ApplicationNodeDict,
-        application_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        application_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {'application_uuid': str(application_uuid), 'node': node}
         super().__init__(content, application_uuid, tenant_uuid)
@@ -187,8 +187,8 @@ class ApplicationNodeCreatedEvent(_ApplicationMixin, TenantEvent):
     def __init__(
         self,
         node: ApplicationNodeDict,
-        application_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        application_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {'application_uuid': str(application_uuid), 'node': node}
         super().__init__(content, application_uuid, tenant_uuid)
@@ -202,8 +202,8 @@ class ApplicationNodeUpdatedEvent(_ApplicationMixin, TenantEvent):
     def __init__(
         self,
         node: ApplicationNodeDict,
-        application_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        application_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {'application_uuid': str(application_uuid), 'node': node}
         super().__init__(content, application_uuid, tenant_uuid)
@@ -217,8 +217,8 @@ class ApplicationNodeDeletedEvent(_ApplicationMixin, TenantEvent):
     def __init__(
         self,
         node: ApplicationNodeDict,
-        application_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        application_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {'application_uuid': str(application_uuid), 'node': node}
         super().__init__(content, application_uuid, tenant_uuid)
@@ -234,8 +234,8 @@ class ApplicationPlaybackCreatedEvent(_ApplicationMixin, TenantEvent):
     def __init__(
         self,
         playback: ApplicationCallPlayDict,
-        application_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        application_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'application_uuid': str(application_uuid),
@@ -254,8 +254,8 @@ class ApplicationPlaybackDeletedEvent(_ApplicationMixin, TenantEvent):
     def __init__(
         self,
         playback: ApplicationCallPlayDict,
-        application_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        application_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'application_uuid': str(application_uuid),
@@ -272,8 +272,8 @@ class ApplicationSnoopCreatedEvent(_ApplicationMixin, TenantEvent):
     def __init__(
         self,
         snoop: ApplicationSnoopDict,
-        application_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        application_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {'application_uuid': str(application_uuid), 'snoop': snoop}
         super().__init__(content, application_uuid, tenant_uuid)
@@ -287,8 +287,8 @@ class ApplicationSnoopUpdatedEvent(_ApplicationMixin, TenantEvent):
     def __init__(
         self,
         snoop: ApplicationSnoopDict,
-        application_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        application_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {'application_uuid': str(application_uuid), 'snoop': snoop}
         super().__init__(content, application_uuid, tenant_uuid)
@@ -302,8 +302,8 @@ class ApplicationSnoopDeletedEvent(_ApplicationMixin, TenantEvent):
     def __init__(
         self,
         snoop: ApplicationSnoopDict,
-        application_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        application_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {'application_uuid': str(application_uuid), 'snoop': snoop}
         super().__init__(content, application_uuid, tenant_uuid)
@@ -319,9 +319,9 @@ class ApplicationUserOutgoingCallCreatedEvent(_ApplicationMixin, UserEvent):
     def __init__(
         self,
         call: ApplicationCallDict,
-        application_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        application_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = {'application_uuid': str(application_uuid), 'call': call}
         super().__init__(content, application_uuid, tenant_uuid, user_uuid)

@@ -3,7 +3,8 @@
 
 from typing import Annotated
 
-from xivo_bus.resources.common.event import TenantEvent
+from ..common.event import TenantEvent
+from ..common.types import Format
 
 
 class CallFilterRecipientUsersAssociatedEvent(TenantEvent):
@@ -15,7 +16,7 @@ class CallFilterRecipientUsersAssociatedEvent(TenantEvent):
         self,
         call_filter_id: int,
         users: list[str],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'call_filter_id': call_filter_id,
@@ -33,7 +34,7 @@ class CallFilterSurrogateUsersAssociatedEvent(TenantEvent):
         self,
         call_filter_id: int,
         users: list[str],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'call_filter_id': call_filter_id,

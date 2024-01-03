@@ -3,7 +3,8 @@
 
 from typing import Annotated
 
-from xivo_bus.resources.common.event import TenantEvent
+from ..common.event import TenantEvent
+from ..common.types import Format
 
 
 class IVRCreatedEvent(TenantEvent):
@@ -11,7 +12,7 @@ class IVRCreatedEvent(TenantEvent):
     name = 'ivr_created'
     routing_key_fmt = 'config.ivr.created'
 
-    def __init__(self, ivr_id: int, tenant_uuid: Annotated[str, {'format': 'uuid'}]):
+    def __init__(self, ivr_id: int, tenant_uuid: Annotated[str, Format('uuid')]):
         content = {'id': ivr_id}
         super().__init__(content, tenant_uuid)
 
@@ -21,7 +22,7 @@ class IVRDeletedEvent(TenantEvent):
     name = 'ivr_deleted'
     routing_key_fmt = 'config.ivr.deleted'
 
-    def __init__(self, ivr_id: int, tenant_uuid: Annotated[str, {'format': 'uuid'}]):
+    def __init__(self, ivr_id: int, tenant_uuid: Annotated[str, Format('uuid')]):
         content = {'id': ivr_id}
         super().__init__(content, tenant_uuid)
 
@@ -31,6 +32,6 @@ class IVREditedEvent(TenantEvent):
     name = 'ivr_edited'
     routing_key_fmt = 'config.ivr.edited'
 
-    def __init__(self, ivr_id: int, tenant_uuid: Annotated[str, {'format': 'uuid'}]):
+    def __init__(self, ivr_id: int, tenant_uuid: Annotated[str, Format('uuid')]):
         content = {'id': ivr_id}
         super().__init__(content, tenant_uuid)

@@ -4,6 +4,7 @@
 from typing import Annotated
 
 from ..common.event import TenantEvent
+from ..common.types import Format
 from .types import GroupDict
 
 
@@ -12,9 +13,7 @@ class GroupCreatedEvent(TenantEvent):
     name = 'group_created'
     routing_key_fmt = 'config.groups.created'
 
-    def __init__(
-        self, group: GroupDict, tenant_uuid: Annotated[str, {'format': 'uuid'}]
-    ):
+    def __init__(self, group: GroupDict, tenant_uuid: Annotated[str, Format('uuid')]):
         super().__init__(group, tenant_uuid)
 
 
@@ -23,9 +22,7 @@ class GroupDeletedEvent(TenantEvent):
     name = 'group_deleted'
     routing_key_fmt = 'config.groups.deleted'
 
-    def __init__(
-        self, group: GroupDict, tenant_uuid: Annotated[str, {'format': 'uuid'}]
-    ):
+    def __init__(self, group: GroupDict, tenant_uuid: Annotated[str, Format('uuid')]):
         super().__init__(group, tenant_uuid)
 
 
@@ -34,9 +31,7 @@ class GroupEditedEvent(TenantEvent):
     name = 'group_edited'
     routing_key_fmt = 'config.groups.edited'
 
-    def __init__(
-        self, group: GroupDict, tenant_uuid: Annotated[str, {'format': 'uuid'}]
-    ):
+    def __init__(self, group: GroupDict, tenant_uuid: Annotated[str, Format('uuid')]):
         super().__init__(group, tenant_uuid)
 
 
@@ -48,8 +43,8 @@ class GroupFallbackEditedEvent(TenantEvent):
     def __init__(
         self,
         group_id: int,
-        group_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        group_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'id': group_id,

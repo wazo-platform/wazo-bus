@@ -4,6 +4,7 @@
 from typing import Annotated
 
 from ..common.event import TenantEvent
+from ..common.types import Format
 from .types import EndpointCustomDict, EndpointIAXDict, EndpointSIPDict, TrunkDict
 
 
@@ -18,7 +19,7 @@ class TrunkEndpointSIPAssociatedEvent(TenantEvent):
         self,
         trunk: TrunkDict,
         sip: EndpointSIPDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'trunk': trunk,
@@ -38,7 +39,7 @@ class TrunkEndpointSIPDissociatedEvent(TenantEvent):
         self,
         trunk: TrunkDict,
         sip: EndpointSIPDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'trunk': trunk,
@@ -58,7 +59,7 @@ class TrunkEndpointIAXAssociatedEvent(TenantEvent):
         self,
         trunk: TrunkDict,
         iax: EndpointIAXDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'trunk': trunk,
@@ -78,7 +79,7 @@ class TrunkEndpointIAXDissociatedEvent(TenantEvent):
         self,
         trunk: TrunkDict,
         iax: EndpointIAXDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'trunk': trunk,
@@ -98,7 +99,7 @@ class TrunkEndpointCustomAssociatedEvent(TenantEvent):
         self,
         trunk: TrunkDict,
         custom: EndpointCustomDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'trunk': trunk,
@@ -118,7 +119,7 @@ class TrunkEndpointCustomDissociatedEvent(TenantEvent):
         self,
         trunk: TrunkDict,
         custom: EndpointCustomDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'trunk': trunk,

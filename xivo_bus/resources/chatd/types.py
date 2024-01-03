@@ -5,6 +5,8 @@ from __future__ import annotations
 
 from typing import Annotated, TypedDict
 
+from ..common.types import Format
+
 
 class LinePresenceDict(TypedDict, total=False):
     id: int
@@ -12,32 +14,32 @@ class LinePresenceDict(TypedDict, total=False):
 
 
 class MessageDict(TypedDict, total=False):
-    uuid: Annotated[str, {'format': 'uuid'}]
+    uuid: Annotated[str, Format('uuid')]
     content: str
     alias: str
-    user_uuid: Annotated[str, {'format': 'uuid'}]
-    tenant_uuid: Annotated[str, {'format': 'uuid'}]
-    wazo_uuid: Annotated[str, {'format': 'uuid'}]
+    user_uuid: Annotated[str, Format('uuid')]
+    tenant_uuid: Annotated[str, Format('uuid')]
+    wazo_uuid: Annotated[str, Format('uuid')]
     created_at: str
     room: RoomDict
 
 
 class RoomDict(TypedDict, total=False):
-    uuid: Annotated[str, {'format': 'uuid'}]
-    tenant_uuid: Annotated[str, {'format': 'uuid'}]
+    uuid: Annotated[str, Format('uuid')]
+    tenant_uuid: Annotated[str, Format('uuid')]
     name: str
     users: list[RoomUserDict]
 
 
 class RoomUserDict(TypedDict, total=False):
-    uuid: Annotated[str, {'format': 'uuid'}]
-    tenant_uuid: Annotated[str, {'format': 'uuid'}]
-    wazo_uuid: Annotated[str, {'format': 'uuid'}]
+    uuid: Annotated[str, Format('uuid')]
+    tenant_uuid: Annotated[str, Format('uuid')]
+    wazo_uuid: Annotated[str, Format('uuid')]
 
 
 class UserPresenceDict(TypedDict, total=False):
-    uuid: Annotated[str, {'format': 'uuid'}]
-    tenant_uuid: Annotated[str, {'format': 'uuid'}]
+    uuid: Annotated[str, Format('uuid')]
+    tenant_uuid: Annotated[str, Format('uuid')]
     state: str
     status: str
     last_activity: str

@@ -4,6 +4,7 @@
 from typing import Annotated
 
 from ..common.event import TenantEvent
+from ..common.types import Format
 from .types import EndpointIAXDict
 
 
@@ -13,7 +14,7 @@ class IAXEndpointCreatedEvent(TenantEvent):
     routing_key_fmt = 'config.iax_endpoint.created'
 
     def __init__(
-        self, endpoint: EndpointIAXDict, tenant_uuid: Annotated[str, {'format': 'uuid'}]
+        self, endpoint: EndpointIAXDict, tenant_uuid: Annotated[str, Format('uuid')]
     ):
         super().__init__(endpoint, tenant_uuid)
 
@@ -24,7 +25,7 @@ class IAXEndpointDeletedEvent(TenantEvent):
     routing_key_fmt = 'config.iax_endpoint.deleted'
 
     def __init__(
-        self, endpoint: EndpointIAXDict, tenant_uuid: Annotated[str, {'format': 'uuid'}]
+        self, endpoint: EndpointIAXDict, tenant_uuid: Annotated[str, Format('uuid')]
     ):
         super().__init__(endpoint, tenant_uuid)
 
@@ -35,6 +36,6 @@ class IAXEndpointEditedEvent(TenantEvent):
     routing_key_fmt = 'config.iax_endpoint.edited'
 
     def __init__(
-        self, endpoint: EndpointIAXDict, tenant_uuid: Annotated[str, {'format': 'uuid'}]
+        self, endpoint: EndpointIAXDict, tenant_uuid: Annotated[str, Format('uuid')]
     ):
         super().__init__(endpoint, tenant_uuid)

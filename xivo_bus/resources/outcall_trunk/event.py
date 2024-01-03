@@ -4,6 +4,7 @@
 from typing import Annotated
 
 from ..common.event import TenantEvent
+from ..common.types import Format
 
 
 class OutcallTrunksAssociatedEvent(TenantEvent):
@@ -15,7 +16,7 @@ class OutcallTrunksAssociatedEvent(TenantEvent):
         self,
         outcall_id: int,
         trunk_ids: list[int],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'outcall_id': outcall_id,

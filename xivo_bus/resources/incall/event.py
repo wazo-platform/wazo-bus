@@ -3,7 +3,8 @@
 
 from typing import Annotated
 
-from xivo_bus.resources.common.event import TenantEvent
+from ..common.event import TenantEvent
+from ..common.types import Format
 
 
 class IncallCreatedEvent(TenantEvent):
@@ -11,7 +12,7 @@ class IncallCreatedEvent(TenantEvent):
     name = 'incall_created'
     routing_key_fmt = 'config.incalls.created'
 
-    def __init__(self, incall_id: int, tenant_uuid: Annotated[str, {'format': 'uuid'}]):
+    def __init__(self, incall_id: int, tenant_uuid: Annotated[str, Format('uuid')]):
         content = {'id': incall_id}
         super().__init__(content, tenant_uuid)
 
@@ -21,7 +22,7 @@ class IncallDeletedEvent(TenantEvent):
     name = 'incall_deleted'
     routing_key_fmt = 'config.incalls.deleted'
 
-    def __init__(self, incall_id: int, tenant_uuid: Annotated[str, {'format': 'uuid'}]):
+    def __init__(self, incall_id: int, tenant_uuid: Annotated[str, Format('uuid')]):
         content = {'id': incall_id}
         super().__init__(content, tenant_uuid)
 
@@ -31,6 +32,6 @@ class IncallEditedEvent(TenantEvent):
     name = 'incall_edited'
     routing_key_fmt = 'config.incalls.edited'
 
-    def __init__(self, incall_id: int, tenant_uuid: Annotated[str, {'format': 'uuid'}]):
+    def __init__(self, incall_id: int, tenant_uuid: Annotated[str, Format('uuid')]):
         content = {'id': incall_id}
         super().__init__(content, tenant_uuid)

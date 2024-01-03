@@ -9,6 +9,7 @@ from typing import Annotated, Any
 from ..common.acl import escape as escape_acl
 from ..common.event import MultiUserEvent, TenantEvent
 from ..common.routing_key import escape as escape_key
+from ..common.types import Format
 from .types import (
     HeldCallDict,
     QueuedCallDict,
@@ -21,7 +22,7 @@ class _SwitchboardMixin:
     def __init__(
         self,
         content: Mapping,
-        switchboard_uuid: Annotated[str, {'format': 'uuid'}],
+        switchboard_uuid: Annotated[str, Format('uuid')],
         *args: Any,
     ):
         super().__init__(content, *args)  # type: ignore[call-arg]
@@ -39,8 +40,8 @@ class SwitchboardCreatedEvent(_SwitchboardMixin, TenantEvent):
     def __init__(
         self,
         switchboard: SwitchboardDict,
-        switchboard_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        switchboard_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(switchboard, switchboard_uuid, tenant_uuid)
 
@@ -54,8 +55,8 @@ class SwitchboardDeletedEvent(_SwitchboardMixin, TenantEvent):
     def __init__(
         self,
         switchboard: SwitchboardDict,
-        switchboard_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        switchboard_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(switchboard, switchboard_uuid, tenant_uuid)
 
@@ -69,8 +70,8 @@ class SwitchboardEditedEvent(_SwitchboardMixin, TenantEvent):
     def __init__(
         self,
         switchboard: SwitchboardDict,
-        switchboard_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        switchboard_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(switchboard, switchboard_uuid, tenant_uuid)
 
@@ -84,8 +85,8 @@ class SwitchboardFallbackEditedEvent(_SwitchboardMixin, TenantEvent):
     def __init__(
         self,
         fallback: SwitchboardFallbackDict,
-        switchboard_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        switchboard_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(fallback, switchboard_uuid, tenant_uuid)
 
@@ -98,8 +99,8 @@ class SwitchboardMemberUserAssociatedEvent(_SwitchboardMixin, MultiUserEvent):
 
     def __init__(
         self,
-        switchboard_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        switchboard_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
         user_uuids: list[str],
     ):
         content = {
@@ -117,8 +118,8 @@ class SwitchboardQueuedCallsUpdatedEvent(_SwitchboardMixin, TenantEvent):
     def __init__(
         self,
         items: list[QueuedCallDict],
-        switchboard_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        switchboard_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'switchboard_uuid': str(switchboard_uuid),
@@ -139,8 +140,8 @@ class SwitchboardQueuedCallAnsweredEvent(_SwitchboardMixin, TenantEvent):
         self,
         operator_call_id: str,
         queued_call_id: str,
-        switchboard_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        switchboard_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'switchboard_uuid': str(switchboard_uuid),
@@ -164,8 +165,8 @@ class SwitchboardHeldCallsUpdatedEvent(_SwitchboardMixin, TenantEvent):
     def __init__(
         self,
         items: list[HeldCallDict],
-        switchboard_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        switchboard_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'switchboard_uuid': str(switchboard_uuid),
@@ -186,8 +187,8 @@ class SwitchboardHeldCallAnsweredEvent(_SwitchboardMixin, TenantEvent):
         self,
         operator_call_id: str,
         held_call_id: str,
-        switchboard_uuid: Annotated[str, {'format': 'uuid'}],
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        switchboard_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'switchboard_uuid': str(switchboard_uuid),

@@ -6,6 +6,7 @@ from __future__ import annotations
 from typing import Annotated
 
 from ..common.event import ServiceEvent
+from ..common.types import Format
 
 
 class RequestHandlersProgressEvent(ServiceEvent):
@@ -15,7 +16,7 @@ class RequestHandlersProgressEvent(ServiceEvent):
 
     def __init__(
         self,
-        request_uuid: Annotated[str, {'format': 'uuid'}],
+        request_uuid: Annotated[str, Format('uuid')],
         request_context: dict | None,
         status: str,
     ):
@@ -34,7 +35,7 @@ class AsteriskReloadProgressEvent(ServiceEvent):
 
     def __init__(
         self,
-        uuid: Annotated[str, {'format': 'uuid'}],
+        uuid: Annotated[str, Format('uuid')],
         status: str,
         command: str,
         request_uuids: list[str],

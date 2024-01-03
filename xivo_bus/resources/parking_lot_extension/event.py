@@ -3,7 +3,8 @@
 
 from typing import Annotated
 
-from xivo_bus.resources.common.event import TenantEvent
+from ..common.event import TenantEvent
+from ..common.types import Format
 
 
 class ParkingLotExtensionAssociatedEvent(TenantEvent):
@@ -15,7 +16,7 @@ class ParkingLotExtensionAssociatedEvent(TenantEvent):
         self,
         parking_id: int,
         extension_id: int,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'parking_lot_id': parking_id,
@@ -33,7 +34,7 @@ class ParkingLotExtensionDissociatedEvent(TenantEvent):
         self,
         parking_id: int,
         extension_id: int,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'parking_lot_id': parking_id,

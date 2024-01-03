@@ -4,6 +4,7 @@
 from typing import Annotated
 
 from ..common.event import TenantEvent, UserEvent
+from ..common.types import Format
 
 
 class QueueMemberAgentAssociatedEvent(TenantEvent):
@@ -16,7 +17,7 @@ class QueueMemberAgentAssociatedEvent(TenantEvent):
         queue_id: int,
         agent_id: int,
         penalty: int,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'queue_id': queue_id,
@@ -35,7 +36,7 @@ class QueueMemberAgentDissociatedEvent(TenantEvent):
         self,
         queue_id: int,
         agent_id: int,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'queue_id': queue_id,
@@ -52,8 +53,8 @@ class QueueMemberUserAssociatedEvent(UserEvent):
     def __init__(
         self,
         queue_id: int,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'queue_id': queue_id,
@@ -70,8 +71,8 @@ class QueueMemberUserDissociatedEvent(UserEvent):
     def __init__(
         self,
         queue_id: int,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
-        user_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
+        user_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'queue_id': queue_id,

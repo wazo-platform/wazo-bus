@@ -3,7 +3,8 @@
 
 from typing import Annotated
 
-from xivo_bus.resources.common.event import TenantEvent
+from ..common.event import TenantEvent
+from ..common.types import Format
 
 
 class IncallScheduleAssociatedEvent(TenantEvent):
@@ -15,7 +16,7 @@ class IncallScheduleAssociatedEvent(TenantEvent):
         self,
         incall_id: int,
         schedule_id: int,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'incall_id': incall_id,
@@ -33,7 +34,7 @@ class IncallScheduleDissociatedEvent(TenantEvent):
         self,
         incall_id: int,
         schedule_id: int,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         content = {
             'incall_id': incall_id,

@@ -3,8 +3,8 @@
 
 from typing import Annotated
 
-from xivo_bus.resources.common.event import TenantEvent
-
+from ..common.event import TenantEvent
+from ..common.types import Format
 from .types import CallLogExportDataDict
 
 
@@ -16,7 +16,7 @@ class CallLogExportCreatedEvent(TenantEvent):
     def __init__(
         self,
         export_data: CallLogExportDataDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(export_data, tenant_uuid)
 
@@ -29,7 +29,7 @@ class CallLogExportUpdatedEvent(TenantEvent):
     def __init__(
         self,
         export_data: CallLogExportDataDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(export_data, tenant_uuid)
 
@@ -42,6 +42,6 @@ class CallLogRetentionUpdatedEvent(TenantEvent):
     def __init__(
         self,
         retention_data: CallLogExportDataDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(retention_data, tenant_uuid)

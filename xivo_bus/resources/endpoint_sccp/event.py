@@ -4,6 +4,7 @@
 from typing import Annotated
 
 from ..common.event import TenantEvent
+from ..common.types import Format
 from .types import EndpointSCCPDict
 
 
@@ -15,7 +16,7 @@ class SCCPEndpointCreatedEvent(TenantEvent):
     def __init__(
         self,
         endpoint: EndpointSCCPDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(endpoint, tenant_uuid)
 
@@ -28,7 +29,7 @@ class SCCPEndpointDeletedEvent(TenantEvent):
     def __init__(
         self,
         endpoint: EndpointSCCPDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(endpoint, tenant_uuid)
 
@@ -41,6 +42,6 @@ class SCCPEndpointEditedEvent(TenantEvent):
     def __init__(
         self,
         endpoint: EndpointSCCPDict,
-        tenant_uuid: Annotated[str, {'format': 'uuid'}],
+        tenant_uuid: Annotated[str, Format('uuid')],
     ):
         super().__init__(endpoint, tenant_uuid)
