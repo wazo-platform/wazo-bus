@@ -38,10 +38,8 @@ repos:
     rev: v1.7.1
     hooks:
       - id: mypy
-        pass_filenames: false
-        args: ["."]
         language_version: "3.10"
-        exclude: build/
+        exclude: (build|integration_tests)/.*
         additional_dependencies:
           - "types-pyyaml"
           - "types-requests"
