@@ -1,3 +1,9 @@
+wazo-bus (24.01) UNRELEASED; urgency=medium
+
+  * rename xivo-bus to wazo_bus
+
+ -- Wazo Maintainers <dev+pkg@wazo.community>  Thu, 04 Jan 2024 15:02:01 -0500
+
 xivo-bus (13.24~20131129.185349.2599ff5) xivo-dev; urgency=low
 
   * move python-pika dependency from xivo-agent to xivo-bus
