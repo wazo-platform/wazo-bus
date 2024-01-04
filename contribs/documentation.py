@@ -33,7 +33,7 @@ from typing import (
 import yaml
 from typing_extensions import TypeAlias, Unpack
 
-PACKAGE_NAME = 'xivo_bus'
+PACKAGE_NAME = 'wazo_bus'
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
