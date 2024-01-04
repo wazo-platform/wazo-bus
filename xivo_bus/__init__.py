@@ -2,11 +2,12 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import sys
-from warnings import warn
+import warnings
 
 import wazo_bus
 
-warn(
+warnings.simplefilter('module', category=DeprecationWarning)
+warnings.warn(
     f'{__name__} is deprecated and will be removed in the future, '
     'Please use `wazo_bus` instead.',
     DeprecationWarning,
