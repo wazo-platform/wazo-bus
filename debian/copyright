@@ -1,9 +1,9 @@
 Format: http://dep.debian.net/deps/dep5
-Upstream-Name: xivo-bus
-Source: https://github.com/wazo-platform/xivo-bus.git
+Upstream-Name: wazo-bus
+Source: https://github.com/wazo-platform/wazo-bus.git
 
 Files: *
-Copyright: 2013 Avencall
+Copyright 2013-2024 The Wazo Authors
 License: GPL-3.0+
 
 License: GPL-3.0+

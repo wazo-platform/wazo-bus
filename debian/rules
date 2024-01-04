@@ -1,8 +1,8 @@
 #!/usr/bin/make -f
 # -*- makefile -*-
 
-export PYBUILD_NAME=xivo_bus
-export PYBUILD_DESTDIR_python3=debian/xivo-bus-python3/
+export PYBUILD_NAME=wazo_bus
+export PYBUILD_DESTDIR_python3=debian/wazo-bus-python3/
 export PYBUILD_DISABLE=test
 
 %:
