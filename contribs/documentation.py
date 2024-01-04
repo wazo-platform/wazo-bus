@@ -38,53 +38,54 @@ logger = logging.getLogger(__name__)
 
 
 class AsyncAPITypes:
-    class Types:
-        @classmethod
-        def array(cls, format: dict[str, str]) -> dict:
-            return {'type': 'array', 'items': format}
+    @classmethod
+    def array(cls, format: dict[str, str]) -> dict:
+        return {'type': 'array', 'items': format}
 
-        @classmethod
-        def boolean(cls, *metadata: Any) -> dict:
-            return {'type': 'boolean'}
+    @classmethod
+    def boolean(cls, *metadata: Any) -> dict:
+        return {'type': 'boolean'}
 
-        @classmethod
-        def float_(cls, *metadata: Any) -> dict:
-            return {'type': 'float'}
+    @classmethod
+    def float_(cls, *metadata: Any) -> dict:
+        return {'type': 'float'}
 
-        @classmethod
-        def integer(cls, *metadata: Any) -> dict:
-            return {'type': 'integer'}
+    @classmethod
+    def integer(cls, *metadata: Any) -> dict:
+        return {'type': 'integer'}
 
-        @classmethod
-        def object_(cls, content: dict | None = None, *metadata: Any) -> dict:
-            return {'type': 'object', 'properties': content or {}}
+    @classmethod
+    def object_(cls, content: dict | None = None, *metadata: Any) -> dict:
+        return {'type': 'object', 'properties': content or {}}
 
-        @classmethod
-        def string(cls, *metadata: Any) -> dict:
-            content = {'type': 'string'}
+    @classmethod
+    def string(cls, *metadata: Any) -> dict:
+        content = {'type': 'string'}
 
-            for obj in metadata:
-                print(obj)
-                if hasattr(obj, 'format'):
-                    content['format'] = obj.format
+        for obj in metadata:
+            if hasattr(obj, 'format'):
+                content['format'] = obj.format
 
-                if hasattr(obj, 'const'):
-                    content['const'] = obj.const
+            if hasattr(obj, 'const'):
+                content['const'] = obj.const
 
-            return content
+        return content
 
-    _TYPES_FACTORIES: dict[type | Any, Callable[..., dict]] = {
-        Any: Types.object_,
-        bool: Types.boolean,
-        dict: Types.object_,
-        float: Types.float_,
-        int: Types.integer,
-        str: Types.string,
+
+class Converter:
+    _type_factories: dict[type | Any, Callable[..., dict]] = {
+        Any: AsyncAPITypes.object_,
+        bool: AsyncAPITypes.boolean,
+        dict: AsyncAPITypes.object_,
+        float: AsyncAPITypes.float_,
+        int: AsyncAPITypes.integer,
+        str: AsyncAPITypes.string,
     }
 
     @classmethod
     def _scan_hint(cls, hint: type) -> dict[str, str]:
         def recurse(type_: type, *metadata: Any) -> dict:
+            # Check if has a subtype i.e: type[subtype, ...]
             if origin_type := get_origin(type_):
                 subtype, *args = get_args(type_)
 
@@ -92,18 +93,19 @@ class AsyncAPITypes:
                     return recurse(subtype, *args)
 
                 elif origin_type is Literal:
-                    return cls.Types.string(*args)
+                    return AsyncAPITypes.string(*args)
 
+                # i.e: Union[X, Y] or X | Y
                 elif origin_type in (UnionType, Union):
                     return recurse(subtype)
 
                 elif origin_type in (list, set, tuple):
                     if len(args) > 0:
                         raise TypeError('arrays cannot have multiple types')
-                    return cls.Types.array(recurse(subtype))
+                    return AsyncAPITypes.array(recurse(subtype))
 
                 elif origin_type is dict:
-                    return cls.Types.object_()
+                    return AsyncAPITypes.object_()
 
             elif is_typeddict(type_):
                 content = {
@@ -112,10 +114,11 @@ class AsyncAPITypes:
                         type_, include_extras=True
                     ).items()
                 }
-                return cls.Types.object_(content)
+                return AsyncAPITypes.object_(content)
 
-            elif type_ in cls._TYPES_FACTORIES.keys():
-                factory = cls._TYPES_FACTORIES[type_]
+            # Standard types: bool, float, int, string, any...
+            elif type_ in cls._type_factories.keys():
+                factory = cls._type_factories[type_]
                 return factory(*metadata)
 
             raise TypeError(f'unhandled type: {type_}')
@@ -136,7 +139,7 @@ class AsyncAPITypes:
         return {param: cls._scan_hint(hint) for param, hint in hints.items()}
 
 
-class Event:
+class EventProxy:
     _DEFAULT_PAYLOAD_IGNORE_KEYS = {
         'self',
         'return',
@@ -212,7 +215,7 @@ class Event:
         return {'type': 'object', 'properties': headers, 'required': required}
 
     def generate_payload(self) -> dict:
-        return AsyncAPITypes.from_init(
+        return Converter.from_init(
             self.class_, ignore_keys=self._DEFAULT_PAYLOAD_IGNORE_KEYS
         )
 
@@ -268,8 +271,8 @@ class EventSpecificationBuilder:
         entrypoint = inspect.getfile(module)
         return Path(os.path.dirname(entrypoint))
 
-    def get_resource_events(self, resource_path: Path) -> list[Event]:
-        events: list[Event] = []
+    def get_resource_events(self, resource_path: Path) -> list[EventProxy]:
+        events: list[EventProxy] = []
         file_paths = sorted(resource_path.glob('*.py'))
 
         for path in file_paths:
@@ -283,12 +286,13 @@ class EventSpecificationBuilder:
                 continue
 
             events.extend(
-                Event(cls) for _, cls in inspect.getmembers(module, Event.is_event)
+                EventProxy(cls)
+                for _, cls in inspect.getmembers(module, EventProxy.is_event)
             )
 
         return events
 
-    def generate_specifications(self, events: list[Event]) -> dict:
+    def generate_specifications(self, events: list[EventProxy]) -> dict:
         print(
             f'generating AsyncAPI specifications for `{self.platform_version}` '
             f'({len(events)} events)'
