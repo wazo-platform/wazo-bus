@@ -1,4 +1,4 @@
-# Copyright 2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2023-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
@@ -6,12 +6,12 @@ from __future__ import annotations
 from typing import TypedDict
 
 
-class LinePresenceDict(TypedDict):
+class LinePresenceDict(TypedDict, total=False):
     id: int
     state: str
 
 
-class MessageDict(TypedDict):
+class MessageDict(TypedDict, total=False):
     uuid: str
     content: str
     alias: str
@@ -22,20 +22,20 @@ class MessageDict(TypedDict):
     room: RoomDict
 
 
-class RoomDict(TypedDict):
+class RoomDict(TypedDict, total=False):
     uuid: str
     tenant_uuid: str
     name: str
     users: list[RoomUserDict]
 
 
-class RoomUserDict(TypedDict):
+class RoomUserDict(TypedDict, total=False):
     uuid: str
     tenant_uuid: str
     wazo_uuid: str
 
 
-class UserPresenceDict(TypedDict):
+class UserPresenceDict(TypedDict, total=False):
     uuid: str
     tenant_uuid: str
     state: str

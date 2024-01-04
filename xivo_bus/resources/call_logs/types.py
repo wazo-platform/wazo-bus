@@ -1,4 +1,4 @@
-# Copyright 2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2023-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
@@ -6,32 +6,32 @@ from __future__ import annotations
 from typing import TypedDict
 
 
-class DestinationConferenceDict(TypedDict):
+class DestinationConferenceDict(TypedDict, total=False):
     conference_id: int
 
 
-class DestinationMeetingDict(TypedDict):
+class DestinationMeetingDict(TypedDict, total=False):
     meeting_uuid: str
     meeting_name: str
 
 
-class DestinationUserDict(TypedDict):
+class DestinationUserDict(TypedDict, total=False):
     user_uuid: str
     user_name: str
 
 
-class DestinationUnknownDict(TypedDict):
+class DestinationUnknownDict(TypedDict, total=False):
     ...
 
 
-class DestinationDetailsDict(TypedDict):
+class DestinationDetailsDict(TypedDict, total=False):
     conference: DestinationConferenceDict
     meeting: DestinationMeetingDict
     user: DestinationUserDict
     unknown: DestinationUnknownDict
 
 
-class RecordingDict(TypedDict):
+class RecordingDict(TypedDict, total=False):
     uuid: str
     start_time: str
     end_time: str
@@ -39,7 +39,7 @@ class RecordingDict(TypedDict):
     filename: str
 
 
-class CDRDataDict(TypedDict):
+class CDRDataDict(TypedDict, total=False):
     id: int
     tenant_uuid: str
     start: str
