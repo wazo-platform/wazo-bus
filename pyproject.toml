@@ -8,7 +8,7 @@ skip-string-normalization = true
 [tool.flake8]
 show-source = true
 max-line-length = 99
-application-import-names = "xivo_bus"
+application-import-names = "wazo_bus"
 ignore = [
   "E203", # whitespace before ':'
   "E501", # line too long
