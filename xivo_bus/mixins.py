@@ -1,4 +1,4 @@
-# Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
@@ -19,7 +19,7 @@ from kombu import binding as Binding
 from kombu.exceptions import OperationalError
 from kombu.mixins import ConsumerMixin as KombuConsumer
 from kombu.transport.base import StdChannel
-from typing_extensions import TypeAlias
+from typing_extensions import Self
 
 from .base import BaseProtocol
 from .collectd.common import CollectdEvent
@@ -109,10 +109,9 @@ class ThreadableMixin(BaseProtocol):
     def __threads(self) -> list[BusThread]:
         return self.__internal_threads_list
 
-    def __enter__(self) -> TypeAlias:
+    def __enter__(self) -> Self:
         self.start()
-        super().__enter__()
-        return self
+        return super().__enter__()
 
     def __exit__(self, *args: Any) -> None:
         self.stop()
@@ -163,9 +162,7 @@ class ThreadableMixin(BaseProtocol):
 
     @staticmethod
     def __wrap_thread(func: ThreadTargetType) -> ThreadTargetType:
-        def wrapper(
-            self: TypeAlias, name: str, ready_flag: Event, **kwargs: Any
-        ) -> None:
+        def wrapper(self: Self, name: str, ready_flag: Event, **kwargs: Any) -> None:
             self.log.debug('Started AMQP thread \'%s\'', name)
             while not self.is_stopping:
                 try:

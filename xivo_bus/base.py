@@ -1,4 +1,4 @@
-# Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
@@ -9,7 +9,7 @@ from typing import Any, NamedTuple, Protocol
 
 from kombu import Exchange
 from kombu.utils.url import as_url
-from typing_extensions import TypeAlias
+from typing_extensions import Self
 
 from .resources.common.abstract import EventProtocol
 
@@ -66,8 +66,8 @@ class BaseProtocol(Protocol):
     ) -> tuple[dict, dict]:
         ...
 
-    def __enter__(self) -> TypeAlias:
-        ...
+    def __enter__(self) -> Self:
+        return self
 
     def __exit__(
         self,
@@ -125,14 +125,3 @@ class Base(BaseProtocol):
         self, event_name: str, headers: dict, payload: dict
     ) -> tuple[dict, dict]:
         return headers, payload
-
-    def __enter__(self) -> TypeAlias:
-        return self
-
-    def __exit__(
-        self,
-        exc: type[BaseException] | None,
-        exc_value: BaseException | None,
-        traceback: TracebackType | None,
-    ) -> None:
-        pass
