@@ -9,7 +9,7 @@ class QueueExtensionAssociatedEvent(TenantEvent):
     name = 'queue_extension_associated'
     routing_key_fmt = 'config.queues.extensions.updated'
 
-    def __init__(self, queue_id, extension_id, tenant_uuid):
+    def __init__(self, queue_id: int, extension_id: int, tenant_uuid: str):
         content = {
             'queue_id': queue_id,
             'extension_id': extension_id,
@@ -22,7 +22,7 @@ class QueueExtensionDissociatedEvent(TenantEvent):
     name = 'queue_extension_dissociated'
     routing_key_fmt = 'config.queues.extensions.deleted'
 
-    def __init__(self, queue_id, extension_id, tenant_uuid):
+    def __init__(self, queue_id: int, extension_id: int, tenant_uuid: str):
         content = {
             'queue_id': queue_id,
             'extension_id': extension_id,

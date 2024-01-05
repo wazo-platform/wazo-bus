@@ -1,7 +1,7 @@
 # Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_bus.resources.common.event import TenantEvent
+from ..common.event import TenantEvent
 
 
 class SoundCreatedEvent(TenantEvent):
@@ -9,7 +9,7 @@ class SoundCreatedEvent(TenantEvent):
     name = 'sound_created'
     routing_key_fmt = 'config.sounds.created'
 
-    def __init__(self, sound_name, tenant_uuid):
+    def __init__(self, sound_name: str, tenant_uuid: str):
         content = {'name': sound_name}
         super().__init__(content, tenant_uuid)
 
@@ -19,6 +19,6 @@ class SoundDeletedEvent(TenantEvent):
     name = 'sound_deleted'
     routing_key_fmt = 'config.sounds.deleted'
 
-    def __init__(self, sound_name, tenant_uuid):
+    def __init__(self, sound_name: str, tenant_uuid: str):
         content = {'name': sound_name}
         super().__init__(content, tenant_uuid)

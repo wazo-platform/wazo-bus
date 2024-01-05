@@ -1,7 +1,7 @@
 # Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_bus.resources.common.event import UserEvent
+from ..common.event import UserEvent
 
 
 class UserAgentAssociatedEvent(UserEvent):
@@ -9,7 +9,7 @@ class UserAgentAssociatedEvent(UserEvent):
     name = 'user_agent_associated'
     routing_key_fmt = 'config.users.{user_uuid}.agents.updated'
 
-    def __init__(self, agent_id, tenant_uuid, user_uuid):
+    def __init__(self, agent_id: int, tenant_uuid: str, user_uuid: str):
         content = {
             'user_uuid': str(user_uuid),
             'agent_id': agent_id,
@@ -22,7 +22,7 @@ class UserAgentDissociatedEvent(UserEvent):
     name = 'user_agent_dissociated'
     routing_key_fmt = 'config.users.{user_uuid}.agents.deleted'
 
-    def __init__(self, agent_id, tenant_uuid, user_uuid):
+    def __init__(self, agent_id: int, tenant_uuid: str, user_uuid: str):
         content = {
             'user_uuid': str(user_uuid),
             'agent_id': agent_id,

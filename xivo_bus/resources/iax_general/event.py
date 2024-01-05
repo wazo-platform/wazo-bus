@@ -9,5 +9,5 @@ class IAXGeneralEditedEvent(ServiceEvent):
     name = 'iax_general_edited'
     routing_key_fmt = 'config.iax_general.edited'
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()

@@ -9,5 +9,5 @@ class HEPGeneralEditedEvent(ServiceEvent):
     name = 'hep_general_edited'
     routing_key_fmt = 'config.hep_general.edited'
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()

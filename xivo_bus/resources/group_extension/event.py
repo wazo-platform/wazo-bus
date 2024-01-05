@@ -9,7 +9,9 @@ class GroupExtensionAssociatedEvent(TenantEvent):
     name = 'group_extension_associated'
     routing_key_fmt = 'config.groups.extensions.updated'
 
-    def __init__(self, group_id, group_uuid, extension_id, tenant_uuid):
+    def __init__(
+        self, group_id: int, group_uuid: str, extension_id: int, tenant_uuid: str
+    ):
         content = {
             'group_id': group_id,
             'group_uuid': str(group_uuid),
@@ -23,7 +25,9 @@ class GroupExtensionDissociatedEvent(TenantEvent):
     name = 'group_extension_dissociated'
     routing_key_fmt = 'config.groups.extensions.deleted'
 
-    def __init__(self, group_id, group_uuid, extension_id, tenant_uuid):
+    def __init__(
+        self, group_id: int, group_uuid: str, extension_id: int, tenant_uuid: str
+    ):
         content = {
             'group_id': group_id,
             'group_uuid': str(group_uuid),

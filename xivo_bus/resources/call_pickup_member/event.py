@@ -9,7 +9,7 @@ class CallPickupInterceptorUsersAssociatedEvent(TenantEvent):
     name = 'call_pickup_interceptor_users_associated'
     routing_key_fmt = 'config.callpickups.interceptors.users.updated'
 
-    def __init__(self, call_pickup_id, users, tenant_uuid):
+    def __init__(self, call_pickup_id: int, users: list[str], tenant_uuid: str):
         content = {
             'call_pickup_id': call_pickup_id,
             'user_uuids': users,
@@ -22,7 +22,7 @@ class CallPickupTargetUsersAssociatedEvent(TenantEvent):
     name = 'call_pickup_target_users_associated'
     routing_key_fmt = 'config.callpickups.targets.users.updated'
 
-    def __init__(self, call_pickup_id, users, tenant_uuid):
+    def __init__(self, call_pickup_id: int, users: list[str], tenant_uuid: str):
         content = {
             'call_pickup_id': call_pickup_id,
             'user_uuids': users,
@@ -35,7 +35,7 @@ class CallPickupInterceptorGroupsAssociatedEvent(TenantEvent):
     name = 'call_pickup_interceptor_groups_associated'
     routing_key_fmt = 'config.callpickups.interceptors.groups.updated'
 
-    def __init__(self, call_pickup_id, group_ids, tenant_uuid):
+    def __init__(self, call_pickup_id: int, group_ids: list[int], tenant_uuid: str):
         content = {
             'call_pickup_id': call_pickup_id,
             'group_ids': group_ids,
@@ -48,7 +48,7 @@ class CallPickupTargetGroupsAssociatedEvent(TenantEvent):
     name = 'call_pickup_target_groups_associated'
     routing_key_fmt = 'config.callpickups.targets.groups.updated'
 
-    def __init__(self, call_pickup_id, group_ids, tenant_uuid):
+    def __init__(self, call_pickup_id: int, group_ids: list[int], tenant_uuid: str):
         content = {
             'call_pickup_id': call_pickup_id,
             'group_ids': group_ids,

@@ -1,12 +1,14 @@
 # Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from __future__ import annotations
+
 from abc import abstractmethod
 
-from ..resources.common.abstract import AbstractEvent
+from ..resources.common.abstract import EventProtocol
 
 
-class CollectdEvent(AbstractEvent):
+class CollectdEvent(EventProtocol):
     '''
     Base Collectd Event
 
@@ -17,23 +19,24 @@ class CollectdEvent(AbstractEvent):
       * type_
     '''
 
-    interval = 10
-    plugin_instance = None
-    time = 'N'
-    type_instance = None
-    values = ()
+    routing_key_fmt: str
+    interval: int = 10
+    plugin_instance: str | None = None
+    time: str | int = 'N'
+    type_instance: str | None = None
+    values: tuple[str, ...] = ()
 
     @property
     @abstractmethod
-    def plugin(self):
+    def plugin(self) -> str:
         pass
 
     @property
     @abstractmethod
-    def type_(self):
+    def type_(self) -> str:
         pass
 
-    def is_valid(self):
+    def is_valid(self) -> bool:
         return (
             self.plugin is not None
             and self.plugin_instance is not None
@@ -43,7 +46,7 @@ class CollectdEvent(AbstractEvent):
             and len(self.values) > 0
         )
 
-    def __str__(self):
+    def __str__(self) -> str:
         content = ', '.join(
             [
                 f'plugin=\'{self.plugin}\'',

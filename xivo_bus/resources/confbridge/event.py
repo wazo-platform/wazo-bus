@@ -9,7 +9,7 @@ class ConfBridgeWazoDefaultBridgeEditedEvent(ServiceEvent):
     name = 'confbridge_wazo_default_bridge_edited'
     routing_key_fmt = 'config.confbridge_wazo_default_bridge.edited'
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
 
@@ -18,5 +18,5 @@ class ConfBridgeWazoDefaultUserEditedEvent(ServiceEvent):
     name = 'confbridge_wazo_default_user_edited'
     routing_key_fmt = 'config.confbridge_wazo_default_user.edited'
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()

@@ -1,7 +1,10 @@
 # Copyright 2012-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from __future__ import annotations
+
 import logging
+from typing import Any
 
 from .base import Base
 from .mixins import PublisherMixin, QueuePublisherMixin, ThreadableMixin, WazoEventMixin
@@ -12,15 +15,15 @@ logger = logging.getLogger(__name__)
 class BusPublisher(WazoEventMixin, PublisherMixin, Base):
     def __init__(
         self,
-        name=None,
-        service_uuid=None,
-        username='guest',
-        password='guest',
-        host='localhost',
-        port=5672,
-        exchange_name='',
-        exchange_type='',
-        **kwargs
+        name: str | None = None,
+        service_uuid: str | None = None,
+        username: str = 'guest',
+        password: str = 'guest',
+        host: str = 'localhost',
+        port: int = 5672,
+        exchange_name: str = '',
+        exchange_type: str = '',
+        **kwargs: Any,
     ):
         super().__init__(
             name=name,
@@ -31,23 +34,28 @@ class BusPublisher(WazoEventMixin, PublisherMixin, Base):
             port=port,
             exchange_name=exchange_name,
             exchange_type=exchange_type,
-            **kwargs
+            **kwargs,
         )
 
 
 # Deprecated, thread should be avoided to respect WPEP-0004
-class BusPublisherWithQueue(WazoEventMixin, ThreadableMixin, QueuePublisherMixin, Base):
+class BusPublisherWithQueue(
+    WazoEventMixin,
+    ThreadableMixin,
+    QueuePublisherMixin,
+    Base,
+):
     def __init__(
         self,
-        name=None,
-        service_uuid=None,
-        username='guest',
-        password='guest',
-        host='localhost',
-        port=5672,
-        exchange_name='',
-        exchange_type='',
-        **kwargs
+        name: str | None = None,
+        service_uuid: str | None = None,
+        username: str = 'guest',
+        password: str = 'guest',
+        host: str = 'localhost',
+        port: int = 5672,
+        exchange_name: str = '',
+        exchange_type: str = '',
+        **kwargs: Any,
     ):
         super().__init__(
             name=name,
@@ -58,5 +66,5 @@ class BusPublisherWithQueue(WazoEventMixin, ThreadableMixin, QueuePublisherMixin
             port=port,
             exchange_name=exchange_name,
             exchange_type=exchange_type,
-            **kwargs
+            **kwargs,
         )

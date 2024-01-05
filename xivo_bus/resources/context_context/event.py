@@ -9,7 +9,7 @@ class ContextContextsAssociatedEvent(TenantEvent):
     name = 'contexts_associated'
     routing_key_fmt = 'config.contexts.contexts.updated'
 
-    def __init__(self, context_id, context_ids, tenant_uuid):
+    def __init__(self, context_id: int, context_ids: list[int], tenant_uuid: str):
         content = {
             'context_id': context_id,
             'context_ids': context_ids,

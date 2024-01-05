@@ -1,13 +1,14 @@
 # Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from __future__ import annotations
 
 import string
 
 from .common import CollectdEvent
 
 
-def _validate_plugin_instance_fragment(plugin_instance_fragment):
+def _validate_plugin_instance_fragment(plugin_instance_fragment: str) -> str:
     result = ''.join(
         c
         for c in plugin_instance_fragment
@@ -22,7 +23,12 @@ class _BaseCallCollectdEvent(CollectdEvent):
     type_ = 'counter'
     values = ('1',)
 
-    def __init__(self, application, application_id, time=None):
+    def __init__(
+        self,
+        application: str,
+        application_id: str | None,
+        time: int | str | None = None,
+    ):
         super().__init__()
         if time:
             self.time = int(time)
@@ -60,6 +66,12 @@ class CallDurationCollectdEvent(_BaseCallCollectdEvent):
     type_ = 'gauge'
     type_instance = 'duration'
 
-    def __init__(self, application, application_id, duration, time=None):
+    def __init__(
+        self,
+        application: str,
+        application_id: str | None,
+        duration: int,
+        time: str | int | None = None,
+    ):
         super().__init__(application, application_id, time)
         self.values = (str(round(duration, 3)),)

@@ -9,6 +9,6 @@ class LiveReloadEditedEvent(ServiceEvent):
     name = 'live_reload_edited'
     routing_key_fmt = 'config.live_reload.edited'
 
-    def __init__(self, live_reload_enabled):
+    def __init__(self, live_reload_enabled: bool):
         content = {'live_reload_enabled': live_reload_enabled}
         super().__init__(content)

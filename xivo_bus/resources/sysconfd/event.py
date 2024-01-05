@@ -1,7 +1,9 @@
 # Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_bus.resources.common.event import ServiceEvent
+from __future__ import annotations
+
+from ..common.event import ServiceEvent
 
 
 class RequestHandlersProgressEvent(ServiceEvent):
@@ -9,7 +11,7 @@ class RequestHandlersProgressEvent(ServiceEvent):
     name = 'request_handlers_progress'
     routing_key_fmt = 'sysconfd.request_handlers.{uuid}.{status}'
 
-    def __init__(self, request_uuid, request_context, status):
+    def __init__(self, request_uuid: str, request_context: dict | None, status: str):
         content = {
             'uuid': str(request_uuid),
             'status': status,
@@ -23,7 +25,7 @@ class AsteriskReloadProgressEvent(ServiceEvent):
     name = 'asterisk_reload_progress'
     routing_key_fmt = 'sysconfd.asterisk.reload.{uuid}.{status}'
 
-    def __init__(self, uuid, status, command, request_uuids):
+    def __init__(self, uuid: str, status: str, command: str, request_uuids: list[str]):
         content = {
             'uuid': str(uuid),
             'status': status,

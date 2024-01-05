@@ -9,7 +9,7 @@ class OutcallScheduleAssociatedEvent(TenantEvent):
     name = 'outcall_schedule_associated'
     routing_key_fmt = 'config.outcalls.schedules.updated'
 
-    def __init__(self, outcall_id, schedule_id, tenant_uuid):
+    def __init__(self, outcall_id: int, schedule_id: int, tenant_uuid: str):
         content = {
             'outcall_id': outcall_id,
             'schedule_id': schedule_id,
@@ -22,7 +22,7 @@ class OutcallScheduleDissociatedEvent(TenantEvent):
     name = 'outcall_schedule_dissociated'
     routing_key_fmt = 'config.outcalls.schedules.deleted'
 
-    def __init__(self, outcall_id, schedule_id, tenant_uuid):
+    def __init__(self, outcall_id: int, schedule_id: int, tenant_uuid: str):
         content = {
             'outcall_id': outcall_id,
             'schedule_id': schedule_id,

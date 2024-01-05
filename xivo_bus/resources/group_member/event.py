@@ -1,7 +1,8 @@
 # Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_bus.resources.common.event import TenantEvent
+from ..common.event import TenantEvent
+from .types import GroupExtensionDict
 
 
 class GroupMemberUsersAssociatedEvent(TenantEvent):
@@ -9,7 +10,9 @@ class GroupMemberUsersAssociatedEvent(TenantEvent):
     name = 'group_member_users_associated'
     routing_key_fmt = 'config.groups.members.users.updated'
 
-    def __init__(self, group_id, group_uuid, users, tenant_uuid):
+    def __init__(
+        self, group_id: int, group_uuid: str, users: list[str], tenant_uuid: str
+    ):
         content = {
             'group_id': group_id,
             'group_uuid': str(group_uuid),
@@ -23,7 +26,13 @@ class GroupMemberExtensionsAssociatedEvent(TenantEvent):
     name = 'group_member_extensions_associated'
     routing_key_fmt = 'config.groups.members.extensions.updated'
 
-    def __init__(self, group_id, group_uuid, extensions, tenant_uuid):
+    def __init__(
+        self,
+        group_id: int,
+        group_uuid: str,
+        extensions: list[GroupExtensionDict],
+        tenant_uuid: str,
+    ):
         content = {
             'group_id': group_id,
             'group_uuid': str(group_uuid),

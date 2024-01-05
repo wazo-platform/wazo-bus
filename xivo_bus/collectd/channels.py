@@ -9,7 +9,6 @@ class _BaseChannelCollectdEvent(CollectdEvent):
     plugin = 'channels'
     plugin_instance = 'global'
     type_ = 'counter'
-    type_instance = None
     values = ('1',)
 
 

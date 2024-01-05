@@ -9,7 +9,9 @@ class GroupScheduleAssociatedEvent(TenantEvent):
     name = 'group_schedule_associated'
     routing_key_fmt = 'config.groups.schedules.updated'
 
-    def __init__(self, group_id, group_uuid, schedule_id, tenant_uuid):
+    def __init__(
+        self, group_id: int, group_uuid: str, schedule_id: int, tenant_uuid: str
+    ):
         content = {
             'group_id': group_id,
             'group_uuid': str(group_uuid),
@@ -23,7 +25,9 @@ class GroupScheduleDissociatedEvent(TenantEvent):
     name = 'group_schedule_dissociated'
     routing_key_fmt = 'config.groups.schedules.deleted'
 
-    def __init__(self, group_id, group_uuid, schedule_id, tenant_uuid):
+    def __init__(
+        self, group_id: int, group_uuid: str, schedule_id: int, tenant_uuid: str
+    ):
         content = {
             'group_id': group_id,
             'group_uuid': str(group_uuid),

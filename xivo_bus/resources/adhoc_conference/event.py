@@ -9,7 +9,7 @@ class AdhocConferenceCreatedEvent(UserEvent):
     routing_key_fmt = 'conferences.users.{user_uuid}.adhoc.created'
     service = 'calld'
 
-    def __init__(self, conference_id, tenant_uuid, user_uuid):
+    def __init__(self, conference_id: int, tenant_uuid: str, user_uuid: str):
         content = {'conference_id': conference_id}
         super().__init__(content, tenant_uuid, user_uuid)
 
@@ -19,7 +19,7 @@ class AdhocConferenceDeletedEvent(UserEvent):
     routing_key_fmt = 'conferences.users.{user_uuid}.adhoc.deleted'
     service = 'calld'
 
-    def __init__(self, conference_id, tenant_uuid, user_uuid):
+    def __init__(self, conference_id: int, tenant_uuid: str, user_uuid: str):
         content = {'conference_id': conference_id}
         super().__init__(content, tenant_uuid, user_uuid)
 
@@ -29,7 +29,9 @@ class AdhocConferenceParticipantJoinedEvent(UserEvent):
     routing_key_fmt = 'conferences.users.{user_uuid}.adhoc.participants.joined'
     service = 'calld'
 
-    def __init__(self, conference_id, call_id, tenant_uuid, user_uuid):
+    def __init__(
+        self, conference_id: int, call_id: str, tenant_uuid: str, user_uuid: str
+    ):
         content = {'conference_id': conference_id, 'call_id': call_id}
         super().__init__(content, tenant_uuid, user_uuid)
 
@@ -39,6 +41,8 @@ class AdhocConferenceParticipantLeftEvent(UserEvent):
     routing_key_fmt = 'conferences.users.{user_uuid}.adhoc.participants.left'
     service = 'calld'
 
-    def __init__(self, conference_id, call_id, tenant_uuid, user_uuid):
+    def __init__(
+        self, conference_id: int, call_id: str, tenant_uuid: str, user_uuid: str
+    ):
         content = {'conference_id': conference_id, 'call_id': call_id}
         super().__init__(content, tenant_uuid, user_uuid)

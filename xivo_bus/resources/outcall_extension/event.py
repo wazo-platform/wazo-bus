@@ -1,7 +1,7 @@
 # Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_bus.resources.common.event import TenantEvent
+from ..common.event import TenantEvent
 
 
 class OutcallExtensionAssociatedEvent(TenantEvent):
@@ -9,7 +9,7 @@ class OutcallExtensionAssociatedEvent(TenantEvent):
     name = 'outcall_extension_associated'
     routing_key_fmt = 'config.outcalls.extensions.updated'
 
-    def __init__(self, outcall_id, extension_id, tenant_uuid):
+    def __init__(self, outcall_id: int, extension_id: int, tenant_uuid: str):
         content = {
             'outcall_id': outcall_id,
             'extension_id': extension_id,
@@ -22,7 +22,7 @@ class OutcallExtensionDissociatedEvent(TenantEvent):
     name = 'outcall_extension_dissociated'
     routing_key_fmt = 'config.outcalls.extensions.deleted'
 
-    def __init__(self, outcall_id, extension_id, tenant_uuid):
+    def __init__(self, outcall_id: int, extension_id: int, tenant_uuid: str):
         content = {
             'outcall_id': outcall_id,
             'extension_id': extension_id,

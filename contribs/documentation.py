@@ -1,6 +1,8 @@
 # Copyright 2022-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from __future__ import annotations
+
 import argparse
 import importlib
 import inspect
@@ -13,10 +15,10 @@ from itertools import chain
 from pathlib import Path
 from sys import stdout
 from time import time
+from typing import Any
 
 import yaml
-
-from xivo_bus.resources.common.abstract import AbstractEvent
+from typing_extensions import TypeAlias
 
 PACKAGE_NAME = 'xivo_bus'
 
@@ -26,63 +28,65 @@ logger = logging.getLogger(__name__)
 
 class AsyncAPITypes:
     @staticmethod
-    def string(*, many=False):
+    def string(*, many: bool = False) -> dict:
         fmt = {'type': 'string'}
         return AsyncAPITypes.array(fmt) if many else fmt
 
     @staticmethod
-    def boolean(*, many=False):
+    def boolean(*, many: bool = False) -> dict:
         fmt = {'type': 'boolean'}
         return AsyncAPITypes.array(fmt) if many else fmt
 
     @staticmethod
-    def integer(*, many=False):
+    def integer(*, many: bool = False) -> dict:
         fmt = {'type': 'integer'}
         return AsyncAPITypes.array(fmt) if many else fmt
 
     @staticmethod
-    def float_(*, many=False):
+    def float_(*, many: bool = False) -> dict:
         fmt = {'type': 'float'}
         return AsyncAPITypes.array(fmt) if many else fmt
 
     @staticmethod
-    def uuid(*, many=False):
+    def uuid(*, many: bool = False) -> dict:
         fmt = {'type': 'string', 'format': 'uuid'}
         return AsyncAPITypes.array(fmt) if many else fmt
 
     @staticmethod
-    def datetime(*, many=False):
+    def datetime(*, many: bool = False) -> dict:
         fmt = {'type': 'string', 'format': 'date-time'}
         return AsyncAPITypes.array(fmt) if many else fmt
 
     @staticmethod
-    def array(type_):
+    def array(type_: Any) -> dict:
         return {'type': 'array', 'items': type_}
 
     @staticmethod
-    def object_(dict_=None):
+    def object_(dict_: dict | None = None) -> dict:
         return {'type': 'object', 'properties': dict_ or {}}
 
 
 class Event:
-    def __init__(self, class_):
+    def __init__(self, class_: type):
         self.class_ = class_
-
-        sig = inspect.signature(class_.__init__)
+        sig = inspect.signature(getattr(class_, '__init__'))
+        self._parameters = sig.parameters
         self._keys = sig.parameters.keys()
 
-    def __getattr__(self, attr):
+    def __getattr__(self, attr: str) -> Any:
         return getattr(self.class_, attr)
 
-    def __lt__(self, other):
+    def __lt__(self, other: TypeAlias) -> bool:
         return self.name < other.name
 
     @staticmethod
-    def is_event(class_):
+    def is_event(class_: type) -> bool:
         if not inspect.isclass(class_):
             return False
 
-        if not issubclass(class_, AbstractEvent):
+        if not all(
+            hasattr(class_, attr) for attr in ('name', 'routing_key_fmt', 'content')
+        ):
             return False
 
         if inspect.isabstract(class_):
@@ -90,17 +94,17 @@ class Event:
 
         return True
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'<Event \'{self.name}\'>'
 
     @property
-    def service(self):
+    def service(self) -> str:
         return getattr(self.class_, 'service', 'undefined')
 
-    def generate_tag(self):
+    def generate_tag(self) -> list[dict]:
         return [{'name': self.service}]
 
-    def generate_headers(self):
+    def generate_headers(self) -> dict:
         headers = {
             'name': {
                 'type': 'string',
@@ -129,7 +133,7 @@ class Event:
 
         return {'type': 'object', 'properties': headers, 'required': required}
 
-    def generate_payload(self):
+    def generate_payload(self) -> dict:
         content = {}
         keys_ignore_list = ('tenant_uuid', 'user_uuid', 'self')
         content_keys = [key for key in self._keys if key not in keys_ignore_list]
@@ -154,7 +158,7 @@ class Event:
             dict(data=AsyncAPITypes.object_(content)),
         )
 
-    def generate_parameters(self):
+    def generate_parameters(self) -> dict:
         parameters = {}
         matches = re.search(r'\{(.*?)\}', self.name)
         if matches:
@@ -167,13 +171,9 @@ class Event:
                 }
         return parameters
 
-    def generate_specification(self):
+    def generate_specification(self) -> dict:
         message_name = '-'.join([self.name.replace('_', '-'), 'payload'])
-
-        try:
-            doc = yaml.safe_load(self.class_.__doc__)
-        except AttributeError:
-            doc = ''
+        doc = yaml.safe_load(self.class_.__doc__ or '')
 
         spec = {
             'subscribe': {
@@ -195,7 +195,7 @@ class Event:
 
 
 class EventSpecificationBuilder:
-    def __init__(self, input_schema, version):
+    def __init__(self, input_schema: str, version: str):
         self.platform_version = str(version)
         self.base_path = self.get_package_path(PACKAGE_NAME)
         resource_dir = self.base_path.joinpath('resources')
@@ -205,13 +205,13 @@ class EventSpecificationBuilder:
             self.input_schema = yaml.safe_load(file)
 
     @staticmethod
-    def get_package_path(package_name):
+    def get_package_path(package_name: str) -> Path:
         module = importlib.import_module(package_name)
         entrypoint = inspect.getfile(module)
         return Path(os.path.dirname(entrypoint))
 
-    def get_resource_events(self, resource_path):
-        events = []
+    def get_resource_events(self, resource_path: Path) -> list[Event]:
+        events: list[Event] = []
         file_paths = sorted(resource_path.glob('*.py'))
 
         for path in file_paths:
@@ -230,11 +230,12 @@ class EventSpecificationBuilder:
 
         return events
 
-    def generate_specifications(self, events):
+    def generate_specifications(self, events: list[Event]) -> dict:
         print(
-            f'generating AsyncAPI specifications for `{self.platform_version}` ({len(events)} events)'
+            f'generating AsyncAPI specifications for `{self.platform_version}` '
+            f'({len(events)} events)'
         )
-        specifications = {}
+        specifications: dict = {}
         for event in events:
             service = event.service
             if service not in specifications:
@@ -244,8 +245,10 @@ class EventSpecificationBuilder:
         print('\n')
         return specifications
 
-    def write_specifications(self, specifications, output_dir, *, dry_run=False):
-        def write(service):
+    def write_specifications(
+        self, specifications: dict, output_dir: str, *, dry_run: bool = False
+    ) -> None:
+        def write(service: str) -> str:
             service_name = (
                 '-'.join(['wazo', service]) if service != 'undefined' else service
             )
@@ -269,7 +272,7 @@ class EventSpecificationBuilder:
             ]
         [print(fut.result()) for fut in futs]
 
-    def run(self, output_dir='asyncapi', *, dry_run=False):
+    def run(self, output_dir: str = 'asyncapi', *, dry_run: bool = False) -> None:
         start_time = time()
         if dry_run:
             print('[DRY RUN]')
@@ -285,7 +288,9 @@ class EventSpecificationBuilder:
         print(f'(execution took \'{exec_time:.3f}\' seconds)')
 
 
-def generate_documentation(template_file, output_dir, version, *, dry_run=False):
+def generate_documentation(
+    template_file: str, output_dir: str, version: str, *, dry_run: bool = False
+) -> None:
     builder = EventSpecificationBuilder(template_file, version)
     builder.run(output_dir, dry_run=dry_run)
 

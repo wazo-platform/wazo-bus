@@ -1,7 +1,7 @@
 # Copyright 2013-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_bus.resources.common.event import TenantEvent, UserEvent
+from ..common.event import TenantEvent, UserEvent
 
 
 class QueueMemberAgentAssociatedEvent(TenantEvent):
@@ -9,7 +9,7 @@ class QueueMemberAgentAssociatedEvent(TenantEvent):
     name = 'queue_member_agent_associated'
     routing_key_fmt = 'config.queues.agents.updated'
 
-    def __init__(self, queue_id, agent_id, penalty, tenant_uuid):
+    def __init__(self, queue_id: int, agent_id: int, penalty: int, tenant_uuid: str):
         content = {
             'queue_id': queue_id,
             'agent_id': agent_id,
@@ -23,7 +23,7 @@ class QueueMemberAgentDissociatedEvent(TenantEvent):
     name = 'queue_member_agent_dissociated'
     routing_key_fmt = 'config.queues.agents.deleted'
 
-    def __init__(self, queue_id, agent_id, tenant_uuid):
+    def __init__(self, queue_id: int, agent_id: int, tenant_uuid: str):
         content = {
             'queue_id': queue_id,
             'agent_id': agent_id,
@@ -36,7 +36,7 @@ class QueueMemberUserAssociatedEvent(UserEvent):
     name = 'queue_member_user_associated'
     routing_key_fmt = 'config.queues.users.updated'
 
-    def __init__(self, queue_id, tenant_uuid, user_uuid):
+    def __init__(self, queue_id: int, tenant_uuid: str, user_uuid: str):
         content = {
             'queue_id': queue_id,
             'user_uuid': str(user_uuid),
@@ -49,7 +49,7 @@ class QueueMemberUserDissociatedEvent(UserEvent):
     name = 'queue_member_user_dissociated'
     routing_key_fmt = 'config.queues.users.deleted'
 
-    def __init__(self, queue_id, tenant_uuid, user_uuid):
+    def __init__(self, queue_id: int, tenant_uuid: str, user_uuid: str):
         content = {
             'queue_id': queue_id,
             'user_uuid': str(user_uuid),

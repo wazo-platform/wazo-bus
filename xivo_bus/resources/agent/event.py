@@ -1,6 +1,8 @@
 # Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from __future__ import annotations
+
 from xivo_bus.resources.common.event import MultiUserEvent, TenantEvent
 
 
@@ -11,7 +13,7 @@ class AgentCreatedEvent(TenantEvent):
     name = 'agent_created'
     routing_key_fmt = 'config.agent.created'
 
-    def __init__(self, agent_id, tenant_uuid):
+    def __init__(self, agent_id: int, tenant_uuid: str):
         content = {'id': int(agent_id)}
         super().__init__(content, tenant_uuid)
 
@@ -23,7 +25,7 @@ class AgentDeletedEvent(TenantEvent):
     name = 'agent_deleted'
     routing_key_fmt = 'config.agent.deleted'
 
-    def __init__(self, agent_id, tenant_uuid):
+    def __init__(self, agent_id: int, tenant_uuid: str):
         content = {'id': int(agent_id)}
         super().__init__(content, tenant_uuid)
 
@@ -35,7 +37,7 @@ class AgentEditedEvent(TenantEvent):
     name = 'agent_edited'
     routing_key_fmt = 'config.agent.edited'
 
-    def __init__(self, agent_id, tenant_uuid):
+    def __init__(self, agent_id: int, tenant_uuid: str):
         content = {'id': int(agent_id)}
         super().__init__(content, tenant_uuid)
 
@@ -48,7 +50,15 @@ class AgentPausedEvent(MultiUserEvent):
     routing_key_fmt = 'status.agent.pause'
     required_acl_fmt = 'events.statuses.agents'
 
-    def __init__(self, agent_id, agent_number, queue, reason, tenant_uuid, user_uuids):
+    def __init__(
+        self,
+        agent_id: int,
+        agent_number: str,
+        queue: str,
+        reason: str,
+        tenant_uuid: str,
+        user_uuids: list[str],
+    ):
         content = {
             'agent_id': agent_id,
             'agent_number': agent_number,
@@ -67,7 +77,15 @@ class AgentUnpausedEvent(MultiUserEvent):
     routing_key_fmt = 'status.agent.unpause'
     required_acl_fmt = 'events.statuses.agents'
 
-    def __init__(self, agent_id, agent_number, queue, reason, tenant_uuid, user_uuids):
+    def __init__(
+        self,
+        agent_id: int,
+        agent_number: str,
+        queue: str,
+        reason: str,
+        tenant_uuid: str,
+        user_uuids: list[str],
+    ):
         content = {
             'agent_id': agent_id,
             'agent_number': agent_number,
@@ -86,6 +104,8 @@ class AgentStatusUpdatedEvent(MultiUserEvent):
     routing_key_fmt = 'status.agent'
     required_acl_fmt = 'events.statuses.agents'
 
-    def __init__(self, agent_id, status, tenant_uuid, user_uuids):
+    def __init__(
+        self, agent_id: int, status: str, tenant_uuid: str, user_uuids: list[str]
+    ):
         content = {'agent_id': int(agent_id), 'status': status}
         super().__init__(content, tenant_uuid, user_uuids)

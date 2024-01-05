@@ -1,25 +1,78 @@
-# Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from __future__ import annotations
+
 import os
-from collections import defaultdict, namedtuple
+from collections import defaultdict
+from collections.abc import Iterator
 from contextlib import contextmanager
 from datetime import datetime
 from queue import Empty, Queue
 from threading import Event, Lock, Thread, current_thread, main_thread
+from typing import Any, Callable, ClassVar, NamedTuple, Protocol, TypedDict
 
 from amqp.exceptions import NotFound
-from kombu import Connection, Exchange, Producer
+from kombu import Connection, Consumer, Exchange, Message, Producer
 from kombu import Queue as AMQPQueue
 from kombu import binding as Binding
 from kombu.exceptions import OperationalError
 from kombu.mixins import ConsumerMixin as KombuConsumer
+from kombu.transport.base import StdChannel
+from typing_extensions import Self
 
-BusThread = namedtuple('BusThread', ['thread', 'on_stop', 'ready_flag'])
-Subscription = namedtuple('Subscription', ['handler', 'binding'])
+from .base import BaseProtocol
+from .collectd.common import CollectdEvent
+from .resources.common.abstract import EventProtocol
+
+EventHandlerType = Callable[[dict], None]
+ThreadTargetType = Callable[..., None]
+ThreadOnStopType = Callable[[], None]
 
 
-class ThreadableMixin:
+class BusThread(NamedTuple):
+    thread: Thread
+    on_stop: ThreadOnStopType | None
+    ready_flag: Event
+
+
+class SubscribeExchangeDict(TypedDict):
+    exchange_name: str
+    exchange_type: str
+
+
+class PublishExchangeDict(TypedDict):
+    exchange_name: str
+    exchange_type: str
+
+
+class Subscription(NamedTuple):
+    handler: EventHandlerType
+    binding: Binding
+
+
+class ThreadableProtocol(Protocol):
+    @property
+    def is_stopping(self) -> bool:
+        ...
+
+    def _register_thread(
+        self,
+        name: str,
+        run: ThreadTargetType,
+        on_stop: ThreadOnStopType | None,
+        **kwargs: Any,
+    ) -> Thread:
+        ...
+
+    def start(self) -> None:
+        ...
+
+    def stop(self) -> None:
+        ...
+
+
+class ThreadableMixin(BaseProtocol):
     '''
     Mixin to provide methods for easy thread creation/management
 
@@ -32,40 +85,45 @@ class ThreadableMixin:
             Starts execution of registered thread
         * `stop`:
             Kill all running threads
+
+    Private methods:
         * `_register_thread`:
             Allows another mixin to register a thread for execution
     '''
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, **kwargs: Any):
+        self.__internal_threads_list: list[BusThread] = list()
         self.__stop_flag = Event()
+        super().__init__(**kwargs)
 
     @property
-    def is_stopping(self):
+    def is_stopping(self) -> bool:
         return self.__stop_flag.is_set()
 
     @property
-    def is_running(self):
+    def is_running(self) -> bool:
         status = all({bus_thread.thread.is_alive() for bus_thread in self.__threads})
-        return super().is_running and status
+        return super().is_running and status  # type: ignore[safe-super]
 
     @property
-    def __threads(self):
-        try:
-            return self.__internal_threads_list
-        except AttributeError:
-            self.__internal_threads_list = list()
-            return self.__internal_threads_list
+    def __threads(self) -> list[BusThread]:
+        return self.__internal_threads_list
 
-    def __enter__(self):
+    def __enter__(self) -> Self:
         self.start()
         return super().__enter__()
 
-    def __exit__(self, exc_type, exc_value, traceback):
+    def __exit__(self, *args: Any) -> None:
         self.stop()
-        super().__exit__(exc_type, exc_value, traceback)
+        super().__exit__(*args)
 
-    def _register_thread(self, name, run, on_stop=None, **kwargs):
+    def _register_thread(
+        self,
+        name: str,
+        run: ThreadTargetType,
+        on_stop: ThreadOnStopType | None = None,
+        **kwargs: Any,
+    ) -> Thread:
         if not callable(run):
             raise ValueError('Run must be a function')
         ready_flag = Event()
@@ -82,7 +140,7 @@ class ThreadableMixin:
         self.__threads.append(bus_thread)
         return bus_thread.thread
 
-    def start(self):
+    def start(self) -> None:
         if self.is_running:
             raise RuntimeError(f'{len(self.__threads)} threads are already running')
 
@@ -93,7 +151,7 @@ class ThreadableMixin:
             bus_thread.ready_flag.wait(timeout=3.0)
         self.log.debug('All threads started successfully...')
 
-    def stop(self):
+    def stop(self) -> None:
         self.__stop_flag.set()
         for bus_thread in self.__threads:
             if bus_thread.thread.is_alive():
@@ -103,8 +161,8 @@ class ThreadableMixin:
                 bus_thread.thread.join()
 
     @staticmethod
-    def __wrap_thread(func):
-        def wrapper(self, name, ready_flag, **kwargs):
+    def __wrap_thread(func: ThreadTargetType) -> ThreadTargetType:
+        def wrapper(self: Self, name: str, ready_flag: Event, **kwargs: Any) -> None:
             self.log.debug('Started AMQP thread \'%s\'', name)
             while not self.is_stopping:
                 try:
@@ -118,7 +176,7 @@ class ThreadableMixin:
         return wrapper
 
 
-class ConsumerMixin(KombuConsumer):
+class ConsumerMixin(KombuConsumer, BaseProtocol):
     '''
     Mixin to provide RabbitMQ message consuming capabilities
 
@@ -131,9 +189,9 @@ class ConsumerMixin(KombuConsumer):
             Uninstall a handler for the specified event
     '''
 
-    consumer_args = {}
+    consumer_args: ClassVar[dict] = {}
 
-    def __init__(self, subscribe=None, **kwargs):
+    def __init__(self, subscribe: SubscribeExchangeDict | None = None, **kwargs: Any):
         super().__init__(**kwargs)
         name = f'{self._name}.{os.urandom(3).hex()}'
         if subscribe:
@@ -141,10 +199,10 @@ class ConsumerMixin(KombuConsumer):
 
         self.__connection = Connection(self.url)
         self.__exchange = exchange if subscribe else self._default_exchange
-        self.__subscriptions = defaultdict(list)
+        self.__subscriptions: defaultdict[str, list[Subscription]] = defaultdict(list)
         self.__queue = AMQPQueue(name=name, auto_delete=True, durable=False)
         self.__lock = Lock()
-        self.__thread = None
+        self.__thread: Thread | None = None
         if hasattr(self, '_register_thread'):
             self.__thread = self._register_thread(
                 'consumer', self.__thread_run, self.__thread_stop
@@ -153,18 +211,18 @@ class ConsumerMixin(KombuConsumer):
         self.create_connection()
         self.log.debug('setting consuming exchange as \'%s\'', self.__exchange)
 
-    def consumer_connected(self):
+    def consumer_connected(self) -> bool:
         is_running = self.__thread.is_alive() if self.__thread is not None else True
         return bool(is_running and self.connection.connected)
 
     @property
     @contextmanager
-    def __binding_channel(self):
+    def __binding_channel(self) -> Iterator[StdChannel]:
         if not self.__connection.connected:
             self.__connection.connect()
         yield self.__connection.default_channel
 
-    def __create_binding(self, headers, routing_key):
+    def __create_binding(self, headers: dict, routing_key: str | None) -> Binding:
         binding = Binding(self.__exchange, routing_key, headers, headers)
         self.__queue.bindings.add(binding)
         if self.is_running:
@@ -180,7 +238,7 @@ class ConsumerMixin(KombuConsumer):
                 )
         return binding
 
-    def __remove_binding(self, binding):
+    def __remove_binding(self, binding: Binding) -> None:
         self.__queue.bindings.remove(binding)
         if self.is_running:
             try:
@@ -192,7 +250,9 @@ class ConsumerMixin(KombuConsumer):
             except NotFound:
                 pass
 
-    def __dispatch(self, event_name, payload, headers=None):
+    def __dispatch(
+        self, event_name: str, payload: dict, headers: dict | None = None
+    ) -> None:
         with self.__lock:
             subscriptions = self.__subscriptions[event_name].copy()
         for handler, _ in subscriptions:
@@ -206,7 +266,7 @@ class ConsumerMixin(KombuConsumer):
                 )
             continue
 
-    def __extract_event_from_message(self, message):
+    def __extract_event_from_message(self, message: Message) -> tuple[str, dict, dict]:
         event_name = None
         headers = message.headers
         payload = message.payload
@@ -221,12 +281,12 @@ class ConsumerMixin(KombuConsumer):
 
     def subscribe(
         self,
-        event_name,
-        handler,
-        headers=None,
-        routing_key=None,
-        headers_match_all=True,
-    ):
+        event_name: str,
+        handler: EventHandlerType,
+        headers: dict | None = None,
+        routing_key: str | None = None,
+        headers_match_all: bool = True,
+    ) -> None:
         headers = dict(headers or {})
         headers.update(name=event_name)
         if self.__exchange.type == 'headers':
@@ -242,7 +302,7 @@ class ConsumerMixin(KombuConsumer):
             event_name,
         )
 
-    def unsubscribe(self, event_name, handler):
+    def unsubscribe(self, event_name: str, handler: EventHandlerType) -> bool:
         with self.__lock:
             subscriptions = self.__subscriptions[event_name].copy()
         try:
@@ -263,7 +323,9 @@ class ConsumerMixin(KombuConsumer):
                 with self.__lock:
                     self.__subscriptions.pop(event_name)
 
-    def get_consumers(self, Consumer, channel):
+    def get_consumers(
+        self, Consumer: type[Consumer], channel: StdChannel
+    ) -> list[Consumer]:
         self.__exchange.bind(channel).declare()
         return [
             Consumer(
@@ -273,7 +335,7 @@ class ConsumerMixin(KombuConsumer):
             )
         ]
 
-    def __on_message_received(self, body, message):
+    def __on_message_received(self, body: Any, message: Message) -> None:
         event_name, headers, payload = self.__extract_event_from_message(message)
         if event_name not in self.__subscriptions:
             return
@@ -286,7 +348,7 @@ class ConsumerMixin(KombuConsumer):
         finally:
             message.ack()
 
-    def on_connection_error(self, exc, interval):
+    def on_connection_error(self, exc: Exception, interval: str) -> None:
         self.log.error(
             'Broker connection error: %s, trying to reconnect in %s seconds...',
             exc,
@@ -297,27 +359,33 @@ class ConsumerMixin(KombuConsumer):
                 raise SystemExit
             self.connection.release()
 
-    def create_connection(self):
+    def create_connection(self) -> Connection:
         self.connection = self.__connection.clone()
         return self.connection
 
     @property
-    def should_stop(self):
+    def should_stop(self) -> bool:
         return getattr(self, 'is_stopping', True)
 
-    def on_consume_ready(self, connection, channel, consumers, **kwargs):
+    def on_consume_ready(
+        self,
+        connection: Connection,
+        channel: Any,
+        consumers: list[Consumer],
+        **kwargs: Any,
+    ) -> None:
         if 'ready_flag' in kwargs:
             ready_flag = kwargs.pop('ready_flag')
             ready_flag.set()
 
-    def __thread_run(self, ready_flag, **kwargs):
+    def __thread_run(self, ready_flag: Event, **kwargs: Any) -> None:
         super().run(ready_flag=ready_flag, **self.consumer_args)
 
-    def __thread_stop(self):
+    def __thread_stop(self) -> None:
         self.__connection.release()
 
 
-class PublisherMixin:
+class PublisherMixin(BaseProtocol):
     '''
     Mixin providing RabbitMQ message publishing capabilities
 
@@ -328,11 +396,11 @@ class PublisherMixin:
             publish an event immediately to the bus
     '''
 
-    publisher_args = {
+    publisher_args: ClassVar[dict] = {
         'max_retries': 2,
     }
 
-    def __init__(self, publish=None, **kwargs):
+    def __init__(self, publish: PublishExchangeDict | None = None, **kwargs: Any):
         super().__init__(**kwargs)
         if publish:
             exchange = Exchange(publish['exchange_name'], publish['exchange_type'])
@@ -341,21 +409,29 @@ class PublisherMixin:
         self.__lock = Lock()
         self.log.debug('setting publishing exchange as \'%s\'', self.__exchange)
 
-    def publisher_connected(self):
+    def publisher_connected(self) -> bool:
         return self.__connection.connected
 
     @contextmanager
-    def Producer(self, connection, **connection_args):
+    def Producer(
+        self, connection: Connection, **connection_args: Any
+    ) -> Iterator[Callable]:
         producer = Producer(connection, exchange=self.__exchange, auto_declare=True)
         yield connection.ensure(
             producer, producer.publish, errback=self.on_publish_error, **connection_args
         )
 
-    def on_publish_error(self, exc, interval):
-        self.log.error('Publish error: %s', exc, exc_info=1)
+    def on_publish_error(self, exc: Exception, interval: int | str) -> None:
+        self.log.error('Publish error: %s', exc, exc_info=True)
         self.log.info('Retry in %s seconds...', interval)
 
-    def publish(self, event, headers=None, routing_key=None, payload=None):
+    def publish(
+        self,
+        event: EventProtocol,
+        headers: dict | None = None,
+        routing_key: str | None = None,
+        payload: dict | None = None,
+    ) -> None:
         headers, payload, routing_key = self._marshal(
             event, headers, payload, routing_key=routing_key
         )
@@ -371,7 +447,7 @@ class PublisherMixin:
         self.log.debug('Published %s', str(event))
 
 
-class QueuePublisherMixin(PublisherMixin):
+class QueuePublisherMixin(PublisherMixin, ThreadableProtocol):
     '''
     Mixin to provide publishing capabilities, including ability to publish
     through a thread
@@ -389,30 +465,30 @@ class QueuePublisherMixin(PublisherMixin):
             Queue an event to be processed by the publishing thread
     '''
 
-    queue_publisher_args = {
+    queue_publisher_args: ClassVar[dict] = {
         'interval_start': 2,
         'interval_step': 2,
         'interval_max': 32,
     }
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Any) -> None:
         retry_policy = self.queue_publisher_args
         super().__init__(**kwargs)
-        self.__flushing = False
-        self.__fifo = Queue()
+        self.__flushing: bool = False
+        self.__fifo: Queue = Queue()
         self.__connection = Connection(self.url, transport_options=retry_policy)
-        self.__thread = None
+        self.__thread: Thread | None = None
 
         if hasattr(self, '_register_thread'):
             self.__thread = self._register_thread(
                 'publisher_queue', self.__thread_run, self.__thread_stop
             )
 
-    def queue_publisher_connected(self):
+    def queue_publisher_connected(self) -> bool:
         is_running = self.__thread.is_alive() if self.__thread is not None else True
         return bool(self.__connection.connected and is_running)
 
-    def __thread_run(self, ready_flag, **kwargs):
+    def __thread_run(self, ready_flag: Event, **kwargs: Any) -> None:
         ready_flag.set()
         retry_policy = self.queue_publisher_args
 
@@ -427,22 +503,28 @@ class QueuePublisherMixin(PublisherMixin):
                     with self.Producer(self.__connection, **retry_policy) as publish:
                         publish(payload, headers=headers, routing_key=routing_key)
                 except OperationalError as exc:
-                    self.log.error('Publishing queue error: %s', exc, exc_info=1)
+                    self.log.error('Publishing queue error: %s', exc, exc_info=True)
                 else:
                     self.__fifo.task_done()
 
-    def __thread_stop(self):
+    def __thread_stop(self) -> None:
         self.__flushing = True
         self.__fifo.put(None)
 
-    def publish_soon(self, event, headers=None, routing_key=None, payload=None):
+    def publish_soon(
+        self,
+        event: EventProtocol,
+        headers: dict | None = None,
+        routing_key: str | None = None,
+        payload: dict | None = None,
+    ) -> None:
         headers, payload, routing_key = self._marshal(
             event, headers, payload, routing_key
         )
         self.__fifo.put((payload, headers, routing_key))
 
 
-class WazoEventMixin:
+class WazoEventMixin(BaseProtocol):
     '''
     Mixin to handle message formatting for wazo events
 
@@ -454,12 +536,14 @@ class WazoEventMixin:
             Deserializes the message received from RabbitMQ
     '''
 
-    def __init__(self, service_uuid=None, **kwargs):
+    def __init__(self, service_uuid: str | None = None, **kwargs: Any):
         super().__init__(**kwargs)
         self.service_uuid = service_uuid
 
-    def __generate_payload(self, event, headers, initial_data):
-        payload = {}
+    def __generate_payload(
+        self, event: EventProtocol, headers: dict, initial_data: dict | None
+    ) -> dict:
+        payload: dict = {}
         data = initial_data.copy() if initial_data else {}
         try:
             data.update(event.marshal())
@@ -470,7 +554,9 @@ class WazoEventMixin:
             payload.update(headers, data=data)
             return payload
 
-    def __generate_headers(self, event, extra_headers):
+    def __generate_headers(
+        self, event: EventProtocol, extra_headers: dict | None
+    ) -> dict:
         headers = {}
         headers.update(extra_headers or {})
 
@@ -494,29 +580,37 @@ class WazoEventMixin:
 
         return headers
 
-    def _marshal(self, event, headers, payload, routing_key=None):
+    def _marshal(
+        self,
+        event: EventProtocol,
+        headers: dict | None,
+        payload: dict | None,
+        routing_key: str | None = None,
+    ) -> tuple[dict, dict, str | None]:
         routing_key = routing_key or getattr(event, 'routing_key', None)
         headers = self.__generate_headers(event, headers)
         payload = self.__generate_payload(event, headers, payload)
 
         return headers, payload, routing_key
 
-    def _unmarshal(self, event_name, headers, payload):
+    def _unmarshal(
+        self, event_name: str, headers: dict, payload: dict
+    ) -> tuple[dict, dict]:
         event_data = payload.pop('data')
         headers = headers or payload
         return headers, event_data
 
 
 class CollectdMixin:
-    content_type = 'text/collectd'
+    content_type: ClassVar[str] = 'text/collectd'
 
-    def __init__(self, service_uuid=None, **kwargs):
+    def __init__(self, service_uuid: str | None = None, **kwargs: Any):
         super().__init__(**kwargs)
         if not service_uuid:
             raise ValueError('service must have an UUID')
         self.service_uuid = service_uuid
 
-    def __generate_payload(self, event):
+    def __generate_payload(self, event: CollectdEvent) -> str:
         if not event.is_valid():
             raise ValueError(event)
 
@@ -533,11 +627,14 @@ class CollectdMixin:
 
         return f'PUTVAL {host}/{plugin}/{type_} interval={interval} {time}:{values}'
 
-    def _marshal(self, event, headers, payload, routing_key=None):
+    def _marshal(
+        self,
+        event: CollectdEvent,
+        headers: dict | None,
+        payload: dict | None,
+        routing_key: str | None = None,
+    ) -> tuple[dict | None, str, str | None]:
         routing_key = routing_key or getattr(event, 'routing_key', None)
-        payload = self.__generate_payload(event)
+        collectd_payload: str = self.__generate_payload(event)
 
-        return headers, payload, routing_key
-
-    def _unmarshal(self, event_name, headers, payload):
-        pass
+        return headers, collectd_payload, routing_key

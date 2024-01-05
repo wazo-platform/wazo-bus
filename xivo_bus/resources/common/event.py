@@ -1,10 +1,14 @@
-# Copyright 2013-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from .abstract import AbstractEvent
+from __future__ import annotations
+
+from collections.abc import Mapping
+
+from .abstract import EventProtocol
 
 
-class ServiceEvent(AbstractEvent):
+class ServiceEvent(EventProtocol):
     '''
     ### Service-level event base class
 
@@ -12,10 +16,11 @@ class ServiceEvent(AbstractEvent):
     make it through the websocket.
     '''
 
-    pass
+    def __init__(self, content: Mapping | None = None):
+        self.content = content or {}
 
 
-class TenantEvent(AbstractEvent):
+class TenantEvent(ServiceEvent):
     '''
     ### Tenant-level event base class
 
@@ -26,8 +31,8 @@ class TenantEvent(AbstractEvent):
         - tenant_uuid
     '''
 
-    def __init__(self, content, tenant_uuid):
-        super().__init__(content=content)
+    def __init__(self, content: Mapping | None, tenant_uuid: str):
+        super().__init__(content)
         if tenant_uuid is None:
             raise ValueError('tenant_uuid must have a value')
         self.tenant_uuid = str(tenant_uuid)
@@ -47,13 +52,15 @@ class UserEvent(TenantEvent):
         - user_uuid
     '''
 
-    def __init__(self, content, tenant_uuid, user_uuid):
+    def __init__(
+        self, content: Mapping | None, tenant_uuid: str, user_uuid: str | None
+    ):
         super().__init__(content, tenant_uuid)
         delattr(self, 'user_uuid:*')
         self.user_uuid = str(user_uuid) if user_uuid else None
 
     @property
-    def headers(self):
+    def headers(self) -> dict:
         headers = super().headers
         uuid = headers.pop('user_uuid')
         if uuid:
@@ -76,7 +83,9 @@ class MultiUserEvent(TenantEvent):
 
     __slots__ = ('user_uuids',)
 
-    def __init__(self, content, tenant_uuid, user_uuids):
+    def __init__(
+        self, content: Mapping | None, tenant_uuid: str, user_uuids: list[str]
+    ):
         super().__init__(content, tenant_uuid)
         delattr(self, 'user_uuid:*')
         if not isinstance(user_uuids, list):
@@ -84,7 +93,7 @@ class MultiUserEvent(TenantEvent):
         self.user_uuids = [str(user_uuid) for user_uuid in user_uuids]
 
     @property
-    def headers(self):
+    def headers(self) -> dict:
         headers = super().headers
         for user_uuid in self.user_uuids:
             headers[f'user_uuid:{user_uuid}'] = True

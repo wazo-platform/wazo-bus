@@ -1,7 +1,8 @@
 # Copyright 2019-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_bus.resources.common.event import TenantEvent
+from ..common.event import TenantEvent
+from .types import ApplicationDict, LineDict
 
 
 class LineApplicationAssociatedEvent(TenantEvent):
@@ -9,7 +10,7 @@ class LineApplicationAssociatedEvent(TenantEvent):
     name = 'line_application_associated'
     routing_key_fmt = 'config.lines.{line[id]}.applications.{application[uuid]}.updated'
 
-    def __init__(self, line, application, tenant_uuid):
+    def __init__(self, line: LineDict, application: ApplicationDict, tenant_uuid: str):
         content = {'line': line, 'application': application}
         super().__init__(content, tenant_uuid)
 
@@ -19,6 +20,6 @@ class LineApplicationDissociatedEvent(TenantEvent):
     name = 'line_application_dissociated'
     routing_key_fmt = 'config.lines.{line[id]}.applications.{application[uuid]}.deleted'
 
-    def __init__(self, line, application, tenant_uuid):
+    def __init__(self, line: LineDict, application: ApplicationDict, tenant_uuid: str):
         content = {'line': line, 'application': application}
         super().__init__(content, tenant_uuid)
