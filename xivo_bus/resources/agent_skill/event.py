@@ -1,10 +1,8 @@
 # Copyright 2018-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from typing import Annotated
-
 from ..common.event import TenantEvent
-from ..common.types import Format
+from ..common.types import UUIDStr
 
 
 class AgentSkillAssociatedEvent(TenantEvent):
@@ -16,7 +14,7 @@ class AgentSkillAssociatedEvent(TenantEvent):
         self,
         agent_id: int,
         skill_id: int,
-        tenant_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: UUIDStr,
     ):
         content = {
             'agent_id': agent_id,
@@ -34,7 +32,7 @@ class AgentSkillDissociatedEvent(TenantEvent):
         self,
         agent_id: int,
         skill_id: int,
-        tenant_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: UUIDStr,
     ):
         content = {
             'agent_id': agent_id,

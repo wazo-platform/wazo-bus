@@ -1,10 +1,8 @@
 # Copyright 2018-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from typing import Annotated
-
 from ..common.event import TenantEvent
-from ..common.types import Format
+from ..common.types import UUIDStr
 from .types import ApplicationDict
 
 
@@ -16,7 +14,7 @@ class ApplicationCreatedEvent(TenantEvent):
     def __init__(
         self,
         application: ApplicationDict,
-        tenant_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: UUIDStr,
     ):
         super().__init__(application, tenant_uuid)
 
@@ -29,7 +27,7 @@ class ApplicationDeletedEvent(TenantEvent):
     def __init__(
         self,
         application: ApplicationDict,
-        tenant_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: UUIDStr,
     ):
         super().__init__(application, tenant_uuid)
 
@@ -42,6 +40,6 @@ class ApplicationEditedEvent(TenantEvent):
     def __init__(
         self,
         application: ApplicationDict,
-        tenant_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: UUIDStr,
     ):
         super().__init__(application, tenant_uuid)

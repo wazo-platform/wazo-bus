@@ -1,10 +1,8 @@
 # Copyright 2018-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from typing import Annotated
-
 from ..common.event import TenantEvent
-from ..common.types import Format
+from ..common.types import UUIDStr
 
 
 class ContextContextsAssociatedEvent(TenantEvent):
@@ -16,7 +14,7 @@ class ContextContextsAssociatedEvent(TenantEvent):
         self,
         context_id: int,
         context_ids: list[int],
-        tenant_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: UUIDStr,
     ):
         content = {
             'context_id': context_id,

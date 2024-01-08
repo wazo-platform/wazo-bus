@@ -3,13 +3,13 @@
 
 from __future__ import annotations
 
-from typing import Annotated, TypedDict
+from typing import TypedDict
 
-from ..common.types import Format
+from ..common.types import UUIDStr
 
 
 class TenantDict(TypedDict, total=False):
-    uuid: Annotated[str, Format('uuid')]
+    uuid: UUIDStr
     name: str
     slug: str
     domain_names: list[str]

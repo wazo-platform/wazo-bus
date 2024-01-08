@@ -3,9 +3,9 @@
 
 from __future__ import annotations
 
-from typing import Annotated, TypedDict
+from typing import TypedDict
 
-from ..common.types import Format
+from ..common.types import UUIDStr
 
 
 class EndpointSIPAuthSectionOptionsDict(TypedDict, total=False):
@@ -13,8 +13,8 @@ class EndpointSIPAuthSectionOptionsDict(TypedDict, total=False):
 
 
 class LineEndpointSIPDict(TypedDict, total=False):
-    uuid: Annotated[str, Format('uuid')]
-    tenant_uuid: Annotated[str, Format('uuid')]
+    uuid: UUIDStr
+    tenant_uuid: UUIDStr
     label: str
     name: str
     auth_section_options: EndpointSIPAuthSectionOptionsDict
@@ -22,16 +22,16 @@ class LineEndpointSIPDict(TypedDict, total=False):
 
 class LineEndpointSCCPDict(TypedDict, total=False):
     id: int
-    tenant_uuid: Annotated[str, Format('uuid')]
+    tenant_uuid: UUIDStr
 
 
 class LineEndpointCustomDict(TypedDict, total=False):
     id: int
-    tenant_uuid: Annotated[str, Format('uuid')]
+    tenant_uuid: UUIDStr
     interface: str
 
 
 class LineDict(TypedDict, total=False):
     id: int
-    tenant_uuid: Annotated[str, Format('uuid')]
+    tenant_uuid: UUIDStr
     name: str

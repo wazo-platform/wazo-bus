@@ -1,10 +1,8 @@
 # Copyright 2018-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from typing import Annotated
-
 from ..common.event import TenantEvent
-from ..common.types import Format
+from ..common.types import UUIDStr
 
 
 class TrunkRegisterIAXAssociatedEvent(TenantEvent):
@@ -16,7 +14,7 @@ class TrunkRegisterIAXAssociatedEvent(TenantEvent):
         self,
         trunk_id: int,
         register_id: int,
-        tenant_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: UUIDStr,
     ):
         content = {'trunk_id': trunk_id, 'register_id': register_id}
         super().__init__(content, tenant_uuid)
@@ -31,7 +29,7 @@ class TrunkRegisterIAXDissociatedEvent(TenantEvent):
         self,
         trunk_id: int,
         register_id: int,
-        tenant_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: UUIDStr,
     ):
         content = {
             'trunk_id': trunk_id,

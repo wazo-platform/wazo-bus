@@ -3,9 +3,9 @@
 
 from __future__ import annotations
 
-from typing import Annotated, TypedDict
+from typing import TypedDict
 
-from ..common.types import Format
+from ..common.types import UUIDStr
 
 
 class DeviceDict(TypedDict, total=False):
@@ -13,7 +13,7 @@ class DeviceDict(TypedDict, total=False):
 
 
 class LineEndpointSIPDict(TypedDict, total=False):
-    uuid: Annotated[str, Format('uuid')]
+    uuid: UUIDStr
 
 
 class LineEndpointSCCPDict(TypedDict, total=False):

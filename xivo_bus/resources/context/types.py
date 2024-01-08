@@ -3,13 +3,13 @@
 
 from __future__ import annotations
 
-from typing import Annotated, TypedDict
+from typing import TypedDict
 
-from ..common.types import Format
+from ..common.types import UUIDStr
 
 
 class ContextDict(TypedDict, total=False):
     id: int
     name: str
     type: str
-    tenant_uuid: Annotated[str, Format('uuid')]
+    tenant_uuid: UUIDStr

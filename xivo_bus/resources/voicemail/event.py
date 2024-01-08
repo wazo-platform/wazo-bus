@@ -1,10 +1,8 @@
 # Copyright 2013-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from typing import Annotated
-
 from ..common.event import TenantEvent, UserEvent
-from ..common.types import Format
+from ..common.types import UUIDStr
 from .types import VoicemailMessageDict
 
 
@@ -13,7 +11,7 @@ class VoicemailCreatedEvent(TenantEvent):
     name = 'voicemail_created'
     routing_key_fmt = 'config.voicemail.created'
 
-    def __init__(self, voicemail_id: int, tenant_uuid: Annotated[str, Format('uuid')]):
+    def __init__(self, voicemail_id: int, tenant_uuid: UUIDStr):
         content = {'id': int(voicemail_id)}
         super().__init__(content, tenant_uuid)
 
@@ -23,7 +21,7 @@ class VoicemailDeletedEvent(TenantEvent):
     name = 'voicemail_deleted'
     routing_key_fmt = 'config.voicemail.deleted'
 
-    def __init__(self, voicemail_id: int, tenant_uuid: Annotated[str, Format('uuid')]):
+    def __init__(self, voicemail_id: int, tenant_uuid: UUIDStr):
         content = {'id': int(voicemail_id)}
         super().__init__(content, tenant_uuid)
 
@@ -33,7 +31,7 @@ class VoicemailEditedEvent(TenantEvent):
     name = 'voicemail_edited'
     routing_key_fmt = 'config.voicemail.edited'
 
-    def __init__(self, voicemail_id: int, tenant_uuid: Annotated[str, Format('uuid')]):
+    def __init__(self, voicemail_id: int, tenant_uuid: UUIDStr):
         content = {'id': int(voicemail_id)}
         super().__init__(content, tenant_uuid)
 
@@ -46,8 +44,8 @@ class UserVoicemailEditedEvent(UserEvent):
     def __init__(
         self,
         voicemail_id: int,
-        tenant_uuid: Annotated[str, Format('uuid')],
-        user_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
     ):
         content = {
             'user_uuid': str(user_uuid),
@@ -67,8 +65,8 @@ class UserVoicemailMessageCreatedEvent(UserEvent):
         message_id: str,
         voicemail_id: int,
         message: VoicemailMessageDict,
-        tenant_uuid: Annotated[str, Format('uuid')],
-        user_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
     ):
         content = {
             'user_uuid': str(user_uuid),
@@ -90,8 +88,8 @@ class UserVoicemailMessageUpdatedEvent(UserEvent):
         message_id: str,
         voicemail_id: int,
         message: VoicemailMessageDict,
-        tenant_uuid: Annotated[str, Format('uuid')],
-        user_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
     ):
         content = {
             'user_uuid': str(user_uuid),
@@ -113,8 +111,8 @@ class UserVoicemailMessageDeletedEvent(UserEvent):
         message_id: str,
         voicemail_id: int,
         message: VoicemailMessageDict,
-        tenant_uuid: Annotated[str, Format('uuid')],
-        user_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
     ):
         content = {
             'user_uuid': str(user_uuid),

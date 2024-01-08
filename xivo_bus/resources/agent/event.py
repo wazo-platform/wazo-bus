@@ -3,10 +3,8 @@
 
 from __future__ import annotations
 
-from typing import Annotated
-
 from ..common.event import MultiUserEvent, TenantEvent
-from ..common.types import Format
+from ..common.types import UUIDStr
 
 
 class AgentCreatedEvent(TenantEvent):
@@ -16,7 +14,7 @@ class AgentCreatedEvent(TenantEvent):
     name = 'agent_created'
     routing_key_fmt = 'config.agent.created'
 
-    def __init__(self, agent_id: int, tenant_uuid: Annotated[str, Format('uuid')]):
+    def __init__(self, agent_id: int, tenant_uuid: UUIDStr):
         content = {'id': int(agent_id)}
         super().__init__(content, tenant_uuid)
 
@@ -28,7 +26,7 @@ class AgentDeletedEvent(TenantEvent):
     name = 'agent_deleted'
     routing_key_fmt = 'config.agent.deleted'
 
-    def __init__(self, agent_id: int, tenant_uuid: Annotated[str, Format('uuid')]):
+    def __init__(self, agent_id: int, tenant_uuid: UUIDStr):
         content = {'id': int(agent_id)}
         super().__init__(content, tenant_uuid)
 
@@ -40,7 +38,7 @@ class AgentEditedEvent(TenantEvent):
     name = 'agent_edited'
     routing_key_fmt = 'config.agent.edited'
 
-    def __init__(self, agent_id: int, tenant_uuid: Annotated[str, Format('uuid')]):
+    def __init__(self, agent_id: int, tenant_uuid: UUIDStr):
         content = {'id': int(agent_id)}
         super().__init__(content, tenant_uuid)
 
@@ -59,8 +57,8 @@ class AgentPausedEvent(MultiUserEvent):
         agent_number: str,
         queue: str,
         reason: str,
-        tenant_uuid: Annotated[str, Format('uuid')],
-        user_uuids: Annotated[list[str], Format('uuid')],
+        tenant_uuid: UUIDStr,
+        user_uuids: list[UUIDStr],
     ):
         content = {
             'agent_id': agent_id,
@@ -86,8 +84,8 @@ class AgentUnpausedEvent(MultiUserEvent):
         agent_number: str,
         queue: str,
         reason: str,
-        tenant_uuid: Annotated[str, Format('uuid')],
-        user_uuids: Annotated[list[str], Format('uuid')],
+        tenant_uuid: UUIDStr,
+        user_uuids: list[UUIDStr],
     ):
         content = {
             'agent_id': agent_id,
@@ -111,8 +109,8 @@ class AgentStatusUpdatedEvent(MultiUserEvent):
         self,
         agent_id: int,
         status: str,
-        tenant_uuid: Annotated[str, Format('uuid')],
-        user_uuids: Annotated[list[str], Format('uuid')],
+        tenant_uuid: UUIDStr,
+        user_uuids: list[UUIDStr],
     ):
         content = {'agent_id': int(agent_id), 'status': status}
         super().__init__(content, tenant_uuid, user_uuids)

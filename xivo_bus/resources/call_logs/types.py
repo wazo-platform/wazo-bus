@@ -3,9 +3,9 @@
 
 from __future__ import annotations
 
-from typing import Annotated, TypedDict
+from typing import TypedDict
 
-from ..common.types import Format
+from ..common.types import DateTimeStr, UUIDStr
 
 
 class DestinationConferenceDict(TypedDict, total=False):
@@ -13,12 +13,12 @@ class DestinationConferenceDict(TypedDict, total=False):
 
 
 class DestinationMeetingDict(TypedDict, total=False):
-    meeting_uuid: Annotated[str, Format('uuid')]
+    meeting_uuid: UUIDStr
     meeting_name: str
 
 
 class DestinationUserDict(TypedDict, total=False):
-    user_uuid: Annotated[str, Format('uuid')]
+    user_uuid: UUIDStr
     user_name: str
 
 
@@ -34,7 +34,7 @@ class DestinationDetailsDict(TypedDict, total=False):
 
 
 class RecordingDict(TypedDict, total=False):
-    uuid: Annotated[str, Format('uuid')]
+    uuid: UUIDStr
     start_time: str
     end_time: str
     deleted: bool
@@ -43,9 +43,9 @@ class RecordingDict(TypedDict, total=False):
 
 class CDRDataDict(TypedDict, total=False):
     id: int
-    tenant_uuid: Annotated[str, Format('uuid')]
-    start: Annotated[str, Format('date-time')]
-    end: Annotated[str, Format('date-time')]
+    tenant_uuid: UUIDStr
+    start: DateTimeStr
+    end: DateTimeStr
     answered: bool
     duration: float
     call_drection: str
@@ -55,7 +55,7 @@ class CDRDataDict(TypedDict, total=False):
     destination_internal_extension: str
     destination_line_id: int
     destination_name: str
-    destination_user_uuid: Annotated[str, Format('uuid')]
+    destination_user_uuid: UUIDStr
     requested_name: str
     requested_context: str
     requested_extension: str
@@ -67,6 +67,6 @@ class CDRDataDict(TypedDict, total=False):
     source_internal_extension: str
     source_line_id: int
     source_name: str
-    source_user_uuid: Annotated[str, Format('uuid')]
+    source_user_uuid: UUIDStr
     tags: list[str]
     recordings: list[RecordingDict]

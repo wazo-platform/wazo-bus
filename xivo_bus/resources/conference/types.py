@@ -3,9 +3,9 @@
 
 from __future__ import annotations
 
-from typing import Annotated, TypedDict
+from typing import TypedDict
 
-from ..common.types import Format
+from ..common.types import UUIDStr
 
 
 class ParticipantDict(TypedDict, total=False):
@@ -17,4 +17,4 @@ class ParticipantDict(TypedDict, total=False):
     admin: bool
     language: str
     call_id: str
-    user_uuid: Annotated[str, Format('uuid')]
+    user_uuid: UUIDStr

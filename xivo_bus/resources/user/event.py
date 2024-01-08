@@ -3,20 +3,18 @@
 
 from __future__ import annotations
 
-from typing import Annotated
-
 from ..common.event import TenantEvent, UserEvent
-from ..common.types import Format
+from ..common.types import UUIDStr
 
 
 class _BaseUserEvent(TenantEvent):
     def __init__(
         self,
         user_id: int,
-        user_uuid: Annotated[str, Format('uuid')],
+        user_uuid: UUIDStr,
         subscription_type: str,
         created_at: str | None,
-        tenant_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: UUIDStr,
     ):
         content = {
             'id': int(user_id),
@@ -54,8 +52,8 @@ class UserFallbackEditedEvent(UserEvent):
     def __init__(
         self,
         user_id: int,
-        tenant_uuid: Annotated[str, Format('uuid')],
-        user_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
     ):
         content = {
             'id': int(user_id),
@@ -77,8 +75,8 @@ class UserServiceEditedEvent(UserEvent):
         user_id: int,
         service_name: str,
         service_enabled: bool,
-        tenant_uuid: Annotated[str, Format('uuid')],
-        user_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
     ):
         self.name = type(self).name.format(service_name=service_name)
         content = {
@@ -102,8 +100,8 @@ class UserForwardEditedEvent(UserEvent):
         forward_name: str,
         forward_enabled: bool,
         forward_dest: str,
-        tenant_uuid: Annotated[str, Format('uuid')],
-        user_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
     ):
         self.name = type(self).name.format(forward_name=forward_name)
         content = {

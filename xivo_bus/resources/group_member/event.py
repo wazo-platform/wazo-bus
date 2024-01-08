@@ -1,10 +1,8 @@
 # Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from typing import Annotated
-
 from ..common.event import TenantEvent
-from ..common.types import Format
+from ..common.types import UUIDStr
 from .types import GroupExtensionDict
 
 
@@ -16,9 +14,9 @@ class GroupMemberUsersAssociatedEvent(TenantEvent):
     def __init__(
         self,
         group_id: int,
-        group_uuid: Annotated[str, Format('uuid')],
+        group_uuid: UUIDStr,
         users: list[str],
-        tenant_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: UUIDStr,
     ):
         content = {
             'group_id': group_id,
@@ -36,9 +34,9 @@ class GroupMemberExtensionsAssociatedEvent(TenantEvent):
     def __init__(
         self,
         group_id: int,
-        group_uuid: Annotated[str, Format('uuid')],
+        group_uuid: UUIDStr,
         extensions: list[GroupExtensionDict],
-        tenant_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: UUIDStr,
     ):
         content = {
             'group_id': group_id,

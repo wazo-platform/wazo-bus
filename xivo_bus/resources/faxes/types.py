@@ -3,9 +3,9 @@
 
 from __future__ import annotations
 
-from typing import Annotated, TypedDict
+from typing import TypedDict
 
-from ..common.types import Format
+from ..common.types import UUIDStr
 
 
 class FaxDict(TypedDict, total=False):
@@ -16,5 +16,5 @@ class FaxDict(TypedDict, total=False):
     caller_id: str
     ivr_extension: str
     wait_time: int
-    user_uuid: Annotated[str, Format('uuid')]
-    tenant_uuid: Annotated[str, Format('uuid')]
+    user_uuid: UUIDStr
+    tenant_uuid: UUIDStr

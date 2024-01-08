@@ -1,10 +1,8 @@
 # Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from typing import Annotated
-
 from ..common.event import UserEvent
-from ..common.types import Format
+from ..common.types import UUIDStr
 
 
 class FavoriteAddedEvent(UserEvent):
@@ -16,9 +14,9 @@ class FavoriteAddedEvent(UserEvent):
         self,
         source_name: str,
         entry_id: str,
-        wazo_uuid: Annotated[str, Format('uuid')],
-        tenant_uuid: Annotated[str, Format('uuid')],
-        user_uuid: Annotated[str, Format('uuid')],
+        wazo_uuid: UUIDStr,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
     ):
         content = {
             'xivo_uuid': str(wazo_uuid),
@@ -38,9 +36,9 @@ class FavoriteDeletedEvent(UserEvent):
         self,
         source_name: str,
         entry_id: str,
-        wazo_uuid: Annotated[str, Format('uuid')],
-        tenant_uuid: Annotated[str, Format('uuid')],
-        user_uuid: Annotated[str, Format('uuid')],
+        wazo_uuid: UUIDStr,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
     ):
         content = {
             'xivo_uuid': str(wazo_uuid),

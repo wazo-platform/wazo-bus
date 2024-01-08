@@ -1,10 +1,8 @@
 # Copyright 2018-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from typing import Annotated
-
 from ..common.event import TenantEvent
-from ..common.types import Format
+from ..common.types import UUIDStr
 
 
 class CallFilterRecipientUsersAssociatedEvent(TenantEvent):
@@ -16,7 +14,7 @@ class CallFilterRecipientUsersAssociatedEvent(TenantEvent):
         self,
         call_filter_id: int,
         users: list[str],
-        tenant_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: UUIDStr,
     ):
         content = {
             'call_filter_id': call_filter_id,
@@ -34,7 +32,7 @@ class CallFilterSurrogateUsersAssociatedEvent(TenantEvent):
         self,
         call_filter_id: int,
         users: list[str],
-        tenant_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: UUIDStr,
     ):
         content = {
             'call_filter_id': call_filter_id,

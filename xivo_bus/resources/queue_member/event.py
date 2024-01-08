@@ -1,10 +1,8 @@
 # Copyright 2013-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from typing import Annotated
-
 from ..common.event import TenantEvent, UserEvent
-from ..common.types import Format
+from ..common.types import UUIDStr
 
 
 class QueueMemberAgentAssociatedEvent(TenantEvent):
@@ -17,7 +15,7 @@ class QueueMemberAgentAssociatedEvent(TenantEvent):
         queue_id: int,
         agent_id: int,
         penalty: int,
-        tenant_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: UUIDStr,
     ):
         content = {
             'queue_id': queue_id,
@@ -36,7 +34,7 @@ class QueueMemberAgentDissociatedEvent(TenantEvent):
         self,
         queue_id: int,
         agent_id: int,
-        tenant_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: UUIDStr,
     ):
         content = {
             'queue_id': queue_id,
@@ -53,8 +51,8 @@ class QueueMemberUserAssociatedEvent(UserEvent):
     def __init__(
         self,
         queue_id: int,
-        tenant_uuid: Annotated[str, Format('uuid')],
-        user_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
     ):
         content = {
             'queue_id': queue_id,
@@ -71,8 +69,8 @@ class QueueMemberUserDissociatedEvent(UserEvent):
     def __init__(
         self,
         queue_id: int,
-        tenant_uuid: Annotated[str, Format('uuid')],
-        user_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
     ):
         content = {
             'queue_id': queue_id,

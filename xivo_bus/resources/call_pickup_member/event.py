@@ -1,10 +1,8 @@
 # Copyright 2018-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from typing import Annotated
-
 from ..common.event import TenantEvent
-from ..common.types import Format
+from ..common.types import UUIDStr
 
 
 class CallPickupInterceptorUsersAssociatedEvent(TenantEvent):
@@ -16,7 +14,7 @@ class CallPickupInterceptorUsersAssociatedEvent(TenantEvent):
         self,
         call_pickup_id: int,
         users: list[str],
-        tenant_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: UUIDStr,
     ):
         content = {
             'call_pickup_id': call_pickup_id,
@@ -34,7 +32,7 @@ class CallPickupTargetUsersAssociatedEvent(TenantEvent):
         self,
         call_pickup_id: int,
         users: list[str],
-        tenant_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: UUIDStr,
     ):
         content = {
             'call_pickup_id': call_pickup_id,
@@ -52,7 +50,7 @@ class CallPickupInterceptorGroupsAssociatedEvent(TenantEvent):
         self,
         call_pickup_id: int,
         group_ids: list[int],
-        tenant_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: UUIDStr,
     ):
         content = {
             'call_pickup_id': call_pickup_id,
@@ -70,7 +68,7 @@ class CallPickupTargetGroupsAssociatedEvent(TenantEvent):
         self,
         call_pickup_id: int,
         group_ids: list[int],
-        tenant_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: UUIDStr,
     ):
         content = {
             'call_pickup_id': call_pickup_id,

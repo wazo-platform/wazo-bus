@@ -3,11 +3,11 @@
 
 from __future__ import annotations
 
-from typing import Annotated, TypedDict
+from typing import TypedDict
 
-from ..common.types import Format
+from ..common.types import UUIDStr
 
 
 class GroupDict(TypedDict, total=False):
     id: int
-    uuid: Annotated[str, Format('uuid')]
+    uuid: UUIDStr

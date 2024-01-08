@@ -1,10 +1,8 @@
 # Copyright 2017-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from typing import Annotated
-
 from ..common.event import TenantEvent, UserEvent
-from ..common.types import Format
+from ..common.types import UUIDStr
 from .types import CDRDataDict
 
 
@@ -13,9 +11,7 @@ class CallLogCreatedEvent(TenantEvent):
     name = 'call_log_created'
     routing_key_fmt = 'call_log.created'
 
-    def __init__(
-        self, cdr_data: CDRDataDict, tenant_uuid: Annotated[str, Format('uuid')]
-    ):
+    def __init__(self, cdr_data: CDRDataDict, tenant_uuid: UUIDStr):
         super().__init__(cdr_data, tenant_uuid)
 
 
@@ -27,7 +23,7 @@ class CallLogUserCreatedEvent(UserEvent):
     def __init__(
         self,
         cdr_data: CDRDataDict,
-        tenant_uuid: Annotated[str, Format('uuid')],
-        user_uuid: Annotated[str, Format('uuid')],
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
     ):
         super().__init__(cdr_data, tenant_uuid, user_uuid)
