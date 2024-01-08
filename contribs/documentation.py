@@ -15,12 +15,13 @@ from itertools import chain
 from pathlib import Path
 from sys import stdout
 from time import time
-from types import UnionType
+from types import NoneType, UnionType
 from typing import (
     Annotated,
     Any,
     Callable,
     Literal,
+    TypedDict,
     Union,
     get_args,
     get_origin,
@@ -29,37 +30,59 @@ from typing import (
 )
 
 import yaml
-from typing_extensions import TypeAlias
+from typing_extensions import TypeAlias, Unpack
 
 PACKAGE_NAME = 'xivo_bus'
-
 logging.basicConfig(stream=stdout, level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
+class AsyncAPIOptions(TypedDict, total=False):
+    nullable: bool
+
+
 class AsyncAPITypes:
+    @classmethod
+    def _process_options(
+        cls,
+        content: dict,
+        **options: Unpack[AsyncAPIOptions],
+    ) -> dict:
+        if 'nullable' in options:
+            content['nullable'] = options.get('nullable', False)
+
+        return content
+
     @classmethod
     def array(cls, format: dict[str, str]) -> dict:
         return {'type': 'array', 'items': format}
 
     @classmethod
-    def boolean(cls, *metadata: Any) -> dict:
-        return {'type': 'boolean'}
+    def boolean(cls, *metadata: Any, **options: Unpack[AsyncAPIOptions]) -> dict:
+        content = {'type': 'boolean'}
+        return cls._process_options(content, **options)
 
     @classmethod
-    def float_(cls, *metadata: Any) -> dict:
-        return {'type': 'float'}
+    def float_(cls, *metadata: Any, **options: Unpack[AsyncAPIOptions]) -> dict:
+        content = {'type': 'float'}
+        return cls._process_options(content, **options)
 
     @classmethod
-    def integer(cls, *metadata: Any) -> dict:
-        return {'type': 'integer'}
+    def integer(cls, *metadata: Any, **options: Unpack[AsyncAPIOptions]) -> dict:
+        content = {'type': 'integer'}
+        return cls._process_options(content, **options)
 
     @classmethod
-    def object_(cls, content: dict | None = None, *metadata: Any) -> dict:
+    def object_(
+        cls,
+        content: dict | None = None,
+        *metadata: Any,
+        **options: Unpack[AsyncAPIOptions],
+    ) -> dict:
         return {'type': 'object', 'properties': content or {}}
 
     @classmethod
-    def string(cls, *metadata: Any) -> dict:
+    def string(cls, *metadata: Any, **options: Unpack[AsyncAPIOptions]) -> dict:
         content = {'type': 'string'}
 
         for obj in metadata:
@@ -69,7 +92,7 @@ class AsyncAPITypes:
             if hasattr(obj, 'const'):
                 content['const'] = obj.const
 
-        return content
+        return cls._process_options(content, **options)
 
 
 class Converter:
@@ -84,25 +107,28 @@ class Converter:
 
     @classmethod
     def _scan_hint(cls, hint: type) -> dict[str, str]:
-        def recurse(type_: type, *metadata: Any) -> dict:
+        def recurse(
+            type_: type, *metadata: Any, **options: Unpack[AsyncAPIOptions]
+        ) -> dict:
             # Check if has a subtype i.e: type[subtype, ...]
             if origin_type := get_origin(type_):
                 subtype, *args = get_args(type_)
 
                 if origin_type is Annotated:
-                    return recurse(subtype, *args)
+                    return recurse(subtype, *args, **options)
 
                 elif origin_type is Literal:
                     return AsyncAPITypes.string(*args)
 
                 # i.e: Union[X, Y] or X | Y
                 elif origin_type in (UnionType, Union):
-                    return recurse(subtype)
+                    nullable = any([item is NoneType for item in args])
+                    return recurse(subtype, *args, nullable=nullable)
 
                 elif origin_type in (list, set, tuple):
                     if len(args) > 0:
                         raise TypeError('arrays cannot have multiple types')
-                    return AsyncAPITypes.array(recurse(subtype))
+                    return AsyncAPITypes.array(recurse(subtype, **options))
 
                 elif origin_type is dict:
                     return AsyncAPITypes.object_()
@@ -119,7 +145,7 @@ class Converter:
             # Standard types: bool, float, int, string, any...
             elif type_ in cls._type_factories.keys():
                 factory = cls._type_factories[type_]
-                return factory(*metadata)
+                return factory(*metadata, **options)
 
             raise TypeError(f'unhandled type: {type_}')
 
