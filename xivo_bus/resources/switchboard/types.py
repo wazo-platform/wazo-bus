@@ -45,7 +45,7 @@ class SwitchboardDict(TypedDict, total=False):
 
 
 class SwitchboardFallbackDict(TypedDict, total=False):
-    noanswer_destination: Any | None
+    noanswer_destination: Any
 
 
 class UserDict(TypedDict, total=False):

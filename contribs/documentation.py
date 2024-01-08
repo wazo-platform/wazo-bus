@@ -9,11 +9,12 @@ import inspect
 import logging
 import os
 import re
+import sys
+from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from copy import deepcopy
 from itertools import chain
 from pathlib import Path
-from sys import stdout
 from time import time
 from types import NoneType, UnionType
 from typing import (
@@ -33,7 +34,7 @@ import yaml
 from typing_extensions import TypeAlias, Unpack
 
 PACKAGE_NAME = 'xivo_bus'
-logging.basicConfig(stream=stdout, level=logging.DEBUG)
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
@@ -79,7 +80,8 @@ class AsyncAPITypes:
         *metadata: Any,
         **options: Unpack[AsyncAPIOptions],
     ) -> dict:
-        return {'type': 'object', 'properties': content or {}}
+        content = {'type': 'object', 'properties': content or {}}
+        return cls._process_options(content, **options)
 
     @classmethod
     def string(cls, *metadata: Any, **options: Unpack[AsyncAPIOptions]) -> dict:
@@ -88,9 +90,6 @@ class AsyncAPITypes:
         for obj in metadata:
             if hasattr(obj, 'format'):
                 content['format'] = obj.format
-
-            if hasattr(obj, 'const'):
-                content['const'] = obj.const
 
         return cls._process_options(content, **options)
 
@@ -319,18 +318,31 @@ class EventSpecificationBuilder:
         return events
 
     def generate_specifications(self, events: list[EventProxy]) -> dict:
+        failures: set[tuple[str, Exception]] = set()
+        specifications: defaultdict[str, dict] = defaultdict(dict)
+
         print(
             f'generating AsyncAPI specifications for `{self.platform_version}` '
             f'({len(events)} events)'
         )
-        specifications: dict = {}
+
         for event in events:
             service = event.service
-            if service not in specifications:
-                specifications[service] = {}
-            specifications[service].update(event.generate_specification())
-            print('.', end='')
+            try:
+                event_spec = event.generate_specification()
+            except Exception as e:
+                print('F', end='')
+                failures.add((event.name, e))
+            else:
+                print('.', end='')
+                specifications[service].update(event_spec)
         print('\n')
+
+        if failures:
+            for event_name, error in failures:
+                print(f'Failed to generate specification for {event_name}: {error}')
+            raise RuntimeError('Failed to generate AsyncAPI specifications')
+
         return specifications
 
     def write_specifications(
@@ -380,7 +392,11 @@ def generate_documentation(
     template_file: str, output_dir: str, version: str, *, dry_run: bool = False
 ) -> None:
     builder = EventSpecificationBuilder(template_file, version)
-    builder.run(output_dir, dry_run=dry_run)
+    try:
+        builder.run(output_dir, dry_run=dry_run)
+    except RuntimeError:
+        print(flush=True)
+        sys.exit('Error while generating AsyncAPI specifications, exiting...')
 
 
 if __name__ == '__main__':
