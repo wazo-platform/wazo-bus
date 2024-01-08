@@ -4,16 +4,17 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Literal
+from typing import Annotated, Literal
 
-string_formats = Literal['date', 'date-time', 'uuid']
-
-
-@dataclass
-class Metadata:
-    format: string_formats | None = field(default=None)
+_string_formats = Literal['date', 'date-time', 'uuid']
 
 
-@dataclass
+@dataclass(frozen=True)
 class Format:
-    format: string_formats | None = field(default=None)
+    format: _string_formats | None = field(default=None)
+
+
+# Type aliases
+UUIDStr = Annotated[str, Format('uuid')]
+DateTimeStr = Annotated[str, Format('date-time')]
+DateStr = Annotated[str, Format('date')]
