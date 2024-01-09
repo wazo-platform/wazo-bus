@@ -17,7 +17,7 @@ services:
         target: /var/lib/rabbitmq
 
   bus:
-    image: xivo-bus-test
+    image: local/bus-test
     volumes:
       - ../..:/usr/src/xivo-bus
     ports:
