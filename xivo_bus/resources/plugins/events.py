@@ -1,9 +1,10 @@
-# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
 
 from ..common.event import ServiceEvent
+from ..common.types import UUIDStr
 from .types import PluginErrorDict
 
 
@@ -13,7 +14,10 @@ class PluginInstallProgressEvent(ServiceEvent):
     routing_key_fmt = 'plugin.install.{uuid}.{status}'
 
     def __init__(
-        self, plugin_uuid: str, status: str, errors: PluginErrorDict | None = None
+        self,
+        plugin_uuid: UUIDStr,
+        status: str,
+        errors: PluginErrorDict | None = None,
     ):
         content = {'uuid': plugin_uuid, 'status': status}
         if errors:
@@ -27,7 +31,10 @@ class PluginUninstallProgressEvent(ServiceEvent):
     routing_key_fmt = 'plugin.uninstall.{uuid}.{status}'
 
     def __init__(
-        self, plugin_uuid: str, status: str, errors: PluginErrorDict | None = None
+        self,
+        plugin_uuid: UUIDStr,
+        status: str,
+        errors: PluginErrorDict | None = None,
     ):
         content = {'uuid': plugin_uuid, 'status': status}
         if errors:

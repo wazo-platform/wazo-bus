@@ -5,6 +5,8 @@ from __future__ import annotations
 
 from typing import TypedDict
 
+from ..common.types import UUIDStr
+
 
 class LinePresenceDict(TypedDict, total=False):
     id: int
@@ -12,32 +14,32 @@ class LinePresenceDict(TypedDict, total=False):
 
 
 class MessageDict(TypedDict, total=False):
-    uuid: str
+    uuid: UUIDStr
     content: str
     alias: str
-    user_uuid: str
-    tenant_uuid: str
-    wazo_uuid: str
+    user_uuid: UUIDStr
+    tenant_uuid: UUIDStr
+    wazo_uuid: UUIDStr
     created_at: str
     room: RoomDict
 
 
 class RoomDict(TypedDict, total=False):
-    uuid: str
-    tenant_uuid: str
+    uuid: UUIDStr
+    tenant_uuid: UUIDStr
     name: str
     users: list[RoomUserDict]
 
 
 class RoomUserDict(TypedDict, total=False):
-    uuid: str
-    tenant_uuid: str
-    wazo_uuid: str
+    uuid: UUIDStr
+    tenant_uuid: UUIDStr
+    wazo_uuid: UUIDStr
 
 
 class UserPresenceDict(TypedDict, total=False):
-    uuid: str
-    tenant_uuid: str
+    uuid: UUIDStr
+    tenant_uuid: UUIDStr
     state: str
     status: str
     last_activity: str

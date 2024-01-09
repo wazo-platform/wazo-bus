@@ -1,7 +1,8 @@
-# Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from ..common.event import TenantEvent
+from ..common.types import UUIDStr
 
 
 class SkillRuleCreatedEvent(TenantEvent):
@@ -9,7 +10,7 @@ class SkillRuleCreatedEvent(TenantEvent):
     name = 'skill_rule_created'
     routing_key_fmt = 'config.queues.skillrules.created'
 
-    def __init__(self, skill_rule_id: int, tenant_uuid: str):
+    def __init__(self, skill_rule_id: int, tenant_uuid: UUIDStr):
         content = {'id': int(skill_rule_id)}
         super().__init__(content, tenant_uuid)
 
@@ -19,7 +20,7 @@ class SkillRuleDeletedEvent(TenantEvent):
     name = 'skill_rule_deleted'
     routing_key_fmt = 'config.queues.skillrules.deleted'
 
-    def __init__(self, skill_rule_id: int, tenant_uuid: str):
+    def __init__(self, skill_rule_id: int, tenant_uuid: UUIDStr):
         content = {'id': int(skill_rule_id)}
         super().__init__(content, tenant_uuid)
 
@@ -29,6 +30,6 @@ class SkillRuleEditedEvent(TenantEvent):
     name = 'skill_rule_edited'
     routing_key_fmt = 'config.queues.skillrules.edited'
 
-    def __init__(self, skill_rule_id: int, tenant_uuid: str):
+    def __init__(self, skill_rule_id: int, tenant_uuid: UUIDStr):
         content = {'id': int(skill_rule_id)}
         super().__init__(content, tenant_uuid)

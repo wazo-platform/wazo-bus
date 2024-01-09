@@ -1,7 +1,8 @@
-# Copyright 2020-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_bus.resources.common.event import UserEvent
+from ..common.event import UserEvent
+from ..common.types import UUIDStr
 
 
 class AdhocConferenceCreatedEvent(UserEvent):
@@ -9,7 +10,12 @@ class AdhocConferenceCreatedEvent(UserEvent):
     routing_key_fmt = 'conferences.users.{user_uuid}.adhoc.created'
     service = 'calld'
 
-    def __init__(self, conference_id: int, tenant_uuid: str, user_uuid: str):
+    def __init__(
+        self,
+        conference_id: int,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
+    ):
         content = {'conference_id': conference_id}
         super().__init__(content, tenant_uuid, user_uuid)
 
@@ -19,7 +25,12 @@ class AdhocConferenceDeletedEvent(UserEvent):
     routing_key_fmt = 'conferences.users.{user_uuid}.adhoc.deleted'
     service = 'calld'
 
-    def __init__(self, conference_id: int, tenant_uuid: str, user_uuid: str):
+    def __init__(
+        self,
+        conference_id: int,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
+    ):
         content = {'conference_id': conference_id}
         super().__init__(content, tenant_uuid, user_uuid)
 
@@ -30,7 +41,11 @@ class AdhocConferenceParticipantJoinedEvent(UserEvent):
     service = 'calld'
 
     def __init__(
-        self, conference_id: int, call_id: str, tenant_uuid: str, user_uuid: str
+        self,
+        conference_id: int,
+        call_id: str,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
     ):
         content = {'conference_id': conference_id, 'call_id': call_id}
         super().__init__(content, tenant_uuid, user_uuid)
@@ -42,7 +57,11 @@ class AdhocConferenceParticipantLeftEvent(UserEvent):
     service = 'calld'
 
     def __init__(
-        self, conference_id: int, call_id: str, tenant_uuid: str, user_uuid: str
+        self,
+        conference_id: int,
+        call_id: str,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
     ):
         content = {'conference_id': conference_id, 'call_id': call_id}
         super().__init__(content, tenant_uuid, user_uuid)

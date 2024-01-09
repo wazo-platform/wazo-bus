@@ -1,7 +1,8 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from ..common.event import TenantEvent
+from ..common.types import UUIDStr
 
 
 class ParkingLotCreatedEvent(TenantEvent):
@@ -9,7 +10,7 @@ class ParkingLotCreatedEvent(TenantEvent):
     name = 'parking_lot_created'
     routing_key_fmt = 'config.parkinglots.created'
 
-    def __init__(self, parking_id: int, tenant_uuid: str):
+    def __init__(self, parking_id: int, tenant_uuid: UUIDStr):
         content = {'id': int(parking_id)}
         super().__init__(content, tenant_uuid)
 
@@ -19,7 +20,7 @@ class ParkingLotDeletedEvent(TenantEvent):
     name = 'parking_lot_deleted'
     routing_key_fmt = 'config.parkinglots.deleted'
 
-    def __init__(self, parking_id: int, tenant_uuid: str):
+    def __init__(self, parking_id: int, tenant_uuid: UUIDStr):
         content = {'id': int(parking_id)}
         super().__init__(content, tenant_uuid)
 
@@ -29,6 +30,6 @@ class ParkingLotEditedEvent(TenantEvent):
     name = 'parking_lot_edited'
     routing_key_fmt = 'config.parkinglots.edited'
 
-    def __init__(self, parking_id: int, tenant_uuid: str):
+    def __init__(self, parking_id: int, tenant_uuid: UUIDStr):
         content = {'id': int(parking_id)}
         super().__init__(content, tenant_uuid)

@@ -6,6 +6,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 
 from .abstract import EventProtocol
+from .types import UUIDStr
 
 
 class ServiceEvent(EventProtocol):
@@ -31,7 +32,7 @@ class TenantEvent(ServiceEvent):
         - tenant_uuid
     '''
 
-    def __init__(self, content: Mapping | None, tenant_uuid: str):
+    def __init__(self, content: Mapping | None, tenant_uuid: UUIDStr):
         super().__init__(content)
         if tenant_uuid is None:
             raise ValueError('tenant_uuid must have a value')
@@ -53,7 +54,10 @@ class UserEvent(TenantEvent):
     '''
 
     def __init__(
-        self, content: Mapping | None, tenant_uuid: str, user_uuid: str | None
+        self,
+        content: Mapping | None,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr | None,
     ):
         super().__init__(content, tenant_uuid)
         delattr(self, 'user_uuid:*')
@@ -84,7 +88,10 @@ class MultiUserEvent(TenantEvent):
     __slots__ = ('user_uuids',)
 
     def __init__(
-        self, content: Mapping | None, tenant_uuid: str, user_uuids: list[str]
+        self,
+        content: Mapping | None,
+        tenant_uuid: UUIDStr,
+        user_uuids: list[UUIDStr],
     ):
         super().__init__(content, tenant_uuid)
         delattr(self, 'user_uuid:*')

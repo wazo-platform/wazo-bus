@@ -5,11 +5,13 @@ from __future__ import annotations
 
 from typing import TypedDict
 
+from ..common.types import DateTimeStr, UUIDStr
+
 
 class CallLogExportDataDict(TypedDict, total=False):
-    uuid: str
-    tenant_uuid: str
-    user_uuid: str
-    requested_at: str
+    uuid: UUIDStr
+    tenant_uuid: UUIDStr
+    user_uuid: UUIDStr
+    requested_at: DateTimeStr
     filename: str
     status: str

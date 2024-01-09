@@ -5,6 +5,8 @@ from __future__ import annotations
 
 from typing import TypedDict
 
+from ..common.types import UUIDStr
+
 
 class EndpointSCCPLineDict(TypedDict, total=False):
     id: int
@@ -12,5 +14,5 @@ class EndpointSCCPLineDict(TypedDict, total=False):
 
 class EndpointSCCPDict(TypedDict, total=False):
     id: int
-    tenant_uuid: str
+    tenant_uuid: UUIDStr
     line: EndpointSCCPLineDict

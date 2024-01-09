@@ -1,12 +1,12 @@
-# Copyright 2022-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2022-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
 
 from typing import Any
 
-from xivo_bus.resources.common.event import TenantEvent, UserEvent
-
+from ..common.event import TenantEvent, UserEvent
+from ..common.types import UUIDStr
 from .types import (
     ApplicationCallDict,
     ApplicationCallPlayDict,
@@ -16,7 +16,12 @@ from .types import (
 
 
 class _ApplicationMixin:
-    def __init__(self, content: dict, application_uuid: str, *args: Any):
+    def __init__(
+        self,
+        content: dict,
+        application_uuid: UUIDStr,
+        *args: Any,
+    ):
         super().__init__(content, *args)  # type: ignore[call-arg]
         if application_uuid is None:
             raise ValueError('application_uuid must have a value')
@@ -29,7 +34,11 @@ class ApplicationCallDTMFReceivedEvent(_ApplicationMixin, TenantEvent):
     routing_key_fmt = 'applications.{application_uuid}.calls.{call_id}.dtmf.created'
 
     def __init__(
-        self, call_id: str, dtmf: str, application_uuid: str, tenant_uuid: str
+        self,
+        call_id: str,
+        dtmf: str,
+        application_uuid: UUIDStr,
+        tenant_uuid: UUIDStr,
     ):
         content = {
             'application_uuid': str(application_uuid),
@@ -47,9 +56,9 @@ class ApplicationCallEnteredEvent(_ApplicationMixin, UserEvent):
     def __init__(
         self,
         application_call: ApplicationCallDict,
-        application_uuid: str,
-        tenant_uuid: str,
-        user_uuid: str,
+        application_uuid: UUIDStr,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
     ):
         content = {'application_uuid': str(application_uuid), 'call': application_call}
         super().__init__(content, application_uuid, tenant_uuid, user_uuid)
@@ -63,9 +72,9 @@ class ApplicationCallInitiatedEvent(_ApplicationMixin, UserEvent):
     def __init__(
         self,
         application_call: ApplicationCallDict,
-        application_uuid: str,
-        tenant_uuid: str,
-        user_uuid: str,
+        application_uuid: UUIDStr,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
     ):
         content = {'application_uuid': str(application_uuid), 'call': application_call}
         super().__init__(content, application_uuid, tenant_uuid, user_uuid)
@@ -79,9 +88,9 @@ class ApplicationCallDeletedEvent(_ApplicationMixin, UserEvent):
     def __init__(
         self,
         application_call: ApplicationCallDict,
-        application_uuid: str,
-        tenant_uuid: str,
-        user_uuid: str,
+        application_uuid: UUIDStr,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
     ):
         content = {'application_uuid': str(application_uuid), 'call': application_call}
         super().__init__(content, application_uuid, tenant_uuid, user_uuid)
@@ -95,9 +104,9 @@ class ApplicationCallUpdatedEvent(_ApplicationMixin, UserEvent):
     def __init__(
         self,
         application_call: ApplicationCallDict,
-        application_uuid: str,
-        tenant_uuid: str,
-        user_uuid: str,
+        application_uuid: UUIDStr,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
     ):
         content = {'application_uuid': str(application_uuid), 'call': application_call}
         super().__init__(content, application_uuid, tenant_uuid, user_uuid)
@@ -111,9 +120,9 @@ class ApplicationCallAnsweredEvent(_ApplicationMixin, UserEvent):
     def __init__(
         self,
         application_call: ApplicationCallDict,
-        application_uuid: str,
-        tenant_uuid: str,
-        user_uuid: str,
+        application_uuid: UUIDStr,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
     ):
         content = {'application_uuid': str(application_uuid), 'call': application_call}
         super().__init__(content, application_uuid, tenant_uuid, user_uuid)
@@ -129,9 +138,9 @@ class ApplicationCallProgressStartedEvent(_ApplicationMixin, UserEvent):
     def __init__(
         self,
         application_call: ApplicationCallDict,
-        application_uuid: str,
-        tenant_uuid: str,
-        user_uuid: str,
+        application_uuid: UUIDStr,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
     ):
         content = {'application_uuid': str(application_uuid), 'call': application_call}
         super().__init__(content, application_uuid, tenant_uuid, user_uuid)
@@ -147,9 +156,9 @@ class ApplicationCallProgressStoppedEvent(_ApplicationMixin, UserEvent):
     def __init__(
         self,
         application_call: ApplicationCallDict,
-        application_uuid: str,
-        tenant_uuid: str,
-        user_uuid: str,
+        application_uuid: UUIDStr,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
     ):
         content = {'application_uuid': str(application_uuid), 'call': application_call}
         super().__init__(content, application_uuid, tenant_uuid, user_uuid)
@@ -161,7 +170,10 @@ class ApplicationDestinationNodeCreatedEvent(_ApplicationMixin, TenantEvent):
     routing_key_fmt = 'applications.{application_uuid}.nodes.created'
 
     def __init__(
-        self, node: ApplicationNodeDict, application_uuid: str, tenant_uuid: str
+        self,
+        node: ApplicationNodeDict,
+        application_uuid: UUIDStr,
+        tenant_uuid: UUIDStr,
     ):
         content = {'application_uuid': str(application_uuid), 'node': node}
         super().__init__(content, application_uuid, tenant_uuid)
@@ -173,7 +185,10 @@ class ApplicationNodeCreatedEvent(_ApplicationMixin, TenantEvent):
     routing_key_fmt = 'applications.{application_uuid}.nodes.created'
 
     def __init__(
-        self, node: ApplicationNodeDict, application_uuid: str, tenant_uuid: str
+        self,
+        node: ApplicationNodeDict,
+        application_uuid: UUIDStr,
+        tenant_uuid: UUIDStr,
     ):
         content = {'application_uuid': str(application_uuid), 'node': node}
         super().__init__(content, application_uuid, tenant_uuid)
@@ -185,7 +200,10 @@ class ApplicationNodeUpdatedEvent(_ApplicationMixin, TenantEvent):
     routing_key_fmt = 'applications.{application_uuid}.nodes.{node[uuid]}.updated'
 
     def __init__(
-        self, node: ApplicationNodeDict, application_uuid: str, tenant_uuid: str
+        self,
+        node: ApplicationNodeDict,
+        application_uuid: UUIDStr,
+        tenant_uuid: UUIDStr,
     ):
         content = {'application_uuid': str(application_uuid), 'node': node}
         super().__init__(content, application_uuid, tenant_uuid)
@@ -197,7 +215,10 @@ class ApplicationNodeDeletedEvent(_ApplicationMixin, TenantEvent):
     routing_key_fmt = 'applications.{application_uuid}.nodes.{node[uuid]}.deleted'
 
     def __init__(
-        self, node: ApplicationNodeDict, application_uuid: str, tenant_uuid: str
+        self,
+        node: ApplicationNodeDict,
+        application_uuid: UUIDStr,
+        tenant_uuid: UUIDStr,
     ):
         content = {'application_uuid': str(application_uuid), 'node': node}
         super().__init__(content, application_uuid, tenant_uuid)
@@ -211,7 +232,10 @@ class ApplicationPlaybackCreatedEvent(_ApplicationMixin, TenantEvent):
     )
 
     def __init__(
-        self, playback: ApplicationCallPlayDict, application_uuid: str, tenant_uuid: str
+        self,
+        playback: ApplicationCallPlayDict,
+        application_uuid: UUIDStr,
+        tenant_uuid: UUIDStr,
     ):
         content = {
             'application_uuid': str(application_uuid),
@@ -228,7 +252,10 @@ class ApplicationPlaybackDeletedEvent(_ApplicationMixin, TenantEvent):
     )
 
     def __init__(
-        self, playback: ApplicationCallPlayDict, application_uuid: str, tenant_uuid: str
+        self,
+        playback: ApplicationCallPlayDict,
+        application_uuid: UUIDStr,
+        tenant_uuid: UUIDStr,
     ):
         content = {
             'application_uuid': str(application_uuid),
@@ -243,7 +270,10 @@ class ApplicationSnoopCreatedEvent(_ApplicationMixin, TenantEvent):
     routing_key_fmt = 'applications.{application_uuid}.snoops.{snoop[uuid]}.created'
 
     def __init__(
-        self, snoop: ApplicationSnoopDict, application_uuid: str, tenant_uuid: str
+        self,
+        snoop: ApplicationSnoopDict,
+        application_uuid: UUIDStr,
+        tenant_uuid: UUIDStr,
     ):
         content = {'application_uuid': str(application_uuid), 'snoop': snoop}
         super().__init__(content, application_uuid, tenant_uuid)
@@ -255,7 +285,10 @@ class ApplicationSnoopUpdatedEvent(_ApplicationMixin, TenantEvent):
     routing_key_fmt = 'applications.{application_uuid}.snoops.{snoop[uuid]}.updated'
 
     def __init__(
-        self, snoop: ApplicationSnoopDict, application_uuid: str, tenant_uuid: str
+        self,
+        snoop: ApplicationSnoopDict,
+        application_uuid: UUIDStr,
+        tenant_uuid: UUIDStr,
     ):
         content = {'application_uuid': str(application_uuid), 'snoop': snoop}
         super().__init__(content, application_uuid, tenant_uuid)
@@ -267,7 +300,10 @@ class ApplicationSnoopDeletedEvent(_ApplicationMixin, TenantEvent):
     routing_key_fmt = 'applications.{application_uuid}.snoops.{snoop[uuid]}.deleted'
 
     def __init__(
-        self, snoop: ApplicationSnoopDict, application_uuid: str, tenant_uuid: str
+        self,
+        snoop: ApplicationSnoopDict,
+        application_uuid: UUIDStr,
+        tenant_uuid: UUIDStr,
     ):
         content = {'application_uuid': str(application_uuid), 'snoop': snoop}
         super().__init__(content, application_uuid, tenant_uuid)
@@ -283,9 +319,9 @@ class ApplicationUserOutgoingCallCreatedEvent(_ApplicationMixin, UserEvent):
     def __init__(
         self,
         call: ApplicationCallDict,
-        application_uuid: str,
-        tenant_uuid: str,
-        user_uuid: str,
+        application_uuid: UUIDStr,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
     ):
         content = {'application_uuid': str(application_uuid), 'call': call}
         super().__init__(content, application_uuid, tenant_uuid, user_uuid)

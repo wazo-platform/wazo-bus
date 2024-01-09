@@ -1,7 +1,8 @@
-# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_bus.resources.common.event import TenantEvent
+from ..common.event import TenantEvent
+from ..common.types import UUIDStr
 
 
 class GroupScheduleAssociatedEvent(TenantEvent):
@@ -10,7 +11,11 @@ class GroupScheduleAssociatedEvent(TenantEvent):
     routing_key_fmt = 'config.groups.schedules.updated'
 
     def __init__(
-        self, group_id: int, group_uuid: str, schedule_id: int, tenant_uuid: str
+        self,
+        group_id: int,
+        group_uuid: UUIDStr,
+        schedule_id: int,
+        tenant_uuid: UUIDStr,
     ):
         content = {
             'group_id': group_id,
@@ -26,7 +31,11 @@ class GroupScheduleDissociatedEvent(TenantEvent):
     routing_key_fmt = 'config.groups.schedules.deleted'
 
     def __init__(
-        self, group_id: int, group_uuid: str, schedule_id: int, tenant_uuid: str
+        self,
+        group_id: int,
+        group_uuid: UUIDStr,
+        schedule_id: int,
+        tenant_uuid: UUIDStr,
     ):
         content = {
             'group_id': group_id,

@@ -1,4 +1,4 @@
-# Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
@@ -9,6 +9,7 @@ from typing import Any
 from ..common.acl import escape as escape_acl
 from ..common.event import MultiUserEvent, TenantEvent
 from ..common.routing_key import escape as escape_key
+from ..common.types import UUIDStr
 from .types import (
     HeldCallDict,
     QueuedCallDict,
@@ -18,7 +19,12 @@ from .types import (
 
 
 class _SwitchboardMixin:
-    def __init__(self, content: Mapping, switchboard_uuid: str, *args: Any):
+    def __init__(
+        self,
+        content: Mapping,
+        switchboard_uuid: UUIDStr,
+        *args: Any,
+    ):
         super().__init__(content, *args)  # type: ignore[call-arg]
         if switchboard_uuid is None:
             raise ValueError('switchboard_uuid must have a value')
@@ -32,7 +38,10 @@ class SwitchboardCreatedEvent(_SwitchboardMixin, TenantEvent):
     required_acl_fmt = 'switchboards.{switchboard_uuid}.created'
 
     def __init__(
-        self, switchboard: SwitchboardDict, switchboard_uuid: str, tenant_uuid: str
+        self,
+        switchboard: SwitchboardDict,
+        switchboard_uuid: UUIDStr,
+        tenant_uuid: UUIDStr,
     ):
         super().__init__(switchboard, switchboard_uuid, tenant_uuid)
 
@@ -44,7 +53,10 @@ class SwitchboardDeletedEvent(_SwitchboardMixin, TenantEvent):
     required_acl_fmt = 'switchboards.{switchboard_uuid}.deleted'
 
     def __init__(
-        self, switchboard: SwitchboardDict, switchboard_uuid: str, tenant_uuid: str
+        self,
+        switchboard: SwitchboardDict,
+        switchboard_uuid: UUIDStr,
+        tenant_uuid: UUIDStr,
     ):
         super().__init__(switchboard, switchboard_uuid, tenant_uuid)
 
@@ -56,7 +68,10 @@ class SwitchboardEditedEvent(_SwitchboardMixin, TenantEvent):
     required_acl_fmt = 'switchboards.{switchboard_uuid}.edited'
 
     def __init__(
-        self, switchboard: SwitchboardDict, switchboard_uuid: str, tenant_uuid: str
+        self,
+        switchboard: SwitchboardDict,
+        switchboard_uuid: UUIDStr,
+        tenant_uuid: UUIDStr,
     ):
         super().__init__(switchboard, switchboard_uuid, tenant_uuid)
 
@@ -68,7 +83,10 @@ class SwitchboardFallbackEditedEvent(_SwitchboardMixin, TenantEvent):
     required_acl_fmt = 'switchboards.fallbacks.edited'
 
     def __init__(
-        self, fallback: SwitchboardFallbackDict, switchboard_uuid: str, tenant_uuid: str
+        self,
+        fallback: SwitchboardFallbackDict,
+        switchboard_uuid: UUIDStr,
+        tenant_uuid: UUIDStr,
     ):
         super().__init__(fallback, switchboard_uuid, tenant_uuid)
 
@@ -79,7 +97,12 @@ class SwitchboardMemberUserAssociatedEvent(_SwitchboardMixin, MultiUserEvent):
     routing_key_fmt = 'config.switchboards.{switchboard_uuid}.members.users.updated'
     required_acl_fmt = 'switchboards.{switchboard_uuid}.members.users.updated'
 
-    def __init__(self, switchboard_uuid: str, tenant_uuid: str, user_uuids: list[str]):
+    def __init__(
+        self,
+        switchboard_uuid: UUIDStr,
+        tenant_uuid: UUIDStr,
+        user_uuids: list[str],
+    ):
         content = {
             'switchboard_uuid': str(switchboard_uuid),
             'users': [{'uuid': str(uuid)} for uuid in user_uuids],
@@ -93,7 +116,10 @@ class SwitchboardQueuedCallsUpdatedEvent(_SwitchboardMixin, TenantEvent):
     routing_key_fmt = 'switchboards.{switchboard_uuid}.calls.queued.updated'
 
     def __init__(
-        self, items: list[QueuedCallDict], switchboard_uuid: str, tenant_uuid: str
+        self,
+        items: list[QueuedCallDict],
+        switchboard_uuid: UUIDStr,
+        tenant_uuid: UUIDStr,
     ):
         content = {
             'switchboard_uuid': str(switchboard_uuid),
@@ -114,8 +140,8 @@ class SwitchboardQueuedCallAnsweredEvent(_SwitchboardMixin, TenantEvent):
         self,
         operator_call_id: str,
         queued_call_id: str,
-        switchboard_uuid: str,
-        tenant_uuid: str,
+        switchboard_uuid: UUIDStr,
+        tenant_uuid: UUIDStr,
     ):
         content = {
             'switchboard_uuid': str(switchboard_uuid),
@@ -137,7 +163,10 @@ class SwitchboardHeldCallsUpdatedEvent(_SwitchboardMixin, TenantEvent):
     routing_key_fmt = 'switchboards.{switchboard_uuid}.calls.held.updated'
 
     def __init__(
-        self, items: list[HeldCallDict], switchboard_uuid: str, tenant_uuid: str
+        self,
+        items: list[HeldCallDict],
+        switchboard_uuid: UUIDStr,
+        tenant_uuid: UUIDStr,
     ):
         content = {
             'switchboard_uuid': str(switchboard_uuid),
@@ -158,8 +187,8 @@ class SwitchboardHeldCallAnsweredEvent(_SwitchboardMixin, TenantEvent):
         self,
         operator_call_id: str,
         held_call_id: str,
-        switchboard_uuid: str,
-        tenant_uuid: str,
+        switchboard_uuid: UUIDStr,
+        tenant_uuid: UUIDStr,
     ):
         content = {
             'switchboard_uuid': str(switchboard_uuid),

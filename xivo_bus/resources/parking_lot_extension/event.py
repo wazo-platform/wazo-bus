@@ -1,7 +1,8 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_bus.resources.common.event import TenantEvent
+from ..common.event import TenantEvent
+from ..common.types import UUIDStr
 
 
 class ParkingLotExtensionAssociatedEvent(TenantEvent):
@@ -9,7 +10,12 @@ class ParkingLotExtensionAssociatedEvent(TenantEvent):
     name = 'parking_lot_extension_associated'
     routing_key_fmt = 'config.parkinglots.extensions.updated'
 
-    def __init__(self, parking_id: int, extension_id: int, tenant_uuid: str):
+    def __init__(
+        self,
+        parking_id: int,
+        extension_id: int,
+        tenant_uuid: UUIDStr,
+    ):
         content = {
             'parking_lot_id': parking_id,
             'extension_id': extension_id,
@@ -22,7 +28,12 @@ class ParkingLotExtensionDissociatedEvent(TenantEvent):
     name = 'parking_lot_extension_dissociated'
     routing_key_fmt = 'config.parkinglots.extensions.deleted'
 
-    def __init__(self, parking_id: int, extension_id: int, tenant_uuid: str):
+    def __init__(
+        self,
+        parking_id: int,
+        extension_id: int,
+        tenant_uuid: UUIDStr,
+    ):
         content = {
             'parking_lot_id': parking_id,
             'extension_id': extension_id,

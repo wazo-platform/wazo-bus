@@ -1,4 +1,4 @@
-# Copyright 2022-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2022-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
@@ -9,64 +9,170 @@ import inspect
 import logging
 import os
 import re
+import sys
+from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from copy import deepcopy
 from itertools import chain
 from pathlib import Path
-from sys import stdout
 from time import time
-from typing import Any
+from types import NoneType, UnionType
+from typing import (
+    Annotated,
+    Any,
+    Callable,
+    Literal,
+    TypedDict,
+    Union,
+    get_args,
+    get_origin,
+    get_type_hints,
+    is_typeddict,
+)
 
 import yaml
-from typing_extensions import TypeAlias
+from typing_extensions import TypeAlias, Unpack
 
 PACKAGE_NAME = 'xivo_bus'
-
-logging.basicConfig(stream=stdout, level=logging.DEBUG)
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
+class AsyncAPIOptions(TypedDict, total=False):
+    nullable: bool
+
+
 class AsyncAPITypes:
-    @staticmethod
-    def string(*, many: bool = False) -> dict:
-        fmt = {'type': 'string'}
-        return AsyncAPITypes.array(fmt) if many else fmt
+    @classmethod
+    def _process_options(
+        cls,
+        content: dict,
+        **options: Unpack[AsyncAPIOptions],
+    ) -> dict:
+        if 'nullable' in options:
+            content['nullable'] = options.get('nullable', False)
 
-    @staticmethod
-    def boolean(*, many: bool = False) -> dict:
-        fmt = {'type': 'boolean'}
-        return AsyncAPITypes.array(fmt) if many else fmt
+        return content
 
-    @staticmethod
-    def integer(*, many: bool = False) -> dict:
-        fmt = {'type': 'integer'}
-        return AsyncAPITypes.array(fmt) if many else fmt
+    @classmethod
+    def array(cls, format: dict[str, str]) -> dict:
+        return {'type': 'array', 'items': format}
 
-    @staticmethod
-    def float_(*, many: bool = False) -> dict:
-        fmt = {'type': 'float'}
-        return AsyncAPITypes.array(fmt) if many else fmt
+    @classmethod
+    def boolean(cls, *metadata: Any, **options: Unpack[AsyncAPIOptions]) -> dict:
+        content = {'type': 'boolean'}
+        return cls._process_options(content, **options)
 
-    @staticmethod
-    def uuid(*, many: bool = False) -> dict:
-        fmt = {'type': 'string', 'format': 'uuid'}
-        return AsyncAPITypes.array(fmt) if many else fmt
+    @classmethod
+    def float_(cls, *metadata: Any, **options: Unpack[AsyncAPIOptions]) -> dict:
+        content = {'type': 'float'}
+        return cls._process_options(content, **options)
 
-    @staticmethod
-    def datetime(*, many: bool = False) -> dict:
-        fmt = {'type': 'string', 'format': 'date-time'}
-        return AsyncAPITypes.array(fmt) if many else fmt
+    @classmethod
+    def integer(cls, *metadata: Any, **options: Unpack[AsyncAPIOptions]) -> dict:
+        content = {'type': 'integer'}
+        return cls._process_options(content, **options)
 
-    @staticmethod
-    def array(type_: Any) -> dict:
-        return {'type': 'array', 'items': type_}
+    @classmethod
+    def object_(
+        cls,
+        content: dict | None = None,
+        *metadata: Any,
+        **options: Unpack[AsyncAPIOptions],
+    ) -> dict:
+        content = {'type': 'object', 'properties': content or {}}
+        return cls._process_options(content, **options)
 
-    @staticmethod
-    def object_(dict_: dict | None = None) -> dict:
-        return {'type': 'object', 'properties': dict_ or {}}
+    @classmethod
+    def string(cls, *metadata: Any, **options: Unpack[AsyncAPIOptions]) -> dict:
+        content = {'type': 'string'}
+
+        for obj in metadata:
+            if hasattr(obj, 'format'):
+                content['format'] = obj.format
+
+        return cls._process_options(content, **options)
 
 
-class Event:
+class Converter:
+    _type_factories: dict[type | Any, Callable[..., dict]] = {
+        Any: AsyncAPITypes.object_,
+        bool: AsyncAPITypes.boolean,
+        dict: AsyncAPITypes.object_,
+        float: AsyncAPITypes.float_,
+        int: AsyncAPITypes.integer,
+        str: AsyncAPITypes.string,
+    }
+
+    @classmethod
+    def _scan_hint(cls, hint: type) -> dict[str, str]:
+        def recurse(
+            type_: type, *metadata: Any, **options: Unpack[AsyncAPIOptions]
+        ) -> dict:
+            # Check if has a subtype i.e: type[subtype, ...]
+            if origin_type := get_origin(type_):
+                subtype, *args = get_args(type_)
+
+                if origin_type is Annotated:
+                    return recurse(subtype, *args, **options)
+
+                elif origin_type is Literal:
+                    return AsyncAPITypes.string(*args)
+
+                # i.e: Union[X, Y] or X | Y
+                elif origin_type in (UnionType, Union):
+                    nullable = any([item is NoneType for item in args])
+                    return recurse(subtype, *args, nullable=nullable)
+
+                elif origin_type in (list, set, tuple):
+                    if len(args) > 0:
+                        raise TypeError('arrays cannot have multiple types')
+                    return AsyncAPITypes.array(recurse(subtype, **options))
+
+                elif origin_type is dict:
+                    return AsyncAPITypes.object_()
+
+            elif is_typeddict(type_):
+                content = {
+                    name: recurse(subtype)
+                    for name, subtype in get_type_hints(
+                        type_, include_extras=True
+                    ).items()
+                }
+                return AsyncAPITypes.object_(content)
+
+            # Standard types: bool, float, int, string, any...
+            elif type_ in cls._type_factories.keys():
+                factory = cls._type_factories[type_]
+                return factory(*metadata, **options)
+
+            raise TypeError(f'unhandled type: {type_}')
+
+        return recurse(hint)
+
+    @classmethod
+    def from_init(cls, class_: type, *, ignore_keys: set[str] | None = None) -> dict:
+        ignore_keys = ignore_keys or set()
+        init_fn = getattr(class_, '__init__')
+
+        hints: dict[str, type] = {
+            param: type_
+            for param, type_ in get_type_hints(init_fn, include_extras=True).items()
+            if param not in ignore_keys
+        }
+
+        return {param: cls._scan_hint(hint) for param, hint in hints.items()}
+
+
+class EventProxy:
+    _DEFAULT_PAYLOAD_IGNORE_KEYS = {
+        'self',
+        'return',
+        'tenant_uuid',
+        'user_uuid',
+        'user_uuids',
+    }
+
     def __init__(self, class_: type):
         self.class_ = class_
         sig = inspect.signature(getattr(class_, '__init__'))
@@ -125,7 +231,7 @@ class Event:
             headers['tenant_uuid'] = {'$ref': '#/components/schemas/tenant_uuid'}
             required.append('tenant_uuid')
 
-        if 'user_uuid' in self._keys:
+        if any([key in self._keys for key in ('user_uuid', 'user_uuids')]):
             headers['user_uuid:{uuid}'] = {
                 '$ref': '#/components/schemas/user_uuid:{uuid}'
             }
@@ -134,28 +240,8 @@ class Event:
         return {'type': 'object', 'properties': headers, 'required': required}
 
     def generate_payload(self) -> dict:
-        content = {}
-        keys_ignore_list = ('tenant_uuid', 'user_uuid', 'self')
-        content_keys = [key for key in self._keys if key not in keys_ignore_list]
-
-        for key in content_keys:
-            if key.endswith('uuid'):
-                content[key] = AsyncAPITypes.uuid()
-            elif key.endswith('uuids'):
-                content[key] = AsyncAPITypes.uuid(many=True)
-            elif key.endswith(('id', 'number')):
-                content[key] = AsyncAPITypes.integer()
-            elif key.startswith('is_'):
-                content[key] = AsyncAPITypes.boolean()
-            elif key.endswith('_at'):
-                content[key] = AsyncAPITypes.datetime()
-            elif key.endswith(('_data', '_info', '_schema')):
-                content[key] = AsyncAPITypes.object_()
-            else:
-                content[key] = AsyncAPITypes.string()
-
-        return AsyncAPITypes.object_(
-            dict(data=AsyncAPITypes.object_(content)),
+        return Converter.from_init(
+            self.class_, ignore_keys=self._DEFAULT_PAYLOAD_IGNORE_KEYS
         )
 
     def generate_parameters(self) -> dict:
@@ -210,8 +296,8 @@ class EventSpecificationBuilder:
         entrypoint = inspect.getfile(module)
         return Path(os.path.dirname(entrypoint))
 
-    def get_resource_events(self, resource_path: Path) -> list[Event]:
-        events: list[Event] = []
+    def get_resource_events(self, resource_path: Path) -> list[EventProxy]:
+        events: list[EventProxy] = []
         file_paths = sorted(resource_path.glob('*.py'))
 
         for path in file_paths:
@@ -225,24 +311,38 @@ class EventSpecificationBuilder:
                 continue
 
             events.extend(
-                Event(cls) for _, cls in inspect.getmembers(module, Event.is_event)
+                EventProxy(cls)
+                for _, cls in inspect.getmembers(module, EventProxy.is_event)
             )
 
         return events
 
-    def generate_specifications(self, events: list[Event]) -> dict:
+    def generate_specifications(self, events: list[EventProxy]) -> dict:
+        failures: set[tuple[str, Exception]] = set()
+        specifications: defaultdict[str, dict] = defaultdict(dict)
+
         print(
             f'generating AsyncAPI specifications for `{self.platform_version}` '
             f'({len(events)} events)'
         )
-        specifications: dict = {}
+
         for event in events:
             service = event.service
-            if service not in specifications:
-                specifications[service] = {}
-            specifications[service].update(event.generate_specification())
-            print('.', end='')
+            try:
+                event_spec = event.generate_specification()
+            except Exception as e:
+                print('F', end='')
+                failures.add((event.name, e))
+            else:
+                print('.', end='')
+                specifications[service].update(event_spec)
         print('\n')
+
+        if failures:
+            for event_name, error in failures:
+                print(f'Failed to generate specification for {event_name}: {error}')
+            raise RuntimeError('Failed to generate AsyncAPI specifications')
+
         return specifications
 
     def write_specifications(
@@ -292,7 +392,11 @@ def generate_documentation(
     template_file: str, output_dir: str, version: str, *, dry_run: bool = False
 ) -> None:
     builder = EventSpecificationBuilder(template_file, version)
-    builder.run(output_dir, dry_run=dry_run)
+    try:
+        builder.run(output_dir, dry_run=dry_run)
+    except RuntimeError:
+        print(flush=True)
+        sys.exit('Error while generating AsyncAPI specifications, exiting...')
 
 
 if __name__ == '__main__':

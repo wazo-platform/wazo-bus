@@ -1,7 +1,8 @@
-# Copyright 2022-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2022-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from ..common.event import UserEvent
+from ..common.types import UUIDStr
 from .types import CallDict, RelocateDict, TransferDict
 
 
@@ -11,7 +12,12 @@ class CallCreatedEvent(UserEvent):
     routing_key_fmt = 'calls.call.created'
     required_acl_fmt = 'events.calls.{user_uuid}'
 
-    def __init__(self, call: CallDict, tenant_uuid: str, user_uuid: str):
+    def __init__(
+        self,
+        call: CallDict,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
+    ):
         super().__init__(call, tenant_uuid, user_uuid)
 
 
@@ -21,7 +27,12 @@ class CallEndedEvent(UserEvent):
     routing_key_fmt = 'calls.call.ended'
     required_acl_fmt = 'events.calls.{user_uuid}'
 
-    def __init__(self, call: CallDict, tenant_uuid: str, user_uuid: str):
+    def __init__(
+        self,
+        call: CallDict,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
+    ):
         super().__init__(call, tenant_uuid, user_uuid)
 
 
@@ -31,7 +42,12 @@ class CallUpdatedEvent(UserEvent):
     routing_key_fmt = 'calls.call.updated'
     required_acl_fmt = 'events.calls.{user_uuid}'
 
-    def __init__(self, call: CallDict, tenant_uuid: str, user_uuid: str):
+    def __init__(
+        self,
+        call: CallDict,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
+    ):
         super().__init__(call, tenant_uuid, user_uuid)
 
 
@@ -41,7 +57,12 @@ class CallAnsweredEvent(UserEvent):
     routing_key_fmt = 'calls.call.answered'
     required_acl_fmt = 'events.calls.{user_uuid}'
 
-    def __init__(self, call: CallDict, tenant_uuid: str, user_uuid: str):
+    def __init__(
+        self,
+        call: CallDict,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
+    ):
         super().__init__(call, tenant_uuid, user_uuid)
 
 
@@ -52,7 +73,11 @@ class CallDTMFEvent(UserEvent):
     required_acl_fmt = 'events.calls.{user_uuid}'
 
     def __init__(
-        self, call_id: str, digit_number: str, tenant_uuid: str, user_uuid: str
+        self,
+        call_id: str,
+        digit_number: str,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
     ):
         content = {
             'call_id': call_id,
@@ -68,7 +93,12 @@ class CallHeldEvent(UserEvent):
     routing_key_fmt = 'calls.hold.created'
     required_acl_fmt = 'events.calls.{user_uuid}'
 
-    def __init__(self, call_id: str, tenant_uuid: str, user_uuid: str):
+    def __init__(
+        self,
+        call_id: str,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
+    ):
         content = {
             'call_id': call_id,
             'user_uuid': str(user_uuid),
@@ -82,7 +112,12 @@ class CallResumedEvent(UserEvent):
     routing_key_fmt = 'calls.hold.deleted'
     required_acl_fmt = 'events.calls.{user_uuid}'
 
-    def __init__(self, call_id: str, tenant_uuid: str, user_uuid: str):
+    def __init__(
+        self,
+        call_id: str,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
+    ):
         content = {
             'call_id': call_id,
             'user_uuid': str(user_uuid),
@@ -96,7 +131,12 @@ class MissedCallEvent(UserEvent):
     routing_key_fmt = 'calls.missed'
     required_acl_fmt = 'events.calls.{user_uuid}'
 
-    def __init__(self, call: CallDict, tenant_uuid: str, user_uuid: str):
+    def __init__(
+        self,
+        call: CallDict,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
+    ):
         super().__init__(call, tenant_uuid, user_uuid)
 
 
@@ -106,7 +146,12 @@ class CallRelocateInitiatedEvent(UserEvent):
     routing_key_fmt = 'calls.relocate.created'
     required_acl_fmt = 'events.relocates.{user_uuid}'
 
-    def __init__(self, relocate: RelocateDict, tenant_uuid: str, user_uuid: str):
+    def __init__(
+        self,
+        relocate: RelocateDict,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
+    ):
         super().__init__(relocate, tenant_uuid, user_uuid)
 
 
@@ -116,7 +161,12 @@ class CallRelocateAnsweredEvent(UserEvent):
     routing_key_fmt = 'calls.relocate.edited'
     required_acl_fmt = 'events.relocates.{user_uuid}'
 
-    def __init__(self, relocate: RelocateDict, tenant_uuid: str, user_uuid: str):
+    def __init__(
+        self,
+        relocate: RelocateDict,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
+    ):
         super().__init__(relocate, tenant_uuid, user_uuid)
 
 
@@ -126,7 +176,12 @@ class CallRelocateCompletedEvent(UserEvent):
     routing_key_fmt = 'calls.relocate.edited'
     required_acl_fmt = 'events.relocates.{user_uuid}'
 
-    def __init__(self, relocate: RelocateDict, tenant_uuid: str, user_uuid: str):
+    def __init__(
+        self,
+        relocate: RelocateDict,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
+    ):
         super().__init__(relocate, tenant_uuid, user_uuid)
 
 
@@ -136,7 +191,12 @@ class CallRelocateEndedEvent(UserEvent):
     routing_key_fmt = 'calls.relocate.deleted'
     required_acl_fmt = 'events.relocates.{user_uuid}'
 
-    def __init__(self, relocate: RelocateDict, tenant_uuid: str, user_uuid: str):
+    def __init__(
+        self,
+        relocate: RelocateDict,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
+    ):
         super().__init__(relocate, tenant_uuid, user_uuid)
 
 
@@ -146,7 +206,12 @@ class CallTransferCreatedEvent(UserEvent):
     routing_key_fmt = 'calls.transfer.created'
     required_acl_fmt = 'events.transfers.{user_uuid}'
 
-    def __init__(self, transfer: TransferDict, tenant_uuid: str, user_uuid: str):
+    def __init__(
+        self,
+        transfer: TransferDict,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
+    ):
         super().__init__(transfer, tenant_uuid, user_uuid)
 
 
@@ -156,7 +221,12 @@ class CallTransferUpdatedEvent(UserEvent):
     routing_key_fmt = 'calls.transfer.created'
     required_acl_fmt = 'events.transfers.{user_uuid}'
 
-    def __init__(self, transfer: TransferDict, tenant_uuid: str, user_uuid: str):
+    def __init__(
+        self,
+        transfer: TransferDict,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
+    ):
         super().__init__(transfer, tenant_uuid, user_uuid)
 
 
@@ -166,7 +236,12 @@ class CallTransferAnsweredEvent(UserEvent):
     routing_key_fmt = 'calls.transfer.edited'
     required_acl_fmt = 'events.transfers.{user_uuid}'
 
-    def __init__(self, transfer: TransferDict, tenant_uuid: str, user_uuid: str):
+    def __init__(
+        self,
+        transfer: TransferDict,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
+    ):
         super().__init__(transfer, tenant_uuid, user_uuid)
 
 
@@ -176,7 +251,12 @@ class CallTransferCancelledEvent(UserEvent):
     routing_key_fmt = 'calls.transfer.edited'
     required_acl_fmt = 'events.transfers.{user_uuid}'
 
-    def __init__(self, transfer: TransferDict, tenant_uuid: str, user_uuid: str):
+    def __init__(
+        self,
+        transfer: TransferDict,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
+    ):
         super().__init__(transfer, tenant_uuid, user_uuid)
 
 
@@ -186,7 +266,12 @@ class CallTransferCompletedEvent(UserEvent):
     routing_key_fmt = 'calls.transfer.edited'
     required_acl_fmt = 'events.transfers.{user_uuid}'
 
-    def __init__(self, transfer: TransferDict, tenant_uuid: str, user_uuid: str):
+    def __init__(
+        self,
+        transfer: TransferDict,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
+    ):
         super().__init__(transfer, tenant_uuid, user_uuid)
 
 
@@ -196,7 +281,12 @@ class CallTransferAbandonedEvent(UserEvent):
     routing_key_fmt = 'calls.transfer.edited'
     required_acl_fmt = 'events.transfers.{user_uuid}'
 
-    def __init__(self, transfer: TransferDict, tenant_uuid: str, user_uuid: str):
+    def __init__(
+        self,
+        transfer: TransferDict,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
+    ):
         super().__init__(transfer, tenant_uuid, user_uuid)
 
 
@@ -206,5 +296,10 @@ class CallTransferEndedEvent(UserEvent):
     routing_key_fmt = 'calls.transfer.deleted'
     required_acl_fmt = 'events.transfers.{user_uuid}'
 
-    def __init__(self, transfer: TransferDict, tenant_uuid: str, user_uuid: str):
+    def __init__(
+        self,
+        transfer: TransferDict,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
+    ):
         super().__init__(transfer, tenant_uuid, user_uuid)

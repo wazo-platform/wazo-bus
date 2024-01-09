@@ -1,7 +1,8 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_bus.resources.common.event import UserEvent
+from ..common.event import UserEvent
+from ..common.types import UUIDStr
 
 
 class FavoriteAddedEvent(UserEvent):
@@ -13,9 +14,9 @@ class FavoriteAddedEvent(UserEvent):
         self,
         source_name: str,
         entry_id: str,
-        wazo_uuid: str,
-        tenant_uuid: str,
-        user_uuid: str,
+        wazo_uuid: UUIDStr,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
     ):
         content = {
             'xivo_uuid': str(wazo_uuid),
@@ -35,9 +36,9 @@ class FavoriteDeletedEvent(UserEvent):
         self,
         source_name: str,
         entry_id: str,
-        wazo_uuid: str,
-        tenant_uuid: str,
-        user_uuid: str,
+        wazo_uuid: UUIDStr,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
     ):
         content = {
             'xivo_uuid': str(wazo_uuid),

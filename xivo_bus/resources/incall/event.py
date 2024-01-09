@@ -1,7 +1,8 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_bus.resources.common.event import TenantEvent
+from ..common.event import TenantEvent
+from ..common.types import UUIDStr
 
 
 class IncallCreatedEvent(TenantEvent):
@@ -9,7 +10,7 @@ class IncallCreatedEvent(TenantEvent):
     name = 'incall_created'
     routing_key_fmt = 'config.incalls.created'
 
-    def __init__(self, incall_id: int, tenant_uuid: str):
+    def __init__(self, incall_id: int, tenant_uuid: UUIDStr):
         content = {'id': incall_id}
         super().__init__(content, tenant_uuid)
 
@@ -19,7 +20,7 @@ class IncallDeletedEvent(TenantEvent):
     name = 'incall_deleted'
     routing_key_fmt = 'config.incalls.deleted'
 
-    def __init__(self, incall_id: int, tenant_uuid: str):
+    def __init__(self, incall_id: int, tenant_uuid: UUIDStr):
         content = {'id': incall_id}
         super().__init__(content, tenant_uuid)
 
@@ -29,6 +30,6 @@ class IncallEditedEvent(TenantEvent):
     name = 'incall_edited'
     routing_key_fmt = 'config.incalls.edited'
 
-    def __init__(self, incall_id: int, tenant_uuid: str):
+    def __init__(self, incall_id: int, tenant_uuid: UUIDStr):
         content = {'id': incall_id}
         super().__init__(content, tenant_uuid)

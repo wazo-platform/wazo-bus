@@ -5,27 +5,29 @@ from __future__ import annotations
 
 from typing import TypedDict
 
+from ..common.types import DateTimeStr, UUIDStr
+
 
 class ApplicationCallDict(TypedDict, total=False):
     id: str
     caller_id_name: str
     caller_id_number: str
-    creation_time: str
+    creation_time: DateTimeStr
     status: str
     on_hold: bool
     is_caller: bool
     dialed_extension: str
     variables: dict[str, str]
-    node_uuid: str
-    moh_uuid: str
+    node_uuid: UUIDStr
+    moh_uuid: UUIDStr
     muted: bool
     snoops: dict[str, str]
-    user_uuid: str
-    tenant_uuid: str
+    user_uuid: UUIDStr
+    tenant_uuid: UUIDStr
 
 
 class ApplicationCallPlayDict(TypedDict, total=False):
-    uuid: str
+    uuid: UUIDStr
     uri: str
     language: str
 
@@ -35,12 +37,12 @@ class ApplicationNodeCallDict(TypedDict, total=False):
 
 
 class ApplicationNodeDict(TypedDict, total=False):
-    uuid: str
+    uuid: UUIDStr
     calls: list[ApplicationNodeCallDict]
 
 
 class ApplicationSnoopDict(TypedDict, total=False):
-    uuid: str
+    uuid: UUIDStr
     snooped_call_id: str
     snooping_call_id: str
 
@@ -59,7 +61,7 @@ class CallDict(TypedDict, total=False):
     muted: bool
     record_state: str
     talking_to: dict[str, str]
-    user_uuid: str
+    user_uuid: UUIDStr
     is_caller: bool
     is_video: bool
     dialed_extension: str
@@ -70,7 +72,7 @@ class CallDict(TypedDict, total=False):
 
 
 class RelocateDict(TypedDict, total=False):
-    uuid: str
+    uuid: UUIDStr
     relocated_call: str
     initiator_call: str
     recipient_call: str
@@ -82,8 +84,8 @@ class RelocateDict(TypedDict, total=False):
 
 class TransferDict(TypedDict, total=False):
     id: str
-    initiator_uuid: str
-    initiator_tenant_uuid: str
+    initiator_uuid: UUIDStr
+    initiator_tenant_uuid: UUIDStr
     transferred_call: str
     initiator_call: str
     recipient_call: str

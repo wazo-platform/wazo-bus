@@ -1,7 +1,8 @@
-# Copyright 2013-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_bus.resources.common.event import TenantEvent
+from ..common.event import TenantEvent
+from ..common.types import UUIDStr
 
 
 class ExtensionCreatedEvent(TenantEvent):
@@ -9,7 +10,13 @@ class ExtensionCreatedEvent(TenantEvent):
     name = 'extension_created'
     routing_key_fmt = 'config.extensions.created'
 
-    def __init__(self, extension_id: int, exten: str, context: str, tenant_uuid: str):
+    def __init__(
+        self,
+        extension_id: int,
+        exten: str,
+        context: str,
+        tenant_uuid: UUIDStr,
+    ):
         content = {
             'id': int(extension_id),
             'exten': exten,
@@ -23,7 +30,13 @@ class ExtensionDeletedEvent(TenantEvent):
     name = 'extension_deleted'
     routing_key_fmt = 'config.extensions.deleted'
 
-    def __init__(self, extension_id: int, exten: str, context: str, tenant_uuid: str):
+    def __init__(
+        self,
+        extension_id: int,
+        exten: str,
+        context: str,
+        tenant_uuid: UUIDStr,
+    ):
         content = {
             'id': int(extension_id),
             'exten': exten,
@@ -37,7 +50,13 @@ class ExtensionEditedEvent(TenantEvent):
     name = 'extension_edited'
     routing_key_fmt = 'config.extensions.edited'
 
-    def __init__(self, extension_id: int, exten: str, context: str, tenant_uuid: str):
+    def __init__(
+        self,
+        extension_id: int,
+        exten: str,
+        context: str,
+        tenant_uuid: UUIDStr,
+    ):
         content = {
             'id': int(extension_id),
             'exten': exten,

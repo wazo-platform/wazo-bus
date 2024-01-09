@@ -1,9 +1,11 @@
-# Copyright 2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2023-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
 
 from typing import TypedDict
+
+from ..common.types import UUIDStr
 
 
 class FaxDict(TypedDict, total=False):
@@ -14,5 +16,5 @@ class FaxDict(TypedDict, total=False):
     caller_id: str
     ivr_extension: str
     wait_time: int
-    user_uuid: str
-    tenant_uuid: str
+    user_uuid: UUIDStr
+    tenant_uuid: UUIDStr
