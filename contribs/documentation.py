@@ -151,7 +151,7 @@ class Converter:
                         type_, include_extras=True
                     ).items()
                 }
-                return AsyncAPITypes.object_(content)
+                return AsyncAPITypes.object_(content, **options)
 
             # Standard types: bool, float, int, string, any...
             elif type_ in cls._type_factories.keys():
