@@ -40,6 +40,8 @@ logger = logging.getLogger(__name__)
 
 class AsyncAPIOptions(TypedDict, total=False):
     nullable: bool
+    const: str
+    enum: list
 
 
 class AsyncAPITypes:
@@ -51,6 +53,12 @@ class AsyncAPITypes:
     ) -> dict:
         if 'nullable' in options:
             content['nullable'] = options.get('nullable', False)
+
+        if 'const' in options:
+            content['const'] = options['const']
+
+        if 'enum' in options:
+            content['enum'] = options['enum']
 
         return content
 
@@ -117,12 +125,16 @@ class Converter:
                     return recurse(subtype, *args, **options)
 
                 elif origin_type is Literal:
-                    return AsyncAPITypes.string(*args)
+                    if len(args) > 0:
+                        return recurse(type(subtype), enum=[subtype, *args])
+                    return recurse(type(subtype), const=subtype)
 
                 # i.e: Union[X, Y] or X | Y
+                # Note: we currently do not support multiple type in the API,
+                #       other types will be omitted from the spec
                 elif origin_type in (UnionType, Union):
                     nullable = any([item is NoneType for item in args])
-                    return recurse(subtype, *args, nullable=nullable)
+                    return recurse(subtype, nullable=nullable)
 
                 elif origin_type in (list, set, tuple):
                     if len(args) > 0:
@@ -130,7 +142,7 @@ class Converter:
                     return AsyncAPITypes.array(recurse(subtype, **options))
 
                 elif origin_type is dict:
-                    return AsyncAPITypes.object_()
+                    return AsyncAPITypes.object_(**options)
 
             elif is_typeddict(type_):
                 content = {
