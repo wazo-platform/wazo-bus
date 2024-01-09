@@ -1,6 +1,7 @@
 # Copyright 2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import json
 import os
 import subprocess
 from tempfile import TemporaryDirectory
@@ -51,22 +52,24 @@ class TestDocumentation(AbstractAssetLaunchingHelper, TestCase):
         options: list[str] = cls._docker_compose_options()
         args: list[str] = [
             'run',
+            '--no-TTY',  # needed for docker-compose v2.2.3 (https://github.com/orgs/community/discussions/11011)
             '-v',
             f'{path}:/{name}.yml',
             cls.validator,
             'validate',
+            '--diagnostics-format',
+            'json',
             f'/{name}.yml',
         ]
 
         return _run_cmd(program + options + args)
 
     @classmethod
-    def _has_errors(cls, process: subprocess.CompletedProcess) -> bool:
-        output = process.stdout.decode().strip().split('\n')
+    def _parse_errors(cls, process: subprocess.CompletedProcess) -> list[str]:
+        output = process.stdout.decode().split('\n')
+        issues = json.loads(''.join(output[2:]))
 
-        if '0 errors' not in output[-1]:
-            return True
-        return False
+        return [issue['message'] for issue in issues if issue['severity'] == 0]
 
     def test_documentation_is_valid(self):
         with TemporaryDirectory() as basepath:
@@ -82,10 +85,14 @@ class TestDocumentation(AbstractAssetLaunchingHelper, TestCase):
                 name, extension = os.path.splitext(filename)
                 if extension.endswith('yml'):
                     result = self._validate_specfile(name, path)
-                    result.check_returncode()
 
-                    if self._has_errors(result):
+                    if result.returncode != 0:
                         print(result.stdout.decode())
+                        raise DockerError('an error occured within the validator')
+
+                    if errors := self._parse_errors(result):
+                        for error in errors:
+                            print(error)
                         raise ValidationError(
-                            f'An error occured while validating {name} specification file'
+                            f'Validation failed for {name} specification file'
                         )
