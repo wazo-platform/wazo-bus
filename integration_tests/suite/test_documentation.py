@@ -30,7 +30,7 @@ class TestDocumentation(AbstractAssetLaunchingHelper, TestCase):
     def _generate_specfiles(
         cls, output_directory: os.PathLike
     ) -> subprocess.CompletedProcess:
-        program: list[str] = ['docker', 'compose']
+        program: list[str] = ['docker-compose']
         options: list[str] = cls._docker_compose_options()
         args: list[str] = [
             'run',
@@ -47,7 +47,7 @@ class TestDocumentation(AbstractAssetLaunchingHelper, TestCase):
     def _validate_specfile(
         cls, name: str, path: os.PathLike
     ) -> subprocess.CompletedProcess:
-        program: list[str] = ['docker', 'compose']
+        program: list[str] = ['docker-compose']
         options: list[str] = cls._docker_compose_options()
         args: list[str] = [
             'run',
