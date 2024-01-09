@@ -14,7 +14,7 @@ services:
       - ../../xivo_bus:/app/xivo_bus:ro
 
   spec-validator:
-    image: asyncapi/cli:latest
+    image: asyncapi/cli
 
   rabbitmq:
     profiles:
