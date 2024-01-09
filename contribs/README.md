@@ -18,3 +18,14 @@ where:
   * stack_version: version to write in the specification files
 
 The docker will then append and write each event's documentation to its microservice specification file.
+
+
+## Validation
+
+To validate the generated specification files, [asyncapi-cli](https://github.com/asyncapi/cli) should be used:
+
+1. `docker run -v ${spec_file}:/{service_name}.yml -i asyncapi/cli:latest validate /{service_name}.yml`
+
+where:
+  * spec_file: absolute path to the specification file you wish to validate
+  * service_name: service name to use by the validator
