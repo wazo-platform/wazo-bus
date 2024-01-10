@@ -36,7 +36,7 @@ class AsteriskReloadProgressEvent(ServiceEvent):
         uuid: UUIDStr,
         status: str,
         command: str,
-        request_uuids: list[str],
+        request_uuids: list[UUIDStr],
     ):
         content = {
             'uuid': str(uuid),
