@@ -11,7 +11,7 @@ services:
       dockerfile: contribs/Dockerfile
     volumes:
       - ../../contribs/documentation.py:/app/documentation.py:ro
-      - ../../xivo_bus:/app/xivo_bus:ro
+      - ../../wazo_bus:/app/wazo_bus:ro
 
   spec-validator:
     image: asyncapi/cli:latest

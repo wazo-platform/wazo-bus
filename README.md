@@ -1,7 +1,7 @@
-xivo-bus [![Build Status](https://jenkins.wazo.community/buildStatus/icon?job=xivo-bus)](https://jenkins.wazo.community/job/xivo-bus)
+wazo-bus [![Build Status](https://jenkins.wazo.community/buildStatus/icon?job=wazo-bus)](https://jenkins.wazo.community/job/wazo-bus)
 ========
 
-xivo-bus is a library used internally in Wazo to communicate with other components
+wazo-bus is a library used internally in Wazo to communicate with other components
 of Wazo using RabbitMQ
 
 
@@ -10,7 +10,7 @@ Running unit tests
 
 ```
 pip install tox
-tox --recreate -e py37
+tox -e py39
 ```
 
 Running integration tests
@@ -21,10 +21,10 @@ tox -e integration
 ```
 
 
-Building xivo-bus
+Building wazo-bus
 -----------------
 
-Use the following commands to build `xivo-bus` manually. The resulting packages will be in the
+Use the following commands to build `wazo-bus` manually. The resulting packages will be in the
 parent directory.
 
 ```sh
