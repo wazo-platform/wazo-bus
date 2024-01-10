@@ -12,6 +12,11 @@ from wazo_test_helpers.asset_launching_test_case import (
     _run_cmd,
 )
 
+# Note: The --no-TTY is needed for correct output with docker-compose v2.2.3
+#       see https://github.com/orgs/community/discussions/11011
+#       This has been fixed and not needed in future version (tested >= 2.21.X+)
+_DOCKER_RUN_COMMAND = ['run', '--rm', '--no-TTY']
+
 
 class DockerError(Exception):
     pass
@@ -28,40 +33,37 @@ class TestDocumentation(AbstractAssetLaunchingHelper, TestCase):
     validator = 'spec-validator'
 
     @classmethod
+    def setUpClass(cls) -> None:
+        cls.pull_containers()
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        cls._maybe_dump_docker_logs()
+
+    @classmethod
     def _generate_specfiles(
         cls, output_directory: os.PathLike
     ) -> subprocess.CompletedProcess:
-        program: list[str] = ['docker-compose']
-        options: list[str] = cls._docker_compose_options()
-        args: list[str] = [
-            'run',
-            '-v',
-            f'{output_directory}:/app/output',
-            cls.service,
-            '-p',
-            'test-version',
-        ]
+        program = ['docker-compose']
+        options = cls._docker_compose_options()
+        volumes = ['-v', f'{output_directory}:/app/output']
+        service = [cls.service]
+        service_args = ['-p', 'test-version']
 
+        args = _DOCKER_RUN_COMMAND + volumes + service + service_args
         return _run_cmd(program + options + args)
 
     @classmethod
     def _validate_specfile(
         cls, name: str, path: os.PathLike
     ) -> subprocess.CompletedProcess:
-        program: list[str] = ['docker-compose']
-        options: list[str] = cls._docker_compose_options()
-        args: list[str] = [
-            'run',
-            '--no-TTY',  # needed for docker-compose v2.2.3 (https://github.com/orgs/community/discussions/11011)
-            '-v',
-            f'{path}:/{name}.yml',
-            cls.validator,
-            'validate',
-            '--diagnostics-format',
-            'json',
-            f'/{name}.yml',
-        ]
+        program = ['docker-compose']
+        options = cls._docker_compose_options()
+        volumes = ['-v', f'{path}:/{name}.yml']
+        service = [cls.validator]
+        service_args = ['validate', '--diagnostics-format', 'json', f'/{name}.yml']
 
+        args = _DOCKER_RUN_COMMAND + volumes + service + service_args
         return _run_cmd(program + options + args)
 
     @classmethod
@@ -88,7 +90,7 @@ class TestDocumentation(AbstractAssetLaunchingHelper, TestCase):
 
                     if result.returncode != 0:
                         print(result.stdout.decode())
-                        raise DockerError('an error occured within the validator')
+                        raise DockerError('Failed to run AsyncAPI validator')
 
                     if errors := self._parse_errors(result):
                         for error in errors:
