@@ -1,4 +1,4 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
@@ -25,6 +25,9 @@ class CollectdEvent(EventProtocol):
     time: str | int = 'N'
     type_instance: str | None = None
     values: tuple[str, ...] = ()
+
+    def __init__(self, content: dict | None = None):
+        self.content = content or {}
 
     @property
     @abstractmethod
