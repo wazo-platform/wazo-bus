@@ -113,7 +113,7 @@ class Converter:
     }
 
     @classmethod
-    def _scan_hint(cls, hint: type) -> dict[str, str]:
+    def _scan_hint(cls, hint: type) -> dict[str, Any]:
         def recurse(
             type_: type, *metadata: Any, **options: Unpack[AsyncAPIOptions]
         ) -> dict:
@@ -173,7 +173,15 @@ class Converter:
             if param not in ignore_keys
         }
 
-        return {param: cls._scan_hint(hint) for param, hint in hints.items()}
+        payload = {param: cls._scan_hint(hint) for param, hint in hints.items()}
+
+        # If there's only 1 key, flatten the dict
+        if len(payload.keys()) == 1:
+            key, value = payload.popitem()
+            if value['type'] == 'object':
+                return AsyncAPITypes.object_(value['properties'])
+            return AsyncAPITypes.object_({key: value})
+        return AsyncAPITypes.object_(payload)
 
 
 class EventProxy:
