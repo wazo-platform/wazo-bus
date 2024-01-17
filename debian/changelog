@@ -1,4 +1,4 @@
-wazo-bus (24.01) UNRELEASED; urgency=medium
+wazo-bus (24.01~20230104) wazo-dev-bullseye; urgency=medium
 
   * rename xivo-bus to wazo_bus
 
