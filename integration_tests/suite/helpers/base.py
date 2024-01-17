@@ -1,4 +1,4 @@
-# Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import os
@@ -12,8 +12,8 @@ from wazo_test_helpers.asset_launching_test_case import (
     NoSuchService,
 )
 
-from xivo_bus.consumer import BusConsumer
-from xivo_bus.publisher import BusPublisherWithQueue
+from wazo_bus.consumer import BusConsumer
+from wazo_bus.publisher import BusPublisherWithQueue
 
 from .accumulator import MessageAccumulator
 from .remote_bus import RemoteBusApiClient

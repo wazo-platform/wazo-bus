@@ -5,9 +5,9 @@
 from setuptools import find_packages, setup
 
 setup(
-    name='xivo-bus',
-    version='0.1',
-    description='XiVO BUS libraries',
+    name='wazo-bus',
+    version='0.2',
+    description='Wazo bus library',
     install_requires=["kombu==5.0.2", "typing_extensions==4.4.0"],
     author='Wazo Authors',
     author_email='dev@wazo.community',

@@ -7,16 +7,16 @@ ENV PATH="/opt/venv/bin:$PATH"
 RUN apt-get -q update
 RUN apt-get -yq install netcat
 
-COPY requirements.txt /usr/src/xivo-bus/requirements.txt
-WORKDIR /usr/src/xivo-bus
+COPY requirements.txt /usr/src/wazo-bus/requirements.txt
+WORKDIR /usr/src/wazo-bus
 RUN pip install --upgrade pip
 RUN pip install flask -r requirements.txt
 
 COPY integration_tests/docker/entrypoint.sh /usr/bin/entrypoint.sh
 COPY integration_tests/docker/remote-bus-pilot.py /usr/src/remote-bus-pilot.py
-COPY . /usr/src/xivo-bus
+COPY . /usr/src/wazo-bus
 
 WORKDIR /usr/src
-RUN pip install -e xivo-bus
+RUN pip install -e wazo-bus
 
 ENTRYPOINT ["/usr/bin/entrypoint.sh"]

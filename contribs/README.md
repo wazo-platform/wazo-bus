@@ -1,7 +1,7 @@
 # AsyncAPI Documentation Generator
 
 This role of this docker is to parse and generate asyncapi documentation for
-all events found in the `xivo_bus/resources` directory.
+all events found in the `wazo_bus/resources` directory.
 
 ## Usage
 

@@ -1,10 +1,18 @@
-# Copyright 2013-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_bus.consumer import BusConsumer
-from xivo_bus.publisher import BusPublisher
+import sys
+import warnings
 
-__all__ = [
-    'BusConsumer',
-    'BusPublisher',
-]
+import wazo_bus
+
+warnings.simplefilter('module', category=DeprecationWarning)
+warnings.warn(
+    f'{__name__} is deprecated and will be removed in the future, '
+    'Please use `wazo_bus` instead.',
+    DeprecationWarning,
+    stacklevel=2,
+)
+
+# Note: Alias xivo_bus to wazo_bus
+sys.modules['xivo_bus'] = wazo_bus

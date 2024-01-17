@@ -19,7 +19,7 @@ services:
   bus:
     image: local/bus-test
     volumes:
-      - ../..:/usr/src/xivo-bus
+      - ../..:/usr/src/wazo-bus
     ports:
       - "5000"
     environment:
