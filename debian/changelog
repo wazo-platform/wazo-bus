@@ -1,6 +1,6 @@
 wazo-bus (24.01~20230104) wazo-dev-bullseye; urgency=medium
 
-  * rename xivo-bus to wazo_bus
+  * rename xivo-bus to wazo-bus
 
  -- Wazo Maintainers <dev+pkg@wazo.community>  Thu, 04 Jan 2024 15:02:01 -0500
 
