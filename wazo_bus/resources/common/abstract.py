@@ -1,4 +1,4 @@
-# Copyright 2022-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2022-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
@@ -6,6 +6,9 @@ from __future__ import annotations
 from abc import ABCMeta, abstractmethod
 from collections.abc import Mapping
 from typing import Any, Protocol
+
+from .acl import escape as escape_acl
+from .routing_key import escape as escape_key
 
 
 class EventProtocol(Protocol):
@@ -49,6 +52,10 @@ class EventProtocol(Protocol):
     def routing_key(self) -> str:
         variables = dict(**self.content)
         variables.update(vars(self), name=self.name)
+        variables = {
+            key: escape_key(value) if isinstance(value, str) else value
+            for key, value in variables.items()
+        }
         return self.routing_key_fmt.format(**variables)
 
     @property
@@ -59,6 +66,10 @@ class EventProtocol(Protocol):
         if hasattr(self, 'required_acl_fmt'):
             variables = dict(**self.content)
             variables.update(vars(self), name=self.name)
+            variables = {
+                key: escape_acl(value) if isinstance(value, str) else value
+                for key, value in variables.items()
+            }
             return self.required_acl_fmt.format(**variables)
         return f'events.{self.routing_key}'
 

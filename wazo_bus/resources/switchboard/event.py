@@ -6,9 +6,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any
 
-from ..common.acl import escape as escape_acl
 from ..common.event import MultiUserEvent, TenantEvent
-from ..common.routing_key import escape as escape_key
 from ..common.types import UUIDStr
 from .types import (
     HeldCallDict,
@@ -114,6 +112,7 @@ class SwitchboardQueuedCallsUpdatedEvent(_SwitchboardMixin, TenantEvent):
     service = 'calld'
     name = 'switchboard_queued_calls_updated'
     routing_key_fmt = 'switchboards.{switchboard_uuid}.calls.queued.updated'
+    required_acl_fmt = 'events.switchboards.{switchboard_uuid}.calls.queued.updated'
 
     def __init__(
         self,
@@ -132,9 +131,9 @@ class SwitchboardQueuedCallAnsweredEvent(_SwitchboardMixin, TenantEvent):
     service = 'calld'
     name = 'switchboard_queued_call_answered'
     routing_key_fmt = (
-        'switchboards.{{switchboard_uuid}}.calls.queued.{queued_call_id}.answer.updated'
+        'switchboards.{switchboard_uuid}.calls.queued.{queued_call_id}.answer.updated'
     )
-    required_acl_fmt = 'events.switchboards.{{switchboard_uuid}}.calls.queued.{queued_call_id}.answer.updated'
+    required_acl_fmt = 'events.switchboards.{switchboard_uuid}.calls.queued.{queued_call_id}.answer.updated'
 
     def __init__(
         self,
@@ -148,12 +147,6 @@ class SwitchboardQueuedCallAnsweredEvent(_SwitchboardMixin, TenantEvent):
             'operator_call_id': operator_call_id,
             'queued_call_id': queued_call_id,
         }
-        self.routing_key_fmt = self.routing_key_fmt.format(
-            queued_call_id=escape_key(queued_call_id)
-        )
-        self.required_acl_fmt = self.required_acl_fmt.format(
-            queued_call_id=escape_acl(queued_call_id)
-        )
         super().__init__(content, switchboard_uuid, tenant_uuid)
 
 
@@ -161,6 +154,7 @@ class SwitchboardHeldCallsUpdatedEvent(_SwitchboardMixin, TenantEvent):
     service = 'calld'
     name = 'switchboard_held_calls_updated'
     routing_key_fmt = 'switchboards.{switchboard_uuid}.calls.held.updated'
+    required_acl_fmt = 'events.switchboards.{switchboard_uuid}.calls.held.updated'
 
     def __init__(
         self,
@@ -179,9 +173,9 @@ class SwitchboardHeldCallAnsweredEvent(_SwitchboardMixin, TenantEvent):
     service = 'calld'
     name = 'switchboard_held_call_answered'
     routing_key_fmt = (
-        'switchboards.{{switchboard_uuid}}.calls.held.{held_call_id}.answer.updated'
+        'switchboards.{switchboard_uuid}.calls.held.{held_call_id}.answer.updated'
     )
-    required_acl_fmt = 'events.switchboards.{{switchboard_uuid}}.calls.held.{held_call_id}.answer.updated'
+    required_acl_fmt = 'events.switchboards.{switchboard_uuid}.calls.held.{held_call_id}.answer.updated'
 
     def __init__(
         self,
@@ -195,10 +189,4 @@ class SwitchboardHeldCallAnsweredEvent(_SwitchboardMixin, TenantEvent):
             'operator_call_id': operator_call_id,
             'held_call_id': held_call_id,
         }
-        self.routing_key_fmt = self.routing_key_fmt.format(
-            held_call_id=escape_key(held_call_id)
-        )
-        self.required_acl_fmt = self.required_acl_fmt.format(
-            held_call_id=escape_acl(held_call_id)
-        )
         super().__init__(content, switchboard_uuid, tenant_uuid)
