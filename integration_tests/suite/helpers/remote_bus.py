@@ -1,11 +1,11 @@
-# Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import requests
 
 
 class RemoteBusApiClient:
-    def __init__(self, host='localhost', port=5000):
+    def __init__(self, host='127.0.0.1', port=5000):
         self._base_url = f'http://{host}:{port}'
 
     def _make_url(self, *part):
