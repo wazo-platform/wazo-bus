@@ -86,7 +86,7 @@ class BusIntegrationTest(AssetLaunchingTestCase):
             port = cls.service_port(5000, 'bus')
         except NoSuchService:
             return
-        return RemoteBusApiClient(host='localhost', port=port)
+        return RemoteBusApiClient(host='127.0.0.1', port=port)
 
     @classmethod
     @contextmanager
