@@ -73,7 +73,7 @@ class AsyncAPITypes:
 
     @classmethod
     def float_(cls, *metadata: Any, **options: Unpack[AsyncAPIOptions]) -> dict:
-        content = {'type': 'float'}
+        content = {'type': 'number', 'format': 'float'}
         return cls._process_options(content, **options)
 
     @classmethod
