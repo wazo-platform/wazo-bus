@@ -18,7 +18,7 @@ class CallParkedEvent(TenantEvent):
         call_id: str,
         parking_id: int,
         slot: str,
-        timeout_at: str,
+        timeout_at: str | None,
         tenant_uuid: UUIDStr,
     ):
         content = {
