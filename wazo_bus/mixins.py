@@ -255,6 +255,13 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
     ) -> None:
         with self.__lock:
             subscriptions = self.__subscriptions[event_name].copy()
+        if subscriptions:
+            self.log.debug(
+                'Received bus event: name=%s, headers=%s, payload=%s',
+                event_name,
+                headers,
+                payload,
+            )
         for handler, _ in subscriptions:
             try:
                 handler(payload)
