@@ -61,7 +61,14 @@ class TestDocumentation(AbstractAssetLaunchingHelper, TestCase):
         options = cls._docker_compose_options()
         volumes = ['-v', f'{path}:/{name}.yml']
         service = [cls.validator]
-        service_args = ['validate', '--diagnostics-format', 'json', f'/{name}.yml']
+        service_args = [
+            'validate',
+            '--fail-severity',
+            'error',
+            '--diagnostics-format',
+            'json',
+            f'/{name}.yml',
+        ]
 
         args = _DOCKER_RUN_COMMAND + volumes + service + service_args
         return _run_cmd(program + options + args)
@@ -69,8 +76,8 @@ class TestDocumentation(AbstractAssetLaunchingHelper, TestCase):
     @classmethod
     def _parse_errors(cls, process: subprocess.CompletedProcess) -> list[str]:
         output = process.stdout.decode().split('\n')
-        issues = json.loads(''.join(output[2:]))
-
+        starting_json = output.index('[')
+        issues = json.loads(''.join(output[starting_json:]))
         return [issue['message'] for issue in issues if issue['severity'] == 0]
 
     def test_documentation_is_valid(self):
@@ -89,11 +96,7 @@ class TestDocumentation(AbstractAssetLaunchingHelper, TestCase):
                     result = self._validate_specfile(name, path)
 
                     if result.returncode != 0:
-                        print(result.stdout.decode())
-                        raise DockerError('Failed to run AsyncAPI validator')
-
-                    if errors := self._parse_errors(result):
-                        for error in errors:
+                        for error in self._parse_errors(result):
                             print(error)
                         raise ValidationError(
                             f'Validation failed for {name} specification file'
