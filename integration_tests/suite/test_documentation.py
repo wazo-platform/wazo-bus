@@ -69,7 +69,8 @@ class TestDocumentation(AbstractAssetLaunchingHelper, TestCase):
     @classmethod
     def _parse_errors(cls, process: subprocess.CompletedProcess) -> list[str]:
         output = process.stdout.decode().split('\n')
-        issues = json.loads(''.join(output[2:]))
+        starting_json = output.index('[')
+        issues = json.loads(''.join(output[starting_json:]))
 
         return [issue['message'] for issue in issues if issue['severity'] == 0]
 
