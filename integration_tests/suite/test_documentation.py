@@ -12,10 +12,7 @@ from wazo_test_helpers.asset_launching_test_case import (
     _run_cmd,
 )
 
-# Note: The --no-TTY is needed for correct output with docker-compose v2.2.3
-#       see https://github.com/orgs/community/discussions/11011
-#       This has been fixed and not needed in future version (tested >= 2.21.X+)
-_DOCKER_RUN_COMMAND = ['run', '--rm', '--no-TTY']
+_DOCKER_RUN_COMMAND = ['run', '--rm']
 
 
 class DockerError(Exception):
@@ -44,7 +41,7 @@ class TestDocumentation(AbstractAssetLaunchingHelper, TestCase):
     def _generate_specfiles(
         cls, output_directory: os.PathLike
     ) -> subprocess.CompletedProcess:
-        program = ['docker-compose']
+        program = ['docker', 'compose']
         options = cls._docker_compose_options()
         volumes = ['-v', f'{output_directory}:/app/output']
         service = [cls.service]
@@ -57,7 +54,7 @@ class TestDocumentation(AbstractAssetLaunchingHelper, TestCase):
     def _validate_specfile(
         cls, name: str, path: os.PathLike
     ) -> subprocess.CompletedProcess:
-        program = ['docker-compose']
+        program = ['docker', 'compose']
         options = cls._docker_compose_options()
         volumes = ['-v', f'{path}:/{name}.yml']
         service = [cls.validator]
