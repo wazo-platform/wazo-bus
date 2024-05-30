@@ -18,6 +18,7 @@ class CallParkedEvent(TenantEvent):
         call_id: str,
         parking_id: int,
         slot: str,
+        parked_at: str,
         timeout_at: str | None,
         tenant_uuid: UUIDStr,
     ):
@@ -25,6 +26,7 @@ class CallParkedEvent(TenantEvent):
             'call_id': call_id,
             'parking_id': parking_id,
             'slot': slot,
+            'parked_at': parked_at,
             'timeout_at': timeout_at,
         }
         super().__init__(content, tenant_uuid)
@@ -41,6 +43,7 @@ class CallUnparkedEvent(TenantEvent):
         call_id: str,
         parking_id: int,
         slot: str,
+        parked_since: str,
         retriever_call_id: str,
         tenant_uuid: UUIDStr,
     ):
@@ -48,6 +51,7 @@ class CallUnparkedEvent(TenantEvent):
             'call_id': call_id,
             'parking_id': parking_id,
             'slot': slot,
+            'parked_since': parked_since,
             'retriever_call_id': retriever_call_id,
         }
         super().__init__(content, tenant_uuid)
