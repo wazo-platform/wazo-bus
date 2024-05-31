@@ -10,8 +10,8 @@ from ..common.types import UUIDStr
 class CallParkedEvent(TenantEvent):
     service = 'calld'
     name = 'call_parked'
-    routing_key_fmt = 'calls.park.created'
-    required_acl_fmt = 'events.calls.{call_id}'
+    routing_key_fmt = 'parkings.{parking_id}.calls.updated'
+    required_acl_fmt = 'events.parkings.{parking_id}.calls.updated'
 
     def __init__(
         self,
@@ -35,8 +35,8 @@ class CallParkedEvent(TenantEvent):
 class CallUnparkedEvent(TenantEvent):
     service = 'calld'
     name = 'call_unparked'
-    routing_key_fmt = 'calls.park.deleted'
-    required_acl_fmt = 'events.calls.{call_id}'
+    routing_key_fmt = 'parkings.{parking_id}.calls.updated'
+    required_acl_fmt = 'events.parkings.{parking_id}.calls.updated'
 
     def __init__(
         self,
@@ -60,8 +60,8 @@ class CallUnparkedEvent(TenantEvent):
 class ParkedCallHungupEvent(TenantEvent):
     service = 'calld'
     name = 'parked_call_hungup'
-    routing_key_fmt = 'calls.park.deleted'
-    required_acl_fmt = 'events.calls.{call_id}'
+    routing_key_fmt = 'parkings.{parking_id}.calls.updated'
+    required_acl_fmt = 'events.parkings.{parking_id}.calls.updated'
 
     def __init__(
         self,
@@ -83,8 +83,8 @@ class ParkedCallHungupEvent(TenantEvent):
 class ParkedCallTimedOutEvent(TenantEvent):
     service = 'calld'
     name = 'parked_call_timed_out'
-    routing_key_fmt = 'calls.park.deleted'
-    required_acl_fmt = 'events.calls.{call_id}'
+    routing_key_fmt = 'parkings.{parking_id}.calls.updated'
+    required_acl_fmt = 'events.parkings.{parking_id}.calls.updated'
 
     def __init__(
         self,
