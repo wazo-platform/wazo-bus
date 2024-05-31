@@ -12,6 +12,7 @@ class ApplicationCallDict(TypedDict, total=False):
     id: str
     caller_id_name: str
     caller_id_number: str
+    conversation_id: str
     creation_time: DateTimeStr
     status: str
     on_hold: bool
