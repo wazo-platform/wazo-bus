@@ -87,6 +87,8 @@ class ParkedCallDict(TypedDict, total=False):
 
 class UnparkedCallDict(ParkedCallDict, total=False):
     retriever_call_id: str
+    retriever_caller_id_name: str
+    retriever_caller_id_num: str
 
 
 class ParkedCallTimedOutDict(ParkedCallDict, total=False):
