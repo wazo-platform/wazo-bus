@@ -5,6 +5,7 @@ from __future__ import annotations
 
 from ..common.event import TenantEvent
 from ..common.types import UUIDStr
+from .types import ParkedCallDict, ParkedCallTimedOutDict, UnparkedCallDict
 
 
 class CallParkedEvent(TenantEvent):
@@ -13,23 +14,8 @@ class CallParkedEvent(TenantEvent):
     routing_key_fmt = 'parkings.{parking_id}.calls.updated'
     required_acl_fmt = 'events.parkings.{parking_id}.calls.updated'
 
-    def __init__(
-        self,
-        call_id: str,
-        parking_id: int,
-        slot: str,
-        parked_at: str,
-        timeout_at: str | None,
-        tenant_uuid: UUIDStr,
-    ):
-        content = {
-            'call_id': call_id,
-            'parking_id': parking_id,
-            'slot': slot,
-            'parked_at': parked_at,
-            'timeout_at': timeout_at,
-        }
-        super().__init__(content, tenant_uuid)
+    def __init__(self, parked_call: ParkedCallDict, tenant_uuid: UUIDStr):
+        super().__init__(parked_call, tenant_uuid)
 
 
 class CallUnparkedEvent(TenantEvent):
@@ -38,23 +24,8 @@ class CallUnparkedEvent(TenantEvent):
     routing_key_fmt = 'parkings.{parking_id}.calls.updated'
     required_acl_fmt = 'events.parkings.{parking_id}.calls.updated'
 
-    def __init__(
-        self,
-        call_id: str,
-        parking_id: int,
-        slot: str,
-        parked_since: str,
-        retriever_call_id: str,
-        tenant_uuid: UUIDStr,
-    ):
-        content = {
-            'call_id': call_id,
-            'parking_id': parking_id,
-            'slot': slot,
-            'parked_since': parked_since,
-            'retriever_call_id': retriever_call_id,
-        }
-        super().__init__(content, tenant_uuid)
+    def __init__(self, unparked_call: UnparkedCallDict, tenant_uuid: str):
+        super().__init__(unparked_call, tenant_uuid)
 
 
 class ParkedCallHungupEvent(TenantEvent):
@@ -63,21 +34,8 @@ class ParkedCallHungupEvent(TenantEvent):
     routing_key_fmt = 'parkings.{parking_id}.calls.updated'
     required_acl_fmt = 'events.parkings.{parking_id}.calls.updated'
 
-    def __init__(
-        self,
-        call_id: str,
-        parking_id: int,
-        slot: str,
-        parked_since: str,
-        tenant_uuid: UUIDStr,
-    ):
-        content = {
-            'call_id': call_id,
-            'parking_id': parking_id,
-            'slot': slot,
-            'parked_since': parked_since,
-        }
-        super().__init__(content, tenant_uuid)
+    def __init__(self, parked_call: ParkedCallDict, tenant_uuid: str):
+        super().__init__(parked_call, tenant_uuid)
 
 
 class ParkedCallTimedOutEvent(TenantEvent):
@@ -86,18 +44,5 @@ class ParkedCallTimedOutEvent(TenantEvent):
     routing_key_fmt = 'parkings.{parking_id}.calls.updated'
     required_acl_fmt = 'events.parkings.{parking_id}.calls.updated'
 
-    def __init__(
-        self,
-        call_id: str,
-        parking_id: int,
-        dialed_extension: str | None,
-        parked_since: str,
-        tenant_uuid: UUIDStr,
-    ):
-        content = {
-            'call_id': call_id,
-            'parking_id': parking_id,
-            'dialed_extension': dialed_extension,
-            'parked_since': parked_since,
-        }
-        super().__init__(content, tenant_uuid)
+    def __init__(self, parked_call: ParkedCallTimedOutDict, tenant_uuid: str):
+        super().__init__(parked_call, tenant_uuid)
