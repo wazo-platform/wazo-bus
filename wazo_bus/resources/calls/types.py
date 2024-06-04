@@ -72,6 +72,29 @@ class CallDict(TypedDict, total=False):
     direction: str
 
 
+class ParkedCallDict(TypedDict, total=False):
+    parking_id: int
+    call_id: str
+    conversation_id: str
+    caller_id_name: str
+    caller_id_num: str
+    parker_caller_id_name: str
+    parker_caller_id_num: str
+    slot: str
+    parked_at: DateTimeStr
+    timeout_at: DateTimeStr | None
+
+
+class UnparkedCallDict(ParkedCallDict, total=False):
+    retriever_call_id: str
+    retriever_caller_id_name: str
+    retriever_caller_id_num: str
+
+
+class ParkedCallTimedOutDict(ParkedCallDict, total=False):
+    dialed_extension: str
+
+
 class RelocateDict(TypedDict, total=False):
     uuid: UUIDStr
     relocated_call: str
