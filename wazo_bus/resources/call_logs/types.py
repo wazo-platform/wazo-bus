@@ -49,6 +49,7 @@ class CDRDataDict(TypedDict, total=False):
     answered: bool
     duration: float
     call_drection: str
+    conversation_id: str
     destination_details: DestinationDetailsDict
     destination_extension: str
     destination_internal_context: str
