@@ -1,4 +1,4 @@
-# Copyright 2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2023-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
@@ -13,3 +13,4 @@ class PushMobileDict(TypedDict, total=False):
     video: bool
     ring_timeout: int
     sip_call_id: str
+    mobile_wakeup_timestamp: str  # iso-formatted timestamp
