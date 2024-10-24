@@ -258,9 +258,13 @@ class ApplicationPlaybackDeletedEvent(_ApplicationMixin, TenantEvent):
         playback: ApplicationCallPlayDict,
         application_uuid: UUIDStr,
         tenant_uuid: UUIDStr,
+        call_id: str,
+        conversation_id: str,
     ):
         content = {
             'application_uuid': str(application_uuid),
+            'call_id': call_id,
+            'conversation_id': conversation_id,
             'playback': playback,
         }
         super().__init__(content, application_uuid, tenant_uuid)
