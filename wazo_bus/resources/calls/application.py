@@ -36,6 +36,7 @@ class ApplicationCallDTMFReceivedEvent(_ApplicationMixin, TenantEvent):
     def __init__(
         self,
         call_id: str,
+        conversation_id: str,
         dtmf: str,
         application_uuid: UUIDStr,
         tenant_uuid: UUIDStr,
@@ -43,6 +44,7 @@ class ApplicationCallDTMFReceivedEvent(_ApplicationMixin, TenantEvent):
         content = {
             'application_uuid': str(application_uuid),
             'call_id': call_id,
+            'conversation_id': conversation_id,
             'dtmf': dtmf,
         }
         super().__init__(content, application_uuid, tenant_uuid)
@@ -236,9 +238,13 @@ class ApplicationPlaybackCreatedEvent(_ApplicationMixin, TenantEvent):
         playback: ApplicationCallPlayDict,
         application_uuid: UUIDStr,
         tenant_uuid: UUIDStr,
+        call_id: str,
+        conversation_id: str,
     ):
         content = {
             'application_uuid': str(application_uuid),
+            'call_id': call_id,
+            'conversation_id': conversation_id,
             'playback': playback,
         }
         super().__init__(content, application_uuid, tenant_uuid)
@@ -256,9 +262,13 @@ class ApplicationPlaybackDeletedEvent(_ApplicationMixin, TenantEvent):
         playback: ApplicationCallPlayDict,
         application_uuid: UUIDStr,
         tenant_uuid: UUIDStr,
+        call_id: str,
+        conversation_id: str,
     ):
         content = {
             'application_uuid': str(application_uuid),
+            'call_id': call_id,
+            'conversation_id': conversation_id,
             'playback': playback,
         }
         super().__init__(content, application_uuid, tenant_uuid)
