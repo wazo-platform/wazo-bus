@@ -7,4 +7,5 @@ from typing import TypedDict
 
 
 class LocalizationDict(TypedDict):
+    tenant_uuid: str
     country: str
