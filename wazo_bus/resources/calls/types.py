@@ -1,4 +1,4 @@
-# Copyright 2023-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2023-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
@@ -115,3 +115,7 @@ class TransferDict(TypedDict, total=False):
     recipient_call: str
     status: str
     flow: str
+
+
+class CallRecordingDict(TypedDict, total=False):
+    call_id: str
