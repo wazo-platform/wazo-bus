@@ -1,9 +1,9 @@
-# Copyright 2022-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2022-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from ..common.event import UserEvent
 from ..common.types import UUIDStr
-from .types import CallDict, RelocateDict, TransferDict
+from .types import CallDict, CallRecordingDict, RelocateDict, TransferDict
 
 
 class CallCreatedEvent(UserEvent):
@@ -303,3 +303,63 @@ class CallTransferEndedEvent(UserEvent):
         user_uuid: UUIDStr,
     ):
         super().__init__(transfer, tenant_uuid, user_uuid)
+
+
+class CallRecordPausedEvent(UserEvent):
+    service = 'calld'
+    name = 'recording_paused'
+    routing_key_fmt = 'calls.recording_paused.created'
+    required_acl_fmt = 'events.calls.{user_uuid}'
+
+    def __init__(
+        self,
+        call_recording: CallRecordingDict,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
+    ):
+        super().__init__(call_recording, tenant_uuid, user_uuid)
+
+
+class CallRecordResumedEvent(UserEvent):
+    service = 'calld'
+    name = 'recording_resumed'
+    routing_key_fmt = 'calls.recording_resumed.created'
+    required_acl_fmt = 'events.calls.{user_uuid}'
+
+    def __init__(
+        self,
+        call_recording: CallRecordingDict,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
+    ):
+        super().__init__(call_recording, tenant_uuid, user_uuid)
+
+
+class CallRecordStartedEvent(UserEvent):
+    service = 'calld'
+    name = 'recording_started'
+    routing_key_fmt = 'calls.recording_started.created'
+    required_acl_fmt = 'events.calls.{user_uuid}'
+
+    def __init__(
+        self,
+        call_recording: CallRecordingDict,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
+    ):
+        super().__init__(call_recording, tenant_uuid, user_uuid)
+
+
+class CallRecordStoppedEvent(UserEvent):
+    service = 'calld'
+    name = 'recording_stopped'
+    routing_key_fmt = 'calls.recording_stopped.created'
+    required_acl_fmt = 'events.calls.{user_uuid}'
+
+    def __init__(
+        self,
+        call_recording: CallRecordingDict,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
+    ):
+        super().__init__(call_recording, tenant_uuid, user_uuid)
