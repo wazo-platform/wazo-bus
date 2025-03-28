@@ -91,6 +91,7 @@ class Base(BaseProtocol):
         exchange_name: str = '',
         exchange_type: str = '',
         exchange_durable: bool = True,
+        exchange_kwargs: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
         self._name = name or type(self).__name__
@@ -100,6 +101,7 @@ class Base(BaseProtocol):
             name=exchange_name,
             type=exchange_type,
             durable=exchange_durable,
+            **(exchange_kwargs or {}),
         )
 
     @property

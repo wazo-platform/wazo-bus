@@ -1,4 +1,4 @@
-# Copyright 2012-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2012-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
@@ -23,6 +23,7 @@ class BusPublisher(WazoEventMixin, PublisherMixin, Base):
         port: int = 5672,
         exchange_name: str = '',
         exchange_type: str = '',
+        exchange_kwargs: dict[str, Any] | None = None,
         **kwargs: Any,
     ):
         super().__init__(
@@ -34,6 +35,7 @@ class BusPublisher(WazoEventMixin, PublisherMixin, Base):
             port=port,
             exchange_name=exchange_name,
             exchange_type=exchange_type,
+            exchange_kwargs=exchange_kwargs,
             **kwargs,
         )
 
@@ -55,6 +57,7 @@ class BusPublisherWithQueue(
         port: int = 5672,
         exchange_name: str = '',
         exchange_type: str = '',
+        exchange_kwargs: dict[str, Any] | None = None,
         **kwargs: Any,
     ):
         super().__init__(
@@ -66,5 +69,6 @@ class BusPublisherWithQueue(
             port=port,
             exchange_name=exchange_name,
             exchange_type=exchange_type,
+            exchange_kwargs=exchange_kwargs,
             **kwargs,
         )

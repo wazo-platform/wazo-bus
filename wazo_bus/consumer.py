@@ -19,6 +19,7 @@ class BusConsumer(WazoEventMixin, ThreadableMixin, ConsumerMixin, Base):
         port: int = 5672,
         exchange_name: str = '',
         exchange_type: str = '',
+        exchange_kwargs: dict[str, Any] | None = None,
         **kwargs: Any,
     ):
         super().__init__(
@@ -29,5 +30,6 @@ class BusConsumer(WazoEventMixin, ThreadableMixin, ConsumerMixin, Base):
             port=port,
             exchange_name=exchange_name,
             exchange_type=exchange_type,
+            exchange_kwargs=exchange_kwargs,
             **kwargs,
         )
