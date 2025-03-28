@@ -1,4 +1,4 @@
-# Copyright 2021-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
@@ -25,7 +25,7 @@ class BaseProtocol(Protocol):
     _name: str
     _logger: logging.Logger
     _connection_params: ConnectionParams
-    _default_exchange: Exchange
+    _exchange: Exchange
 
     def __init__(
         self,
@@ -90,14 +90,16 @@ class Base(BaseProtocol):
         port: int = 5672,
         exchange_name: str = '',
         exchange_type: str = '',
+        exchange_durable: bool = True,
         **kwargs: Any,
     ) -> None:
-        durable = kwargs.pop('exchange_durable', True)
         self._name = name or type(self).__name__
         self._logger = logging.getLogger(type(self).__name__)
         self._connection_params = ConnectionParams(username, password, host, port)
-        self._default_exchange = Exchange(
-            name=exchange_name, type=exchange_type, durable=durable
+        self._exchange = Exchange(
+            name=exchange_name,
+            type=exchange_type,
+            durable=exchange_durable,
         )
 
     @property

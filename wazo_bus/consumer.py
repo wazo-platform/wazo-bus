@@ -1,4 +1,4 @@
-# Copyright 2020-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
@@ -6,12 +6,7 @@ from __future__ import annotations
 from typing import Any
 
 from .base import Base
-from .mixins import (
-    ConsumerMixin,
-    SubscribeExchangeDict,
-    ThreadableMixin,
-    WazoEventMixin,
-)
+from .mixins import ConsumerMixin, ThreadableMixin, WazoEventMixin
 
 
 class BusConsumer(WazoEventMixin, ThreadableMixin, ConsumerMixin, Base):
@@ -24,7 +19,6 @@ class BusConsumer(WazoEventMixin, ThreadableMixin, ConsumerMixin, Base):
         port: int = 5672,
         exchange_name: str = '',
         exchange_type: str = '',
-        subscribe: SubscribeExchangeDict | None = None,
         **kwargs: Any,
     ):
         super().__init__(
@@ -35,6 +29,5 @@ class BusConsumer(WazoEventMixin, ThreadableMixin, ConsumerMixin, Base):
             port=port,
             exchange_name=exchange_name,
             exchange_type=exchange_type,
-            subscribe=subscribe,
             **kwargs,
         )
