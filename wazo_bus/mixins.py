@@ -1,4 +1,4 @@
-# Copyright 2021-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
@@ -10,10 +10,10 @@ from contextlib import contextmanager
 from datetime import datetime
 from queue import Empty, Queue
 from threading import Event, Lock, Thread, current_thread, main_thread
-from typing import Any, Callable, ClassVar, NamedTuple, Protocol, TypedDict
+from typing import Any, Callable, ClassVar, NamedTuple, Protocol
 
 from amqp.exceptions import NotFound
-from kombu import Connection, Consumer, Exchange, Message, Producer
+from kombu import Connection, Consumer, Message, Producer
 from kombu import Queue as AMQPQueue
 from kombu import binding as Binding
 from kombu.exceptions import OperationalError
@@ -34,16 +34,6 @@ class BusThread(NamedTuple):
     thread: Thread
     on_stop: ThreadOnStopType | None
     ready_flag: Event
-
-
-class SubscribeExchangeDict(TypedDict):
-    exchange_name: str
-    exchange_type: str
-
-
-class PublishExchangeDict(TypedDict):
-    exchange_name: str
-    exchange_type: str
 
 
 class Subscription(NamedTuple):
@@ -191,14 +181,10 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
 
     consumer_args: ClassVar[dict] = {}
 
-    def __init__(self, subscribe: SubscribeExchangeDict | None = None, **kwargs: Any):
+    def __init__(self, **kwargs: Any):
         super().__init__(**kwargs)
         name = f'{self._name}.{os.urandom(3).hex()}'
-        if subscribe:
-            exchange = Exchange(subscribe['exchange_name'], subscribe['exchange_type'])
-
         self.__connection = Connection(self.url)
-        self.__exchange = exchange if subscribe else self._default_exchange
         self.__subscriptions: defaultdict[str, list[Subscription]] = defaultdict(list)
         self.__queue = AMQPQueue(name=name, auto_delete=True, durable=False)
         self.__lock = Lock()
@@ -209,7 +195,7 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
             )
 
         self.create_connection()
-        self.log.debug('setting consuming exchange as \'%s\'', self.__exchange)
+        self.log.debug('setting consuming exchange as \'%s\'', self._exchange)
 
     def consumer_connected(self) -> bool:
         is_running = self.__thread.is_alive() if self.__thread is not None else True
@@ -223,7 +209,7 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
         yield self.__connection.default_channel
 
     def __create_binding(self, headers: dict, routing_key: str | None) -> Binding:
-        binding = Binding(self.__exchange, routing_key, headers, headers)
+        binding = Binding(self._exchange, routing_key, headers, headers)
         self.__queue.bindings.add(binding)
         if self.is_running:
             try:
@@ -296,7 +282,7 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
     ) -> None:
         headers = dict(headers or {})
         headers.update(name=event_name)
-        if self.__exchange.type == 'headers':
+        if self._exchange.type == 'headers':
             headers.setdefault('x-match', 'all' if headers_match_all else 'any')
 
         binding = self.__create_binding(headers, routing_key)
@@ -333,7 +319,7 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
     def get_consumers(
         self, Consumer: type[Consumer], channel: StdChannel
     ) -> list[Consumer]:
-        self.__exchange.bind(channel).declare()
+        self._exchange.bind(channel).declare()
         return [
             Consumer(
                 queues=[self.__queue],
@@ -407,14 +393,14 @@ class PublisherMixin(BaseProtocol):
         'max_retries': 2,
     }
 
-    def __init__(self, publish: PublishExchangeDict | None = None, **kwargs: Any):
+    def __init__(
+        self,
+        **kwargs: Any,
+    ):
         super().__init__(**kwargs)
-        if publish:
-            exchange = Exchange(publish['exchange_name'], publish['exchange_type'])
-        self.__exchange = exchange if publish else self._default_exchange
         self.__connection = Connection(self.url, transport_options=self.publisher_args)
         self.__lock = Lock()
-        self.log.debug('setting publishing exchange as \'%s\'', self.__exchange)
+        self.log.debug('setting publishing exchange as \'%s\'', self._exchange)
 
     def publisher_connected(self) -> bool:
         return self.__connection.connected
@@ -423,7 +409,7 @@ class PublisherMixin(BaseProtocol):
     def Producer(
         self, connection: Connection, **connection_args: Any
     ) -> Iterator[Callable]:
-        producer = Producer(connection, exchange=self.__exchange, auto_declare=True)
+        producer = Producer(connection, exchange=self._exchange, auto_declare=True)
         yield connection.ensure(
             producer, producer.publish, errback=self.on_publish_error, **connection_args
         )
