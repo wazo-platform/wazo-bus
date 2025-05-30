@@ -70,6 +70,8 @@ class CallDict(TypedDict, total=False):
     answer_time: str
     hangup_time: str
     direction: str
+    parked: bool
+    sip_call_id: str
 
 
 class ParkedCallDict(TypedDict, total=False):
