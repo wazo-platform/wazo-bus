@@ -1,4 +1,4 @@
-# Copyright 2015-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
@@ -15,7 +15,10 @@ class AgentCreatedEvent(TenantEvent):
     routing_key_fmt = 'config.agent.created'
 
     def __init__(self, agent_id: int, tenant_uuid: UUIDStr):
-        content = {'id': int(agent_id)}
+        content = {
+            'id': int(agent_id),
+            'tenant_uuid': tenant_uuid,
+        }
         super().__init__(content, tenant_uuid)
 
 
@@ -27,7 +30,10 @@ class AgentDeletedEvent(TenantEvent):
     routing_key_fmt = 'config.agent.deleted'
 
     def __init__(self, agent_id: int, tenant_uuid: UUIDStr):
-        content = {'id': int(agent_id)}
+        content = {
+            'id': int(agent_id),
+            'tenant_uuid': tenant_uuid,
+        }
         super().__init__(content, tenant_uuid)
 
 
@@ -39,7 +45,10 @@ class AgentEditedEvent(TenantEvent):
     routing_key_fmt = 'config.agent.edited'
 
     def __init__(self, agent_id: int, tenant_uuid: UUIDStr):
-        content = {'id': int(agent_id)}
+        content = {
+            'id': int(agent_id),
+            'tenant_uuid': tenant_uuid,
+        }
         super().__init__(content, tenant_uuid)
 
 
@@ -66,6 +75,7 @@ class AgentPausedEvent(MultiUserEvent):
             'paused': True,
             'paused_reason': reason or '',
             'queue': queue,
+            'tenant_uuid': tenant_uuid,
         }
         super().__init__(content, tenant_uuid, user_uuids)
 
@@ -93,6 +103,7 @@ class AgentUnpausedEvent(MultiUserEvent):
             'paused': False,
             'paused_reason': reason or '',
             'queue': queue,
+            'tenant_uuid': tenant_uuid,
         }
         super().__init__(content, tenant_uuid, user_uuids)
 
@@ -112,5 +123,9 @@ class AgentStatusUpdatedEvent(MultiUserEvent):
         tenant_uuid: UUIDStr,
         user_uuids: list[UUIDStr],
     ):
-        content = {'agent_id': int(agent_id), 'status': status}
+        content = {
+            'agent_id': int(agent_id),
+            'status': status,
+            'tenant_uuid': tenant_uuid,
+        }
         super().__init__(content, tenant_uuid, user_uuids)
