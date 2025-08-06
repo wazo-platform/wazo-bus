@@ -1,4 +1,4 @@
-# Copyright 2022-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2022-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
@@ -237,21 +237,21 @@ class EventProxy:
                 'const': self.name,
                 'description': 'Name of the event (used for routing the message)',
             },
-            'required_access': {
+            'required_acl': {
                 'type': 'string',
-                'const': f'event.{self.name}',
+                'const': f'events.{(self.required_acl_fmt if hasattr(self, "required_acl_fmt") else self.routing_key_fmt)}',
                 'description': 'Necessary user access required to read this event',
             },
             'origin_uuid': {'$ref': '#/components/schemas/origin_uuid'},
             'timestamp': {'$ref': '#/components/schemas/timestamp'},
         }
-        required = ['name', 'required_access', 'origin_uuid', 'timestamp']
+        required = ['name', 'required_acl', 'origin_uuid', 'timestamp']
 
         if 'tenant_uuid' in self._keys:
             headers['tenant_uuid'] = {'$ref': '#/components/schemas/tenant_uuid'}
             required.append('tenant_uuid')
 
-        if any([key in self._keys for key in ('user_uuid', 'user_uuids')]):
+        if any(key in self._keys for key in ('user_uuid', 'user_uuids')):
             headers['user_uuid:{uuid}'] = {
                 '$ref': '#/components/schemas/user_uuid:{uuid}'
             }
