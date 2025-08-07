@@ -1,4 +1,4 @@
-# Copyright 2017-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from ..common.event import TenantEvent, UserEvent
@@ -69,6 +69,21 @@ class UserExternalAuthDeletedEvent(UserEvent):
     service = 'auth'
     name = 'auth_user_external_auth_deleted'
     routing_key_fmt = 'auth.users.{user_uuid}.external.{external_auth_name}.deleted'
+
+    def __init__(
+        self,
+        external_auth_name: str,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
+    ):
+        content = {'user_uuid': user_uuid, 'external_auth_name': external_auth_name}
+        super().__init__(content, tenant_uuid, user_uuid)
+
+
+class UserExternalAuthUpdatedEvent(UserEvent):
+    service = 'auth'
+    name = 'auth_user_external_auth_updated'
+    routing_key_fmt = 'auth.users.{user_uuid}.external.{external_auth_name}.updated'
 
     def __init__(
         self,
