@@ -1,1 +1,1 @@
-kombu==5.2.4
+-e .  # see setup.py install_requires
