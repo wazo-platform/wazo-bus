@@ -5,7 +5,7 @@ RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 RUN apt-get -q update
-RUN apt-get -yq install netcat
+RUN apt-get -yq install netcat-openbsd
 
 COPY requirements.txt /usr/src/wazo-bus/requirements.txt
 WORKDIR /usr/src/wazo-bus
