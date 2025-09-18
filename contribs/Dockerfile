@@ -11,9 +11,8 @@ COPY contribs/documentation.py /app
 WORKDIR /app
 
 RUN true \
-    && pip install pyyaml \
-    && pip install -r wazo-bus/requirements.txt \
     && pip install -e wazo-bus \
+    && pip install pyyaml \
     && mkdir -p -m777 /app/output
 
 ENTRYPOINT ["python", "documentation.py", "-o", "/app/output"]
