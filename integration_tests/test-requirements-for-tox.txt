@@ -2,7 +2,3 @@ https://github.com/wazo-platform/wazo-test-helpers/archive/master.zip
 pyhamcrest
 pytest
 requests
-
-# From wazo-bus
-kombu==5.0.2
-typing_extensions==4.4.0
