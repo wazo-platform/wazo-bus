@@ -1,4 +1,4 @@
-FROM python:3.10-slim-bullseye
+FROM python:3.11-slim-bookworm
 LABEL maintainer="Wazo Maintainers <dev@wazo.community>"
 
 RUN python -m venv /opt/venv

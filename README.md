@@ -10,7 +10,7 @@ Running unit tests
 
 ```
 pip install tox
-tox -e py39
+tox -e py311
 ```
 
 Running integration tests
