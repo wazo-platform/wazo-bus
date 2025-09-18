@@ -11,6 +11,7 @@ import os
 import re
 import sys
 from collections import defaultdict
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from copy import deepcopy
 from itertools import chain
@@ -20,10 +21,11 @@ from types import NoneType, UnionType
 from typing import (
     Annotated,
     Any,
-    Callable,
     Literal,
+    TypeAlias,
     TypedDict,
     Union,
+    Unpack,
     get_args,
     get_origin,
     get_type_hints,
@@ -31,7 +33,6 @@ from typing import (
 )
 
 import yaml
-from typing_extensions import TypeAlias, Unpack
 
 PACKAGE_NAME = 'wazo_bus'
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)

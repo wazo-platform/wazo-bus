@@ -5,11 +5,10 @@ from __future__ import annotations
 
 import logging
 from types import TracebackType
-from typing import Any, NamedTuple, Protocol
+from typing import Any, NamedTuple, Protocol, Self
 
 from kombu import Exchange
 from kombu.utils.url import as_url
-from typing_extensions import Self
 
 from .resources.common.abstract import EventProtocol
 
