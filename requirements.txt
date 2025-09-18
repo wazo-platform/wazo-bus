@@ -1,2 +1,1 @@
 kombu==5.2.4
-typing_extensions==4.4.0
