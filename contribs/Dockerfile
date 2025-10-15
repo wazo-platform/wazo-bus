@@ -1,4 +1,4 @@
-FROM python:3.10-slim-bullseye
+FROM python:3.11-slim-bookworm
 LABEL maintainer="Wazo Maintainers <dev@wazo.community>"
 
 RUN python -m venv /opt/venv
@@ -11,9 +11,8 @@ COPY contribs/documentation.py /app
 WORKDIR /app
 
 RUN true \
-    && pip install pyyaml \
-    && pip install -r wazo-bus/requirements.txt \
     && pip install -e wazo-bus \
+    && pip install pyyaml \
     && mkdir -p -m777 /app/output
 
 ENTRYPOINT ["python", "documentation.py", "-o", "/app/output"]

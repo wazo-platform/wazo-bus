@@ -1,16 +1,13 @@
-FROM python:3.9-slim-bullseye
+FROM python:3.11-slim-bookworm
 LABEL maintainer="Wazo Maintainers <dev@wazo.community>"
 
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-RUN apt-get -q update
-RUN apt-get -yq install netcat
+RUN apt-get -q update && apt-get -yq install netcat-openbsd
 
-COPY requirements.txt /usr/src/wazo-bus/requirements.txt
 WORKDIR /usr/src/wazo-bus
-RUN pip install --upgrade pip
-RUN pip install flask -r requirements.txt
+RUN pip install flask
 
 COPY integration_tests/docker/entrypoint.sh /usr/bin/entrypoint.sh
 COPY integration_tests/docker/remote-bus-pilot.py /usr/src/remote-bus-pilot.py

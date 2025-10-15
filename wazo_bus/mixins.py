@@ -5,12 +5,12 @@ from __future__ import annotations
 
 import os
 from collections import defaultdict
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from datetime import datetime
 from queue import Empty, Queue
 from threading import Event, Lock, Thread, current_thread, main_thread
-from typing import Any, Callable, ClassVar, NamedTuple, Protocol
+from typing import Any, ClassVar, NamedTuple, Protocol, Self
 
 from amqp.exceptions import NotFound
 from kombu import Connection, Consumer, Message, Producer
@@ -19,7 +19,6 @@ from kombu import binding as Binding
 from kombu.exceptions import OperationalError
 from kombu.mixins import ConsumerMixin as KombuConsumer
 from kombu.transport.base import StdChannel
-from typing_extensions import Self
 
 from .base import BaseProtocol
 from .collectd.common import CollectdEvent
