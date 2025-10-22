@@ -17,7 +17,7 @@ class VoicemailMessageDict(TypedDict, total=False):
     caller_id_name: str
     caller_id_num: str
     duration: int
-    tiemstamp: int
+    timestamp: int
     folder: VoicemailFolderDict
 
 
