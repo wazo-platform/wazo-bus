@@ -1,9 +1,9 @@
-# Copyright 2013-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from ..common.event import TenantEvent, UserEvent
 from ..common.types import UUIDStr
-from .types import VoicemailMessageDict
+from .types import SharedVoicemailMessageDict, VoicemailMessageDict
 
 
 class VoicemailCreatedEvent(TenantEvent):
@@ -121,3 +121,39 @@ class UserVoicemailMessageDeletedEvent(UserEvent):
             'message': message,
         }
         super().__init__(content, tenant_uuid, user_uuid)
+
+
+class SharedVoicemailMessageCreatedEvent(TenantEvent):
+    service = 'calld'
+    name = 'shared_voicemail_message_created'
+    routing_key_fmt = 'voicemails.shared.messages.created'
+    required_acl_fmt = 'events.voicemails.shared.messages.created'
+
+    def __init__(
+        self, message_id: str, message: SharedVoicemailMessageDict, tenant_uuid: UUIDStr
+    ):
+        ...
+
+
+class SharedVoicemailMessageDeletedEvent(TenantEvent):
+    service = 'calld'
+    name = 'shared_voicemail_message_deleted'
+    routing_key_fmt = 'voicemails.shared.messages.deleted'
+    required_acl_fmt = 'events.voicemails.shared.messages.deleted'
+
+    def __init__(
+        self, message_id: str, message: SharedVoicemailMessageDict, tenant_uuid: UUIDStr
+    ):
+        ...
+
+
+class SharedVoicemailMessageUpdatedEvent(TenantEvent):
+    service = 'calld'
+    name = 'shared_voicemail_message_updated'
+    routing_key_fmt = 'voicemails.shared.messages.updated'
+    required_acl_fmt = 'events.voicemails.shared.messages.updated'
+
+    def __init__(
+        self, message_id: str, message: SharedVoicemailMessageDict, tenant_uuid: UUIDStr
+    ):
+        ...
