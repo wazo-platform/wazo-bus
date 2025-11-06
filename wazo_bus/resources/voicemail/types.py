@@ -6,6 +6,12 @@ from __future__ import annotations
 from typing import Literal, TypedDict
 
 
+class VoicemailDict(TypedDict, total=False):
+    id: int
+    name: str
+    type: Literal["shared", "personal"]
+
+
 class VoicemailFolderDict(TypedDict, total=False):
     id: int
     name: str
@@ -21,7 +27,5 @@ class VoicemailMessageDict(TypedDict, total=False):
     folder: VoicemailFolderDict
 
 
-class SharedVoicemailMessageDict(VoicemailMessageDict, total=False):
-    voicemail_id: int
-    voicemail_name: str
-    voicemail_type: Literal["shared", "personal"]
+class UnifiedVoicemailessageDict(VoicemailMessageDict, total=False):
+    voicemail: VoicemailDict
