@@ -3,7 +3,7 @@
 
 from ..common.event import TenantEvent, UserEvent
 from ..common.types import UUIDStr
-from .types import UnifiedVoicemailessageDict, VoicemailMessageDict
+from .types import UnifiedVoicemailMessageDict, VoicemailMessageDict
 
 
 class VoicemailCreatedEvent(TenantEvent):
@@ -129,7 +129,7 @@ class SharedVoicemailMessageCreatedEvent(TenantEvent):
     routing_key_fmt = 'voicemails.shared.messages.created'
     required_acl_fmt = 'events.voicemails.shared.messages.created'
 
-    def __init__(self, message: UnifiedVoicemailessageDict, tenant_uuid: UUIDStr):
+    def __init__(self, message: UnifiedVoicemailMessageDict, tenant_uuid: UUIDStr):
         super().__init__(message, tenant_uuid)
 
 
@@ -139,7 +139,7 @@ class SharedVoicemailMessageDeletedEvent(TenantEvent):
     routing_key_fmt = 'voicemails.shared.messages.deleted'
     required_acl_fmt = 'events.voicemails.shared.messages.deleted'
 
-    def __init__(self, message: UnifiedVoicemailessageDict, tenant_uuid: UUIDStr):
+    def __init__(self, message: UnifiedVoicemailMessageDict, tenant_uuid: UUIDStr):
         super().__init__(message, tenant_uuid)
 
 
@@ -149,5 +149,5 @@ class SharedVoicemailMessageUpdatedEvent(TenantEvent):
     routing_key_fmt = 'voicemails.shared.messages.updated'
     required_acl_fmt = 'events.voicemails.shared.messages.updated'
 
-    def __init__(self, message: UnifiedVoicemailessageDict, tenant_uuid: UUIDStr):
+    def __init__(self, message: UnifiedVoicemailMessageDict, tenant_uuid: UUIDStr):
         super().__init__(message, tenant_uuid)
