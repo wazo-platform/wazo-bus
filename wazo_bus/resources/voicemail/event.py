@@ -123,31 +123,31 @@ class UserVoicemailMessageDeletedEvent(UserEvent):
         super().__init__(content, tenant_uuid, user_uuid)
 
 
-class SharedVoicemailMessageCreatedEvent(TenantEvent):
+class GlobalVoicemailMessageCreatedEvent(TenantEvent):
     service = 'calld'
-    name = 'shared_voicemail_message_created'
-    routing_key_fmt = 'voicemails.shared.messages.created'
-    required_acl_fmt = 'events.voicemails.shared.messages.created'
+    name = 'global_voicemail_message_created'
+    routing_key_fmt = 'voicemails.global.messages.created'
+    required_acl_fmt = 'events.voicemails.global.messages.created'
 
     def __init__(self, message: UnifiedVoicemailMessageDict, tenant_uuid: UUIDStr):
         super().__init__(message, tenant_uuid)
 
 
-class SharedVoicemailMessageDeletedEvent(TenantEvent):
+class GlobalVoicemailMessageDeletedEvent(TenantEvent):
     service = 'calld'
-    name = 'shared_voicemail_message_deleted'
-    routing_key_fmt = 'voicemails.shared.messages.deleted'
-    required_acl_fmt = 'events.voicemails.shared.messages.deleted'
+    name = 'global_voicemail_message_deleted'
+    routing_key_fmt = 'voicemails.global.messages.deleted'
+    required_acl_fmt = 'events.voicemails.global.messages.deleted'
 
     def __init__(self, message: UnifiedVoicemailMessageDict, tenant_uuid: UUIDStr):
         super().__init__(message, tenant_uuid)
 
 
-class SharedVoicemailMessageUpdatedEvent(TenantEvent):
+class GlobalVoicemailMessageUpdatedEvent(TenantEvent):
     service = 'calld'
-    name = 'shared_voicemail_message_updated'
-    routing_key_fmt = 'voicemails.shared.messages.updated'
-    required_acl_fmt = 'events.voicemails.shared.messages.updated'
+    name = 'global_voicemail_message_updated'
+    routing_key_fmt = 'voicemails.global.messages.updated'
+    required_acl_fmt = 'events.voicemails.global.messages.updated'
 
     def __init__(self, message: UnifiedVoicemailMessageDict, tenant_uuid: UUIDStr):
         super().__init__(message, tenant_uuid)
