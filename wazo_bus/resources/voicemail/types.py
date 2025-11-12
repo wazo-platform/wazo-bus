@@ -9,13 +9,13 @@ from typing import Literal, TypedDict
 class VoicemailDict(TypedDict, total=False):
     id: int
     name: str
-    type: Literal["shared", "personal"]
+    accesstype: Literal["global", "personal"]
 
 
 class VoicemailFolderDict(TypedDict, total=False):
     id: int
     name: str
-    type: str
+    accesstype: str
 
 
 class VoicemailMessageDict(TypedDict, total=False):
