@@ -27,5 +27,5 @@ class VoicemailMessageDict(TypedDict, total=False):
     folder: VoicemailFolderDict
 
 
-class UnifiedVoicemailessageDict(VoicemailMessageDict, total=False):
+class UnifiedVoicemailMessageDict(VoicemailMessageDict, total=False):
     voicemail: VoicemailDict
