@@ -12,9 +12,6 @@ Section: python
 Depends: ${python3:Depends},
          ${misc:Depends},
          python3-typing-extensions (>= 4.4.0)
-Provides: xivo-bus-python3
-Conflicts: xivo-bus-python3
-Replaces: xivo-bus-python3
 Description: Wazo message bus library - Python 3
  Wazo is a system based on a powerful IPBX, to bring an easy to
  install solution for telephony and related services.
