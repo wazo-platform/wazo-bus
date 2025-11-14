@@ -1,9 +1,9 @@
-# Copyright 2013-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from ..common.event import TenantEvent, UserEvent
 from ..common.types import UUIDStr
-from .types import VoicemailMessageDict
+from .types import UnifiedVoicemailMessageDict, VoicemailMessageDict
 
 
 class VoicemailCreatedEvent(TenantEvent):
@@ -121,3 +121,33 @@ class UserVoicemailMessageDeletedEvent(UserEvent):
             'message': message,
         }
         super().__init__(content, tenant_uuid, user_uuid)
+
+
+class GlobalVoicemailMessageCreatedEvent(TenantEvent):
+    service = 'calld'
+    name = 'global_voicemail_message_created'
+    routing_key_fmt = 'voicemails.global.messages.created'
+    required_acl_fmt = 'events.voicemails.global.messages.created'
+
+    def __init__(self, message: UnifiedVoicemailMessageDict, tenant_uuid: UUIDStr):
+        super().__init__(message, tenant_uuid)
+
+
+class GlobalVoicemailMessageDeletedEvent(TenantEvent):
+    service = 'calld'
+    name = 'global_voicemail_message_deleted'
+    routing_key_fmt = 'voicemails.global.messages.deleted'
+    required_acl_fmt = 'events.voicemails.global.messages.deleted'
+
+    def __init__(self, message: UnifiedVoicemailMessageDict, tenant_uuid: UUIDStr):
+        super().__init__(message, tenant_uuid)
+
+
+class GlobalVoicemailMessageUpdatedEvent(TenantEvent):
+    service = 'calld'
+    name = 'global_voicemail_message_updated'
+    routing_key_fmt = 'voicemails.global.messages.updated'
+    required_acl_fmt = 'events.voicemails.global.messages.updated'
+
+    def __init__(self, message: UnifiedVoicemailMessageDict, tenant_uuid: UUIDStr):
+        super().__init__(message, tenant_uuid)
