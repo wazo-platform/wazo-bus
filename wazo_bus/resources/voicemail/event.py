@@ -3,7 +3,7 @@
 
 from ..common.event import TenantEvent, UserEvent
 from ..common.types import UUIDStr
-from .types import UnifiedVoicemailMessageDict, VoicemailMessageDict
+from .types import VoicemailMessageDict
 
 
 class VoicemailCreatedEvent(TenantEvent):
@@ -129,8 +129,13 @@ class GlobalVoicemailMessageCreatedEvent(TenantEvent):
     routing_key_fmt = 'voicemails.global.messages.created'
     required_acl_fmt = 'events.voicemails.global.messages.created'
 
-    def __init__(self, message: UnifiedVoicemailMessageDict, tenant_uuid: UUIDStr):
-        super().__init__(message, tenant_uuid)
+    def __init__(self, message: VoicemailMessageDict, tenant_uuid: UUIDStr):
+        content = {
+            'voicemail_id': message['voicemail']['id'],
+            'message_id': message['id'],
+            'message': message,
+        }
+        super().__init__(content, tenant_uuid)
 
 
 class GlobalVoicemailMessageDeletedEvent(TenantEvent):
@@ -139,8 +144,13 @@ class GlobalVoicemailMessageDeletedEvent(TenantEvent):
     routing_key_fmt = 'voicemails.global.messages.deleted'
     required_acl_fmt = 'events.voicemails.global.messages.deleted'
 
-    def __init__(self, message: UnifiedVoicemailMessageDict, tenant_uuid: UUIDStr):
-        super().__init__(message, tenant_uuid)
+    def __init__(self, message: VoicemailMessageDict, tenant_uuid: UUIDStr):
+        content = {
+            'voicemail_id': message['voicemail']['id'],
+            'message_id': message['id'],
+            'message': message,
+        }
+        super().__init__(content, tenant_uuid)
 
 
 class GlobalVoicemailMessageUpdatedEvent(TenantEvent):
@@ -149,5 +159,10 @@ class GlobalVoicemailMessageUpdatedEvent(TenantEvent):
     routing_key_fmt = 'voicemails.global.messages.updated'
     required_acl_fmt = 'events.voicemails.global.messages.updated'
 
-    def __init__(self, message: UnifiedVoicemailMessageDict, tenant_uuid: UUIDStr):
-        super().__init__(message, tenant_uuid)
+    def __init__(self, message: VoicemailMessageDict, tenant_uuid: UUIDStr):
+        content = {
+            'voicemail_id': message['voicemail']['id'],
+            'message_id': message['id'],
+            'message': message,
+        }
+        super().__init__(content, tenant_uuid)

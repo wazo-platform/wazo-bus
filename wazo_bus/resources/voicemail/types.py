@@ -25,7 +25,4 @@ class VoicemailMessageDict(TypedDict, total=False):
     duration: int
     timestamp: int
     folder: VoicemailFolderDict
-
-
-class UnifiedVoicemailMessageDict(VoicemailMessageDict, total=False):
     voicemail: VoicemailDict
