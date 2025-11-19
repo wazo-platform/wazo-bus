@@ -1,15 +1,21 @@
-# Copyright 2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2023-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
 
-from typing import TypedDict
+from typing import Literal, TypedDict
+
+
+class VoicemailDict(TypedDict, total=False):
+    id: int
+    name: str
+    accesstype: Literal["global", "personal"]
 
 
 class VoicemailFolderDict(TypedDict, total=False):
     id: int
     name: str
-    type: str
+    accesstype: str
 
 
 class VoicemailMessageDict(TypedDict, total=False):
@@ -17,5 +23,6 @@ class VoicemailMessageDict(TypedDict, total=False):
     caller_id_name: str
     caller_id_num: str
     duration: int
-    tiemstamp: int
+    timestamp: int
     folder: VoicemailFolderDict
+    voicemail: VoicemailDict
