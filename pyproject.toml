@@ -43,3 +43,6 @@ module = [
     "*.tests.*",
 ]
 ignore_errors = true
+
+[tool.pytest]
+testpaths = ["wazo_bus"]
