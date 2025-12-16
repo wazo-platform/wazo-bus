@@ -1,7 +1,7 @@
-# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from ..common.event import UserEvent
+from ..common.event import MultiUserEvent, UserEvent
 from ..common.types import UUIDStr
 
 
@@ -39,3 +39,43 @@ class UserAgentDissociatedEvent(UserEvent):
             'agent_id': agent_id,
         }
         super().__init__(content, tenant_uuid, user_uuid)
+
+
+class UserAgentQueueLoggedInEvent(MultiUserEvent):
+    service = 'agentd'
+    name = 'user_agent_queue_logged_in'
+    routing_key_fmt = 'agentd.agents.{agent_id}.queues.{queue_id}.login.updated'
+    required_acl_fmt = 'events.statuses.agents'
+
+    def __init__(
+        self,
+        agent_id: int,
+        queue_id: int,
+        tenant_uuid: UUIDStr,
+        user_uuids: list[UUIDStr],
+    ):
+        content = {
+            'agent_id': agent_id,
+            'queue_id': queue_id,
+        }
+        super().__init__(content, tenant_uuid, user_uuids)
+
+
+class UserAgentQueueLoggedOffEvent(MultiUserEvent):
+    service = 'agentd'
+    name = 'user_agent_queue_logged_off'
+    routing_key_fmt = 'agentd.agents.{agent_id}.queues.{queue_id}.logoff.updated'
+    required_acl_fmt = 'events.statuses.agents'
+
+    def __init__(
+        self,
+        agent_id: int,
+        queue_id: int,
+        tenant_uuid: UUIDStr,
+        user_uuids: list[UUIDStr],
+    ):
+        content = {
+            'agent_id': agent_id,
+            'queue_id': queue_id,
+        }
+        super().__init__(content, tenant_uuid, user_uuids)
