@@ -1,4 +1,4 @@
-# Copyright 2021-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
@@ -83,7 +83,8 @@ class ThreadableMixin(BaseProtocol):
     def __init__(self, **kwargs: Any):
         self.__internal_threads_list: list[BusThread] = list()
         self.__stop_flag = Event()
-        super().__init__(**kwargs)
+        # NOTE(clanglois): Mixin expects a parent class to provide __init__ implementation
+        super().__init__(**kwargs)  # type: ignore[safe-super]
 
     @property
     def is_stopping(self) -> bool:
@@ -104,7 +105,8 @@ class ThreadableMixin(BaseProtocol):
 
     def __exit__(self, *args: Any) -> None:
         self.stop()
-        super().__exit__(*args)
+        # NOTE(clanglois): Mixin expects a parent class to provide __exit__ implementation
+        super().__exit__(*args)  # type: ignore[safe-super]
 
     def _register_thread(
         self,
@@ -181,7 +183,8 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
     consumer_args: ClassVar[dict] = {}
 
     def __init__(self, **kwargs: Any):
-        super().__init__(**kwargs)
+        # NOTE(clanglois): Mixin expects a parent class to provide __init__ implementation
+        super().__init__(**kwargs)  # type: ignore[safe-super]
         name = f'{self._name}.{os.urandom(3).hex()}'
         self.__connection = Connection(self.url)
         self.__subscriptions: defaultdict[str, list[Subscription]] = defaultdict(list)
@@ -396,7 +399,8 @@ class PublisherMixin(BaseProtocol):
         self,
         **kwargs: Any,
     ):
-        super().__init__(**kwargs)
+        # NOTE(clanglois): Mixin expects a parent class to provide __init__ implementation
+        super().__init__(**kwargs)  # type: ignore[safe-super]
         self.__connection = Connection(self.url, transport_options=self.publisher_args)
         self.__lock = Lock()
         self.log.debug('setting publishing exchange as \'%s\'', self._exchange)
@@ -529,7 +533,8 @@ class WazoEventMixin(BaseProtocol):
     '''
 
     def __init__(self, service_uuid: str | None = None, **kwargs: Any):
-        super().__init__(**kwargs)
+        # NOTE(clanglois): Mixin expects a parent class to provide __init__ implementation
+        super().__init__(**kwargs)  # type: ignore[safe-super]
         self.service_uuid = service_uuid
 
     def __generate_payload(
