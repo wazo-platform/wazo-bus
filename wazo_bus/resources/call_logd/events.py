@@ -1,11 +1,9 @@
 # Copyright 2021-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from typing import Mapping
-
 from ..common.event import TenantEvent
 from ..common.types import UUIDStr
-from .types import CallLogExportDataDict
+from .types import CallLogExportDataDict, VoicemailTranscriptionDataDict
 
 
 class CallLogExportCreatedEvent(TenantEvent):
@@ -54,7 +52,7 @@ class VoicemailTranscriptionCreatedEvent(TenantEvent):
 
     def __init__(
         self,
-        transcription_data: Mapping,
+        transcription_data: VoicemailTranscriptionDataDict,
         tenant_uuid: UUIDStr,
     ):
         super().__init__(transcription_data, tenant_uuid)
@@ -67,7 +65,7 @@ class VoicemailTranscriptionDeletedEvent(TenantEvent):
 
     def __init__(
         self,
-        transcription_data: Mapping,
+        transcription_data: VoicemailTranscriptionDataDict,
         tenant_uuid: UUIDStr,
     ):
         super().__init__(transcription_data, tenant_uuid)
