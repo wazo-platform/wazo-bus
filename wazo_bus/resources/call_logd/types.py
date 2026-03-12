@@ -18,7 +18,7 @@ class CallLogExportDataDict(TypedDict, total=False):
 
 
 class VoicemailTranscriptionDataDict(TypedDict, total=False):
-    voicemail_message_id: str
+    message_id: str
     tenant_uuid: UUIDStr
     voicemail_id: int
     transcription_text: str
