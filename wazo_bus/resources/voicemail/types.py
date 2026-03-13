@@ -1,4 +1,4 @@
-# Copyright 2023-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2023-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
@@ -26,3 +26,13 @@ class VoicemailMessageDict(TypedDict, total=False):
     timestamp: int
     folder: VoicemailFolderDict
     voicemail: VoicemailDict
+
+
+class VoicemailTranscriptionDict(TypedDict, total=False):
+    voicemail_id: int
+    message_id: str
+    transcription_text: str
+    provider_id: str
+    language: str
+    duration: float
+    created_at: str
