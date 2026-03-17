@@ -3,7 +3,7 @@
 
 from ..common.event import TenantEvent, UserEvent
 from ..common.types import UUIDStr
-from .types import VoicemailMessageDict, VoicemailTranscriptionDict
+from .types import VoicemailMessageDict, VoicemailTranscriptionCalldDataDict
 
 
 class VoicemailCreatedEvent(TenantEvent):
@@ -176,7 +176,7 @@ class UserVoicemailTranscriptionCreatedEvent(UserEvent):
 
     def __init__(
         self,
-        transcription: VoicemailTranscriptionDict,
+        transcription: VoicemailTranscriptionCalldDataDict,
         tenant_uuid: UUIDStr,
         user_uuid: UUIDStr,
     ):
@@ -195,7 +195,7 @@ class UserVoicemailTranscriptionDeletedEvent(UserEvent):
 
     def __init__(
         self,
-        transcription: VoicemailTranscriptionDict,
+        transcription: VoicemailTranscriptionCalldDataDict,
         tenant_uuid: UUIDStr,
         user_uuid: UUIDStr,
     ):
@@ -214,7 +214,7 @@ class GlobalVoicemailTranscriptionCreatedEvent(TenantEvent):
 
     def __init__(
         self,
-        transcription: VoicemailTranscriptionDict,
+        transcription: VoicemailTranscriptionCalldDataDict,
         tenant_uuid: UUIDStr,
     ):
         super().__init__(transcription, tenant_uuid)
@@ -228,7 +228,7 @@ class GlobalVoicemailTranscriptionDeletedEvent(TenantEvent):
 
     def __init__(
         self,
-        transcription: VoicemailTranscriptionDict,
+        transcription: VoicemailTranscriptionCalldDataDict,
         tenant_uuid: UUIDStr,
     ):
         super().__init__(transcription, tenant_uuid)

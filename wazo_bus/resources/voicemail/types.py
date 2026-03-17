@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from typing import Literal, TypedDict
 
-from ..common.types import DateTimeStr, UUIDStr
+from ..call_logd.types import VoicemailTranscriptionDataDict
 
 
 class VoicemailDict(TypedDict, total=False):
@@ -30,12 +30,5 @@ class VoicemailMessageDict(TypedDict, total=False):
     voicemail: VoicemailDict
 
 
-class VoicemailTranscriptionDict(TypedDict, total=False):
-    voicemail_id: int
-    message_id: str
-    tenant_uuid: UUIDStr
-    transcription_text: str
-    provider_id: str
-    language: str
-    duration: float
-    created_at: DateTimeStr
+class VoicemailTranscriptionCalldDataDict(VoicemailTranscriptionDataDict, total=False):
+    pass
