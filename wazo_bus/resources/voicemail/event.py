@@ -1,9 +1,9 @@
-# Copyright 2013-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from ..common.event import TenantEvent, UserEvent
 from ..common.types import UUIDStr
-from .types import VoicemailMessageDict
+from .types import VoicemailMessageDict, VoicemailTranscriptionCalldDataDict
 
 
 class VoicemailCreatedEvent(TenantEvent):
@@ -166,3 +166,69 @@ class GlobalVoicemailMessageUpdatedEvent(TenantEvent):
             'message': message,
         }
         super().__init__(content, tenant_uuid)
+
+
+class UserVoicemailTranscriptionCreatedEvent(UserEvent):
+    service = 'calld'
+    name = 'user_voicemail_transcription_created'
+    routing_key_fmt = 'voicemails.transcriptions.created'
+    required_acl_fmt = 'events.users.{user_uuid}.voicemails.transcriptions.created'
+
+    def __init__(
+        self,
+        transcription: VoicemailTranscriptionCalldDataDict,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
+    ):
+        content = {
+            'user_uuid': str(user_uuid),
+            **transcription,
+        }
+        super().__init__(content, tenant_uuid, user_uuid)
+
+
+class UserVoicemailTranscriptionDeletedEvent(UserEvent):
+    service = 'calld'
+    name = 'user_voicemail_transcription_deleted'
+    routing_key_fmt = 'voicemails.transcriptions.deleted'
+    required_acl_fmt = 'events.users.{user_uuid}.voicemails.transcriptions.deleted'
+
+    def __init__(
+        self,
+        transcription: VoicemailTranscriptionCalldDataDict,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
+    ):
+        content = {
+            'user_uuid': str(user_uuid),
+            **transcription,
+        }
+        super().__init__(content, tenant_uuid, user_uuid)
+
+
+class GlobalVoicemailTranscriptionCreatedEvent(TenantEvent):
+    service = 'calld'
+    name = 'global_voicemail_transcription_created'
+    routing_key_fmt = 'voicemails.global.transcriptions.created'
+    required_acl_fmt = 'events.voicemails.global.transcriptions.created'
+
+    def __init__(
+        self,
+        transcription: VoicemailTranscriptionCalldDataDict,
+        tenant_uuid: UUIDStr,
+    ):
+        super().__init__(transcription, tenant_uuid)
+
+
+class GlobalVoicemailTranscriptionDeletedEvent(TenantEvent):
+    service = 'calld'
+    name = 'global_voicemail_transcription_deleted'
+    routing_key_fmt = 'voicemails.global.transcriptions.deleted'
+    required_acl_fmt = 'events.voicemails.global.transcriptions.deleted'
+
+    def __init__(
+        self,
+        transcription: VoicemailTranscriptionCalldDataDict,
+        tenant_uuid: UUIDStr,
+    ):
+        super().__init__(transcription, tenant_uuid)
