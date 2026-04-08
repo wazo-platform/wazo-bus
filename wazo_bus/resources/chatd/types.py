@@ -32,6 +32,8 @@ class MessageDict(TypedDict, total=False):
     uuid: UUIDStr
     content: str
     alias: str
+    type: str
+    backend: str
     user_uuid: UUIDStr
     tenant_uuid: UUIDStr
     wazo_uuid: UUIDStr
