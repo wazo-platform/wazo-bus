@@ -28,12 +28,17 @@ class LinePresenceDict(TypedDict, total=False):
     state: str
 
 
+class MessageDeliveryDict(TypedDict, total=False):
+    type: str
+    backend: str
+    status: str
+
+
 class MessageDict(TypedDict, total=False):
     uuid: UUIDStr
     content: str
     alias: str
-    type: str
-    backend: str
+    delivery: MessageDeliveryDict
     user_uuid: UUIDStr
     tenant_uuid: UUIDStr
     wazo_uuid: UUIDStr
