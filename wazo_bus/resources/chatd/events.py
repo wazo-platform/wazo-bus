@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-from ..common.event import MultiUserEvent, TenantEvent, UserEvent
+from ..common.event import TenantEvent, UserEvent
 from ..common.types import UUIDStr
 from .types import (
     DeliveryStatusDict,
@@ -101,10 +101,11 @@ class UserIdentityDeletedEvent(UserEvent):
         super().__init__(identity_data, tenant_uuid, user_uuid)
 
 
-class MessageDeliveryStatusEvent(MultiUserEvent):
+class MessageDeliveryStatusEvent(UserEvent):
     service = 'chatd'
     name = 'chatd_message_delivery_status'
     routing_key_fmt = 'chatd.rooms.{room_uuid}.messages.{message_uuid}.delivery'
+    required_acl_fmt = 'events.chat.message.{message_uuid}.{user_uuid}.delivery'
 
     def __init__(
         self,
@@ -112,8 +113,8 @@ class MessageDeliveryStatusEvent(MultiUserEvent):
         room_uuid: UUIDStr,
         message_uuid: UUIDStr,
         tenant_uuid: UUIDStr,
-        user_uuids: list[UUIDStr],
+        user_uuid: UUIDStr,
     ) -> None:
-        super().__init__(delivery_data, tenant_uuid, user_uuids)
+        super().__init__(delivery_data, tenant_uuid, user_uuid)
         self.room_uuid = str(room_uuid)
         self.message_uuid = str(message_uuid)
