@@ -10,6 +10,7 @@ from ..common.types import UUIDStr
 
 class DeliveryStatusDict(TypedDict, total=False):
     message_uuid: UUIDStr
+    recipient_identity: str
     status: str
     timestamp: str
     backend: str
@@ -31,7 +32,6 @@ class LinePresenceDict(TypedDict, total=False):
 class MessageDeliveryDict(TypedDict, total=False):
     type: str
     backend: str
-    status: str
 
 
 class MessageDict(TypedDict, total=False):
