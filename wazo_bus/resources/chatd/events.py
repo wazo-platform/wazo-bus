@@ -114,7 +114,13 @@ class MessageDeliveryStatusEvent(UserEvent):
         message_uuid: UUIDStr,
         tenant_uuid: UUIDStr,
         user_uuid: UUIDStr,
-    ) -> None:
+    ):
         super().__init__(delivery_data, tenant_uuid, user_uuid)
+        if room_uuid is None:
+            raise ValueError('room_uuid must have a value')
+
+        if message_uuid is None:
+            raise ValueError('message_uuid must have a value')
+
         self.room_uuid = str(room_uuid)
         self.message_uuid = str(message_uuid)
