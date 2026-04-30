@@ -1,11 +1,17 @@
-# Copyright 2019-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
 
 from ..common.event import TenantEvent, UserEvent
 from ..common.types import UUIDStr
-from .types import MessageDict, RoomDict, UserPresenceDict
+from .types import (
+    DeliveryStatusDict,
+    MessageDict,
+    RoomDict,
+    UserIdentityDict,
+    UserPresenceDict,
+)
 
 
 class PresenceUpdatedEvent(TenantEvent):
@@ -51,3 +57,70 @@ class UserRoomMessageCreatedEvent(UserEvent):
         if room_uuid is None:
             raise ValueError('room_uuid must have a value')
         self.room_uuid = str(room_uuid)
+
+
+class UserIdentityCreatedEvent(UserEvent):
+    service = 'chatd'
+    name = 'chatd_user_identity_created'
+    routing_key_fmt = 'chatd.users.{user_uuid}.identities.created'
+
+    def __init__(
+        self,
+        identity_data: UserIdentityDict,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
+    ):
+        super().__init__(identity_data, tenant_uuid, user_uuid)
+
+
+class UserIdentityUpdatedEvent(UserEvent):
+    service = 'chatd'
+    name = 'chatd_user_identity_updated'
+    routing_key_fmt = 'chatd.users.{user_uuid}.identities.updated'
+
+    def __init__(
+        self,
+        identity_data: UserIdentityDict,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
+    ):
+        super().__init__(identity_data, tenant_uuid, user_uuid)
+
+
+class UserIdentityDeletedEvent(UserEvent):
+    service = 'chatd'
+    name = 'chatd_user_identity_deleted'
+    routing_key_fmt = 'chatd.users.{user_uuid}.identities.deleted'
+
+    def __init__(
+        self,
+        identity_data: UserIdentityDict,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
+    ):
+        super().__init__(identity_data, tenant_uuid, user_uuid)
+
+
+class MessageDeliveryStatusEvent(UserEvent):
+    service = 'chatd'
+    name = 'chatd_message_delivery_status'
+    routing_key_fmt = 'chatd.rooms.{room_uuid}.messages.{message_uuid}.delivery'
+    required_acl_fmt = 'events.chat.message.{message_uuid}.{user_uuid}.delivery'
+
+    def __init__(
+        self,
+        delivery_data: DeliveryStatusDict,
+        room_uuid: UUIDStr,
+        message_uuid: UUIDStr,
+        tenant_uuid: UUIDStr,
+        user_uuid: UUIDStr,
+    ):
+        super().__init__(delivery_data, tenant_uuid, user_uuid)
+        if room_uuid is None:
+            raise ValueError('room_uuid must have a value')
+
+        if message_uuid is None:
+            raise ValueError('message_uuid must have a value')
+
+        self.room_uuid = str(room_uuid)
+        self.message_uuid = str(message_uuid)
