@@ -29,9 +29,16 @@ class LinePresenceDict(TypedDict, total=False):
     state: str
 
 
+class MessageRecipientDict(TypedDict, total=False):
+    identity: str
+    status: str
+    updated_at: str
+
+
 class MessageDeliveryDict(TypedDict, total=False):
     type: str
     backend: str
+    recipients: list[MessageRecipientDict]
 
 
 class MessageDict(TypedDict, total=False):
