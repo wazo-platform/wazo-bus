@@ -263,36 +263,58 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
                 if in_desired == in_active:
                     self.__pending_events.pop(binding).set()
 
+    @contextmanager
+    def __open_channel(self) -> Iterator[StdChannel]:
+        channel = self.connection.channel()
+        try:
+            yield channel
+        finally:
+            try:
+                channel.close()
+            except (AttributeError, KeyError):
+                pass
+
     def __apply_binding_changes(
         self, to_add: set[Binding], to_remove: set[Binding]
     ) -> None:
         if self.__queue is None:
             return
 
-        channel = self.connection.default_channel
         errors = self.connection.connection_errors + self.connection.channel_errors
 
-        for binding in to_add:
-            try:
-                binding.bind(self.__queue, channel=channel)
-            except errors as exc:
-                self.log.warning('Failed to bind %s, will retry: %s', binding, exc)
-                continue
-            except NotFound as exc:
-                self.log.warning('Failed to bind %s, queue gone: %s', binding, exc)
-                continue
+        with self.__open_channel() as channel:
+            for binding in to_add:
+                try:
+                    binding.bind(self.__queue, channel=channel)
+                except NotFound as exc:
+                    self.log.warning(
+                        'Queue %s gone while binding %s, reconnecting: %s',
+                        self.__queue.name,
+                        binding,
+                        exc,
+                    )
+                    raise
+                except errors as exc:
+                    self.log.warning('Failed to bind %s, will retry: %s', binding, exc)
+                    continue
 
-            self.__queue.bindings.add(binding)
+                self.__queue.bindings.add(binding)
 
-        for binding in to_remove:
-            try:
-                binding.unbind(self.__queue, channel=channel)
-            except errors as exc:
-                self.log.warning('Failed to unbind %s: %s', binding, exc)
-            except NotFound:
-                pass
+            for binding in to_remove:
+                try:
+                    binding.unbind(self.__queue, channel=channel)
+                except NotFound as exc:
+                    self.log.warning(
+                        'Queue %s gone while unbinding %s, reconnecting: %s',
+                        self.__queue.name,
+                        binding,
+                        exc,
+                    )
+                    raise
+                except errors as exc:
+                    self.log.warning('Failed to unbind %s: %s', binding, exc)
 
-            self.__queue.bindings.discard(binding)
+                self.__queue.bindings.discard(binding)
 
     def __dispatch(
         self, event_name: str, payload: dict, headers: dict | None = None
