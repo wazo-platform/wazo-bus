@@ -1,4 +1,4 @@
-# Copyright 2021-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import os
@@ -53,10 +53,15 @@ class BusIntegrationTest(AssetLaunchingTestCase):
     def start_rabbitmq(cls):
         cls.start_service('rabbitmq')
         port = cls.service_port(5672, 'rabbitmq')
-        # Note: only needed on integration tests because ports are dynamic
-        url = f'amqp://guest:guest@127.0.0.1:{port}//'
+        # Note: only needed on integration tests because ports are dynamic.
+        # Update _connection_params so self.url reflects the new port (used
+        # by future create_connection calls), and switch the standing
+        # Connection objects so in-flight retry loops pick up the new URL.
+        cls.local_bus._connection_params = cls.local_bus._connection_params._replace(
+            port=port
+        )
+        url = cls.local_bus.url
         cls.local_bus._PublisherMixin__connection.switch(url)
-        cls.local_bus._ConsumerMixin__connection.switch(url)
         cls.local_bus.connection.switch(url)
         wait_for_rabbitmq(cls)
 

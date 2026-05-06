@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import os
-from collections import defaultdict
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from datetime import datetime
@@ -169,7 +168,12 @@ class ThreadableMixin(BaseProtocol):
 
 class ConsumerMixin(KombuConsumer, BaseProtocol):
     '''
-    Mixin to provide RabbitMQ message consuming capabilities
+    Mixin to provide RabbitMQ message consuming capabilities.
+
+    Bindings are reconciled against the broker from the consumer thread on
+    every `on_iteration` tick. By default, `subscribe`/`unsubscribe` block
+    until that reconciliation converges (or is cancelled by a concurrent
+    inverse call); pass `wait=False` to skip the wait.
 
     Public methods:
         * `consumer_connected`:
@@ -180,15 +184,17 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
             Uninstall a handler for the specified event
     '''
 
-    consumer_args: ClassVar[dict] = {}
+    consumer_args: ClassVar[dict] = {'safety_interval': 0.2}
+    _binding_apply_timeout: ClassVar[float] = 5.0
 
     def __init__(self, **kwargs: Any):
         # NOTE(clanglois): Mixin expects a parent class to provide __init__ implementation
         super().__init__(**kwargs)  # type: ignore[safe-super]
-        name = f'{self._name}.{os.urandom(3).hex()}'
-        self.__connection = Connection(self.url)
-        self.__subscriptions: defaultdict[str, list[Subscription]] = defaultdict(list)
-        self.__queue = AMQPQueue(name=name, auto_delete=True, durable=False)
+        self.__subscriptions: dict[str, list[Subscription]] = {}
+        self.__bindings: set[Binding] = set()
+        self.__pending_binds: dict[Binding, Event] = {}
+        self.__pending_unbinds: dict[Binding, Event] = {}
+        self.__queue: AMQPQueue | None = None
         self.__lock = Lock()
         self.__thread: Thread | None = None
         if hasattr(self, '_register_thread'):
@@ -203,46 +209,109 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
         is_running = self.__thread.is_alive() if self.__thread is not None else True
         return bool(is_running and self.connection.connected)
 
-    @property
+    def __should_wait_for_apply(self) -> bool:
+        return (
+            self.is_running
+            and not self.is_stopping
+            and self.__thread is not None
+            and current_thread() is not self.__thread
+        )
+
+    def __wait_for_binding(self, event: Event, target: str) -> None:
+        if not event.wait(timeout=self._binding_apply_timeout):
+            self.log.warning(
+                'Timed out waiting for binding state of \'%s\' to converge',
+                target,
+            )
+
+    def on_iteration(self) -> None:
+        if self.__queue is None:
+            return
+
+        active_bindings = self.__queue.bindings
+
+        with self.__lock:
+            to_add = self.__bindings - active_bindings
+            to_remove = active_bindings - self.__bindings
+            has_pending = bool(self.__pending_binds) or bool(self.__pending_unbinds)
+
+        if not to_add and not to_remove and not has_pending:
+            return
+
+        if to_add or to_remove:
+            self.__apply_binding_changes(to_add, to_remove)
+
+        with self.__lock:
+            for binding in list(self.__pending_binds):
+                if binding in active_bindings or binding not in self.__bindings:
+                    self.__pending_binds.pop(binding).set()
+
+            for binding in list(self.__pending_unbinds):
+                if binding not in active_bindings or binding in self.__bindings:
+                    self.__pending_unbinds.pop(binding).set()
+
     @contextmanager
-    def __binding_channel(self) -> Iterator[StdChannel]:
-        if not self.__connection.connected:
-            self.__connection.connect()
-        yield self.__connection.default_channel
-
-    def __create_binding(self, headers: dict, routing_key: str | None) -> Binding:
-        binding = Binding(self._exchange, routing_key, headers, headers)
-        self.__queue.bindings.add(binding)
-        if self.is_running:
+    def __open_channel(self) -> Iterator[StdChannel]:
+        channel = self.connection.channel()
+        try:
+            yield channel
+        finally:
             try:
-                with self.__binding_channel as channel:
-                    self.__queue.queue_declare(passive=True, channel=channel)
+                channel.close()
+            except Exception:
+                self.log.debug('Ignoring error while closing channel', exc_info=True)
+
+    def __apply_binding_changes(
+        self, to_add: set[Binding], to_remove: set[Binding]
+    ) -> None:
+        if self.__queue is None:
+            return
+
+        errors = self.connection.connection_errors + self.connection.channel_errors
+
+        with self.__open_channel() as channel:
+            for binding in to_add:
+                try:
                     binding.bind(self.__queue, channel=channel)
-            except self.__connection.connection_errors as e:
-                self.log.error('Connection error while creating binding: %s', e)
-            except NotFound:
-                self.log.error(
-                    'Queue %s doesn\'t exist on the server', self.__queue.name
-                )
-        return binding
+                except NotFound as exc:
+                    self.log.warning(
+                        'Queue %s gone while binding %s, reconnecting: %s',
+                        self.__queue.name,
+                        binding,
+                        exc,
+                    )
+                    raise
+                except errors as exc:
+                    self.log.warning('Failed to bind %s, will retry: %s', binding, exc)
+                    continue
 
-    def __remove_binding(self, binding: Binding) -> None:
-        self.__queue.bindings.remove(binding)
-        if self.is_running:
-            try:
-                with self.__binding_channel as channel:
-                    self.__queue.queue_declare(passive=True, channel=channel)
+                self.__queue.bindings.add(binding)
+
+            for binding in to_remove:
+                try:
                     binding.unbind(self.__queue, channel=channel)
-            except self.__connection.connection_errors:
-                self.log.exception('Connection error while removing binding: %s')
-            except NotFound:
-                pass
+                except NotFound as exc:
+                    self.log.warning(
+                        'Queue %s gone while unbinding %s, reconnecting: %s',
+                        self.__queue.name,
+                        binding,
+                        exc,
+                    )
+                    raise
+                except errors as exc:
+                    self.log.warning(
+                        'Failed to unbind %s, will retry: %s', binding, exc
+                    )
+                    continue
+
+                self.__queue.bindings.discard(binding)
 
     def __dispatch(
         self, event_name: str, payload: dict, headers: dict | None = None
     ) -> None:
         with self.__lock:
-            subscriptions = self.__subscriptions[event_name].copy()
+            subscriptions = tuple(self.__subscriptions.get(event_name, ()))
+
         if subscriptions:
             self.log.debug(
                 'Received bus event: name=%s, headers=%s, payload=%s',
@@ -250,6 +319,7 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
                 headers,
                 payload,
             )
+
         for handler, _ in subscriptions:
             try:
                 handler(payload)
@@ -259,19 +329,20 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
                     getattr(handler, '__name__', handler),
                     event_name,
                 )
-            continue
 
     def __extract_event_from_message(self, message: Message) -> tuple[str, dict, dict]:
         event_name = None
-        headers = message.headers
+        headers = dict(message.headers)
         payload = message.payload
+        if isinstance(payload, dict):
+            payload = dict(payload)
 
         if 'name' in headers:
             event_name = headers['name']
         elif isinstance(payload, dict) and 'name' in payload:
             event_name = payload['name']
         else:
-            raise ValueError('Received invalid messsage; no event name could be found.')
+            raise ValueError('Received invalid message; no event name could be found.')
         return event_name, headers, payload
 
     def subscribe(
@@ -281,46 +352,89 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
         headers: dict | None = None,
         routing_key: str | None = None,
         headers_match_all: bool = True,
+        *,
+        wait: bool = True,
     ) -> None:
         headers = dict(headers or {})
         headers.update(name=event_name)
+
         if self._exchange.type == 'headers':
             headers.setdefault('x-match', 'all' if headers_match_all else 'any')
 
-        binding = self.__create_binding(headers, routing_key)
+        binding = Binding(self._exchange, routing_key, headers, headers)
         subscription = Subscription(handler, binding)
+        should_wait = wait and self.__should_wait_for_apply()
+        event: Event | None = None
+
         with self.__lock:
-            self.__subscriptions[event_name].append(subscription)
+            self.__subscriptions.setdefault(event_name, []).append(subscription)
+            self.__bindings.add(binding)
+            if should_wait and not self.is_stopping:
+                event = Event()
+                self.__pending_binds[binding] = event
+
+        if event is not None:
+            self.__wait_for_binding(event, event_name)
+
         self.log.debug(
             'Registered handler \'%s\' to event \'%s\'',
             getattr(handler, '__name__', handler),
             event_name,
         )
 
-    def unsubscribe(self, event_name: str, handler: EventHandlerType) -> bool:
+    def unsubscribe(
+        self,
+        event_name: str,
+        handler: EventHandlerType,
+        *,
+        wait: bool = True,
+    ) -> bool:
+        should_wait = wait and self.__should_wait_for_apply()
+        event: Event | None = None
+
         with self.__lock:
-            subscriptions = self.__subscriptions[event_name].copy()
-        try:
-            for subscription in subscriptions:
-                if subscription.handler == handler:
-                    with self.__lock:
-                        self.__subscriptions[event_name].remove(subscription)
-                    self.__remove_binding(subscription.binding)
-                    self.log.debug(
-                        'Unregistered handler \'%s\' from \'%s\'',
-                        getattr(handler, '__name__', handler),
-                        event_name,
-                    )
-                    return True
-            return False
-        finally:
-            if not self.__subscriptions[event_name]:
-                with self.__lock:
-                    self.__subscriptions.pop(event_name)
+            subscriptions = self.__subscriptions.get(event_name)
+            if subscriptions is None:
+                return False
+
+            matching = next((s for s in subscriptions if s.handler == handler), None)
+            if matching is None:
+                return False
+
+            subscriptions.remove(matching)
+            self.__bindings.discard(matching.binding)
+
+            if not subscriptions:
+                self.__subscriptions.pop(event_name)
+
+            if should_wait and not self.is_stopping:
+                event = Event()
+                self.__pending_unbinds[matching.binding] = event
+
+        if event is not None:
+            self.__wait_for_binding(event, event_name)
+
+        self.log.debug(
+            'Unregistered handler \'%s\' from \'%s\'',
+            getattr(handler, '__name__', handler),
+            event_name,
+        )
+        return True
 
     def get_consumers(
         self, Consumer: type[Consumer], channel: StdChannel
     ) -> list[Consumer]:
+        with self.__lock:
+            bindings = set(self.__bindings)
+
+        self.__queue = AMQPQueue(
+            name=f'{self._name}.{os.urandom(3).hex()}',
+            exclusive=True,
+            auto_delete=True,
+            durable=False,
+            bindings=bindings,
+        )
+
         self._exchange.bind(channel).declare()
         return [
             Consumer(
@@ -330,16 +444,15 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
             )
         ]
 
-    def __on_message_received(self, body: Any, message: Message) -> None:
-        event_name, headers, payload = self.__extract_event_from_message(message)
-        if event_name not in self.__subscriptions:
-            return
+    def __on_message_received(self, _body: Any, message: Message) -> None:
         try:
+            event_name, headers, payload = self.__extract_event_from_message(message)
+            if event_name not in self.__subscriptions:
+                return
             headers, payload = self._unmarshal(event_name, headers, payload)
-        except Exception:
-            raise
-        else:
             self.__dispatch(event_name, payload, headers)
+        except Exception:
+            self.log.exception('Failed to process message')
         finally:
             message.ack()
 
@@ -355,7 +468,7 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
             self.connection.release()
 
     def create_connection(self) -> Connection:
-        self.connection = self.__connection.clone()
+        self.connection = Connection(self.url)
         return self.connection
 
     @property
@@ -377,7 +490,15 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
         super().run(ready_flag=ready_flag, **self.consumer_args)
 
     def __thread_stop(self) -> None:
-        self.__connection.release()
+        with self.__lock:
+            for event in self.__pending_binds.values():
+                event.set()
+
+            for event in self.__pending_unbinds.values():
+                event.set()
+
+            self.__pending_binds.clear()
+            self.__pending_unbinds.clear()
 
 
 class PublisherMixin(BaseProtocol):
