@@ -1,4 +1,4 @@
-# Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from datetime import datetime
@@ -11,6 +11,7 @@ from hamcrest import (
     has_item,
     has_items,
     has_key,
+    has_length,
     is_,
 )
 
@@ -48,12 +49,16 @@ class TestRoutingKey(BusIntegrationTest):
             )
 
     def test_wrong_routing_key(self):
-        event = MockEvent('wrong_routing_key', data='something')
+        wrong = MockEvent('wrong_routing_key', data='wrong')
+        right = MockEvent('wrong_routing_key', data='right')
 
-        with self.local_event(event.name, routing_key='events.bus.good.#'):
-            self.local_bus.publish(event, routing_key='events.bus.wrong')
+        with self.local_event(wrong.name, routing_key='events.bus.good.#'):
+            self.local_bus.publish(wrong, routing_key='events.bus.wrong')
+            self.local_bus.publish(right, routing_key='events.bus.good.1')
 
-            assert_that(self.local_messages(event.name), is_(empty()))
+            messages = self.local_messages(wrong.name, 1)
+            assert_that(messages, has_length(1))
+            assert_that(messages, has_item(has_entry('data', 'right')))
 
     def test_no_event_routing_key(self):
         event = MockEvent('no_key', data='something')
@@ -64,12 +69,16 @@ class TestRoutingKey(BusIntegrationTest):
             assert_that(self.local_messages(event.name), is_(empty()))
 
     def test_no_routing_key(self):
-        event = MockEvent('no_publish_key', data='payload')
+        no_key = MockEvent('no_publish_key', data='no_key')
+        with_key = MockEvent('no_publish_key', data='with_key')
 
-        with self.local_event(event.name, routing_key='events.bus.good.#'):
-            self.local_bus.publish(event, routing_key=None)
+        with self.local_event(no_key.name, routing_key='events.bus.good.#'):
+            self.local_bus.publish(no_key, routing_key=None)
+            self.local_bus.publish(with_key, routing_key='events.bus.good.1')
 
-            assert_that(self.local_messages(event.name), is_(empty()))
+            messages = self.local_messages(no_key.name, 1)
+            assert_that(messages, has_length(1))
+            assert_that(messages, has_item(has_entry('data', 'with_key')))
 
     def test_headers_disabled_when_using_routing_key(self):
         event = MockEvent('headers_test', data='payload')
