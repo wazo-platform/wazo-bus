@@ -196,8 +196,7 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
         self.__subscriptions: dict[str, list[Subscription]] = {}
         self.__bindings: set[Binding] = set()
         self.__queue: AMQPQueue | None = None
-        self.__lock = Lock()
-        self.__synced = Condition(self.__lock)
+        self.__synced = Condition(Lock())
         self.__thread: Thread | None = None
         if hasattr(self, '_register_thread'):
             self.__thread = self._register_thread(
@@ -233,9 +232,8 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
         if self.__queue is None:
             return
 
-        active_before = set(self.__queue.bindings)
-
-        with self.__lock:
+        with self.__synced:
+            active_before = set(self.__queue.bindings)
             to_add = self.__bindings - active_before
             to_remove = active_before - self.__bindings
 
@@ -266,6 +264,8 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
             return
 
         errors = self.connection.connection_errors + self.connection.channel_errors
+        added: set[Binding] = set()
+        removed: set[Binding] = set()
 
         with self.__open_channel() as channel:
             for binding in to_add:
@@ -282,8 +282,7 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
                 except errors as exc:
                     self.log.warning('Failed to bind %s, will retry: %s', binding, exc)
                     continue
-
-                self.__queue.bindings.add(binding)
+                added.add(binding)
 
             for binding in to_remove:
                 try:
@@ -301,13 +300,16 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
                         'Failed to unbind %s, will retry: %s', binding, exc
                     )
                     continue
+                removed.add(binding)
 
-                self.__queue.bindings.discard(binding)
+        with self.__synced:
+            self.__queue.bindings |= added
+            self.__queue.bindings -= removed
 
     def __dispatch(
         self, event_name: str, payload: dict, headers: dict | None = None
     ) -> None:
-        with self.__lock:
+        with self.__synced:
             subscriptions = tuple(self.__subscriptions.get(event_name, ()))
 
         if subscriptions:
@@ -360,7 +362,7 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
         binding = Binding(self._exchange, routing_key, headers, headers)
         subscription = Subscription(handler, binding)
 
-        with self.__lock:
+        with self.__synced:
             self.__subscriptions.setdefault(event_name, []).append(subscription)
             self.__bindings.add(binding)
 
@@ -375,7 +377,7 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
         event_name: str,
         handler: EventHandlerType,
     ) -> bool:
-        with self.__lock:
+        with self.__synced:
             subscriptions = self.__subscriptions.get(event_name)
             if subscriptions is None:
                 return False
@@ -400,16 +402,14 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
     def get_consumers(
         self, Consumer: type[Consumer], channel: StdChannel
     ) -> list[Consumer]:
-        with self.__lock:
-            bindings = set(self.__bindings)
-
-        self.__queue = AMQPQueue(
-            name=f'{self._name}.{os.urandom(3).hex()}',
-            exclusive=True,
-            auto_delete=True,
-            durable=False,
-            bindings=bindings,
-        )
+        with self.__synced:
+            self.__queue = AMQPQueue(
+                name=f'{self._name}.{os.urandom(3).hex()}',
+                exclusive=True,
+                auto_delete=True,
+                durable=False,
+                bindings=set(self.__bindings),
+            )
 
         self._exchange.bind(channel).declare()
         return [
@@ -461,6 +461,8 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
         if 'ready_flag' in kwargs:
             ready_flag = kwargs.pop('ready_flag')
             ready_flag.set()
+        with self.__synced:
+            self.__synced.notify_all()
 
     def __thread_run(self, ready_flag: Event, **kwargs: Any) -> None:
         super().run(ready_flag=ready_flag, **self.consumer_args)
