@@ -138,7 +138,7 @@ class BusIntegrationTest(AssetLaunchingTestCase):
     @classmethod
     def remote_messages(cls, event_name, expected=None, timeout=3.0):
         def test():
-            return cls.remote_bus.get_messages_count == expected
+            return cls.remote_bus.get_messages_count(event_name) == expected
 
         try:
             until.true(test, timeout=timeout, interval=0.1)
