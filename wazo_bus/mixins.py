@@ -189,15 +189,12 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
     '''
 
     consumer_args: ClassVar[dict] = {'safety_interval': 0.2}
-    _binding_apply_timeout: ClassVar[float] = 5.0
 
     def __init__(self, **kwargs: Any):
         # NOTE(clanglois): Mixin expects a parent class to provide __init__ implementation
         super().__init__(**kwargs)  # type: ignore[safe-super]
         self.__subscriptions: dict[str, list[Subscription]] = {}
         self.__bindings: set[Binding] = set()
-        self.__pending_binds: dict[Binding, Event] = {}
-        self.__pending_unbinds: dict[Binding, Event] = {}
         self.__queue: AMQPQueue | None = None
         self.__lock = Lock()
         self.__synced = Condition(self.__lock)
@@ -213,21 +210,6 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
     def consumer_connected(self) -> bool:
         is_running = self.__thread.is_alive() if self.__thread is not None else True
         return bool(is_running and self.connection.connected)
-
-    def __should_wait_for_apply(self) -> bool:
-        return (
-            self.is_running
-            and not self.is_stopping
-            and self.__thread is not None
-            and current_thread() is not self.__thread
-        )
-
-    def __wait_for_binding(self, event: Event, target: str) -> None:
-        if not event.wait(timeout=self._binding_apply_timeout):
-            self.log.warning(
-                'Timed out waiting for binding state of \'%s\' to converge',
-                target,
-            )
 
     def __is_synced(self) -> bool:
         if self.__queue is None:
@@ -256,23 +238,13 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
         with self.__lock:
             to_add = self.__bindings - active_before
             to_remove = active_before - self.__bindings
-            has_pending = bool(self.__pending_binds) or bool(self.__pending_unbinds)
 
-        if not to_add and not to_remove and not has_pending:
+        if not to_add and not to_remove:
             return
 
-        if to_add or to_remove:
-            self.__apply_binding_changes(to_add, to_remove)
+        self.__apply_binding_changes(to_add, to_remove)
 
         with self.__synced:
-            for binding in list(self.__pending_binds):
-                if binding in self.__queue.bindings or binding not in self.__bindings:
-                    self.__pending_binds.pop(binding).set()
-
-            for binding in list(self.__pending_unbinds):
-                if binding not in self.__queue.bindings or binding in self.__bindings:
-                    self.__pending_unbinds.pop(binding).set()
-
             if self.__queue.bindings != active_before:
                 self.__synced.notify_all()
 
@@ -378,8 +350,6 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
         headers: dict | None = None,
         routing_key: str | None = None,
         headers_match_all: bool = True,
-        *,
-        wait: bool = True,
     ) -> None:
         headers = dict(headers or {})
         headers.update(name=event_name)
@@ -389,18 +359,10 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
 
         binding = Binding(self._exchange, routing_key, headers, headers)
         subscription = Subscription(handler, binding)
-        should_wait = wait and self.__should_wait_for_apply()
-        event: Event | None = None
 
         with self.__lock:
             self.__subscriptions.setdefault(event_name, []).append(subscription)
             self.__bindings.add(binding)
-            if should_wait and not self.is_stopping:
-                event = Event()
-                self.__pending_binds[binding] = event
-
-        if event is not None:
-            self.__wait_for_binding(event, event_name)
 
         self.log.debug(
             'Registered handler \'%s\' to event \'%s\'',
@@ -412,12 +374,7 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
         self,
         event_name: str,
         handler: EventHandlerType,
-        *,
-        wait: bool = True,
     ) -> bool:
-        should_wait = wait and self.__should_wait_for_apply()
-        event: Event | None = None
-
         with self.__lock:
             subscriptions = self.__subscriptions.get(event_name)
             if subscriptions is None:
@@ -432,13 +389,6 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
 
             if not subscriptions:
                 self.__subscriptions.pop(event_name)
-
-            if should_wait and not self.is_stopping:
-                event = Event()
-                self.__pending_unbinds[matching.binding] = event
-
-        if event is not None:
-            self.__wait_for_binding(event, event_name)
 
         self.log.debug(
             'Unregistered handler \'%s\' from \'%s\'',
@@ -517,14 +467,6 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
 
     def __thread_stop(self) -> None:
         with self.__synced:
-            for event in self.__pending_binds.values():
-                event.set()
-
-            for event in self.__pending_unbinds.values():
-                event.set()
-
-            self.__pending_binds.clear()
-            self.__pending_unbinds.clear()
             self.__synced.notify_all()
 
 
