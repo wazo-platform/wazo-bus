@@ -8,7 +8,8 @@ from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from datetime import datetime
 from queue import Empty, Queue
-from threading import Event, Lock, Thread, current_thread, main_thread
+from threading import Condition, Event, Lock, Thread, current_thread, main_thread
+from time import monotonic
 from typing import Any, ClassVar, NamedTuple, Protocol, Self
 
 from amqp.exceptions import NotFound
@@ -171,9 +172,10 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
     Mixin to provide RabbitMQ message consuming capabilities.
 
     Bindings are reconciled against the broker from the consumer thread on
-    every `on_iteration` tick. By default, `subscribe`/`unsubscribe` block
-    until that reconciliation converges (or is cancelled by a concurrent
-    inverse call); pass `wait=False` to skip the wait.
+    every `on_iteration` tick. `subscribe`/`unsubscribe` mutate the desired
+    state and return immediately; convergence happens within one
+    `safety_interval`. Callers that need a barrier (tests, batched
+    setup/teardown) can use `wait_synchronized()`.
 
     Public methods:
         * `consumer_connected`:
@@ -182,6 +184,8 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
             Install a handler for the specified event
         * `unsubscribe`:
             Uninstall a handler for the specified event
+        * `wait_synchronized`:
+            Block until desired bindings are live at the broker
     '''
 
     consumer_args: ClassVar[dict] = {'safety_interval': 0.2}
@@ -196,6 +200,7 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
         self.__pending_unbinds: dict[Binding, Event] = {}
         self.__queue: AMQPQueue | None = None
         self.__lock = Lock()
+        self.__synced = Condition(self.__lock)
         self.__thread: Thread | None = None
         if hasattr(self, '_register_thread'):
             self.__thread = self._register_thread(
@@ -224,15 +229,33 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
                 target,
             )
 
+    def __is_synced(self) -> bool:
+        if self.__queue is None:
+            return not self.__bindings
+        return self.__bindings == self.__queue.bindings
+
+    def wait_synchronized(self, timeout: float = 5.0) -> bool:
+        deadline = monotonic() + timeout
+        with self.__synced:
+            while True:
+                if self.is_stopping:
+                    return False
+                if self.__is_synced():
+                    return True
+                remaining = deadline - monotonic()
+                if remaining <= 0:
+                    return False
+                self.__synced.wait(timeout=remaining)
+
     def on_iteration(self) -> None:
         if self.__queue is None:
             return
 
-        active_bindings = self.__queue.bindings
+        active_before = set(self.__queue.bindings)
 
         with self.__lock:
-            to_add = self.__bindings - active_bindings
-            to_remove = active_bindings - self.__bindings
+            to_add = self.__bindings - active_before
+            to_remove = active_before - self.__bindings
             has_pending = bool(self.__pending_binds) or bool(self.__pending_unbinds)
 
         if not to_add and not to_remove and not has_pending:
@@ -241,14 +264,17 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
         if to_add or to_remove:
             self.__apply_binding_changes(to_add, to_remove)
 
-        with self.__lock:
+        with self.__synced:
             for binding in list(self.__pending_binds):
-                if binding in active_bindings or binding not in self.__bindings:
+                if binding in self.__queue.bindings or binding not in self.__bindings:
                     self.__pending_binds.pop(binding).set()
 
             for binding in list(self.__pending_unbinds):
-                if binding not in active_bindings or binding in self.__bindings:
+                if binding not in self.__queue.bindings or binding in self.__bindings:
                     self.__pending_unbinds.pop(binding).set()
+
+            if self.__queue.bindings != active_before:
+                self.__synced.notify_all()
 
     @contextmanager
     def __open_channel(self) -> Iterator[StdChannel]:
@@ -490,7 +516,7 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
         super().run(ready_flag=ready_flag, **self.consumer_args)
 
     def __thread_stop(self) -> None:
-        with self.__lock:
+        with self.__synced:
             for event in self.__pending_binds.values():
                 event.set()
 
@@ -499,6 +525,7 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
 
             self.__pending_binds.clear()
             self.__pending_unbinds.clear()
+            self.__synced.notify_all()
 
 
 class PublisherMixin(BaseProtocol):

@@ -1,4 +1,4 @@
-# Copyright 2021-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -136,6 +136,7 @@ def subscribe(event):
     headers, routing_key, _ = process_json(event, request.json, use_match=True)
     handler = create_event_handler(event, headers, routing_key)
     bus.subscribe(event, handler, headers, routing_key)
+    bus.wait_synchronized(timeout=5.0)
     info('Subscribed to \'%s\' (headers: %s)', event, headers)
     return make_response(
         200,
@@ -153,6 +154,7 @@ def unsubscribe(event):
     handler = broker.unbind_handler(event, headers, routing_key)
     if handler:
         bus.unsubscribe(event, handler)
+        bus.wait_synchronized(timeout=5.0)
         info('Unsubscribed from \'%s\' (headers: %s)', event, headers)
         return make_response(200, 'Unregistered event handler', event=event)
     return make_response(400, 'Handler not found', event=event)
