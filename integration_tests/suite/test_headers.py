@@ -35,7 +35,7 @@ class TestHeaders(BusIntegrationTest):
             )
 
         self.local_bus.publish(event2)
-        assert_that(self.local_messages(event_name, 1), is_(empty()))
+        assert_that(self.local_messages(event_name, 1, timeout=1.0), is_(empty()))
 
     def test_routing_key_disabled_with_headers_exchange(self):
         event_name = 'routing_key_event'

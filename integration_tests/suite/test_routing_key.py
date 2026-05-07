@@ -35,7 +35,7 @@ class TestRoutingKey(BusIntegrationTest):
             )
 
         self.local_bus.publish(event)
-        assert_that(self.local_messages(event.name, 1), is_(empty()))
+        assert_that(self.local_messages(event.name, 1, timeout=1.0), is_(empty()))
 
     def test_good_routing_key(self):
         event = MockEvent('good_routing_key', data='payload')
@@ -66,7 +66,7 @@ class TestRoutingKey(BusIntegrationTest):
         with self.local_event(event.name, routing_key=None):
             self.local_bus.publish(event, routing_key='events.bus.somewhere')
 
-            assert_that(self.local_messages(event.name), is_(empty()))
+            assert_that(self.local_messages(event.name, timeout=1.0), is_(empty()))
 
     def test_no_routing_key(self):
         no_key = MockEvent('no_publish_key', data='no_key')
