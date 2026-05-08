@@ -1,4 +1,4 @@
-# Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from datetime import datetime
@@ -35,7 +35,7 @@ class TestHeaders(BusIntegrationTest):
             )
 
         self.local_bus.publish(event2)
-        assert_that(self.local_messages(event_name, 1), is_(empty()))
+        assert_that(self.local_messages(event_name, 1, timeout=1.0), is_(empty()))
 
     def test_routing_key_disabled_with_headers_exchange(self):
         event_name = 'routing_key_event'
@@ -73,10 +73,15 @@ class TestHeaders(BusIntegrationTest):
 
         with self.local_event(event.name, headers=headers):
             self.local_bus.publish(
-                event, payload={'value': 'something'}, headers={'required': False}
+                event, payload={'value': 'wrong'}, headers={'required': False}
+            )
+            self.local_bus.publish(
+                event, payload={'value': 'right'}, headers={'required': True}
             )
 
-            assert_that(self.local_messages(event.name), is_(empty()))
+            messages = self.local_messages(event.name, 1)
+            assert_that(messages, has_length(1))
+            assert_that(messages, has_item(has_entry('value', 'right')))
 
     def test_publish_ignore_extra_headers(self):
         event = MockEvent('extra_ignored_headers', some='payload')

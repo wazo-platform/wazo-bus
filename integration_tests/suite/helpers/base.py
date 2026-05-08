@@ -116,11 +116,13 @@ class BusIntegrationTest(AssetLaunchingTestCase):
         handler = cls._local_messages.create_handler(event)
         try:
             cls.local_bus.subscribe(event, handler, headers, routing_key)
+            cls.local_bus.wait_synchronized(timeout=5.0)
             yield
         except Exception:
             raise
         finally:
             assert_that(cls.local_bus.unsubscribe(event, handler), is_(True))
+            cls.local_bus.wait_synchronized(timeout=5.0)
 
     @classmethod
     def local_messages(cls, event_name, expected=None, timeout=3.0):
@@ -136,7 +138,7 @@ class BusIntegrationTest(AssetLaunchingTestCase):
     @classmethod
     def remote_messages(cls, event_name, expected=None, timeout=3.0):
         def test():
-            return cls.remote_bus.get_messages_count == expected
+            return cls.remote_bus.get_messages_count(event_name) == expected
 
         try:
             until.true(test, timeout=timeout, interval=0.1)
