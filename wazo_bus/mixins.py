@@ -196,7 +196,8 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
         self.__subscriptions: dict[str, list[Subscription]] = {}
         self.__bindings: set[Binding] = set()
         self.__queue: AMQPQueue | None = None
-        self.__synced = Condition(Lock())
+        self.__lock = Lock()
+        self.__synced = Condition(self.__lock)
         self.__thread: Thread | None = None
         if hasattr(self, '_register_thread'):
             self.__thread = self._register_thread(
