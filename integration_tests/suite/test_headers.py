@@ -5,6 +5,7 @@ from datetime import datetime
 
 from hamcrest import (
     assert_that,
+    calling,
     empty,
     has_entries,
     has_entry,
@@ -13,6 +14,7 @@ from hamcrest import (
     has_key,
     has_length,
     is_,
+    raises,
 )
 
 from .helpers.base import BusIntegrationTest
@@ -193,3 +195,20 @@ class TestHeaders(BusIntegrationTest):
                 self.local_messages(event_name, 1),
                 has_items(has_entries(id=4567, value='something')),
             )
+
+    def test_unmarshal_rejects_non_dict_payload(self):
+        assert_that(
+            calling(self.local_bus._unmarshal).with_args(
+                'some_event', {'name': 'some_event'}, 'not a dict'
+            ),
+            raises(ValueError),
+        )
+
+    def test_unmarshal_accepts_dict_payload(self):
+        headers, data = self.local_bus._unmarshal(
+            'some_event',
+            {'name': 'some_event'},
+            {'name': 'some_event', 'data': {'value': 42}},
+        )
+        assert_that(headers, has_entry('name', 'some_event'))
+        assert_that(data, has_entry('value', 42))

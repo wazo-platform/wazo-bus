@@ -430,6 +430,7 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
             self.__dispatch(event_name, payload, headers)
         except Exception:
             self.log.exception('Failed to process message')
+            raise
         finally:
             message.ack()
 
@@ -686,6 +687,11 @@ class WazoEventMixin(BaseProtocol):
     def _unmarshal(
         self, event_name: str, headers: dict, payload: dict
     ) -> tuple[dict, dict]:
+        if not isinstance(payload, dict):
+            raise ValueError(
+                f"Invalid payload for event '{event_name}': "
+                f"expected dict, got {type(payload).__name__}"
+            )
         event_data = payload.pop('data')
         headers = headers or payload
         return headers, event_data
