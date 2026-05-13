@@ -1,4 +1,4 @@
-# Copyright 2017-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from ..common.event import TenantEvent, UserEvent
@@ -32,6 +32,57 @@ class TenantDeletedEvent(TenantEvent):
 
     def __init__(self, tenant_uuid: UUIDStr):
         content = {'uuid': tenant_uuid}
+        super().__init__(content, tenant_uuid)
+
+
+class ExternalAuthAddedEvent(TenantEvent):
+    service = 'auth'
+    name = 'auth_external_auth_added'
+    routing_key_fmt = 'auth.tenants.{tenant_uuid}.external.{external_auth_name}.created'
+
+    def __init__(
+        self,
+        external_auth_name: str,
+        tenant_uuid: UUIDStr,
+    ):
+        content = {
+            'uuid': tenant_uuid,
+            'external_auth_name': external_auth_name,
+        }
+        super().__init__(content, tenant_uuid)
+
+
+class ExternalAuthUpdatedEvent(TenantEvent):
+    service = 'auth'
+    name = 'auth_external_auth_updated'
+    routing_key_fmt = 'auth.tenants.{tenant_uuid}.external.{external_auth_name}.updated'
+
+    def __init__(
+        self,
+        external_auth_name: str,
+        tenant_uuid: UUIDStr,
+    ):
+        content = {
+            'uuid': tenant_uuid,
+            'external_auth_name': external_auth_name,
+        }
+        super().__init__(content, tenant_uuid)
+
+
+class ExternalAuthDeletedEvent(TenantEvent):
+    service = 'auth'
+    name = 'auth_external_auth_deleted'
+    routing_key_fmt = 'auth.tenants.{tenant_uuid}.external.{external_auth_name}.deleted'
+
+    def __init__(
+        self,
+        external_auth_name: str,
+        tenant_uuid: UUIDStr,
+    ):
+        content = {
+            'uuid': tenant_uuid,
+            'external_auth_name': external_auth_name,
+        }
         super().__init__(content, tenant_uuid)
 
 
