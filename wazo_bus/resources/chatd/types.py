@@ -21,7 +21,6 @@ class UserIdentityDict(TypedDict, total=False):
     backend: str
     type: str
     identity: str
-    extra: dict[str, str]
 
 
 class LinePresenceDict(TypedDict, total=False):
