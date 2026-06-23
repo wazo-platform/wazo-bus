@@ -248,3 +248,13 @@ class SessionExpireSoonEvent(UserEvent):
         }
         super().__init__(content, tenant_uuid, user_uuid)
         self.session_uuid = str(session_uuid)
+
+
+class UserDeletedEvent(UserEvent):
+    service = 'auth'
+    name = 'auth_user_deleted'
+    routing_key_fmt = 'auth.users.{user_uuid}.deleted'
+
+    def __init__(self, tenant_uuid: UUIDStr, user_uuid: UUIDStr):
+        content = {'uuid': user_uuid, 'tenant_uuid': tenant_uuid}
+        super().__init__(content, tenant_uuid, user_uuid)
