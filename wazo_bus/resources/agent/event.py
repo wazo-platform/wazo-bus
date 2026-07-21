@@ -1,4 +1,4 @@
-# Copyright 2015-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
@@ -27,7 +27,7 @@ class AgentDeletedEvent(TenantEvent):
     routing_key_fmt = 'config.agent.deleted'
 
     def __init__(self, agent_id: int, tenant_uuid: UUIDStr):
-        content = {'id': int(agent_id)}
+        content = {'id': int(agent_id), 'tenant_uuid': str(tenant_uuid)}
         super().__init__(content, tenant_uuid)
 
 
