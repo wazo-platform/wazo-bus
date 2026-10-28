@@ -23,6 +23,7 @@ from kombu.transport.base import StdChannel
 from .base import BaseProtocol
 from .collectd.common import CollectdEvent
 from .resources.common.abstract import EventProtocol
+from .upstream import UpstreamBindings
 
 EventHandlerType = Callable[[dict], None]
 ThreadTargetType = Callable[..., None]
@@ -177,6 +178,11 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
     `safety_interval`. Callers that need a barrier (tests, batched
     setup/teardown) can use `wait_synchronized()`.
 
+    With `upstream_exchange_name`, the consuming exchange is declared
+    transient and auto-delete and bound to that (never declared) headers upstream exchange
+    once per subscribed event name, and those bindings are reconciled the same
+    way.
+
     Public methods:
         * `consumer_connected`:
             Returns whether the consumer is connected to RabbitMQ or not
@@ -190,11 +196,22 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
 
     consumer_args: ClassVar[dict] = {'safety_interval': 0.2}
 
-    def __init__(self, **kwargs: Any):
+    def __init__(
+        self,
+        upstream_exchange_name: str | None = None,
+        **kwargs: Any,
+    ):
+        if upstream_exchange_name:
+            kwargs['exchange_kwargs'] = {
+                **(kwargs.get('exchange_kwargs') or {}),
+                'auto_delete': True,
+            }
+            kwargs['exchange_durable'] = False
         # NOTE(clanglois): Mixin expects a parent class to provide __init__ implementation
         super().__init__(**kwargs)  # type: ignore[safe-super]
         self.__subscriptions: dict[str, list[Subscription]] = {}
         self.__bindings: set[Binding] = set()
+        self.__upstream = UpstreamBindings(upstream_exchange_name, self.log)
         self.__queue: AMQPQueue | None = None
         self.__lock = Lock()
         self.__synced = Condition(self.__lock)
@@ -213,8 +230,8 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
 
     def __is_synced(self) -> bool:
         if self.__queue is None:
-            return not self.__bindings
-        return self.__bindings == self.__queue.bindings
+            return not self.__bindings and self.__upstream.is_synced()
+        return self.__bindings == self.__queue.bindings and self.__upstream.is_synced()
 
     def wait_synchronized(self, timeout: float = 5.0) -> bool:
         deadline = monotonic() + timeout
@@ -238,13 +255,35 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
             to_add = self.__bindings - active_before
             to_remove = active_before - self.__bindings
 
-        if not to_add and not to_remove:
+            upstream_to_add, upstream_to_remove = self.__upstream.changes()
+
+        if not (to_add or to_remove or upstream_to_add or upstream_to_remove):
             return
 
-        self.__apply_binding_changes(to_add, to_remove)
+        upstream_added: set[Binding] = set()
+        upstream_removed: set[Binding] = set()
+        # NOTE: upstream first: the last queue unbind deletes an auto-delete exchange
+        if upstream_to_add or upstream_to_remove:
+            errors = self.connection.connection_errors + self.connection.channel_errors
+            upstream_added, upstream_removed = self.__upstream.apply(
+                upstream_to_add,
+                upstream_to_remove,
+                self._exchange,
+                self.__open_channel,
+                errors,
+            )
+            with self.__synced:
+                self.__upstream.commit(upstream_added, upstream_removed)
+
+        if to_add or to_remove:
+            self.__apply_binding_changes(to_add, to_remove)
 
         with self.__synced:
-            if self.__queue.bindings != active_before:
+            if (
+                self.__queue.bindings != active_before
+                or upstream_added
+                or upstream_removed
+            ):
                 self.__synced.notify_all()
 
     @contextmanager
@@ -366,6 +405,7 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
         with self.__synced:
             self.__subscriptions.setdefault(event_name, []).append(subscription)
             self.__bindings.add(binding)
+            self.__upstream.add(event_name)
 
         self.log.debug(
             'Registered handler \'%s\' to event \'%s\'',
@@ -392,6 +432,7 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
 
             if not subscriptions:
                 self.__subscriptions.pop(event_name)
+                self.__upstream.discard(event_name)
 
         self.log.debug(
             'Unregistered handler \'%s\' from \'%s\'',
@@ -411,6 +452,7 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
                 durable=False,
                 bindings=set(self.__bindings),
             )
+            self.__upstream.reset()
 
         self._exchange.bind(channel).declare()
         return [
