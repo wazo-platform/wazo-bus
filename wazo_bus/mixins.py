@@ -13,7 +13,7 @@ from time import monotonic
 from typing import Any, ClassVar, NamedTuple, Protocol, Self
 
 from amqp.exceptions import NotFound
-from kombu import Connection, Consumer, Message, Producer
+from kombu import Connection, Consumer, Exchange, Message, Producer
 from kombu import Queue as AMQPQueue
 from kombu import binding as Binding
 from kombu.exceptions import OperationalError
@@ -177,6 +177,11 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
     `safety_interval`. Callers that need a barrier (tests, batched
     setup/teardown) can use `wait_synchronized()`.
 
+    With `upstream_exchange_name`, the consuming exchange is declared
+    transient and auto-delete and bound to that (never declared) headers upstream exchange
+    once per subscribed event name, and those bindings are reconciled the same
+    way.
+
     Public methods:
         * `consumer_connected`:
             Returns whether the consumer is connected to RabbitMQ or not
@@ -190,11 +195,27 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
 
     consumer_args: ClassVar[dict] = {'safety_interval': 0.2}
 
-    def __init__(self, **kwargs: Any):
+    def __init__(
+        self,
+        upstream_exchange_name: str | None = None,
+        **kwargs: Any,
+    ):
+        if upstream_exchange_name:
+            kwargs['exchange_kwargs'] = {
+                **(kwargs.get('exchange_kwargs') or {}),
+                'auto_delete': True,
+            }
+            kwargs['exchange_durable'] = False
         # NOTE(clanglois): Mixin expects a parent class to provide __init__ implementation
         super().__init__(**kwargs)  # type: ignore[safe-super]
         self.__subscriptions: dict[str, list[Subscription]] = {}
         self.__bindings: set[Binding] = set()
+        self.__upstream_exchange: Exchange | None = None
+        if upstream_exchange_name:
+            self.__upstream_exchange = Exchange(upstream_exchange_name, 'headers')
+        self.__upstream_binding_by_event: dict[str, Binding] = {}
+        self.__live_upstream_bindings: set[Binding] = set()
+        self.__upstream_last_error: str | None = None
         self.__queue: AMQPQueue | None = None
         self.__lock = Lock()
         self.__synced = Condition(self.__lock)
@@ -213,8 +234,11 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
 
     def __is_synced(self) -> bool:
         if self.__queue is None:
-            return not self.__bindings
-        return self.__bindings == self.__queue.bindings
+            return not self.__bindings and not self.__upstream_binding_by_event
+        return self.__bindings == self.__queue.bindings and (
+            self.__live_upstream_bindings
+            == set(self.__upstream_binding_by_event.values())
+        )
 
     def wait_synchronized(self, timeout: float = 5.0) -> bool:
         deadline = monotonic() + timeout
@@ -238,13 +262,26 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
             to_add = self.__bindings - active_before
             to_remove = active_before - self.__bindings
 
-        if not to_add and not to_remove:
+            upstream_desired = set(self.__upstream_binding_by_event.values())
+            upstream_before = set(self.__live_upstream_bindings)
+            upstream_to_add = upstream_desired - upstream_before
+            upstream_to_remove = upstream_before - upstream_desired
+
+        if not (to_add or to_remove or upstream_to_add or upstream_to_remove):
             return
 
-        self.__apply_binding_changes(to_add, to_remove)
+        # NOTE: upstream first: the last queue unbind deletes an auto-delete exchange
+        if upstream_to_add or upstream_to_remove:
+            self.__apply_upstream_binding_changes(upstream_to_add, upstream_to_remove)
+
+        if to_add or to_remove:
+            self.__apply_binding_changes(to_add, to_remove)
 
         with self.__synced:
-            if self.__queue.bindings != active_before:
+            if (
+                self.__queue.bindings != active_before
+                or self.__live_upstream_bindings != upstream_before
+            ):
                 self.__synced.notify_all()
 
     @contextmanager
@@ -307,6 +344,49 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
             self.__queue.bindings |= added
             self.__queue.bindings -= removed
 
+    def __apply_upstream_binding_changes(
+        self, to_add: set[Binding], to_remove: set[Binding]
+    ) -> None:
+        assert self.__upstream_exchange is not None
+        errors = self.connection.connection_errors + self.connection.channel_errors
+        added: set[Binding] = set()
+        removed: set[Binding] = set()
+
+        # NOTE: removals first: a resubscribed event's binding has the same arguments
+        try:
+            for binding in to_remove:
+                try:
+                    with self.__open_channel() as channel:
+                        binding.unbind(self._exchange, channel=channel)
+                except NotFound:
+                    # NOTE: a missing exchange holds no binding; NotFound closed the channel
+                    pass
+                removed.add(binding)
+            if to_add:
+                with self.__open_channel() as channel:
+                    self._exchange.bind(channel).declare()
+                    for binding in to_add:
+                        binding.bind(self._exchange, channel=channel)
+                        added.add(binding)
+        except errors as exc:
+            log = self.log.debug
+            if str(exc) != self.__upstream_last_error:
+                self.__upstream_last_error = str(exc)
+                log = self.log.warning
+            log(
+                'Failed to update bindings from upstream exchange \'%s\' '
+                'to \'%s\', will retry: %s',
+                self.__upstream_exchange.name,
+                self._exchange.name,
+                exc,
+            )
+        else:
+            self.__upstream_last_error = None
+
+        with self.__synced:
+            self.__live_upstream_bindings |= added
+            self.__live_upstream_bindings -= removed
+
     def __dispatch(
         self, event_name: str, payload: dict, headers: dict | None = None
     ) -> None:
@@ -366,6 +446,14 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
         with self.__synced:
             self.__subscriptions.setdefault(event_name, []).append(subscription)
             self.__bindings.add(binding)
+            if (
+                self.__upstream_exchange is not None
+                and event_name not in self.__upstream_binding_by_event
+            ):
+                upstream_headers = {'name': event_name}
+                self.__upstream_binding_by_event[event_name] = Binding(
+                    self.__upstream_exchange, None, upstream_headers, upstream_headers
+                )
 
         self.log.debug(
             'Registered handler \'%s\' to event \'%s\'',
@@ -392,6 +480,7 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
 
             if not subscriptions:
                 self.__subscriptions.pop(event_name)
+                self.__upstream_binding_by_event.pop(event_name, None)
 
         self.log.debug(
             'Unregistered handler \'%s\' from \'%s\'',
@@ -411,6 +500,7 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
                 durable=False,
                 bindings=set(self.__bindings),
             )
+            self.__live_upstream_bindings = set()
 
         self._exchange.bind(channel).declare()
         return [
