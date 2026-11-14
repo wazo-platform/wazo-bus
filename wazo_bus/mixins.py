@@ -4,7 +4,8 @@
 from __future__ import annotations
 
 import os
-from collections.abc import Callable, Iterator
+from collections import Counter
+from collections.abc import Callable, Iterable, Iterator
 from contextlib import contextmanager
 from datetime import datetime
 from queue import Empty, Queue
@@ -39,6 +40,18 @@ class BusThread(NamedTuple):
 class Subscription(NamedTuple):
     handler: EventHandlerType
     binding: Binding
+
+
+BindingKey = tuple[str | None, frozenset[tuple[str, Any]]]
+
+
+def headers_match(headers: dict, arguments: dict) -> bool:
+    compare = all if arguments.get('x-match', 'all') == 'all' else any
+    return compare(
+        key in headers and headers[key] == value
+        for key, value in arguments.items()
+        if not key.startswith('x-')
+    )
 
 
 class ThreadableProtocol(Protocol):
@@ -184,6 +197,17 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
     way. A queue binding goes live only once its event's upstream binding is
     live, so a live queue binding means its events can be delivered.
 
+    With `bind_keys` (a headers exchange only, `ValueError` otherwise), the
+    queue is no longer bound once per subscription: subscriptions share one
+    binding per routing key, event name and value of each listed header key
+    their headers carry (`()` binds by name alone; a `x-match: any`
+    subscription binds by name alone). The handlers of an event are then
+    called only for messages whose headers match their own subscription's
+    headers (`x-` keys ignored, `x-match` all or any), so a handler receives
+    the same events as with a binding of its own. Without `bind_keys` every
+    subscription has its own queue binding and every handler of an event is
+    called.
+
     Public methods:
         * `consumer_connected`:
             Returns whether the consumer is connected to RabbitMQ or not
@@ -202,6 +226,7 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
     def __init__(
         self,
         upstream_exchange_name: str | None = None,
+        bind_keys: Iterable[str] | None = None,
         **kwargs: Any,
     ):
         if upstream_exchange_name:
@@ -212,8 +237,17 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
             kwargs['exchange_durable'] = False
         # NOTE(clanglois): Mixin expects a parent class to provide __init__ implementation
         super().__init__(**kwargs)  # type: ignore[safe-super]
+        if bind_keys is not None and self._exchange.type != 'headers':
+            raise ValueError(
+                f'bind_keys needs a headers exchange, not \'{self._exchange.type}\''
+            )
+        self.__bind_keys = None if bind_keys is None else tuple(bind_keys)
         self.__subscriptions: dict[str, list[Subscription]] = {}
         self.__bindings: set[Binding] = set()
+        # NOTE: one object per key for the consumer's life: a binding dropped and
+        # re-added between two ticks is the same object, never a bind then an unbind
+        self.__shared_bindings: dict[BindingKey, Binding] = {}
+        self.__shared_counts: Counter[BindingKey] = Counter()
         self.__failed_bindings: set[Binding] = set()
         self.__upstream = UpstreamBindings(upstream_exchange_name, self.log)
         self.__queue: AMQPQueue | None = None
@@ -389,7 +423,11 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
                 payload,
             )
 
-        for handler, _ in subscriptions:
+        for handler, binding in subscriptions:
+            if self.__bind_keys is not None and not headers_match(
+                headers or {}, binding.arguments
+            ):
+                continue
             try:
                 handler(payload)
             except Exception:
@@ -433,7 +471,10 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
 
         with self.__synced:
             self.__subscriptions.setdefault(event_name, []).append(subscription)
-            self.__bindings.add(binding)
+            if self.__bind_keys is None:
+                self.__bindings.add(binding)
+            else:
+                self.__share(binding)
             self.__upstream.add(event_name)
 
         self.log.debug(
@@ -457,7 +498,10 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
                 return False
 
             subscriptions.remove(matching)
-            self.__bindings.discard(matching.binding)
+            if self.__bind_keys is None:
+                self.__bindings.discard(matching.binding)
+            else:
+                self.__release(matching.binding)
 
             if not subscriptions:
                 self.__subscriptions.pop(event_name)
@@ -469,6 +513,34 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
             event_name,
         )
         return True
+
+    def __shared_key(self, binding: Binding) -> BindingKey:
+        assert self.__bind_keys is not None
+        arguments = binding.arguments
+        kept = {'name': arguments['name'], 'x-match': 'all'}
+        if arguments['x-match'] == 'all':
+            kept.update(
+                (key, arguments[key]) for key in self.__bind_keys if key in arguments
+            )
+        return binding.routing_key, frozenset(kept.items())
+
+    def __share(self, binding: Binding) -> None:
+        key = self.__shared_key(binding)
+        if key not in self.__shared_bindings:
+            routing_key, items = key
+            arguments = dict(items)
+            self.__shared_bindings[key] = Binding(
+                self._exchange, routing_key, arguments, arguments
+            )
+        self.__shared_counts[key] += 1
+        self.__bindings.add(self.__shared_bindings[key])
+
+    def __release(self, binding: Binding) -> None:
+        key = self.__shared_key(binding)
+        self.__shared_counts[key] -= 1
+        if self.__shared_counts[key] <= 0:
+            del self.__shared_counts[key]
+            self.__bindings.discard(self.__shared_bindings[key])
 
     def get_consumers(
         self, Consumer: type[Consumer], channel: StdChannel
