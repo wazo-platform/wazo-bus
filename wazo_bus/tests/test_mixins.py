@@ -432,6 +432,37 @@ class TestBindKeysBindings(TestCase):
             ),
         )
 
+    def test_a_consumer_without_bind_keys_takes_any_exchange_type(self):
+        for exchange_type in ('topic', 'direct', 'fanout', 'headers', ''):
+            BusConsumer(
+                name='bind-keys-unit',
+                exchange_name='downstream',
+                exchange_type=exchange_type,
+            )
+
+    def test_bind_keys_reject_an_x_match_other_than_all_or_any(self):
+        for x_match in ('all-with-x', 'any-with-x', 'none'):
+            consumer = make_headers_consumer(bind_keys=('tenant_uuid',))
+            with self.assertRaises(ValueError):
+                consumer.subscribe(
+                    'some_event',
+                    Mock(),
+                    headers={**subscriber_headers(1, TENANT_1), 'x-match': x_match},
+                )
+            assert_that(consumer._ConsumerMixin__subscriptions, equal_to({}))
+            assert_that(queue_bindings(consumer), equal_to([]))
+
+    def test_without_bind_keys_any_x_match_is_kept(self):
+        consumer = make_headers_consumer()
+        consumer.subscribe(
+            'some_event',
+            Mock(),
+            headers={**subscriber_headers(1), 'x-match': 'all-with-x'},
+        )
+
+        [binding] = queue_bindings(consumer)
+        assert_that(dict(binding[1])['x-match'], equal_to('all-with-x'))
+
     def test_bind_keys_on_a_non_headers_exchange_raises(self):
         for exchange_type in ('topic', 'direct', 'fanout', ''):
             with self.assertRaises(ValueError):
@@ -650,7 +681,7 @@ class TestBindKeysDispatch(TestCase):
 
         assert_that(handler.call_count, equal_to(1))
 
-    def test_a_match_any_subscription_needs_one_matching_header(self):
+    def test_a_match_any_subscription_receives_every_message_of_its_name(self):
         consumer = make_headers_consumer(bind_keys=('tenant_uuid',))
         handler = Mock()
         consumer.subscribe(

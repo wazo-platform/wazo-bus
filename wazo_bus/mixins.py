@@ -46,7 +46,7 @@ BindingKey = tuple[str | None, frozenset[tuple[str, Any]]]
 
 
 def headers_match(headers: dict, arguments: dict) -> bool:
-    compare = all if arguments.get('x-match', 'all') == 'all' else any
+    compare = all if arguments['x-match'] == 'all' else any
     return compare(
         key in headers and headers[key] == value
         for key, value in arguments.items()
@@ -200,10 +200,11 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
     With `bind_keys` (a headers exchange only, `ValueError` otherwise), the
     queue is no longer bound once per subscription: subscriptions share one
     binding per routing key, event name and value of each listed header key
-    their headers carry (`()` binds by name alone; a `x-match: any`
-    subscription binds by name alone). The handlers of an event are then
-    called only for messages whose headers match their own subscription's
-    headers (`x-` keys ignored, `x-match` all or any), so a handler receives
+    their headers carry (`()` binds by name alone; an `x-match: any`
+    subscription binds by name alone; an `x-match` other than `all` or `any`
+    raises `ValueError`). The handlers of an event are then called only for
+    messages whose headers match their own subscription's headers (`x-` keys
+    ignored, `x-match` all or any), so a handler receives
     the same events as with a binding of its own. Without `bind_keys` every
     subscription has its own queue binding and every handler of an event is
     called.
@@ -465,6 +466,11 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
 
         if self._exchange.type == 'headers':
             headers.setdefault('x-match', 'all' if headers_match_all else 'any')
+
+        if self.__bind_keys is not None and headers['x-match'] not in ('all', 'any'):
+            raise ValueError(
+                f'bind_keys needs x-match all or any, not \'{headers["x-match"]}\''
+            )
 
         binding = Binding(self._exchange, routing_key, headers, headers)
         subscription = Subscription(handler, binding)
