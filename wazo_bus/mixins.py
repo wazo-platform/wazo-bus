@@ -344,7 +344,10 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
     ignored, `x-match` all or any, values compared as the connected RabbitMQ
     compares them: see `amqp_value` and `broker_tells_numbers_apart`; a
     consumer overriding the dispatcher calls `_headers_match`), so a handler
-    receives the same events as with a binding of its own. Without `bind_keys` every
+    receives the same events as with a binding of its own. A subscription's
+    keys, at any depth, are read as py-amqp delivers them (a UTF-8 bytes key is
+    its text, `key_on_the_wire`), so a key given both as bytes and as its text
+    raises `ValueError`. Without `bind_keys` every
     subscription has its own queue binding and every handler of an event is
     called.
 
@@ -608,6 +611,12 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
     ) -> None:
         headers = dict(headers or {})
         headers.update(name=event_name)
+        if self.__bind_keys is not None:
+            # NOTE: its keys as a consumer reads them, so the dispatcher finds
+            # them in a message and a bytes x-match is its x-match; a copy, so a
+            # caller changing a list or a table later changes neither the
+            # shared key, the broker binding nor the dispatch
+            headers = keys_on_the_wire(headers)
 
         if self._exchange.type == 'headers':
             headers.setdefault('x-match', 'all' if headers_match_all else 'any')
@@ -618,13 +627,9 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
             )
         if self.__bind_keys is not None:
             # NOTE: the dispatcher compares every value, so one it cannot read
-            # fails here, before any state changes, not at each message; a copy,
-            # so a caller changing a list or a table later changes neither the
-            # shared key, the broker binding nor the dispatch; its keys as a
-            # consumer reads them, so the dispatcher finds them in a message
+            # fails here, before any state changes, not at each message
             for value in headers.values():
                 amqp_value(value)
-            headers = keys_on_the_wire(headers)
 
         binding = Binding(self._exchange, routing_key, headers, headers)
         subscription = Subscription(handler, binding)

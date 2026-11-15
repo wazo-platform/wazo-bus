@@ -1242,6 +1242,28 @@ class TestBindKeysByteKeysAsOnTheWire(TestCase):
 
         assert_that(self.handler.call_count, equal_to(1))
 
+    def test_a_bytes_x_match_given_alone_is_the_subscription_s_x_match(self):
+        self.consumer.subscribe(
+            'some_event',
+            self.handler,
+            headers={b'x-match': 'any', 'tenant_uuid': TENANT_1, 'user_uuid': 'u1'},
+        )
+
+        deliver(
+            self.consumer,
+            {'name': 'some_event', 'tenant_uuid': TENANT_2, 'user_uuid': 'u1'},
+        )
+
+        assert_that(self.handler.call_count, equal_to(1))
+
+    def test_a_bytes_x_match_other_than_all_or_any_raises_as_its_text_does(self):
+        with self.assertRaisesRegex(ValueError, 'bind_keys needs x-match all or any'):
+            self.consumer.subscribe(
+                'some_event', Mock(), headers={b'x-match': 'all-with-x'}
+            )
+
+        assert_that(self.consumer._ConsumerMixin__subscriptions, equal_to({}))
+
     def test_a_key_given_as_bytes_and_as_text_raises_before_any_state_changes(self):
         collisions = (
             {b'tenant_uuid': TENANT_1, 'tenant_uuid': TENANT_1},
