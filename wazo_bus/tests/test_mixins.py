@@ -23,8 +23,10 @@ from hamcrest import (
 )
 from kombu import Exchange
 from kombu import binding as Binding
+from kombu.transport import pyamqp
 
 from ..consumer import BusConsumer
+from ..mixins import broker_tells_numbers_apart
 
 
 class TestUpstreamBindings(TestCase):
@@ -784,14 +786,25 @@ class TestBindKeysDispatchNumbersAsTheBrokerDoes(TestCase):
             assert_that(handler_called({'key': 1.0}, {'key': 1}, broker), equal_to(1))
 
     def test_an_unknown_broker_tells_numbers_apart_as_rabbitmq_does_today(self):
+        no_connection = Mock()
+        del no_connection.connection
         for broker in (
-            None,
+            no_connection,
             Mock(),
             Mock(connection=Mock(server_properties={})),
             connected_to('not a version'),
             connected_to(b'3.10.8x'),
         ):
             assert_that(handler_called({'key': 1}, {'key': 1.0}, broker), equal_to(0))
+
+    def test_the_version_is_read_where_py_amqp_keeps_it(self):
+        # kombu's own channel on py-amqp's connection, never connected: the
+        # properties are set as Connection._on_start sets them
+        connection = pyamqp.Connection(host='localhost:1')
+        connection.server_properties = {'version': '3.10.8'}
+        channel = pyamqp.Channel(connection, 1)
+
+        assert_that(broker_tells_numbers_apart(channel), equal_to(False))
 
     def test_the_version_may_come_as_bytes(self):
         assert_that(
