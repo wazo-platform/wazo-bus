@@ -1012,9 +1012,13 @@ class TestBindKeysTimestampsAndDecimalsAsOnTheWire(TestCase):
         self,
     ):
         # py-amqp packs a decimal's scale as an unsigned byte and its digits as
-        # a signed 32-bit integer, a timestamp as an unsigned 64-bit second
+        # a signed 32-bit integer, a timestamp as an unsigned 64-bit second;
+        # a datetime whose UTC time falls outside the calendar has no second
         cannot_carry = (
             {'tenant_uuid': Decimal('1E+2')},
+            {'tenant_uuid': Decimal('1E-256')},
+            {'user_uuid:a': datetime.min.replace(tzinfo=timezone(timedelta(hours=1)))},
+            {'user_uuid:a': datetime.max.replace(tzinfo=timezone(-timedelta(hours=1)))},
             {'tenant_uuid': Decimal('NaN')},
             {'tenant_uuid': Decimal('Infinity')},
             {'tenant_uuid': Decimal(2**31)},

@@ -65,8 +65,12 @@ def decimal_on_the_wire(value: Decimal) -> tuple[int, int]:
 def timestamp_on_the_wire(value: datetime) -> int:
     # NOTE: the UTC second py-amqp packs a datetime as (serialization.py,
     # '>cQ', unsigned): its microseconds and its time zone never reach the
-    # broker, and a second before 1970 cannot be packed
-    seconds = calendar.timegm(value.utctimetuple())
+    # broker, a second before 1970 cannot be packed, and a datetime whose UTC
+    # time falls outside the calendar has no second
+    try:
+        seconds = calendar.timegm(value.utctimetuple())
+    except OverflowError:
+        raise TypeError(f'not an AMQP timestamp: {value!r}') from None
     if seconds < 0:
         raise TypeError(f'not an AMQP timestamp: {value!r}')
     return seconds
