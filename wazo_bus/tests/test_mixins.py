@@ -747,6 +747,11 @@ class TestBindKeysDispatchByAmqpValue(TestCase):
         assert_that(handler_called({'key': 'text'}, {'key': b'text'}), equal_to(1))
         assert_that(handler_called({'key': [b'text']}, {'key': ('text',)}), equal_to(1))
 
+    def test_a_text_with_a_lone_surrogate_matches_its_bytes_as_py_amqp_sends_it(self):
+        text = 'a\ud800b'
+        sent = text.encode('utf-8', 'surrogatepass')
+        assert_that(handler_called({'key': text}, {'key': sent}), equal_to(1))
+
     def test_an_integer_matches_a_float_of_the_same_value_as_rabbitmq_3_10_does(self):
         assert_that(handler_called({'key': 1}, {'key': 1.0}), equal_to(1))
 
@@ -804,7 +809,14 @@ class TestBindKeysStructuredValues(TestCase):
         assert_that(queue_bindings(self.consumer), has_length(2))
 
     def test_a_header_value_amqp_cannot_carry_raises_before_any_state_changes(self):
-        for headers in ({'tenant_uuid': {'a set'}}, {'user_uuid:a': object()}):
+        # py-amqp sends a str or a bytes as a long string, never a bytearray
+        cannot_carry = (
+            {'tenant_uuid': {'a set'}},
+            {'user_uuid:a': object()},
+            {'tenant_uuid': bytearray(b'text')},
+            {'user_uuid:a': memoryview(b'text')},
+        )
+        for headers in cannot_carry:
             with self.assertRaises(TypeError):
                 self.consumer.subscribe('some_event', Mock(), headers=headers)
 

@@ -48,17 +48,20 @@ BindingKey = tuple[str | None, frozenset[tuple[str, Hashable]]]
 
 def amqp_value(value: Any) -> Hashable:
     # NOTE: a header value as RabbitMQ compares it (rabbit_exchange_type_headers,
-    # v3.10.8): a boolean is never a number, a text is its bytes (both go on the
-    # wire as a long string), an int equals a float of the same value (3.13
-    # tells them apart); hashable, so arrays and tables can key a binding
+    # v3.10.8): a boolean is never a number, a text is its bytes (py-amqp sends
+    # a str and a bytes as one long string, and nothing else as one), an int
+    # equals a float of the same value at the top level (3.13 tells them apart;
+    # inside an array or a table the broker compares typed items, so [1] is
+    # not [1.0] there, and a top-level timestamp equals its integer; no
+    # publisher sends either); hashable, so arrays and tables can key a binding
     if isinstance(value, bool):
         return ('bool', value)
     if isinstance(value, (int, float)):
         return ('number', value)
     if isinstance(value, str):
         return ('text', value.encode('utf-8', 'surrogatepass'))
-    if isinstance(value, (bytes, bytearray, memoryview)):
-        return ('text', bytes(value))
+    if isinstance(value, bytes):
+        return ('text', value)
     if isinstance(value, (list, tuple)):
         return ('array', tuple(amqp_value(item) for item in value))
     if isinstance(value, dict):
