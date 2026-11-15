@@ -1365,13 +1365,19 @@ class TestBindKeysBytesXMatchAsOnTheWire(TestCase):
             assert_that(handler.call_count, equal_to(1))
 
     def test_a_bytes_x_match_other_than_all_or_any_still_raises(self):
-        for value in (b'all-with-x', b'\xffall', b'ALL'):
-            with self.assertRaisesRegex(
-                ValueError, 'bind_keys needs x-match all or any'
-            ):
+        for value, said in (
+            (b'all-with-x', "'all-with-x'"),
+            (b'\xffall', "b'\\xffall'"),
+            (b'ALL', "'ALL'"),
+        ):
+            with self.assertRaises(ValueError) as raised:
                 self.consumer.subscribe(
                     'some_event', Mock(), headers={'x-match': value}
                 )
 
+            assert_that(
+                str(raised.exception),
+                equal_to(f'bind_keys needs x-match all or any, not {said}'),
+            )
             assert_that(self.consumer._ConsumerMixin__subscriptions, equal_to({}))
             assert_that(queue_bindings(self.consumer), empty())

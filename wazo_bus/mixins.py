@@ -347,7 +347,8 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
     receives the same events as with a binding of its own. A subscription's
     keys, at any depth, are read as py-amqp delivers them (a UTF-8 bytes key is
     its text, `key_on_the_wire`), so a key given both as bytes and as its text
-    raises `ValueError`. Without `bind_keys` every
+    raises `ValueError`; a bytes `x-match` is its UTF-8 text, as py-amqp sends
+    it, and one that is not UTF-8 raises `ValueError`. Without `bind_keys` every
     subscription has its own queue binding and every handler of an event is
     called.
 
@@ -631,7 +632,7 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
 
         if self.__bind_keys is not None and headers['x-match'] not in ('all', 'any'):
             raise ValueError(
-                f'bind_keys needs x-match all or any, not \'{headers["x-match"]}\''
+                f'bind_keys needs x-match all or any, not {headers["x-match"]!r}'
             )
         if self.__bind_keys is not None:
             # NOTE: the dispatcher compares every value, so one it cannot read
