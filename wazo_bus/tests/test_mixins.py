@@ -1289,3 +1289,89 @@ class TestBindKeysByteKeysAsOnTheWire(TestCase):
                 [{b'tenant_uuid': TENANT_1, 'name': 'some_event', 'x-match': 'all'}]
             ),
         )
+
+
+class TestBindKeysBytesXMatchAsOnTheWire(TestCase):
+    # codex P2, PRRT_kwDOBHUTtc63po_V: py-amqp sends a str and a bytes value as
+    # one long string (serialization.py, 'S'), so the broker reads a bytes
+    # x-match as its text
+    def setUp(self):
+        self.consumer = make_headers_consumer(bind_keys=('tenant_uuid',))
+        self.handler = Mock()
+
+    def test_a_bytes_x_match_all_shares_the_binding_of_its_text(self):
+        for key in ('x-match', b'x-match'):
+            consumer = make_headers_consumer(bind_keys=('tenant_uuid',))
+            consumer.subscribe(
+                'some_event', Mock(), headers={key: b'all', 'tenant_uuid': TENANT_1}
+            )
+            consumer.subscribe('some_event', Mock(), headers={'tenant_uuid': TENANT_1})
+
+            assert_that(
+                queue_bindings(consumer), equal_to([reduced('some_event', TENANT_1)])
+            )
+
+    def test_a_bytes_x_match_all_needs_every_header(self):
+        self.consumer.subscribe(
+            'some_event',
+            self.handler,
+            headers={'x-match': b'all', 'tenant_uuid': TENANT_1, 'user_uuid': 'u1'},
+        )
+
+        deliver(
+            self.consumer,
+            {'name': 'some_event', 'tenant_uuid': TENANT_1, 'user_uuid': 'u1'},
+            {'for': 1},
+        )
+        deliver(
+            self.consumer,
+            {'name': 'some_event', 'tenant_uuid': TENANT_1, 'user_uuid': 'u2'},
+        )
+
+        self.handler.assert_called_once_with({'for': 1})
+
+    def test_a_bytes_x_match_any_keeps_its_own_binding_and_matches_any(self):
+        for key in ('x-match', b'x-match'):
+            consumer = make_headers_consumer(bind_keys=('tenant_uuid',))
+            handler = Mock()
+            consumer.subscribe(
+                'some_event',
+                handler,
+                headers={key: b'any', 'tenant_uuid': TENANT_1, 'user_uuid': 'u1'},
+            )
+
+            assert_that(
+                queue_bindings(consumer),
+                equal_to(
+                    [
+                        (
+                            '',
+                            sorted(
+                                {
+                                    'name': 'some_event',
+                                    'tenant_uuid': TENANT_1,
+                                    'user_uuid': 'u1',
+                                    'x-match': 'any',
+                                }.items()
+                            ),
+                        )
+                    ]
+                ),
+            )
+            deliver(
+                consumer,
+                {'name': 'some_event', 'tenant_uuid': TENANT_2, 'user_uuid': 'u1'},
+            )
+            assert_that(handler.call_count, equal_to(1))
+
+    def test_a_bytes_x_match_other_than_all_or_any_still_raises(self):
+        for value in (b'all-with-x', b'\xffall', b'ALL'):
+            with self.assertRaisesRegex(
+                ValueError, 'bind_keys needs x-match all or any'
+            ):
+                self.consumer.subscribe(
+                    'some_event', Mock(), headers={'x-match': value}
+                )
+
+            assert_that(self.consumer._ConsumerMixin__subscriptions, equal_to({}))
+            assert_that(queue_bindings(self.consumer), empty())

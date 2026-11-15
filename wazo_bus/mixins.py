@@ -617,6 +617,14 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
             # caller changing a list or a table later changes neither the
             # shared key, the broker binding nor the dispatch
             headers = keys_on_the_wire(headers)
+            match = headers.get('x-match')
+            if isinstance(match, bytes):
+                # NOTE: py-amqp sends a bytes value as the long string a str
+                # is sent as, so the broker reads a bytes x-match as its text
+                try:
+                    headers['x-match'] = match.decode('utf-8')
+                except UnicodeDecodeError:
+                    pass
 
         if self._exchange.type == 'headers':
             headers.setdefault('x-match', 'all' if headers_match_all else 'any')
