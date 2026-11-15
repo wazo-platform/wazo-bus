@@ -9,7 +9,6 @@ import re
 from collections import Counter
 from collections.abc import Callable, Hashable, Iterable, Iterator
 from contextlib import contextmanager
-from copy import deepcopy
 from datetime import datetime
 from decimal import Decimal
 from queue import Empty, Queue
@@ -123,6 +122,44 @@ def amqp_value(
     raise TypeError(f'not an AMQP header value: {value!r}')
 
 
+def key_on_the_wire(key: str | bytes) -> str | bytes:
+    # NOTE: a field-table key as a consumer reads it: py-amqp sends a str as
+    # its UTF-8 bytes and a bytes as given, and decodes a received key to a str
+    # when it is UTF-8, else keeps its bytes (serialization.py, pstr_t)
+    if isinstance(key, bytes):
+        try:
+            return key.decode('utf-8', 'surrogatepass')
+        except UnicodeDecodeError:
+            return key
+    return key
+
+
+def is_x_key(key: str | bytes) -> bool:
+    # NOTE: RabbitMQ ignores a key whose bytes start with x- (x-match aside)
+    if isinstance(key, str):
+        key = key.encode('utf-8', 'surrogatepass')
+    return key.startswith(b'x-')
+
+
+def keys_on_the_wire(value: Any) -> Any:
+    # NOTE: a copy of a header value whose tables, at any depth, are keyed as
+    # a consumer reads them; a key given both as bytes and as its text is one
+    # key on the wire, so it raises rather than keep one of the two
+    if isinstance(value, dict):
+        copy: dict = {}
+        for key, item in value.items():
+            wire_key = key_on_the_wire(key)
+            if wire_key in copy:
+                raise ValueError(f'header key given twice: {wire_key!r}')
+            copy[wire_key] = keys_on_the_wire(item)
+        return copy
+    if isinstance(value, list):
+        return [keys_on_the_wire(item) for item in value]
+    if isinstance(value, tuple):
+        return tuple(keys_on_the_wire(item) for item in value)
+    return value
+
+
 def headers_match(headers: dict, arguments: dict, numbers_apart: bool = True) -> bool:
     compare = all if arguments['x-match'] == 'all' else any
     return compare(
@@ -133,7 +170,7 @@ def headers_match(headers: dict, arguments: dict, numbers_apart: bool = True) ->
             == amqp_value(value, numbers_apart, scales_apart=False)
         )
         for key, value in arguments.items()
-        if not key.startswith('x-')
+        if not is_x_key(key)
     )
 
 
@@ -583,10 +620,11 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
             # NOTE: the dispatcher compares every value, so one it cannot read
             # fails here, before any state changes, not at each message; a copy,
             # so a caller changing a list or a table later changes neither the
-            # shared key, the broker binding nor the dispatch
+            # shared key, the broker binding nor the dispatch; its keys as a
+            # consumer reads them, so the dispatcher finds them in a message
             for value in headers.values():
                 amqp_value(value)
-            headers = deepcopy(headers)
+            headers = keys_on_the_wire(headers)
 
         binding = Binding(self._exchange, routing_key, headers, headers)
         subscription = Subscription(handler, binding)
@@ -651,7 +689,7 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
         others = {
             key: value
             for key, value in arguments.items()
-            if not key.startswith('x-') and key != 'name'
+            if not is_x_key(key) and key != 'name'
         }
         if others:
             kept.update(others, **{'x-match': 'any'})

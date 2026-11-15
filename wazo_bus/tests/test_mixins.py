@@ -1145,3 +1145,125 @@ class TestBindKeysMatchAnyAsItsOwnBinding(TestCase):
             has_item(reduced('some_event', TENANT_1)),
         )
         assert_that(queue_bindings(self.consumer), has_length(2))
+
+
+class TestBindKeysByteKeysAsOnTheWire(TestCase):
+    # codex P2, PRRT_kwDOBHUTtc63o1Tm: py-amqp sends a bytes key as its bytes
+    # and decodes a received UTF-8 key to a str (serialization.py, pstr_t), so
+    # a subscription's bytes key is its decoded text
+    def setUp(self):
+        self.consumer = make_headers_consumer(bind_keys=('tenant_uuid',))
+        self.handler = Mock()
+
+    def test_a_bytes_bind_key_shares_the_binding_of_its_text(self):
+        self.consumer.subscribe(
+            'some_event', self.handler, headers={b'tenant_uuid': TENANT_1}
+        )
+        self.consumer.subscribe('some_event', Mock(), headers={'tenant_uuid': TENANT_1})
+
+        assert_that(
+            queue_bindings(self.consumer), equal_to([reduced('some_event', TENANT_1)])
+        )
+
+    def test_a_bytes_key_matches_the_message_py_amqp_decodes(self):
+        self.consumer.subscribe(
+            'some_event', self.handler, headers={b'tenant_uuid': b't1'}
+        )
+
+        deliver(
+            self.consumer,
+            on_the_wire({'name': 'some_event', b'tenant_uuid': b't1'}),
+            {'for': 1},
+        )
+        deliver(
+            self.consumer,
+            on_the_wire({'name': 'some_event', b'tenant_uuid': b't2'}),
+        )
+
+        self.handler.assert_called_once_with({'for': 1})
+
+    def test_a_bytes_key_inside_a_table_matches_the_message_py_amqp_decodes(self):
+        self.consumer.subscribe(
+            'some_event',
+            self.handler,
+            headers={
+                'user': {b'uuid': 'u1', b'roles': [{b'name': 'admin'}]},
+                'groups': ({b'id': 1},),
+            },
+        )
+
+        deliver(
+            self.consumer,
+            on_the_wire(
+                {
+                    'name': 'some_event',
+                    'user': {'uuid': 'u1', 'roles': [{'name': 'admin'}]},
+                    'groups': [{'id': 1}],
+                }
+            ),
+        )
+
+        assert_that(self.handler.call_count, equal_to(1))
+
+    def test_a_key_that_is_not_utf_8_stays_bytes_as_py_amqp_decodes_it(self):
+        self.consumer.subscribe(
+            'some_event', self.handler, headers={b'\xffkey': 'v', 'x-tag': 't'}
+        )
+
+        delivered = on_the_wire({'name': 'some_event', b'\xffkey': 'v'})
+        assert_that(list(delivered), has_item(b'\xffkey'))
+        deliver(self.consumer, delivered)
+
+        assert_that(self.handler.call_count, equal_to(1))
+
+    def test_a_key_with_a_lone_surrogate_is_decoded_as_py_amqp_decodes_it(self):
+        self.consumer.subscribe(
+            'some_event', self.handler, headers={b'\xed\xa0\x80key': 'v'}
+        )
+
+        delivered = on_the_wire({'name': 'some_event', b'\xed\xa0\x80key': 'v'})
+        assert_that(list(delivered), has_item('\ud800key'))
+        deliver(self.consumer, delivered)
+
+        assert_that(self.handler.call_count, equal_to(1))
+
+    def test_a_bytes_x_key_is_not_required_in_the_message(self):
+        self.consumer.subscribe(
+            'some_event',
+            self.handler,
+            headers={
+                b'x-subscription': 'one',
+                b'x-\xfftag': 't',
+                'tenant_uuid': TENANT_1,
+            },
+        )
+
+        deliver(self.consumer, {'name': 'some_event', 'tenant_uuid': TENANT_1})
+
+        assert_that(self.handler.call_count, equal_to(1))
+
+    def test_a_key_given_as_bytes_and_as_text_raises_before_any_state_changes(self):
+        collisions = (
+            {b'tenant_uuid': TENANT_1, 'tenant_uuid': TENANT_1},
+            {b'name': 'some_event'},
+            {'user': {b'uuid': 'u1', 'uuid': 'u1'}},
+            {'roles': [{b'name': 'a', 'name': 'a'}]},
+        )
+        for headers in collisions:
+            with self.assertRaises(ValueError):
+                self.consumer.subscribe('some_event', Mock(), headers=headers)
+
+            assert_that(self.consumer._ConsumerMixin__subscriptions, equal_to({}))
+            assert_that(queue_bindings(self.consumer), empty())
+
+    def test_without_bind_keys_a_bytes_key_goes_to_the_broker_as_given(self):
+        consumer = make_headers_consumer()
+        consumer.subscribe('some_event', Mock(), headers={b'tenant_uuid': TENANT_1})
+
+        consumer.get_consumers(Mock(), Mock())
+        assert_that(
+            [binding.arguments for binding in consumer._ConsumerMixin__queue.bindings],
+            equal_to(
+                [{b'tenant_uuid': TENANT_1, 'name': 'some_event', 'x-match': 'all'}]
+            ),
+        )
