@@ -27,7 +27,7 @@ from kombu import binding as Binding
 from kombu.transport import pyamqp
 
 from ..consumer import BusConsumer
-from ..mixins import broker_tells_numbers_apart
+from ..mixins import broker_tells_numbers_apart, headers_match
 
 
 class TestUpstreamBindings(TestCase):
@@ -405,12 +405,12 @@ class TestBindKeysBindings(TestCase):
 
         assert_that(queue_bindings(consumer), equal_to([reduced('some_event')]))
 
-    def test_a_match_any_subscription_binds_by_name_alone(self):
+    def test_a_match_any_subscription_by_name_alone_binds_by_name_alone(self):
         consumer = make_headers_consumer(bind_keys=('tenant_uuid',))
         consumer.subscribe(
             'some_event',
             Mock(),
-            headers=subscriber_headers(1, TENANT_1),
+            headers={'x-subscription': 'one'},
             headers_match_all=False,
         )
 
@@ -1047,3 +1047,101 @@ class TestBindKeysTimestampsAndDecimalsAsOnTheWire(TestCase):
             assert_that(
                 self.consumer.unsubscribe('some_event', handler), equal_to(True)
             )
+
+
+def routed(consumer, headers):
+    # the broker's test of a message against the queue's bindings, x- keys
+    # ignored, as RabbitMQ's headers exchange does
+    return any(
+        headers_match(headers, binding.arguments)
+        for binding in consumer._ConsumerMixin__queue.bindings
+    )
+
+
+def deliver_named_in_payload(consumer, headers, data=None):
+    message = Mock(
+        headers=dict(headers), payload={'name': 'some_event', 'data': data or {}}
+    )
+    consumer._ConsumerMixin__on_message_received(None, message)
+
+
+class TestBindKeysMatchAnyAsItsOwnBinding(TestCase):
+    # codex P2, PRRT_kwDOBHUTtc63o1Tk: an x-match any binding of its own routes
+    # a message by any of its headers, the name among them but not required
+    def setUp(self):
+        self.consumer = make_headers_consumer(bind_keys=('tenant_uuid',))
+        self.handler = Mock()
+        self.consumer.subscribe(
+            'some_event',
+            self.handler,
+            headers=subscriber_headers(1, TENANT_1),
+            headers_match_all=False,
+        )
+
+    def test_its_binding_keeps_its_header_keys_without_its_x_keys(self):
+        assert_that(
+            queue_bindings(self.consumer),
+            equal_to(
+                [
+                    (
+                        '',
+                        sorted(
+                            {
+                                'name': 'some_event',
+                                'origin_uuid': 'wazo-uuid',
+                                'tenant_uuid': TENANT_1,
+                                'user_uuid:user-1': True,
+                                'x-match': 'any',
+                            }.items()
+                        ),
+                    )
+                ]
+            ),
+        )
+
+    def test_a_message_named_in_its_payload_reaches_the_queue_and_the_handler(self):
+        queue_bindings(self.consumer)
+        headers = {'tenant_uuid': TENANT_1}
+
+        assert_that(routed(self.consumer, headers), equal_to(True))
+        deliver_named_in_payload(self.consumer, headers, {'for': 1})
+        self.handler.assert_called_once_with({'for': 1})
+
+    def test_a_message_matching_none_of_its_headers_is_not_routed(self):
+        queue_bindings(self.consumer)
+
+        assert_that(routed(self.consumer, {'tenant_uuid': TENANT_2}), equal_to(False))
+
+    def test_a_message_named_in_its_headers_is_routed_whatever_its_others(self):
+        queue_bindings(self.consumer)
+
+        assert_that(
+            routed(self.consumer, {'name': 'some_event', 'tenant_uuid': TENANT_2}),
+            equal_to(True),
+        )
+
+    def test_two_subscriptions_apart_only_by_their_x_keys_share_one_binding(self):
+        other = Mock()
+        headers = dict(subscriber_headers(1, TENANT_1), **{'x-subscription': 'two'})
+        self.consumer.subscribe(
+            'some_event', other, headers=headers, headers_match_all=False
+        )
+        assert_that(queue_bindings(self.consumer), has_length(1))
+
+        assert_that(
+            self.consumer.unsubscribe('some_event', self.handler), equal_to(True)
+        )
+        assert_that(queue_bindings(self.consumer), has_length(1))
+        assert_that(self.consumer.unsubscribe('some_event', other), equal_to(True))
+        assert_that(queue_bindings(self.consumer), empty())
+
+    def test_a_match_any_and_a_match_all_subscription_bind_apart(self):
+        self.consumer.subscribe(
+            'some_event', Mock(), headers=subscriber_headers(1, TENANT_1)
+        )
+
+        assert_that(
+            queue_bindings(self.consumer),
+            has_item(reduced('some_event', TENANT_1)),
+        )
+        assert_that(queue_bindings(self.consumer), has_length(2))

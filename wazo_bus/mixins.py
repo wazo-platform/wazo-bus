@@ -300,8 +300,9 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
     queue is no longer bound once per subscription: subscriptions share one
     binding per routing key, event name and value of each listed header key
     their headers carry (`()` binds by name alone; an `x-match: any`
-    subscription binds by name alone; an `x-match` other than `all` or `any`
-    raises `ValueError`). The handlers of an event are then called only for
+    subscription keeps its own binding without its `x-` keys, since any of its
+    headers routes a message, the name not required; an `x-match` other than
+    `all` or `any` raises `ValueError`). The handlers of an event are then called only for
     messages whose headers match their own subscription's headers (`x-` keys
     ignored, `x-match` all or any, values compared as the connected RabbitMQ
     compares them: see `amqp_value` and `broker_tells_numbers_apart`; a
@@ -643,6 +644,17 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
             kept.update(
                 (key, arguments[key]) for key in self.__bind_keys if key in arguments
             )
+            return kept
+        # NOTE: an x-match any binding routes a message by any of its headers,
+        # the name not required (a publisher may name the event in the payload
+        # only), so its only superset is itself, without its x- keys
+        others = {
+            key: value
+            for key, value in arguments.items()
+            if not key.startswith('x-') and key != 'name'
+        }
+        if others:
+            kept.update(others, **{'x-match': 'any'})
         return kept
 
     def __shared_key(self, binding: Binding) -> BindingKey:
