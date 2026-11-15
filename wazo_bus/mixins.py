@@ -5,9 +5,10 @@ from __future__ import annotations
 
 import os
 from collections import Counter
-from collections.abc import Callable, Iterable, Iterator
+from collections.abc import Callable, Hashable, Iterable, Iterator
 from contextlib import contextmanager
 from datetime import datetime
+from decimal import Decimal
 from queue import Empty, Queue
 from threading import Condition, Event, Lock, Thread, current_thread, main_thread
 from time import monotonic
@@ -42,13 +43,36 @@ class Subscription(NamedTuple):
     binding: Binding
 
 
-BindingKey = tuple[str | None, frozenset[tuple[str, Any]]]
+BindingKey = tuple[str | None, frozenset[tuple[str, Hashable]]]
+
+
+def amqp_value(value: Any) -> Hashable:
+    # NOTE: a header value as RabbitMQ compares it (rabbit_exchange_type_headers,
+    # v3.10.8): a boolean is never a number, a text is its bytes (both go on the
+    # wire as a long string), an int equals a float of the same value (3.13
+    # tells them apart); hashable, so arrays and tables can key a binding
+    if isinstance(value, bool):
+        return ('bool', value)
+    if isinstance(value, (int, float)):
+        return ('number', value)
+    if isinstance(value, str):
+        return ('text', value.encode('utf-8', 'surrogatepass'))
+    if isinstance(value, (bytes, bytearray, memoryview)):
+        return ('text', bytes(value))
+    if isinstance(value, (list, tuple)):
+        return ('array', tuple(amqp_value(item) for item in value))
+    if isinstance(value, dict):
+        return ('table', frozenset((k, amqp_value(v)) for k, v in value.items()))
+    if value is None or isinstance(value, (Decimal, datetime)):
+        return (type(value).__name__, value)
+    raise TypeError(f'not an AMQP header value: {value!r}')
 
 
 def headers_match(headers: dict, arguments: dict) -> bool:
     compare = all if arguments['x-match'] == 'all' else any
     return compare(
-        key in headers and headers[key] == value
+        key in headers
+        and (value is None or amqp_value(headers[key]) == amqp_value(value))
         for key, value in arguments.items()
         if not key.startswith('x-')
     )
@@ -204,7 +228,8 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
     subscription binds by name alone; an `x-match` other than `all` or `any`
     raises `ValueError`). The handlers of an event are then called only for
     messages whose headers match their own subscription's headers (`x-` keys
-    ignored, `x-match` all or any), so a handler receives
+    ignored, `x-match` all or any, values compared as RabbitMQ compares them:
+    see `amqp_value`), so a handler receives
     the same events as with a binding of its own. Without `bind_keys` every
     subscription has its own queue binding and every handler of an event is
     called.
@@ -471,6 +496,11 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
             raise ValueError(
                 f'bind_keys needs x-match all or any, not \'{headers["x-match"]}\''
             )
+        if self.__bind_keys is not None:
+            # NOTE: the dispatcher compares every value, so one it cannot read
+            # fails here, before any state changes, not at each message
+            for value in headers.values():
+                amqp_value(value)
 
         binding = Binding(self._exchange, routing_key, headers, headers)
         subscription = Subscription(handler, binding)
@@ -520,7 +550,7 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
         )
         return True
 
-    def __shared_key(self, binding: Binding) -> BindingKey:
+    def __shared_arguments(self, binding: Binding) -> dict[str, Any]:
         assert self.__bind_keys is not None
         arguments = binding.arguments
         kept = {'name': arguments['name'], 'x-match': 'all'}
@@ -528,15 +558,20 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
             kept.update(
                 (key, arguments[key]) for key in self.__bind_keys if key in arguments
             )
-        return binding.routing_key, frozenset(kept.items())
+        return kept
+
+    def __shared_key(self, binding: Binding) -> BindingKey:
+        kept = self.__shared_arguments(binding)
+        return binding.routing_key, frozenset(
+            (key, amqp_value(value)) for key, value in kept.items()
+        )
 
     def __share(self, binding: Binding) -> None:
         key = self.__shared_key(binding)
         if key not in self.__shared_bindings:
-            routing_key, items = key
-            arguments = dict(items)
+            arguments = self.__shared_arguments(binding)
             self.__shared_bindings[key] = Binding(
-                self._exchange, routing_key, arguments, arguments
+                self._exchange, binding.routing_key, arguments, arguments
             )
         self.__shared_counts[key] += 1
         self.__bindings.add(self.__shared_bindings[key])

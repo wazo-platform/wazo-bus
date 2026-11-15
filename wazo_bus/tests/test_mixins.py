@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
+from datetime import datetime
+from decimal import Decimal
 from threading import Thread
 from time import monotonic
 from unittest import TestCase
@@ -700,3 +702,111 @@ class TestBindKeysDispatch(TestCase):
 
         self.user_a.assert_not_called()
         self.user_b.assert_not_called()
+
+
+def handler_called(subscribed, delivered):
+    consumer = make_headers_consumer(bind_keys=('tenant_uuid',))
+    handler = Mock()
+    consumer.subscribe('some_event', handler, headers=subscribed)
+    deliver(consumer, {'name': 'some_event', **delivered})
+    return handler.call_count
+
+
+class TestBindKeysDispatchByAmqpValue(TestCase):
+    # RabbitMQ's own headers match, the one a binding of the subscription's own
+    # would apply: rabbit_exchange_type_headers.erl, v3.10.8 and v3.13.7
+
+    def test_a_boolean_header_does_not_match_an_integer(self):
+        assert_that(
+            handler_called({'user_uuid:a': True}, {'user_uuid:a': 1}), equal_to(0)
+        )
+        assert_that(
+            handler_called({'user_uuid:a': 1}, {'user_uuid:a': True}), equal_to(0)
+        )
+        assert_that(
+            handler_called({'user_uuid:a': False}, {'user_uuid:a': 0}), equal_to(0)
+        )
+
+    def test_a_boolean_inside_an_array_does_not_match_an_integer(self):
+        assert_that(handler_called({'tags': [True]}, {'tags': [1]}), equal_to(0))
+        assert_that(
+            handler_called({'tags': {'on': True}}, {'tags': {'on': 1}}), equal_to(0)
+        )
+
+    def test_equal_values_of_the_same_kind_match(self):
+        for value in (True, 1, 'text', [1, 'two'], {'on': [True]}):
+            assert_that(handler_called({'key': value}, {'key': value}), equal_to(1))
+
+    def test_a_decimal_a_timestamp_or_a_void_matches_only_its_own_kind(self):
+        for value in (Decimal('1.5'), datetime(2026, 11, 15)):
+            assert_that(handler_called({'key': value}, {'key': value}), equal_to(1))
+        assert_that(handler_called({'key': Decimal(1)}, {'key': 1}), equal_to(0))
+        assert_that(handler_called({'key': 'text'}, {'key': None}), equal_to(0))
+
+    def test_a_text_matches_its_bytes_as_both_go_on_the_wire_as_a_long_string(self):
+        assert_that(handler_called({'key': 'text'}, {'key': b'text'}), equal_to(1))
+        assert_that(handler_called({'key': [b'text']}, {'key': ('text',)}), equal_to(1))
+
+    def test_an_integer_matches_a_float_of_the_same_value_as_rabbitmq_3_10_does(self):
+        assert_that(handler_called({'key': 1}, {'key': 1.0}), equal_to(1))
+
+    def test_a_void_subscription_header_matches_the_key_whatever_its_value(self):
+        assert_that(handler_called({'key': None}, {'key': 'anything'}), equal_to(1))
+        assert_that(handler_called({'key': None}, {'other': 'anything'}), equal_to(0))
+
+
+class TestBindKeysStructuredValues(TestCase):
+    def setUp(self):
+        self.consumer = make_headers_consumer(bind_keys=('tenant_uuid',))
+
+    def test_an_array_or_a_table_bind_key_binds_then_unbinds(self):
+        for value in (['t1', 't2'], {'id': ['t1']}, ('t1',)):
+            handler = Mock()
+            self.consumer.subscribe(
+                'some_event', handler, headers={'tenant_uuid': value}
+            )
+            assert_that(
+                queue_bindings(self.consumer),
+                equal_to(
+                    [
+                        (
+                            '',
+                            [
+                                ('name', 'some_event'),
+                                ('tenant_uuid', value),
+                                ('x-match', 'all'),
+                            ],
+                        )
+                    ]
+                ),
+            )
+
+            assert_that(
+                self.consumer.unsubscribe('some_event', handler), equal_to(True)
+            )
+            assert_that(queue_bindings(self.consumer), empty())
+
+    def test_equal_structured_bind_keys_share_one_binding(self):
+        first, second = Mock(), Mock()
+        self.consumer.subscribe('some_event', first, headers={'tenant_uuid': ['t1']})
+        self.consumer.subscribe('some_event', second, headers={'tenant_uuid': ['t1']})
+        assert_that(queue_bindings(self.consumer), has_length(1))
+
+        self.consumer.unsubscribe('some_event', first)
+        assert_that(queue_bindings(self.consumer), has_length(1))
+        self.consumer.unsubscribe('some_event', second)
+        assert_that(queue_bindings(self.consumer), empty())
+
+    def test_a_boolean_and_an_integer_bind_key_do_not_share_a_binding(self):
+        self.consumer.subscribe('some_event', Mock(), headers={'tenant_uuid': True})
+        self.consumer.subscribe('some_event', Mock(), headers={'tenant_uuid': 1})
+
+        assert_that(queue_bindings(self.consumer), has_length(2))
+
+    def test_a_header_value_amqp_cannot_carry_raises_before_any_state_changes(self):
+        for headers in ({'tenant_uuid': {'a set'}}, {'user_uuid:a': object()}):
+            with self.assertRaises(TypeError):
+                self.consumer.subscribe('some_event', Mock(), headers=headers)
+
+            assert_that(self.consumer._ConsumerMixin__subscriptions, equal_to({}))
+            assert_that(queue_bindings(self.consumer), empty())
