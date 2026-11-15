@@ -704,8 +704,16 @@ class TestBindKeysDispatch(TestCase):
         self.user_b.assert_not_called()
 
 
-def handler_called(subscribed, delivered):
+def connected_to(version):
+    # the channel get_consumers receives: py-amqp keeps the broker's
+    # connection.start properties, RabbitMQ's version among them
+    return Mock(connection=Mock(server_properties={'version': version}))
+
+
+def handler_called(subscribed, delivered, broker=None):
     consumer = make_headers_consumer(bind_keys=('tenant_uuid',))
+    if broker is not None:
+        consumer.get_consumers(Mock(), broker)
     handler = Mock()
     consumer.subscribe('some_event', handler, headers=subscribed)
     deliver(consumer, {'name': 'some_event', **delivered})
@@ -752,12 +760,70 @@ class TestBindKeysDispatchByAmqpValue(TestCase):
         sent = text.encode('utf-8', 'surrogatepass')
         assert_that(handler_called({'key': text}, {'key': sent}), equal_to(1))
 
-    def test_an_integer_matches_a_float_of_the_same_value_as_rabbitmq_3_10_does(self):
-        assert_that(handler_called({'key': 1}, {'key': 1.0}), equal_to(1))
-
     def test_a_void_subscription_header_matches_the_key_whatever_its_value(self):
         assert_that(handler_called({'key': None}, {'key': 'anything'}), equal_to(1))
         assert_that(handler_called({'key': None}, {'other': 'anything'}), equal_to(0))
+
+
+class TestBindKeysDispatchNumbersAsTheBrokerDoes(TestCase):
+    # codex PRRT_kwDOBHUTtc63oNlU: a top-level header is compared with == up to
+    # RabbitMQ 3.12 (1 equals 1.0) and with =:= from 3.13 (they differ);
+    # inside an array or a table the items are typed on every version
+
+    def test_an_integer_does_not_match_a_float_on_rabbitmq_3_13_and_later(self):
+        for version in ('3.13.0', '3.13.7', '4.0.5'):
+            broker = connected_to(version)
+            assert_that(handler_called({'key': 1}, {'key': 1.0}, broker), equal_to(0))
+            assert_that(handler_called({'key': 1.0}, {'key': 1}, broker), equal_to(0))
+            assert_that(handler_called({'key': 1}, {'key': 1}, broker), equal_to(1))
+
+    def test_an_integer_matches_a_float_before_rabbitmq_3_13(self):
+        for version in ('3.10.8', '3.12.14'):
+            broker = connected_to(version)
+            assert_that(handler_called({'key': 1}, {'key': 1.0}, broker), equal_to(1))
+            assert_that(handler_called({'key': 1.0}, {'key': 1}, broker), equal_to(1))
+
+    def test_an_unknown_broker_tells_numbers_apart_as_rabbitmq_does_today(self):
+        for broker in (
+            None,
+            Mock(),
+            Mock(connection=Mock(server_properties={})),
+            connected_to('not a version'),
+            connected_to(b'3.10.8x'),
+        ):
+            assert_that(handler_called({'key': 1}, {'key': 1.0}, broker), equal_to(0))
+
+    def test_the_version_may_come_as_bytes(self):
+        assert_that(
+            handler_called({'key': 1}, {'key': 1.0}, connected_to(b'3.10.8')),
+            equal_to(1),
+        )
+
+    def test_inside_an_array_or_a_table_an_integer_is_never_a_float(self):
+        for version in ('3.10.8', '4.0.5'):
+            broker = connected_to(version)
+            assert_that(
+                handler_called({'key': [1]}, {'key': [1.0]}, broker), equal_to(0)
+            )
+            assert_that(
+                handler_called({'key': {'n': 1}}, {'key': {'n': 1.0}}, broker),
+                equal_to(0),
+            )
+            assert_that(handler_called({'key': [1]}, {'key': [1]}, broker), equal_to(1))
+
+    def test_an_integer_and_a_float_bind_key_do_not_share_a_binding(self):
+        # each type keeps its broker binding, so either broker version routes
+        # both to the queue and the dispatcher decides
+        consumer = make_headers_consumer(bind_keys=('tenant_uuid',))
+        first, second = Mock(), Mock()
+        consumer.subscribe('some_event', first, headers={'tenant_uuid': 1})
+        consumer.subscribe('some_event', second, headers={'tenant_uuid': 1.0})
+        assert_that(queue_bindings(consumer), has_length(2))
+
+        consumer.unsubscribe('some_event', first)
+        assert_that(queue_bindings(consumer), has_length(1))
+        consumer.unsubscribe('some_event', second)
+        assert_that(queue_bindings(consumer), empty())
 
 
 class TestBindKeysStructuredValues(TestCase):
@@ -807,6 +873,38 @@ class TestBindKeysStructuredValues(TestCase):
         self.consumer.subscribe('some_event', Mock(), headers={'tenant_uuid': 1})
 
         assert_that(queue_bindings(self.consumer), has_length(2))
+
+    def test_a_structured_header_changed_after_subscribe_changes_nothing(self):
+        # codex PRRT_kwDOBHUTtc63oNlX: the subscription keeps the values it was
+        # given, so its shared key, its broker binding and its dispatch hold
+        headers = {'tenant_uuid': ['t1'], 'tags': {'on': [True]}}
+        handler = Mock()
+        self.consumer.subscribe('some_event', handler, headers=headers)
+        headers['tenant_uuid'].append('t2')
+        headers['tags']['on'].append(False)
+
+        assert_that(
+            queue_bindings(self.consumer),
+            equal_to([reduced('some_event', tenant_uuid=['t1'])]),
+        )
+        deliver(
+            self.consumer,
+            {'name': 'some_event', 'tenant_uuid': ['t1'], 'tags': {'on': [True]}},
+        )
+        assert_that(handler.call_count, equal_to(1))
+
+        assert_that(self.consumer.unsubscribe('some_event', handler), equal_to(True))
+        assert_that(queue_bindings(self.consumer), empty())
+        assert_that(self.consumer._ConsumerMixin__shared_counts, equal_to({}))
+
+    def test_unsubscribe_after_the_caller_appends_to_a_bind_key_unbinds(self):
+        headers = {'tenant_uuid': ['t1']}
+        handler = Mock()
+        self.consumer.subscribe('some_event', handler, headers=headers)
+        headers['tenant_uuid'].append('t2')
+
+        assert_that(self.consumer.unsubscribe('some_event', handler), equal_to(True))
+        assert_that(queue_bindings(self.consumer), empty())
 
     def test_a_header_value_amqp_cannot_carry_raises_before_any_state_changes(self):
         # py-amqp sends a str or a bytes as a long string, never a bytearray
