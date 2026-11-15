@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from threading import Thread
 from time import monotonic
@@ -10,6 +10,7 @@ from unittest import TestCase
 from unittest.mock import Mock, patch
 
 from amqp.exceptions import AccessRefused, NotFound
+from amqp.serialization import dumps, loads
 from hamcrest import (
     assert_that,
     empty,
@@ -933,3 +934,112 @@ class TestBindKeysStructuredValues(TestCase):
 
             assert_that(self.consumer._ConsumerMixin__subscriptions, equal_to({}))
             assert_that(queue_bindings(self.consumer), empty())
+
+
+def on_the_wire(headers):
+    # the headers as a consumer reads them: encoded and decoded by py-amqp,
+    # the field table the broker matched in between
+    return loads('F', dumps('F', [headers]), 0)[0][0]
+
+
+class TestBindKeysTimestampsAndDecimalsAsOnTheWire(TestCase):
+    # codex PRRT_kwDOBHUTtc63ogT8: py-amqp sends a datetime as its UTC second
+    # (serialization.py:393-395) and a Decimal as its scale and its unscaled
+    # integer (:385-392); RabbitMQ compares those wire values
+
+    def setUp(self):
+        self.consumer = make_headers_consumer(bind_keys=('tenant_uuid',))
+
+    def test_a_timestamp_matches_the_utc_second_it_goes_on_the_wire_as(self):
+        with_microseconds = datetime(2026, 11, 15, 12, 0, 0, 500000)
+        aware = datetime(2026, 11, 15, 12, 0, tzinfo=timezone(timedelta(hours=1)))
+        for value in (with_microseconds, aware, [with_microseconds]):
+            delivered = on_the_wire({'key': value})
+            assert_that(handler_called({'key': value}, delivered), equal_to(1))
+
+    def test_a_timestamp_does_not_match_another_second(self):
+        value = datetime(2026, 11, 15, 12, 0)
+        delivered = on_the_wire({'key': value + timedelta(seconds=1)})
+        assert_that(handler_called({'key': value}, delivered), equal_to(0))
+
+    def test_timestamps_of_one_second_share_one_binding(self):
+        first, second = Mock(), Mock()
+        at = datetime(2026, 11, 15, 12, 0, 0, 100)
+        self.consumer.subscribe('some_event', first, headers={'tenant_uuid': at})
+        self.consumer.subscribe(
+            'some_event', second, headers={'tenant_uuid': at.replace(microsecond=0)}
+        )
+        assert_that(queue_bindings(self.consumer), has_length(1))
+
+        self.consumer.unsubscribe('some_event', first)
+        assert_that(queue_bindings(self.consumer), has_length(1))
+        self.consumer.unsubscribe('some_event', second)
+        assert_that(queue_bindings(self.consumer), empty())
+
+    def test_decimals_of_another_scale_keep_their_own_binding(self):
+        for value in (Decimal('1.0'), Decimal('1.00')):
+            self.consumer.subscribe(
+                'some_event', Mock(), headers={'tenant_uuid': value}
+            )
+
+        bindings = queue_bindings(self.consumer)
+
+        assert_that(bindings, has_length(2))
+        scales = sorted(
+            dict(arguments)['tenant_uuid'].as_tuple().exponent
+            for _, arguments in bindings
+        )
+        assert_that(scales, equal_to([-2, -1]))
+
+    def test_a_decimal_matches_its_value_as_py_amqp_decodes_it(self):
+        # py-amqp decodes Decimal(n) / Decimal(10 ** d) (serialization.py:108):
+        # 1.0 arrives as 1, its scale is gone before the dispatcher reads it
+        delivered = on_the_wire({'key': Decimal('1.0')})
+        assert_that(delivered['key'].as_tuple().exponent, equal_to(0))
+        assert_that(handler_called({'key': Decimal('1.0')}, delivered), equal_to(1))
+        assert_that(
+            handler_called(
+                {'key': [Decimal('1.0')]}, on_the_wire({'key': [Decimal('1.0')]})
+            ),
+            equal_to(1),
+        )
+        in_a_table = {'key': {'d': Decimal('1.0')}}
+        assert_that(handler_called(in_a_table, on_the_wire(in_a_table)), equal_to(1))
+        other = on_the_wire({'key': Decimal('1.1')})
+        assert_that(handler_called({'key': Decimal('1.0')}, other), equal_to(0))
+
+    def test_a_decimal_or_a_timestamp_amqp_cannot_carry_raises_before_any_state_changes(
+        self,
+    ):
+        # py-amqp packs a decimal's scale as an unsigned byte and its digits as
+        # a signed 32-bit integer, a timestamp as an unsigned 64-bit second
+        cannot_carry = (
+            {'tenant_uuid': Decimal('1E+2')},
+            {'tenant_uuid': Decimal('NaN')},
+            {'tenant_uuid': Decimal('Infinity')},
+            {'tenant_uuid': Decimal(2**31)},
+            {'user_uuid:a': Decimal(-(2**31) - 1)},
+            {'user_uuid:a': [datetime(1969, 12, 31, 23, 59, 59)]},
+        )
+        for headers in cannot_carry:
+            with self.assertRaisesRegex(TypeError, r'^not an AMQP (decimal|timestamp)'):
+                self.consumer.subscribe('some_event', Mock(), headers=headers)
+
+            assert_that(self.consumer._ConsumerMixin__subscriptions, equal_to({}))
+            assert_that(queue_bindings(self.consumer), empty())
+
+    def test_the_edges_py_amqp_can_carry_are_kept(self):
+        for value in (
+            Decimal(2**31 - 1),
+            Decimal(-(2**31)),
+            Decimal('0.' + '0' * 254 + '1'),
+            datetime(1970, 1, 1),
+        ):
+            on_the_wire({'key': value})
+            handler = Mock()
+            self.consumer.subscribe(
+                'some_event', handler, headers={'tenant_uuid': value}
+            )
+            assert_that(
+                self.consumer.unsubscribe('some_event', handler), equal_to(True)
+            )

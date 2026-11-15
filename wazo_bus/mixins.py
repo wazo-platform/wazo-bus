@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import calendar
 import os
 import re
 from collections import Counter
@@ -48,15 +49,44 @@ class Subscription(NamedTuple):
 BindingKey = tuple[str | None, frozenset[tuple[str, Hashable]]]
 
 
-def amqp_value(value: Any, numbers_apart: bool = True) -> Hashable:
+def decimal_on_the_wire(value: Decimal) -> tuple[int, int]:
+    # NOTE: the scale and the unscaled integer py-amqp packs a Decimal as
+    # (serialization.py, '>cBi'), the pair RabbitMQ compares: 1.0 is (1, 10)
+    # and 1.00 is (2, 100), two values on the broker, one in Python
+    sign, digits, exponent = value.as_tuple()
+    if not isinstance(exponent, int) or not 0 <= -exponent <= 255:
+        raise TypeError(f'not an AMQP decimal: {value!r}')
+    unscaled = int(''.join(map(str, digits))) * (-1 if sign else 1)
+    if not -(2**31) <= unscaled < 2**31:
+        raise TypeError(f'not an AMQP decimal: {value!r}')
+    return -exponent, unscaled
+
+
+def timestamp_on_the_wire(value: datetime) -> int:
+    # NOTE: the UTC second py-amqp packs a datetime as (serialization.py,
+    # '>cQ', unsigned): its microseconds and its time zone never reach the
+    # broker, and a second before 1970 cannot be packed
+    seconds = calendar.timegm(value.utctimetuple())
+    if seconds < 0:
+        raise TypeError(f'not an AMQP timestamp: {value!r}')
+    return seconds
+
+
+def amqp_value(
+    value: Any, numbers_apart: bool = True, scales_apart: bool = True
+) -> Hashable:
     # NOTE: a header value as RabbitMQ compares it (rabbit_exchange_type_headers,
     # v3.10.8 and v3.13.7): a boolean is never a number, a text is its bytes
     # (py-amqp sends a str and a bytes as one long string, and nothing else as
     # one); an int and a float of the same value differ (numbers_apart), as
     # from 3.13 on, or are equal at the top level, as up to 3.12, while the
     # items of an array or a table are typed on every version, so [1] is never
-    # [1.0]; a top-level timestamp equals its integer on the broker, not here
-    # (no publisher sends one); hashable, so arrays and tables can key a binding
+    # [1.0]; a timestamp is its UTC second and a decimal its scale and digits,
+    # as py-amqp sends them, but py-amqp decodes a decimal without its scale
+    # (Decimal(n) / Decimal(10 ** d)), so a received one is compared by value
+    # (scales_apart false); a top-level timestamp equals its integer on the
+    # broker, not here (no publisher sends one); hashable, so arrays and
+    # tables can key a binding
     if isinstance(value, bool):
         return ('bool', value)
     if isinstance(value, (int, float)):
@@ -68,11 +98,24 @@ def amqp_value(value: Any, numbers_apart: bool = True) -> Hashable:
     if isinstance(value, bytes):
         return ('text', value)
     if isinstance(value, (list, tuple)):
-        return ('array', tuple(amqp_value(item) for item in value))
+        return (
+            'array',
+            tuple(amqp_value(item, scales_apart=scales_apart) for item in value),
+        )
     if isinstance(value, dict):
-        return ('table', frozenset((k, amqp_value(v)) for k, v in value.items()))
-    if value is None or isinstance(value, (Decimal, datetime)):
-        return (type(value).__name__, value)
+        return (
+            'table',
+            frozenset(
+                (k, amqp_value(v, scales_apart=scales_apart)) for k, v in value.items()
+            ),
+        )
+    if isinstance(value, Decimal):
+        on_the_wire = decimal_on_the_wire(value)
+        return ('decimal', on_the_wire if scales_apart else value)
+    if isinstance(value, datetime):
+        return ('timestamp', timestamp_on_the_wire(value))
+    if value is None:
+        return ('void', None)
     raise TypeError(f'not an AMQP header value: {value!r}')
 
 
@@ -82,8 +125,8 @@ def headers_match(headers: dict, arguments: dict, numbers_apart: bool = True) ->
         key in headers
         and (
             value is None
-            or amqp_value(headers[key], numbers_apart)
-            == amqp_value(value, numbers_apart)
+            or amqp_value(headers[key], numbers_apart, scales_apart=False)
+            == amqp_value(value, numbers_apart, scales_apart=False)
         )
         for key, value in arguments.items()
         if not key.startswith('x-')
