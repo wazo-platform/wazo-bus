@@ -3,10 +3,14 @@
 
 from __future__ import annotations
 
+import calendar
 import os
-from collections.abc import Callable, Iterator
+import re
+from collections import Counter
+from collections.abc import Callable, Hashable, Iterable, Iterator
 from contextlib import contextmanager
 from datetime import datetime
+from decimal import Decimal
 from queue import Empty, Queue
 from threading import Condition, Event, Lock, Thread, current_thread, main_thread
 from time import monotonic
@@ -39,6 +43,151 @@ class BusThread(NamedTuple):
 class Subscription(NamedTuple):
     handler: EventHandlerType
     binding: Binding
+
+
+BindingKey = tuple[str | None, frozenset[tuple[str, Hashable]]]
+
+
+def decimal_on_the_wire(value: Decimal) -> tuple[int, int]:
+    # NOTE: the scale and the unscaled integer py-amqp packs a Decimal as
+    # (serialization.py, '>cBi'), the pair RabbitMQ compares: 1.0 is (1, 10)
+    # and 1.00 is (2, 100), two values on the broker, one in Python
+    sign, digits, exponent = value.as_tuple()
+    if not isinstance(exponent, int) or not 0 <= -exponent <= 255:
+        raise TypeError(f'not an AMQP decimal: {value!r}')
+    unscaled = int(''.join(map(str, digits))) * (-1 if sign else 1)
+    if not -(2**31) <= unscaled < 2**31:
+        raise TypeError(f'not an AMQP decimal: {value!r}')
+    return -exponent, unscaled
+
+
+def timestamp_on_the_wire(value: datetime) -> int:
+    # NOTE: the UTC second py-amqp packs a datetime as (serialization.py,
+    # '>cQ', unsigned): its microseconds and its time zone never reach the
+    # broker, a second before 1970 cannot be packed, and a datetime whose UTC
+    # time falls outside the calendar has no second
+    try:
+        seconds = calendar.timegm(value.utctimetuple())
+    except OverflowError:
+        raise TypeError(f'not an AMQP timestamp: {value!r}') from None
+    if seconds < 0:
+        raise TypeError(f'not an AMQP timestamp: {value!r}')
+    return seconds
+
+
+def amqp_value(
+    value: Any, numbers_apart: bool = True, scales_apart: bool = True
+) -> Hashable:
+    # NOTE: a header value as RabbitMQ compares it (rabbit_exchange_type_headers,
+    # v3.10.8 and v3.13.7): a boolean is never a number, a text is its bytes
+    # (py-amqp sends a str and a bytes as one long string, and nothing else as
+    # one); an int and a float of the same value differ (numbers_apart), as
+    # from 3.13 on, or are equal at the top level, as up to 3.12, while the
+    # items of an array or a table are typed on every version, so [1] is never
+    # [1.0]; a timestamp is its UTC second and a decimal its scale and digits,
+    # as py-amqp sends them, but py-amqp decodes a decimal without its scale
+    # (Decimal(n) / Decimal(10 ** d)), so a received one is compared by value
+    # (scales_apart false); a top-level timestamp equals its integer on the
+    # broker, not here (no publisher sends one); hashable, so arrays and
+    # tables can key a binding
+    if isinstance(value, bool):
+        return ('bool', value)
+    if isinstance(value, (int, float)):
+        if not numbers_apart:
+            return ('number', value)
+        return ('int' if isinstance(value, int) else 'float', value)
+    if isinstance(value, str):
+        return ('text', value.encode('utf-8', 'surrogatepass'))
+    if isinstance(value, bytes):
+        return ('text', value)
+    if isinstance(value, (list, tuple)):
+        return (
+            'array',
+            tuple(amqp_value(item, scales_apart=scales_apart) for item in value),
+        )
+    if isinstance(value, dict):
+        return (
+            'table',
+            frozenset(
+                (k, amqp_value(v, scales_apart=scales_apart)) for k, v in value.items()
+            ),
+        )
+    if isinstance(value, Decimal):
+        on_the_wire = decimal_on_the_wire(value)
+        return ('decimal', on_the_wire if scales_apart else value)
+    if isinstance(value, datetime):
+        return ('timestamp', timestamp_on_the_wire(value))
+    if value is None:
+        return ('void', None)
+    raise TypeError(f'not an AMQP header value: {value!r}')
+
+
+def key_on_the_wire(key: str | bytes) -> str | bytes:
+    # NOTE: a field-table key as a consumer reads it: py-amqp sends a str as
+    # its UTF-8 bytes and a bytes as given, and decodes a received key to a str
+    # when it is UTF-8, else keeps its bytes (serialization.py, pstr_t)
+    if isinstance(key, bytes):
+        try:
+            return key.decode('utf-8', 'surrogatepass')
+        except UnicodeDecodeError:
+            return key
+    return key
+
+
+def is_x_key(key: str | bytes) -> bool:
+    # NOTE: RabbitMQ ignores a key whose bytes start with x- (x-match aside)
+    if isinstance(key, str):
+        key = key.encode('utf-8', 'surrogatepass')
+    return key.startswith(b'x-')
+
+
+def keys_on_the_wire(value: Any) -> Any:
+    # NOTE: a copy of a header value whose tables, at any depth, are keyed as
+    # a consumer reads them; a key given both as bytes and as its text is one
+    # key on the wire, so it raises rather than keep one of the two
+    if isinstance(value, dict):
+        copy: dict = {}
+        for key, item in value.items():
+            wire_key = key_on_the_wire(key)
+            if wire_key in copy:
+                raise ValueError(f'header key given twice: {wire_key!r}')
+            copy[wire_key] = keys_on_the_wire(item)
+        return copy
+    if isinstance(value, list):
+        return [keys_on_the_wire(item) for item in value]
+    if isinstance(value, tuple):
+        return tuple(keys_on_the_wire(item) for item in value)
+    return value
+
+
+def headers_match(headers: dict, arguments: dict, numbers_apart: bool = True) -> bool:
+    compare = all if arguments['x-match'] == 'all' else any
+    return compare(
+        key in headers
+        and (
+            value is None
+            or amqp_value(headers[key], numbers_apart, scales_apart=False)
+            == amqp_value(value, numbers_apart, scales_apart=False)
+        )
+        for key, value in arguments.items()
+        if not is_x_key(key)
+    )
+
+
+def broker_tells_numbers_apart(channel: Any) -> bool:
+    # NOTE: RabbitMQ matches a header with == up to 3.12 (1 equals 1.0) and with
+    # =:= from 3.13.0 on; a version that cannot be read is taken as today's
+    connection = getattr(channel, 'connection', None)
+    properties = getattr(connection, 'server_properties', None)
+    version = properties.get('version') if isinstance(properties, dict) else None
+    if isinstance(version, bytes):
+        version = version.decode('utf-8', 'replace')
+    if not isinstance(version, str):
+        return True
+    found = re.fullmatch(r'(\d+)\.(\d+)(?:\.\d+)*(?:[-+].*)?', version)
+    if found is None:
+        return True
+    return (int(found[1]), int(found[2])) >= (3, 13)
 
 
 class ThreadableProtocol(Protocol):
@@ -184,6 +333,25 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
     way. A queue binding goes live only once its event's upstream binding is
     live, so a live queue binding means its events can be delivered.
 
+    With `bind_keys` (a headers exchange only, `ValueError` otherwise), the
+    queue is no longer bound once per subscription: subscriptions share one
+    binding per routing key, event name and value of each listed header key
+    their headers carry (`()` binds by name alone; an `x-match: any`
+    subscription keeps its own binding without its `x-` keys, since any of its
+    headers routes a message, the name not required; an `x-match` other than
+    `all` or `any` raises `ValueError`). The handlers of an event are then called only for
+    messages whose headers match their own subscription's headers (`x-` keys
+    ignored, `x-match` all or any, values compared as the connected RabbitMQ
+    compares them: see `amqp_value` and `broker_tells_numbers_apart`; a
+    consumer overriding the dispatcher calls `_headers_match`), so a handler
+    receives the same events as with a binding of its own. A subscription's
+    keys, at any depth, are read as py-amqp delivers them (a UTF-8 bytes key is
+    its text, `key_on_the_wire`), so a key given both as bytes and as its text
+    raises `ValueError`; a bytes `x-match` is its UTF-8 text, as py-amqp sends
+    it, and one that is not UTF-8 raises `ValueError`. Without `bind_keys` every
+    subscription has its own queue binding and every handler of an event is
+    called.
+
     Public methods:
         * `consumer_connected`:
             Returns whether the consumer is connected to RabbitMQ or not
@@ -202,6 +370,7 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
     def __init__(
         self,
         upstream_exchange_name: str | None = None,
+        bind_keys: Iterable[str] | None = None,
         **kwargs: Any,
     ):
         if upstream_exchange_name:
@@ -212,8 +381,18 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
             kwargs['exchange_durable'] = False
         # NOTE(clanglois): Mixin expects a parent class to provide __init__ implementation
         super().__init__(**kwargs)  # type: ignore[safe-super]
+        if bind_keys is not None and self._exchange.type != 'headers':
+            raise ValueError(
+                f'bind_keys needs a headers exchange, not \'{self._exchange.type}\''
+            )
+        self.__bind_keys = None if bind_keys is None else tuple(bind_keys)
+        self.__numbers_apart = True
         self.__subscriptions: dict[str, list[Subscription]] = {}
         self.__bindings: set[Binding] = set()
+        # NOTE: one object per key for the consumer's life: a binding dropped and
+        # re-added between two ticks is the same object, never a bind then an unbind
+        self.__shared_bindings: dict[BindingKey, Binding] = {}
+        self.__shared_counts: Counter[BindingKey] = Counter()
         self.__failed_bindings: set[Binding] = set()
         self.__upstream = UpstreamBindings(upstream_exchange_name, self.log)
         self.__queue: AMQPQueue | None = None
@@ -389,7 +568,11 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
                 payload,
             )
 
-        for handler, _ in subscriptions:
+        for handler, binding in subscriptions:
+            if self.__bind_keys is not None and not self._headers_match(
+                headers or {}, binding.arguments
+            ):
+                continue
             try:
                 handler(payload)
             except Exception:
@@ -398,6 +581,11 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
                     getattr(handler, '__name__', handler),
                     event_name,
                 )
+
+    def _headers_match(self, headers: dict, arguments: dict) -> bool:
+        # NOTE: as the broker this consumer is connected to compares them, so a
+        # consumer overriding the dispatcher (wazo-webhookd) matches the same
+        return headers_match(headers, arguments, self.__numbers_apart)
 
     def __extract_event_from_message(self, message: Message) -> tuple[str, dict, dict]:
         event_name = None
@@ -424,16 +612,43 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
     ) -> None:
         headers = dict(headers or {})
         headers.update(name=event_name)
+        if self.__bind_keys is not None:
+            # NOTE: its keys as a consumer reads them, so the dispatcher finds
+            # them in a message and a bytes x-match is its x-match; a copy, so a
+            # caller changing a list or a table later changes neither the
+            # shared key, the broker binding nor the dispatch
+            headers = keys_on_the_wire(headers)
+            match = headers.get('x-match')
+            if isinstance(match, bytes):
+                # NOTE: py-amqp sends a bytes value as the long string a str
+                # is sent as, so the broker reads a bytes x-match as its text
+                try:
+                    headers['x-match'] = match.decode('utf-8')
+                except UnicodeDecodeError:
+                    pass
 
         if self._exchange.type == 'headers':
             headers.setdefault('x-match', 'all' if headers_match_all else 'any')
+
+        if self.__bind_keys is not None and headers['x-match'] not in ('all', 'any'):
+            raise ValueError(
+                f'bind_keys needs x-match all or any, not {headers["x-match"]!r}'
+            )
+        if self.__bind_keys is not None:
+            # NOTE: the dispatcher compares every value, so one it cannot read
+            # fails here, before any state changes, not at each message
+            for value in headers.values():
+                amqp_value(value)
 
         binding = Binding(self._exchange, routing_key, headers, headers)
         subscription = Subscription(handler, binding)
 
         with self.__synced:
             self.__subscriptions.setdefault(event_name, []).append(subscription)
-            self.__bindings.add(binding)
+            if self.__bind_keys is None:
+                self.__bindings.add(binding)
+            else:
+                self.__share(binding)
             self.__upstream.add(event_name)
 
         self.log.debug(
@@ -457,7 +672,10 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
                 return False
 
             subscriptions.remove(matching)
-            self.__bindings.discard(matching.binding)
+            if self.__bind_keys is None:
+                self.__bindings.discard(matching.binding)
+            else:
+                self.__release(matching.binding)
 
             if not subscriptions:
                 self.__subscriptions.pop(event_name)
@@ -469,6 +687,50 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
             event_name,
         )
         return True
+
+    def __shared_arguments(self, binding: Binding) -> dict[str, Any]:
+        assert self.__bind_keys is not None
+        arguments = binding.arguments
+        kept = {'name': arguments['name'], 'x-match': 'all'}
+        if arguments['x-match'] == 'all':
+            kept.update(
+                (key, arguments[key]) for key in self.__bind_keys if key in arguments
+            )
+            return kept
+        # NOTE: an x-match any binding routes a message by any of its headers,
+        # the name not required (a publisher may name the event in the payload
+        # only), so its only superset is itself, without its x- keys
+        others = {
+            key: value
+            for key, value in arguments.items()
+            if not is_x_key(key) and key != 'name'
+        }
+        if others:
+            kept.update(others, **{'x-match': 'any'})
+        return kept
+
+    def __shared_key(self, binding: Binding) -> BindingKey:
+        kept = self.__shared_arguments(binding)
+        return binding.routing_key, frozenset(
+            (key, amqp_value(value)) for key, value in kept.items()
+        )
+
+    def __share(self, binding: Binding) -> None:
+        key = self.__shared_key(binding)
+        if key not in self.__shared_bindings:
+            arguments = self.__shared_arguments(binding)
+            self.__shared_bindings[key] = Binding(
+                self._exchange, binding.routing_key, arguments, arguments
+            )
+        self.__shared_counts[key] += 1
+        self.__bindings.add(self.__shared_bindings[key])
+
+    def __release(self, binding: Binding) -> None:
+        key = self.__shared_key(binding)
+        self.__shared_counts[key] -= 1
+        if self.__shared_counts[key] <= 0:
+            del self.__shared_counts[key]
+            self.__bindings.discard(self.__shared_bindings[key])
 
     def get_consumers(
         self, Consumer: type[Consumer], channel: StdChannel
@@ -484,6 +746,7 @@ class ConsumerMixin(KombuConsumer, BaseProtocol):
                 bindings=self.__deliverable(self.__bindings),
             )
 
+        self.__numbers_apart = broker_tells_numbers_apart(channel)
         self._exchange.bind(channel).declare()
         return [
             Consumer(
